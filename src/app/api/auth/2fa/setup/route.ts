@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
-// @ts-ignore
-import { authenticator } from "otplib"
+import { OTP } from "otplib"
 import { authOptions } from "../../[...nextauth]/route"
 
 export async function POST(req: Request) {
@@ -13,6 +12,8 @@ export async function POST(req: Request) {
     })
 
     if (!user) return Response.json({ error: "User not found" }, { status: 404 })
+
+    const authenticator = new OTP()
 
     // Generate Secret
     const secret = authenticator.generateSecret()
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
 
     return Response.json({
         secret,
-        otpauth_url: authenticator.keyuri(user.email, "Ante Social", secret),
+        otpauth_url: authenticator.generateURI({ label: user.email, issuer: "Ante Social", secret }),
         message: "Scan QR code and verify to enable"
     })
 }

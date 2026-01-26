@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
-// @ts-ignore
-import { authenticator } from "otplib"
+import { OTP } from "otplib"
 import { authOptions } from "../../[...nextauth]/route"
 
 export async function POST(req: Request) {
@@ -18,8 +17,10 @@ export async function POST(req: Request) {
         return Response.json({ error: "2FA setup not initiated" }, { status: 400 })
     }
 
+    const authenticator = new OTP()
+
     // Verify Token
-    const isValid = authenticator.verify({
+    const isValid = await authenticator.verify({
         token,
         secret: user.two_factor_secret
     })
