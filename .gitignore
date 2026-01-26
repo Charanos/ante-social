@@ -6,4 +6,4 @@ node_modules
 # Next build output
 .next/
 
-
+.env
