@@ -83,8 +83,8 @@ export default function AuditLogsPage() {
   }
 
   const getActorBadgeStyles = (actor: string) => {
-    return actor === "USER" 
-      ? "bg-blue-50 text-blue-700 border-blue-200" 
+    return actor === "USER"
+      ? "bg-blue-50 text-blue-700 border-blue-200"
       : "bg-neutral-100 text-neutral-700 border-neutral-200"
   }
 
@@ -109,39 +109,39 @@ export default function AuditLogsPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle="Cryptographically secured audit trail" 
+        <DashboardHeader
+          subtitle="Cryptographically secured audit trail"
         />
 
         <div className="flex items-center justify-end gap-3 -mt-6 mb-8">
-            <button 
-              onClick={handleRefresh}
-              className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-            <button 
-              onClick={handleExportCSV}
-              className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <Download className="w-4 h-4" />
-              Export CSV
-            </button>
-            <button 
-              onClick={handleVerifyIntegrity}
-              className="px-4 py-2.5 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <Shield className="w-4 h-4" />
-              Verify Integrity
-            </button>
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+          <button
+            onClick={handleExportCSV}
+            className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={handleVerifyIntegrity}
+            className="px-4 py-2.5 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg flex items-center gap-2 cursor-pointer transition-all"
+          >
+            <Shield className="w-4 h-4" />
+            Verify Integrity
+          </button>
         </div>
 
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Stats Overview */}
@@ -152,7 +152,7 @@ export default function AuditLogsPage() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
         >
           {/* Total Logs Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -168,7 +168,7 @@ export default function AuditLogsPage() {
           </Card>
 
           {/* Verified Logs Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -184,7 +184,7 @@ export default function AuditLogsPage() {
           </Card>
 
           {/* Last Sync Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -202,9 +202,9 @@ export default function AuditLogsPage() {
 
         {/* Visual Separator - Filters */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Filters</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Filters */}
@@ -260,9 +260,9 @@ export default function AuditLogsPage() {
 
         {/* Visual Separator - Audit Logs */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Audit Logs ({mockAuditLogs.length})</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Audit Logs */}
@@ -331,7 +331,7 @@ export default function AuditLogsPage() {
 
                   {/* Hash Information */}
                   <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4 mb-4">
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <div className="flex items-start gap-3">
                         <span className="text-xs text-neutral-500 font-medium w-20 flex-shrink-0 pt-0.5">Previous:</span>
                         <span className="text-xs font-mono text-neutral-700 break-all">{log.previousHash}</span>

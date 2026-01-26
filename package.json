@@ -1,5 +1,5 @@
 {
-  "name": "ante-social-frontend",
+  "name": "ante-social",
   "version": "1.0.0",
   "description": "Ante Social - Social Casino Platform for the Kenyan Market",
   "scripts": {
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/artx71/mot-frontend.git"
+    "url": "git+https://github.com/artx71/ante-social-frontend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/artx71/mot-frontend/issues"
+    "url": "https://github.com/artx71/ante-social-frontend/issues"
   },
-  "homepage": "https://github.com/artx71/mot-frontend#readme",
+  "homepage": "https://github.com/artx71/ante-social-frontend#readme",
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",

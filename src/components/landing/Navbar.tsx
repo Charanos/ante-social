@@ -20,20 +20,20 @@ export function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-0 transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 px-12 flex items-center justify-between py-0 transition-all duration-300",
         isScrolled
           ? "bg-white/80 backdrop-blur-md border-b border-black/5 py-3"
           : "bg-transparent py-5"
       )}
     >
-      <div className="flex items-center gap-2 h-6">
-        <div className="relative w-24 h-24 -mr-6 -ml-6">
-           <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
+      <Link href="/" className="flex items-center gap-2 h-6">
+        <div className="relative w-16 h-16 -mr-2 -ml-6">
+          <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
         </div>
-        <span className="text-xl font-medium tracking-tighter text-black">
+        <span className="text-xl font-semibold tracking-tight text-black">
           ANTE SOCIAL
         </span>
-      </div>
+      </Link>
 
       <div className="hidden md:flex items-center gap-8">
         {["Features", "Leaderboard", "Community"].map((item) => (

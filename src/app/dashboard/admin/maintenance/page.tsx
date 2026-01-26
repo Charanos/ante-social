@@ -82,8 +82,8 @@ export default function DataMaintenancePage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle="Data repair, integrity checks, and system reconciliation" 
+        <DashboardHeader
+          subtitle="Data repair, integrity checks, and system reconciliation"
         />
 
         {/* Tasks Grid */}
@@ -105,7 +105,7 @@ export default function DataMaintenancePage() {
                     <p className="text-sm text-neutral-600 leading-relaxed">{task.description}</p>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => handleRunTask(task.id)}
                   disabled={isRunning === task.id}
@@ -136,7 +136,7 @@ export default function DataMaintenancePage() {
         >
           <DashboardCard className="p-6 bg-blue-50/50 border-blue-100">
             <h3 className="text-base font-medium text-blue-900 mb-4">Important Notes</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-4">
               {[
                 "All destructive actions require confirmation before execution",
                 "Concurrent execution is prevented - only one admin can run each task at a time",

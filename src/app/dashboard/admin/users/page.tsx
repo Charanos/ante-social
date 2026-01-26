@@ -65,8 +65,8 @@ export default function UserManagementPage() {
   const [levelFilter, setLevelFilter] = useState("all")
   const [openDropdown, setOpenDropdown] = useState<number | null>(null)
 
-  const filteredUsers = levelFilter === "all" 
-    ? mockUsers 
+  const filteredUsers = levelFilter === "all"
+    ? mockUsers
     : mockUsers.filter(user => user.level === levelFilter)
 
   const handleLevelChange = (userId: number, newLevel: string) => {
@@ -83,8 +83,8 @@ export default function UserManagementPage() {
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader 
-          subtitle="User lookup, tier management, KYC review, and fraud detection" 
+        <DashboardHeader
+          subtitle="User lookup, tier management, KYC review, and fraud detection"
         />
 
         {/* Main Content Card */}
@@ -98,11 +98,10 @@ export default function UserManagementPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${
-                    isActive 
-                      ? "text-neutral-900" 
+                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${isActive
+                      ? "text-neutral-900"
                       : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50"
-                  }`}
+                    }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? "text-neutral-900" : "text-neutral-400"}`} />
                   {tab.label}
@@ -209,12 +208,12 @@ export default function UserManagementPage() {
                   {/* Users List */}
                   <div className="space-y-3">
                     {filteredUsers.map((user) => (
-                      <div 
+                      <div
                         key={user.id}
                         className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all group"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-500 flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-500 flex-shrink-0">
                             <User className="w-5 h-5" />
                           </div>
                           <div>

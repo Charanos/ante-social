@@ -16,13 +16,13 @@ export function DashboardCard({ children, className, gradient = true }: Dashboar
       )}
     >
       {/* Glass Shine Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent pointer-events-none" />
-      
+      <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent pointer-events-none" />
+
       {/* Subtle Background Gradient Blob */}
       {gradient && (
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-neutral-100/80 to-transparent blur-3xl pointer-events-none opacity-60" />
+        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-linear-to-br from-neutral-100/80 to-transparent blur-3xl pointer-events-none opacity-60" />
       )}
-      
+
       <div className="relative z-10">
         {children}
       </div>

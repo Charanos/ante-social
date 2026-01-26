@@ -54,11 +54,11 @@ export default function NotificationsPage() {
   const [selectedNotification, setSelectedNotification] = useState<typeof mockNotifications[0] | null>(null)
 
   const markAsRead = (id: string) => {
-    setNotifications(notifications.map(n => n.id === id ? {...n, is_read: true} : n))
+    setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: true } : n))
   }
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({...n, is_read: true})))
+    setNotifications(notifications.map(n => ({ ...n, is_read: true })))
   }
 
   const deleteNotification = (id: string) => {
@@ -66,27 +66,27 @@ export default function NotificationsPage() {
   }
 
   const unreadCount = notifications.filter(n => !n.is_read).length
-  
-  const filteredNotifications = filter === "all" 
-    ? notifications 
+
+  const filteredNotifications = filter === "all"
+    ? notifications
     : notifications.filter(n => n.type === filter)
 
   const getTimeAgo = (timestamp: string) => {
     const now = Date.now()
     const time = new Date(timestamp).getTime()
     const diff = now - time
-    
+
     const minutes = Math.floor(diff / 60000)
     const hours = Math.floor(diff / 3600000)
     const days = Math.floor(diff / 86400000)
-    
+
     if (minutes < 60) return `${minutes}m ago`
     if (hours < 24) return `${hours}h ago`
     return `${days}d ago`
   }
 
   const getTypeColor = (type: string) => {
-    switch(type) {
+    switch (type) {
       case "payment": return "bg-emerald-50 text-emerald-600 border-emerald-100"
       case "alert": return "bg-amber-50 text-amber-600 border-amber-100"
       case "update": return "bg-gray-50 text-gray-600 border-gray-100"
@@ -97,22 +97,22 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
-      <DashboardHeader 
+      <DashboardHeader
         subtitle={unreadCount > 0 ? `${unreadCount} new notifications waiting for you` : "You're all caught up!"}
       />
-      
+
       {unreadCount > 0 && (
-         <div className="flex justify-end mb-6 z-10 px-2">
-            <motion.button
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={markAllAsRead}
-              className="group flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-4 text-white shadow-sm transition-all hover:bg-black"
-            >
-              <CheckCheck className="h-3.5 w-3.5" />
-              <span className="font-medium text-xs">Mark all read</span>
-            </motion.button>
-         </div>
+        <div className="flex justify-end mb-6 z-10 px-2">
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={markAllAsRead}
+            className="group flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-4 text-white shadow-sm transition-all hover:bg-black"
+          >
+            <CheckCheck className="h-3.5 w-3.5" />
+            <span className="font-medium text-xs">Mark all read</span>
+          </motion.button>
+        </div>
       )}
 
       {/* Filter Tabs */}
@@ -128,11 +128,10 @@ export default function NotificationsPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setFilter(filterType)}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all whitespace-nowrap ${
-              filter === filterType
-                ? "bg-gray-900 text-white shadow-md shadow-gray-900/20"
-                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
-            }`}
+            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all whitespace-nowrap ${filter === filterType
+              ? "bg-gray-900 text-white shadow-md shadow-gray-900/20"
+              : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+              }`}
           >
             {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
           </motion.button>
@@ -157,14 +156,14 @@ export default function NotificationsPage() {
                 >
                   <div className="relative mb-6">
                     <div className="absolute inset-0 animate-pulse rounded-full bg-gray-100 blur-2xl opacity-50" />
-                    <div className="relative rounded-full bg-gradient-to-br from-gray-50 to-gray-100 p-8 border border-gray-200">
+                    <div className="relative rounded-full bg-linear-to-br from-gray-50 to-gray-100 p-8 border border-gray-200">
                       <Bell className="h-12 w-12 text-gray-300" />
                     </div>
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
                   <p className="text-gray-500 max-w-sm">
-                    {filter !== "all" 
-                      ? `No ${filter} notifications at the moment` 
+                    {filter !== "all"
+                      ? `No ${filter} notifications at the moment`
                       : "You're all caught up! We'll notify you when something new happens."}
                   </p>
                 </motion.div>
@@ -177,11 +176,10 @@ export default function NotificationsPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     transition={{ delay: index * 0.03 }}
-                    className={`group relative flex items-start gap-5 px-6 py-6 transition-all ${
-                      !notification.is_read 
-                        ? 'bg-gradient-to-r from-gray-50/50 to-transparent hover:from-gray-50' 
-                        : 'hover:bg-gray-50/50'
-                    }`}
+                    className={`group relative flex items-start gap-5 px-6 py-6 transition-all ${!notification.is_read
+                      ? 'bg-linear-to-r from-gray-50/50 to-transparent hover:from-gray-50'
+                      : 'hover:bg-gray-50/50'
+                      }`}
                     onClick={() => {
                       markAsRead(notification.id)
                       setSelectedNotification(notification)
@@ -191,29 +189,27 @@ export default function NotificationsPage() {
                     {!notification.is_read && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-gray-500 to-indigo-500" />
                     )}
-                    
+
                     {/* Icon */}
-                    <div className={`relative flex-shrink-0 rounded-xl p-3.5 transition-all border ${
-                      !notification.is_read 
-                        ? getTypeColor(notification.type) + ' shadow-sm'
-                        : 'bg-white border-gray-200 group-hover:shadow-md group-hover:border-gray-300'
-                    }`}>
+                    <div className={`relative flex-shrink-0 rounded-xl p-3.5 transition-all border ${!notification.is_read
+                      ? getTypeColor(notification.type) + ' shadow-sm'
+                      : 'bg-white border-gray-200 group-hover:shadow-md group-hover:border-gray-300'
+                      }`}>
                       {notification.icon}
                       {!notification.is_read && (
                         <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-gray-500 border-2 border-white" />
                       )}
                     </div>
-                    
+
                     {/* Content */}
-                    <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex-1 min-w-0 space-y-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0 cursor-pointer">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className={`text-base ${
-                              !notification.is_read 
-                                ? 'font-medium text-gray-900' 
-                                : 'font-medium text-gray-700'
-                            }`}>
+                            <h3 className={`text-base ${!notification.is_read
+                              ? 'font-medium text-gray-900'
+                              : 'font-medium text-gray-700'
+                              }`}>
                               {notification.title}
                             </h3>
                             {!notification.is_read && (
@@ -230,7 +226,7 @@ export default function NotificationsPage() {
                             {notification.message}
                           </p>
                         </div>
-                        
+
                         <div className="flex flex-col items-end gap-2">
                           <span className="text-xs font-medium text-gray-400 whitespace-nowrap font-mono">
                             {getTimeAgo(notification.timestamp)}
@@ -246,7 +242,7 @@ export default function NotificationsPage() {
                           </button>
                         </div>
                       </div>
-                      
+
                       {/* Amount Badge */}
                       {'amount' in notification && notification.amount && (
                         <motion.div
@@ -332,7 +328,7 @@ export default function NotificationsPage() {
                 {'amount' in selectedNotification && selectedNotification.amount && (
                   <div className="mb-6 rounded-xl bg-emerald-50 border-2 border-emerald-200 p-4">
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium text-emerald-900">Amount</span>
+                      <span className="text-sm font-medium text-emerald-900">Amount</span>
                     </div>
                     <p className="text-3xl font-medium text-emerald-700 font-mono">
                       ${selectedNotification.amount.toFixed(2)}
@@ -354,7 +350,7 @@ export default function NotificationsPage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedNotification(null)}
-                    className="cursor-pointer flex-1 rounded-xl bg-gradient-to-r from-gray-600 to-indigo-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all"
+                    className="cursor-pointer flex-1 rounded-xl bg-linear-to-r from-gray-600 to-indigo-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all"
                   >
                     Got it
                   </motion.button>

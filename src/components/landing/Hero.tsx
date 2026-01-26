@@ -41,23 +41,23 @@ function WaveBackground() {
       draw(time: number) {
         ctx!.beginPath();
         ctx!.moveTo(0, height);
-        
+
         for (let x = 0; x <= width; x += 3) {
-          const y = this.yOffset + 
+          const y = this.yOffset +
             Math.sin(x * this.frequency + time * this.speed + this.phase) * this.amplitude +
             Math.sin(x * this.frequency * 2 + time * this.speed * 0.7) * (this.amplitude * 0.3);
-          
+
           if (x === 0) {
             ctx!.moveTo(x, y);
           } else {
             ctx!.lineTo(x, y);
           }
         }
-        
+
         ctx!.lineTo(width, height);
         ctx!.lineTo(0, height);
         ctx!.closePath();
-        
+
         ctx!.fillStyle = `rgba(0, 0, 0, ${this.opacity})`;
         ctx!.fill();
       }
@@ -114,13 +114,13 @@ function WaveBackground() {
       height = window.innerHeight;
       canvas.width = width;
       canvas.height = height;
-      
+
       // Create wave layers
       waves = [];
       for (let i = 0; i < 3; i++) {
         waves.push(new Wave(i));
       }
-      
+
       // Create particles
       particles = [];
       const particleCount = Math.min(Math.floor(width * 0.15), 250);
@@ -161,7 +161,7 @@ function WaveBackground() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ 
+      style={{
         zIndex: 0,
         maskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)',
         WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)'
@@ -174,7 +174,7 @@ function WaveBackground() {
 function FloatingStats() {
   const stats = [
     { icon: Users, label: "Active Players", value: "12.5K", delay: 0.2 },
-    { icon: TrendingUp, label: "Total Volume", value: "₭8.2M", delay: 0.4 },
+    { icon: TrendingUp, label: "Total Volume", value: "KSH 8.2M", delay: 0.4 },
     { icon: Zap, label: "Markets Live", value: "342", delay: 0.6 }
   ];
 
@@ -204,7 +204,7 @@ export function Hero() {
   const [mounted, setMounted] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  
+
   const springConfig = { stiffness: 150, damping: 30 };
   const rotateX = useSpring(useTransform(mouseY, [-300, 300], [5, -5]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-5, 5]), springConfig);
@@ -234,7 +234,7 @@ export function Hero() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-50/40 via-white to-white" style={{ zIndex: -10 }} />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-black/5 blur-[120px] rounded-full pointer-events-none" style={{ zIndex: -5 }} />
-      
+
       {/* Ambient floating orbs */}
       <motion.div
         className="absolute top-20 left-1/4 w-64 h-64 bg-black/3 rounded-full blur-3xl"
@@ -274,7 +274,7 @@ export function Hero() {
         className="relative max-w-5xl mx-auto space-y-8 pt-16 z-10"
       >
 
-        <motion.h1 
+        <motion.h1
           className="text-5xl md:text-8xl font-medium tracking-tight text-black leading-[1.1]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -294,7 +294,7 @@ export function Hero() {
           </span>
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-600 font-medium leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -304,7 +304,7 @@ export function Hero() {
           your wins, climb the leaderboard, and master the market.
         </motion.p>
 
-        <motion.div 
+        <motion.div
           className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -317,7 +317,7 @@ export function Hero() {
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-black via-neutral-800 to-black"
+              className="absolute inset-0 bg-linear-to-r from-black via-neutral-800 to-black"
               initial={{ x: "-100%" }}
               whileHover={{ x: "100%" }}
               transition={{ duration: 0.6 }}
@@ -325,7 +325,7 @@ export function Hero() {
             <span className="relative z-10">Get Started for Free</span>
             <ArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
           </motion.button>
-          
+
           <motion.button
             className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full hover:bg-black/5 transition-colors shadow-sm"
             whileHover={{ scale: 1.02, y: -2 }}
@@ -346,8 +346,8 @@ export function Hero() {
           <FloatingStats />
         </motion.div>
 
-         {/* Scroll indicator */}
-      {/* <motion.div
+        {/* Scroll indicator */}
+        {/* <motion.div
         className="relative bottom-0 left-[50vw] pt-18 -translate-x-1/2"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -367,7 +367,7 @@ export function Hero() {
       </motion.div> */}
       </motion.div>
 
-     
+
 
       {/* Enhanced Dashboard Mockup */}
       <motion.div
@@ -390,9 +390,9 @@ export function Hero() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           {/* Dashboard Preview */}
-          <div className="relative bg-gradient-to-br from-neutral-50 to-white p-8 md:p-12">
+          <div className="relative bg-linear-to-br from-neutral-50 to-white p-8 md:p-12">
             {/* Mockup placeholder - replace with actual dashboard image */}
-            <div className="aspect-video bg-gradient-to-br from-neutral-100 to-neutral-50 rounded-xl border border-black/5 flex items-center justify-center overflow-hidden">
+            <div className="aspect-video bg-linear-to-br from-neutral-100 to-neutral-50 rounded-xl border border-black/5 flex items-center justify-center overflow-hidden">
               <div className="text-center space-y-8 p-8">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-full text-sm font-mono">
                   <span className="relative flex h-2 w-2">
@@ -405,13 +405,13 @@ export function Hero() {
               </div>
             </div>
           </div>
-          
+
           {/* Overlay effects */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent pointer-events-none" />
-          
+
           {/* Shimmer effect on hover */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none"
+            className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none"
             initial={{ x: "-100%" }}
             whileHover={{ x: "100%" }}
             transition={{ duration: 0.8 }}
@@ -419,14 +419,14 @@ export function Hero() {
         </motion.div>
 
         {/* Enhanced Reflection */}
-        <motion.div 
+        <motion.div
           className="absolute -bottom-20 left-0 right-0 h-32 opacity-30 blur-2xl"
           style={{
             background: "linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)",
             transform: "scaleY(-1)"
           }}
         />
-        
+
         {/* Floating accent elements */}
         <motion.div
           className="absolute -top-4 -right-4 w-24 h-24 bg-black/5 rounded-full blur-2xl"
@@ -455,7 +455,7 @@ export function Hero() {
         />
       </motion.div>
 
-      
+
     </section>
   );
 }

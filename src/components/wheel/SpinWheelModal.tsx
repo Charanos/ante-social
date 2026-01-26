@@ -38,14 +38,14 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
     // Calculate rotation
     const segmentDegrees = 360 / REWARDS.length
     const baseRotation = 360 * 5 // Spin 5 full times
-    
+
     // We need to land on the segment at the TOP (where the pointer is)
     // The pointer is at 0 degrees (top), so we need to rotate until the selected segment is at 0
     // Each segment starts at: index * segmentDegrees
     // To get segment to top, we need to rotate: 360 - (index * segmentDegrees) - (segmentDegrees / 2)
     const targetSegmentRotation = 360 - (randomIndex * segmentDegrees) - (segmentDegrees / 2)
     const targetRotation = baseRotation + targetSegmentRotation
-    
+
     setRotation(targetRotation)
 
     setTimeout(() => {
@@ -76,7 +76,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
 
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 mb-2 shadow-lg">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-amber-600 mb-2 shadow-lg">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <h2 className="text-xl font-medium text-neutral-900 mb-1">Wheel of Fortune</h2>
@@ -93,13 +93,13 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
             {/* Wheel */}
             <div className="relative w-64 h-64 mx-auto">
               {/* Outer Border */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 p-1.5 shadow-xl">
-                
+              <div className="absolute inset-0 rounded-full bg-linear-to-br from-amber-500 via-amber-600 to-amber-700 p-1.5 shadow-xl">
+
                 {/* Inner Border */}
                 <div className="w-full h-full rounded-full bg-white p-1">
-                  
+
                   {/* Spinning Wheel Container */}
-                  <div 
+                  <div
                     className="relative w-full h-full rounded-full overflow-hidden shadow-inner transition-transform duration-[4000ms] ease-out"
                     style={{
                       transform: `rotate(${rotation}deg)`
@@ -109,7 +109,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
                     {REWARDS.map((reward, index) => {
                       const segmentDegrees = 360 / REWARDS.length
                       const rotation = index * segmentDegrees
-                      
+
                       return (
                         <div
                           key={index}
@@ -121,14 +121,14 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
                               ${50 + 50 * Math.cos((segmentDegrees - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((segmentDegrees - 90) * Math.PI / 180)}%)`
                           }}
                         >
-                          <div 
+                          <div
                             className="w-full h-full flex items-start justify-center pt-8 border-r border-white/20"
-                            style={{ 
+                            style={{
                               backgroundColor: reward.color,
                               transform: `rotate(${segmentDegrees / 2}deg)`
                             }}
                           >
-                            <span 
+                            <span
                               className="font-medium text-sm drop-shadow-sm tracking-wide"
                               style={{ color: reward.textColor }}
                             >
@@ -141,7 +141,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
                   </div>
 
                   {/* Center Circle */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-4 border-white shadow-lg flex items-center justify-center z-10">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-linear-to-br from-amber-400 via-amber-500 to-amber-600 border-4 border-white shadow-lg flex items-center justify-center z-10">
                     <Gift className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -156,7 +156,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mb-4 p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 text-center"
+                className="mb-4 p-4 rounded-xl bg-linear-to-br from-green-50 to-emerald-50 border border-green-200 text-center"
               >
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Trophy className="w-4 h-4 text-green-600" />
@@ -175,7 +175,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
               w-full py-3 rounded-xl font-medium text-sm shadow-sm transition-all
               ${isSpinning || hasSpunToday
                 ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200'
-                : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-md cursor-pointer'
+                : 'bg-linear-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-md cursor-pointer'
               }
             `}
           >

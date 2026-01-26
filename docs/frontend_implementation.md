@@ -9,6 +9,7 @@ This document outlines all frontend market pages and features implemented for th
 ## ✅ Completed Features
 
 ### 1. Toast Notification System
+
 - Custom toast component with animations (`toast-notification.tsx`)
 - Zustand-based global state management (`useToast.tsx`)
 - 4 variants: success, error, warning, info
@@ -16,11 +17,13 @@ This document outlines all frontend market pages and features implemented for th
 - Integrated system-wide via `Providers.tsx`
 
 ### 2. Navigation Enhancements
+
 - **Markets page** added to sidebar navigation
 - Markets listing page showing all available market types
 - Direct navigation to each market type
 
 ### 3. Premium Spin Wheel
+
 - Glassmorphic design matching dashboard aesthetic
 - 6 reward tiers: 0, 1, 25, 50, 75, 100 MP
 - Realistic 4-second spin animation with easing
@@ -35,6 +38,7 @@ This document outlines all frontend market pages and features implemented for th
 ### Poll-Style Market (`/dashboard/markets/[id]`)
 
 **Features:**
+
 - Option selection grid with visual feedback
 - Media display support for option images
 - Selection state with checkmark indicator
@@ -55,6 +59,7 @@ This document outlines all frontend market pages and features implemented for th
 ### Betrayal Game (`/dashboard/markets/[id]/betrayal`)
 
 **Features:**
+
 - Dramatic choice cards: **Cooperate** vs **Betray**
 - Hover animations and scaling effects
 - Visual feedback for selected choice
@@ -64,6 +69,7 @@ This document outlines all frontend market pages and features implemented for th
 - "Your choice is secret" info card
 
 **Design:**
+
 - Gradient backgrounds matching choices
 - Emoji + icon combinations
 - Clear risk/reward messaging
@@ -74,6 +80,7 @@ This document outlines all frontend market pages and features implemented for th
 ### Reflex Reaction (`/dashboard/markets/[id]/reflex`)
 
 **Features:**
+
 - **5-second countdown timer** with animations
 - Color-changing countdown (green → amber → red)
 - Scale animation on completion
@@ -83,6 +90,7 @@ This document outlines all frontend market pages and features implemented for th
 - Scenario display card
 
 **UX Flow:**
+
 1. View scenario
 2. Start countdown
 3. Quick select predicted majority option
@@ -94,6 +102,7 @@ This document outlines all frontend market pages and features implemented for th
 ### Majority Ladder (`/dashboard/markets/[id]/ladder`)
 
 **Features:**
+
 - **Drag-and-drop ranking** interface
 - Sortable items with grip handles
 - Numbered ranking badges
@@ -104,6 +113,7 @@ This document outlines all frontend market pages and features implemented for th
 - Ranking validation
 
 **Tech:**
+
 - `@dnd-kit/core` for DnD
 - Vertical sorting strategy
 - Keyboard accessible
@@ -114,10 +124,11 @@ This document outlines all frontend market pages and features implemented for th
 ## 🎨 Design System
 
 ### Stats Cards Pattern
+
 ```tsx
 // Gradient backgrounds with blur effects
-className="relative overflow-hidden border-none 
-  bg-gradient-to-br from-{color}-50 via-white to-white 
+className="relative overflow-hidden border-none
+  bg-linear-to-br from-{color}-50 via-white to-white
   shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]"
 
 // Glassmorphic icon containers
@@ -128,24 +139,35 @@ className="font-mono text-2xl"
 ```
 
 ### Interactive Elements
+
 - ✅ `cursor-pointer` on all clickable items
 - ✅ `hover:shadow-lg` transitions
 - ✅ `transition-all` for smooth effects
 - ✅ Framer Motion page animations
 
 ### Visual Separators
+
 ```tsx
 <div className="flex items-center gap-4">
-  <div className="h-px flex-1 bg-gradient-to-r 
-    from-transparent via-neutral-200 to-transparent" />
-  <h2 className="text-xs font-medium text-neutral-400 
-    uppercase tracking-wider">Section Title</h2>
-  <div className="h-px flex-1 bg-gradient-to-r 
-    from-transparent via-neutral-200 to-transparent" />
+  <div
+    className="h-px flex-1 bg-linear-to-r 
+    from-transparent via-neutral-200 to-transparent"
+  />
+  <h2
+    className="text-xs font-medium text-neutral-400 
+    uppercase tracking-wider"
+  >
+    Section Title
+  </h2>
+  <div
+    className="h-px flex-1 bg-linear-to-r 
+    from-transparent via-neutral-200 to-transparent"
+  />
 </div>
 ```
 
 ### Color Palette
+
 - **Blue:** Buy-in amounts, primary actions
 - **Green:** Pools, success states
 - **Purple:** Participants
@@ -170,32 +192,34 @@ className="font-mono text-2xl"
 ✅ Semantic HTML  
 ✅ Accessible form inputs  
 ✅ Loading states  
-✅ Disabled states for invalid actions  
+✅ Disabled states for invalid actions
 
 ---
 
 ## 🔒 Privacy & Compliance
 
 ### Participant Data Display
+
 ```tsx
 // ✅ COMPLIANT
-participants.map(p => (
+participants.map((p) => (
   <div>
     <span>{p.username}</span>
     <span className="font-mono">{p.total_stake} MP</span>
     <span>{p.timestamp}</span>
   </div>
-))
+));
 
 // ❌ NON-COMPLIANT
 // <span>{p.option_chosen}</span> // Hidden!
 ```
 
 ### No Odds Display
+
 ✅ All vote counts hidden until settlement  
 ✅ No percentages or progress bars  
 ✅ No live result indicators  
-✅ Pure option selection without bias  
+✅ Pure option selection without bias
 
 ---
 
@@ -226,12 +250,14 @@ src/
 ## 🚀 Next Steps
 
 ### Backend Integration
+
 1. Connect to real APIs
 2. Replace mock data with database calls
 3. Implement settlement logic
 4. Test payout calculations
 
 ### Optional Enhancements
+
 1. Media upload for poll options
 2. Admin settlement views
 3. Market creation forms per type

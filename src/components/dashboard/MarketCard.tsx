@@ -37,7 +37,7 @@ export function MarketCard({
       className="group relative overflow-hidden border border-neutral-100 bg-white rounded-2xl text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] cursor-pointer h-full flex flex-col"
     >
       {/* Top muted accent using provided gradient (muted via opacity) */}
-      <div className={`absolute -left-24 -top-20 h-48 w-48 rounded-full blur-3xl ${imageGradient || 'bg-gradient-to-br from-amber-50 to-amber-100'} opacity-20`} />
+      <div className={`absolute -left-24 -top-20 h-48 w-48 rounded-full blur-3xl ${imageGradient || 'bg-linear-to-br from-amber-50 to-amber-100'} opacity-20`} />
 
       <div className="relative z-10 flex h-full flex-col">
         <CardHeader className="p-6 pb-4 space-y-3">
@@ -58,7 +58,7 @@ export function MarketCard({
               )}
             </div>
 
-            <div tabIndex={0} role="button" className="flex-shrink-0 flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-br from-zinc-900 to-zinc-800 text-white shadow-md cursor-pointer transform transition-transform duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300">
+            <div tabIndex={0} role="button" className="flex-shrink-0 flex items-center gap-2 px-3 py-1 rounded-full bg-linear-to-br from-zinc-900 to-zinc-800 text-white shadow-md cursor-pointer transform transition-transform duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300">
               <TrendingUp className="w-4 h-4 text-amber-300" />
               <span className="text-sm font-medium">{odds}</span>
             </div>
@@ -87,14 +87,14 @@ export function MarketCard({
 
         <CardContent className="flex-1 px-6 pb-6 space-y-5">
           {/* Pool Progress */}
-          <div className="space-y-2">
+          <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Pool</span>
               <span className="text-sm font-medium text-zinc-900">{poolProgress}%</span>
             </div>
             <div className="relative h-2 w-full rounded-full bg-zinc-100 overflow-hidden">
               <div
-                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 transition-all duration-700 shadow-sm"
+                className="absolute inset-y-0 left-0 rounded-full bg-linear-to-r from-amber-400 via-amber-500 to-amber-600 transition-all duration-700 shadow-sm"
                 style={{ width: `${poolProgress}%` }}
               />
             </div>
@@ -119,7 +119,7 @@ export function MarketCard({
 
         {/* Hover indicator */}
         <div className="absolute bottom-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="h-1 w-full bg-gradient-to-r from-amber-400 to-amber-500" />
+          <div className="h-1 w-full bg-linear-to-r from-amber-400 to-amber-500" />
         </div>
       </div>
     </Card>

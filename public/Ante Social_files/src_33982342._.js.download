@@ -15,14 +15,14 @@ function DashboardCard({ children, className, gradient = true }) {
         className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-xl p-6 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/90", className),
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent pointer-events-none"
+                className: "absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent pointer-events-none"
             }, void 0, false, {
                 fileName: "[project]/src/components/dashboard/DashboardCard.tsx",
                 lineNumber: 19,
                 columnNumber: 7
             }, this),
             gradient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-neutral-100/80 to-transparent blur-3xl pointer-events-none opacity-60"
+                className: "absolute -right-10 -top-10 h-40 w-40 rounded-full bg-linear-to-br from-neutral-100/80 to-transparent blur-3xl pointer-events-none opacity-60"
             }, void 0, false, {
                 fileName: "[project]/src/components/dashboard/DashboardCard.tsx",
                 lineNumber: 23,
@@ -426,7 +426,7 @@ function SpinWheelModal({ isOpen, onClose }) {
                         className: "text-center mb-6",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 mb-2 shadow-lg",
+                                className: "inline-flex items-center justify-center w-12 h-12 rounded-full bg-linear-to-br from-amber-400 to-amber-600 mb-2 shadow-lg",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sparkles$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Sparkles$3e$__["Sparkles"], {
                                     className: "w-6 h-6 text-white"
                                 }, void 0, false, {
@@ -481,7 +481,7 @@ function SpinWheelModal({ isOpen, onClose }) {
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "relative w-64 h-64 mx-auto",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "absolute inset-0 rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 p-1.5 shadow-xl",
+                                    className: "absolute inset-0 rounded-full bg-linear-to-br from-amber-500 via-amber-600 to-amber-700 p-1.5 shadow-xl",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "w-full h-full rounded-full bg-white p-1",
                                         children: [
@@ -535,7 +535,7 @@ function SpinWheelModal({ isOpen, onClose }) {
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-4 border-white shadow-lg flex items-center justify-center z-10",
+                                                className: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-linear-to-br from-amber-400 via-amber-500 to-amber-600 border-4 border-white shadow-lg flex items-center justify-center z-10",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$gift$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Gift$3e$__["Gift"], {
                                                     className: "w-5 h-5 text-white"
                                                 }, void 0, false, {
@@ -584,7 +584,7 @@ function SpinWheelModal({ isOpen, onClose }) {
                                 opacity: 0,
                                 y: -20
                             },
-                            className: "mb-4 p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 text-center",
+                            className: "mb-4 p-4 rounded-xl bg-linear-to-br from-green-50 to-emerald-50 border border-green-200 text-center",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center justify-center gap-2 mb-1",
@@ -637,7 +637,7 @@ function SpinWheelModal({ isOpen, onClose }) {
                         disabled: isSpinning || hasSpunToday,
                         className: `
               w-full py-3 rounded-xl font-medium text-sm shadow-sm transition-all
-              ${isSpinning || hasSpunToday ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200' : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-md cursor-pointer'}
+              ${isSpinning || hasSpunToday ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200' : 'bg-linear-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-md cursor-pointer'}
             `,
                         children: hasSpunToday ? '✓ Spun Today - Come Back Tomorrow' : isSpinning ? 'Spinning...' : 'Spin the Wheel'
                     }, void 0, false, {
@@ -935,7 +935,7 @@ function DashboardPage() {
                             opacity: 1,
                             y: 0
                         },
-                        className: "relative overflow-visible rounded-3xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-black text-white shadow-2xl p-8 md:p-10 border border-white/10",
+                        className: "relative overflow-visible rounded-3xl bg-linear-to-br from-neutral-900 via-neutral-800 to-black text-white shadow-2xl p-8 md:p-10 border border-white/10",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"
@@ -958,14 +958,14 @@ function DashboardPage() {
                                         className: "flex-1 space-y-6",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "space-y-2",
+                                                className: "space-y-4",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                                                         className: "text-4xl md:text-5xl font-semibold tracking-tight",
                                                         children: [
                                                             "Hi, ",
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500",
+                                                                className: "text-transparent bg-clip-text bg-linear-to-r from-amber-200 to-yellow-500",
                                                                 children: user?.username || "High Roller"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/page.tsx",
@@ -1030,7 +1030,7 @@ function DashboardPage() {
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "h-4 w-full bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/5",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                                                            className: "h-full bg-gradient-to-r from-amber-400 to-yellow-600 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.5)]",
+                                                            className: "h-full bg-linear-to-r from-amber-400 to-yellow-600 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.5)]",
                                                             initial: {
                                                                 width: 0
                                                             },
@@ -1102,7 +1102,7 @@ function DashboardPage() {
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
-                                                        className: "bg-gradient-to-r from-amber-500 put-yellow-600 to-yellow-500 hover:brightness-110 text-black border-0 rounded-xl px-8 py-2 h-auto text-base font-semibold shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all hover:scale-105",
+                                                        className: "bg-linear-to-r from-amber-500 put-yellow-600 to-yellow-500 hover:brightness-110 text-black border-0 rounded-xl px-8 py-2 h-auto text-base font-semibold shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all hover:scale-105",
                                                         children: "Deposit"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/page.tsx",

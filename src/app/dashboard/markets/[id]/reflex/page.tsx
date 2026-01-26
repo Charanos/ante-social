@@ -44,7 +44,7 @@ export default function ReflexMarketPage() {
   const [isCountingDown, setIsCountingDown] = useState(false)
   const [hasSubmitted, setHasSubmitted] = useState(false)
 
- const startCountdown = () => {
+  const startCountdown = () => {
     setIsCountingDown(true)
     setCountdown(5)
   }
@@ -90,17 +90,17 @@ export default function ReflexMarketPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle={market.description} 
+        <DashboardHeader
+          subtitle={market.description}
         />
 
         <div className="flex items-center gap-2 -mt-16 mb-8 relative z-10 px-2 justify-end">
-              <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-medium uppercase tracking-wide border border-amber-200 shadow-sm">
-                Reflex Test
-              </span>
-            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
-              {market.status}
-            </span>
+          <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-medium uppercase tracking-wide border border-amber-200 shadow-sm">
+            Reflex Test
+          </span>
+          <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
+            {market.status}
+          </span>
         </div>
 
         {/* Stats Cards */}
@@ -110,7 +110,7 @@ export default function ReflexMarketPage() {
           transition={{ delay: 0.05 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"
         >
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -125,7 +125,7 @@ export default function ReflexMarketPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -140,7 +140,7 @@ export default function ReflexMarketPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ export default function ReflexMarketPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-100/50 blur-2xl transition-all group-hover:bg-amber-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -172,7 +172,7 @@ export default function ReflexMarketPage() {
         </motion.div>
 
         {/* Scenario Card */}
-        <DashboardCard className="p-8 mb-10 bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200">
+        <DashboardCard className="p-8 mb-10 bg-linear-to-br from-blue-50 to-white border-2 border-blue-200">
           <div className="text-center">
             <h2 className="text-2xl font-medium text-neutral-900 mb-4">Scenario</h2>
             <p className="text-lg text-neutral-700">{market.scenario}</p>
@@ -185,7 +185,7 @@ export default function ReflexMarketPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="mb-10"
         >
-          <DashboardCard className={`p-12 text-center ${isCountingDown ? 'bg-gradient-to-br from-red-50 to-amber-50 border-2 border-amber-400' : 'bg-neutral-50'}`}>
+          <DashboardCard className={`p-12 text-center ${isCountingDown ? 'bg-linear-to-br from-red-50 to-amber-50 border-2 border-amber-400' : 'bg-neutral-50'}`}>
             <AnimatePresence mode="wait">
               {!isCountingDown ? (
                 <motion.div
@@ -199,7 +199,7 @@ export default function ReflexMarketPage() {
                   <p className="text-neutral-600 mb-6">You'll have 5 seconds to predict what most people will choose</p>
                   <button
                     onClick={startCountdown}
-                    className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all cursor-pointer"
+                    className="px-8 py-4 bg-linear-to-r from-amber-500 to-orange-500 text-white font-medium text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all cursor-pointer"
                   >
                     Start Countdown
                   </button>
@@ -233,9 +233,9 @@ export default function ReflexMarketPage() {
 
         {/* Visual Separator */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Quick Choose</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Options Grid */}

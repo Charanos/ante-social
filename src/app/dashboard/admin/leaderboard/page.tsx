@@ -87,11 +87,11 @@ export default function LeaderboardPage() {
   const getRankBadgeColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return "bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200"
+        return "bg-linear-to-br from-amber-50 to-amber-100 border-amber-200"
       case 2:
-        return "bg-gradient-to-br from-neutral-50 to-neutral-100 border-neutral-300"
+        return "bg-linear-to-br from-neutral-50 to-neutral-100 border-neutral-300"
       case 3:
-        return "bg-gradient-to-br from-amber-50/50 to-orange-50 border-orange-200"
+        return "bg-linear-to-br from-amber-50/50 to-orange-50 border-orange-200"
       default:
         return "bg-neutral-50 border-neutral-200"
     }
@@ -105,12 +105,12 @@ export default function LeaderboardPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle="View all users ranked by MP balance" 
+        <DashboardHeader
+          subtitle="View all users ranked by MP balance"
         />
 
         <div className="flex justify-end -mt-6 mb-8">
-          <button 
+          <button
             onClick={handleRefresh}
             className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
           >
@@ -121,9 +121,9 @@ export default function LeaderboardPage() {
 
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Stats Overview */}
@@ -134,7 +134,7 @@ export default function LeaderboardPage() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
         >
           {/* Total Users - Blue */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -150,7 +150,7 @@ export default function LeaderboardPage() {
           </Card>
 
           {/* Total MP in Circulation - Green */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -166,7 +166,7 @@ export default function LeaderboardPage() {
           </Card>
 
           {/* Average Balance - Purple */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -184,9 +184,9 @@ export default function LeaderboardPage() {
 
         {/* Visual Separator - Search */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Search</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Search */}
@@ -211,9 +211,9 @@ export default function LeaderboardPage() {
 
         {/* Visual Separator - Rankings */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Rankings ({mockLeaderboard.length})</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Leaderboard Table */}
@@ -245,7 +245,7 @@ export default function LeaderboardPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
                             <User className="w-5 h-5 text-neutral-600" />
                           </div>
                           <div>

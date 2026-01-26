@@ -71,8 +71,8 @@ export default function AdminPage() {
   return (
     <div className="space-y-10 pb-12">
       {/* Header */}
-      <DashboardHeader 
-        subtitle="Manage public betting markets and platform operations" 
+      <DashboardHeader
+        subtitle="Manage public betting markets and platform operations"
       />
 
       <div className="flex justify-end z-10 px-2">
@@ -90,9 +90,9 @@ export default function AdminPage() {
 
       {/* Visual Separator - Overview */}
       <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Platform Overview</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
       {/* Stats Cards */}
@@ -103,7 +103,7 @@ export default function AdminPage() {
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-10"
       >
         {/* Active Markets - Blue */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export default function AdminPage() {
         </Card>
 
         {/* Total Users - Purple */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -135,7 +135,7 @@ export default function AdminPage() {
         </Card>
 
         {/* Total Volume - Green */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export default function AdminPage() {
         </Card>
 
         {/* Flagged Markets - Red/Orange */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-red-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-red-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-red-100/50 blur-2xl transition-all group-hover:bg-red-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -174,9 +174,9 @@ export default function AdminPage() {
 
       {/* Visual Separator - Quick Actions */}
       <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Quick Actions</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
       {/* Quick Actions */}
@@ -199,7 +199,7 @@ export default function AdminPage() {
                     {section.category}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 pt-4">
+                <CardContent className="space-y-4 pt-4">
                   {section.actions.map((action) => (
                     action.name === "Create New Market" ? (
                       <Link key={action.name} href="/dashboard/admin/create-market" className="block w-full">
@@ -332,9 +332,9 @@ export default function AdminPage() {
 
       {/* Visual Separator - System Maintenance */}
       <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">System Maintenance</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
       {/* Data Maintenance */}
@@ -370,9 +370,9 @@ export default function AdminPage() {
 
       {/* Visual Separator - Recent Markets */}
       <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Recent Markets ({mockMarkets.length})</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
       {/* Recent Markets */}
@@ -455,7 +455,7 @@ export default function AdminPage() {
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 leading-relaxed max-w-2xl">{market.description}</p>
-                      
+
                       <div className="mt-4 flex flex-wrap gap-2">
                         {market.tags.map((tag) => (
                           <span
@@ -510,9 +510,9 @@ export default function AdminPage() {
           </CardContent>
         </DashboardCard>
       </motion.div>
-      
+
       {/* Recurring Market Modal */}
-      <RecurringMarketModal 
+      <RecurringMarketModal
         isOpen={isRecurringModalOpen}
         onClose={() => setIsRecurringModalOpen(false)}
       />

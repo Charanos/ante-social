@@ -12,11 +12,11 @@ import { useToast } from "@/hooks/useToast"
 export default function LoginPage() {
   const router = useRouter()
   const toast = useToast()
-  
+
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [step, setStep] = useState<"credentials" | "2fa">("credentials")
-  
+
   // Form State
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -34,40 +34,6 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        // Check if error implies 2FA required (custom logic or status)
-        // For now, simpler handling: if error is standard, show it.
-        // If we implement HTTP 428 equivalent in NextAuth, it's tricky.
-        // We will assume simpler flow: Login successful -> Dashboard.
-        // Or if we want pre-2FA check, we'd need a custom endpoint fetch first.
-        // Given current AuthConfig, it just validates credentials. 
-        // 2FA enforcement is handled via checking 'two_factor_enabled' in user object mostly?
-        // Or we should update the provider to throw a specific error?
-        // Let's stick to standard sign-in for now. 
-        // If 2FA is needed, the USER object in session has 'two_factor_enabled'.
-        // This login page handles 'pre-login' 2FA? Or 'post-login' 2FA?
-        // Standard flow: Login -> (if 2FA) -> 2FA Page -> Dashboard.
-        // But NextAuth Credentials provider signs you in immediately.
-        // We might want to protect Dashboard with middleware that checks 2FA status?
-        // Or we handle 2FA in the `authorize` callback throwing an error if 2FA code missing?
-        // Let's go with: Login -> Success. If they need 2FA, the middleware or dashboard prompts it.
-        // Wait, the UI has a "2FA Step".
-        // Let's implement the 'verify' logic on the second step.
-        // But the first step 'signIn' logs them in.
-        // Modified Flow: 
-        // 1. Credentials check (custom API or signIn with fake password to check existence? no)
-        // 2. We will use signIn. If successful, we check session.
-        // Actually, for this specific "2FA Step" UI, we usually verify credentials first, then ask for code, THEN sign in fully.
-        // But NextAuth makes this hard.
-        // OPTION 2: Just sign in directly.
-        // If user has 2FA, prompt for it AFTER login (interstitial) or
-        // pass code TO signIn: signIn('credentials', { ..., code: '...' })
-        // Let's assume we pass code if step is 2fa.
-        
-        // REVISED PLAN:
-        // We will modify the login form to handle this.
-        // But the `authorize` function generally expects all credentials at once.
-        // I will implement standard signIn. If it fails, toast error.
-        
         toast.error("Login Failed", "Invalid email or password")
       } else {
         toast.success("Welcome back!", "Redirecting to dashboard...")
@@ -80,20 +46,11 @@ export default function LoginPage() {
     }
   }
 
-  // NOTE: This UI had a 2-step flow mock. 
-  // With standard NextAuth Credentials, we typically bundle the 2FA code with the password 
-  // OR we rely on a separate 2FA flow. 
-  // To keep it simple and working: We just use standard login for now.
-  // The 'step' state is kept for future expansion if we add 'pre-flight' checks.
-  
   const handleVerify2FA = async (e: React.FormEvent) => {
-      // This would be used if we had a multi-stage login API.
-      // For now, let's merge with handleLogin or simplify.
-      // I will keep the function signature but warn it's not fully wired to NextAuth yet without custom backend logic.
-      e.preventDefault();
-      toast.info("Feature Update", "2FA Login integration pending backend update. Converting to standard login.");
-      // Fallback
-      handleLogin(e);
+    e.preventDefault();
+    toast.info("Feature Update", "2FA Login integration pending backend update. Converting to standard login.");
+    // Fallback
+    handleLogin(e);
   }
 
   return (
@@ -112,14 +69,14 @@ export default function LoginPage() {
             The market never sleeps. Secure your position, analyze the trends, and make your move.
           </p>
         </div>
-        
+
         {/* Abstract shapes */}
-        <motion.div 
+        <motion.div
           className="absolute top-1/4 right-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
-        <motion.div 
+        <motion.div
           className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
           animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
           transition={{ duration: 10, repeat: Infinity }}
@@ -134,18 +91,18 @@ export default function LoginPage() {
               {step === "credentials" ? "Sign in" : "Two-Factor Auth"}
             </CardTitle>
             <CardDescription>
-              {step === "credentials" 
-                ? "Enter your credentials to access your account" 
+              {step === "credentials"
+                ? "Enter your credentials to access your account"
                 : "Enter the 6-digit code from your authenticator app"
               }
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent>
             {step === "credentials" ? (
               <form onSubmit={handleLogin} className="space-y-8">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none" htmlFor="email">
+                <div className="space-y-4">
+                  <label className="text-sm font-medium " htmlFor="email">
                     Email
                   </label>
                   <input
@@ -158,13 +115,13 @@ export default function LoginPage() {
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium leading-none" htmlFor="password">
                       Password
                     </label>
-                    <Link 
-                      href="/forgot-password" 
+                    <Link
+                      href="/forgot-password"
                       className="text-sm font-medium text-neutral-500 hover:text-black transition-colors"
                     >
                       Forgot password?
@@ -188,14 +145,14 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </div>
-                
+
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="inline-flex h-11 cursor-pointer w-full items-center justify-center rounded-xl bg-black px-8 text-sm font-medium text-white ring-offset-white transition-colors hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 mt-2"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin cursor-disabled" />
                   ) : (
                     <>
                       Sign In <ArrowRight className="ml-2 w-4 h-4" />
@@ -205,7 +162,7 @@ export default function LoginPage() {
               </form>
             ) : (
               <form onSubmit={handleVerify2FA} className="space-y-8">
-                <div className="space-y-2">
+                <div className="space-y-4">
                   <label className="text-sm font-medium leading-none">Authentication Code</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
@@ -241,7 +198,7 @@ export default function LoginPage() {
               </form>
             )}
           </CardContent>
-          
+
           <CardFooter className="flex flex-col space-y-8 text-center text-sm text-neutral-500">
             <p>
               Don't have an account?{" "}

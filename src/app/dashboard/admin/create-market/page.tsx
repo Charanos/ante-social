@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { motion,  AnimatePresence } from "framer-motion"
-import { 
+import { motion, AnimatePresence } from "framer-motion"
+import {
   ArrowLeft, Plus, X, Save, Image as ImageIcon,
   Users, Zap, Brain, ShieldAlert, Trophy, Calendar, DollarSign, Clock
 } from "lucide-react"
@@ -22,7 +22,7 @@ const marketTypes = [
 export default function CreateMarketPage() {
   const router = useRouter()
   const toast = useToast()
-  
+
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -75,15 +75,15 @@ export default function CreateMarketPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle="Choose a market type and configure the details" 
+        <DashboardHeader
+          subtitle="Choose a market type and configure the details"
         />
 
         {/* Visual Separator */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Select Market Type</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Market Type Selection */}
@@ -144,15 +144,15 @@ export default function CreateMarketPage() {
             >
               {/* Visual Separator */}
               <div className="flex items-center gap-4 mb-10">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+                <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
                 <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Market Configuration</h2>
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+                <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
               </div>
 
               {/* Basic Details */}
               <DashboardCard className="p-6 mb-6">
                 <h3 className="text-lg font-medium text-neutral-900 mb-4">Basic Details</h3>
-                
+
                 <div className="space-y-8">
                   {/* Title */}
                   <div>
@@ -227,7 +227,7 @@ export default function CreateMarketPage() {
                 <DashboardCard className="p-6 mb-6">
                   <h3 className="text-lg font-medium text-neutral-900 mb-4">Poll Options</h3>
                   <p className="text-sm text-neutral-600 mb-4">Add options for participants to vote on. Winners split the pool pro-rata.</p>
-                  
+
                   <div className="space-y-3">
                     {options.map((option, index) => (
                       <div key={option.id} className="flex items-center gap-3">
@@ -270,7 +270,7 @@ export default function CreateMarketPage() {
               {selectedType === "reflex" && (
                 <DashboardCard className="p-6 mb-6">
                   <h3 className="text-lg font-medium text-neutral-900 mb-4">Reflex Test Configuration</h3>
-                  
+
                   <div className="space-y-8">
                     {/* Scenario */}
                     <div>
@@ -344,7 +344,7 @@ export default function CreateMarketPage() {
                 <DashboardCard className="p-6 mb-6">
                   <h3 className="text-lg font-medium text-neutral-900 mb-4">Ranking Items</h3>
                   <p className="text-sm text-neutral-600 mb-4">Create items for participants to rank. Winners match the majority's exact order.</p>
-                  
+
                   <div className="space-y-3">
                     {ladderItems.map((item, index) => (
                       <div key={item.id} className="flex items-center gap-3">
@@ -397,12 +397,12 @@ export default function CreateMarketPage() {
               )}
 
               {selectedType === "betrayal" && (
-                <DashboardCard className="p-6 mb-6 bg-gradient-to-br from-red-50 to-white border-2 border-red-200">
+                <DashboardCard className="p-6 mb-6 bg-linear-to-br from-red-50 to-white border-2 border-red-200">
                   <h3 className="text-lg font-medium text-neutral-900 mb-2">Betrayal Game</h3>
                   <p className="text-sm text-neutral-600 mb-4">
                     This market type has predefined mechanics: <strong>Cooperate</strong> or <strong>Betray</strong>. No additional configuration needed.
                   </p>
-                  
+
                   <div className="p-4 rounded-lg bg-white border border-red-200">
                     <h4 className="font-medium text-red-900 mb-2">Outcome Rules:</h4>
                     <ul className="text-sm text-neutral-700 space-y-1">

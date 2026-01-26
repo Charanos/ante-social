@@ -84,15 +84,15 @@ export default function AchievementManagerPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle="Manage achievements, rewards, and user progress" 
+        <DashboardHeader
+          subtitle="Manage achievements, rewards, and user progress"
         />
 
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Stats Overview */}
@@ -103,7 +103,7 @@ export default function AchievementManagerPage() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
         >
           {/* Total Achievements - Amber */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-100/50 blur-2xl transition-all group-hover:bg-amber-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ export default function AchievementManagerPage() {
           </Card>
 
           {/* Total Unlocks - Blue */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -135,7 +135,7 @@ export default function AchievementManagerPage() {
           </Card>
 
           {/* Users with Badges - Green */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -153,9 +153,9 @@ export default function AchievementManagerPage() {
 
         {/* Visual Separator - Search */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Search User Badge History</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Search */}
@@ -185,9 +185,9 @@ export default function AchievementManagerPage() {
 
         {/* Visual Separator - Achievements */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Achievements ({mockAchievements.length})</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Achievements Table */}

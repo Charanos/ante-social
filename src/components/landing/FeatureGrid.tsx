@@ -1,12 +1,12 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { 
-  TrendingUp, 
-  Smartphone, 
-  Shield, 
-  Users, 
-  Zap, 
+import {
+  TrendingUp,
+  Smartphone,
+  Shield,
+  Users,
+  Zap,
   ArrowRight,
   Target,
   Coins,
@@ -79,21 +79,21 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ 
-        delay: index * 0.08, 
+      transition={{
+        delay: index * 0.08,
         duration: 0.5,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
       className={`group relative ${feature.colSpan} flex flex-col`}
     >
       <div className="relative h-full p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 overflow-hidden shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)]">
-        
+
         {/* Subtle shine effect on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Top border accent - Animated on View */}
         <motion.div
-          className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-black/20 to-transparent"
+          className="absolute top-0 left-0 right-0 h-[1px] bg-linear-to-r from-transparent via-black/20 to-transparent"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           transition={{ delay: index * 0.08 + 0.3, duration: 0.6 }}
@@ -140,7 +140,7 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
                 </div>
               ))}
             </div>
-            
+
             {/* Explore Link - Visible on Hover */}
             <div className="flex items-center gap-2 mt-4 text-sm font-semibold text-black opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
               Explore Feature <ArrowRight className="w-4 h-4" />
@@ -160,7 +160,7 @@ export function FeatureGrid() {
     >
       {/* Background Decor */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-black/[0.02] via-transparent to-transparent pointer-events-none" />
-      
+
       <div className="relative max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16 md:mb-24 space-y-6 max-w-3xl mx-auto">
@@ -176,7 +176,7 @@ export function FeatureGrid() {
             </span>
           </motion.div>
 
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -186,7 +186,7 @@ export function FeatureGrid() {
             Everything you need completely reimagined.
           </motion.h2>
 
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -206,11 +206,11 @@ export function FeatureGrid() {
 
         {/* Bottom CTA */}
         <motion.div
-           initial={{ opacity: 0, y: 30 }}
-           whileInView={{ opacity: 1, y: 0 }}
-           viewport={{ once: true }}
-           transition={{ delay: 0.4 }}
-           className="mt-20 flex justify-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+          className="mt-20 flex justify-center"
         >
           <button className="group relative inline-flex cursor-pointer items-center gap-3 px-8 py-3 bg-black text-white rounded-full overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
             <span className="relative z-10 font-normal tracking-wide text-lg">Start Betting Now</span>

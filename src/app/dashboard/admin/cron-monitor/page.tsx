@@ -99,32 +99,32 @@ export default function CronMonitorPage() {
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader 
-          subtitle="Automated task execution and health monitoring" 
+        <DashboardHeader
+          subtitle="Automated task execution and health monitoring"
         />
 
         <div className="flex items-center justify-end gap-3 -mt-6 mb-8">
-            <button 
-              onClick={handleRefresh}
-              className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-            <button 
-              onClick={handleTriggerNow}
-              className="px-4 py-2.5 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg flex items-center gap-2 cursor-pointer transition-all"
-            >
-              <Play className="w-4 h-4" />
-              Trigger Now
-            </button>
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+          <button
+            onClick={handleTriggerNow}
+            className="px-4 py-2.5 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg flex items-center gap-2 cursor-pointer transition-all"
+          >
+            <Play className="w-4 h-4" />
+            Trigger Now
+          </button>
         </div>
 
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview (24h)</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Stats Overview */}
@@ -135,7 +135,7 @@ export default function CronMonitorPage() {
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"
         >
           {/* Total Runs Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export default function CronMonitorPage() {
           </Card>
 
           {/* Successful Runs Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -167,7 +167,7 @@ export default function CronMonitorPage() {
           </Card>
 
           {/* Failed Runs Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-red-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-red-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-red-100/50 blur-2xl transition-all group-hover:bg-red-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -183,7 +183,7 @@ export default function CronMonitorPage() {
           </Card>
 
           {/* Avg Duration Card */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -201,9 +201,9 @@ export default function CronMonitorPage() {
 
         {/* Visual Separator - Current Jobs */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Current Job Status</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Current Jobs */}
@@ -226,7 +226,7 @@ export default function CronMonitorPage() {
                       </span>
                     </div>
                     <p className="text-sm text-neutral-600 mb-3">{job.description}</p>
-                    
+
                     <div className="flex items-center gap-6 text-xs">
                       <div className="flex items-center gap-2">
                         <Code className="w-3.5 h-3.5 text-neutral-400" />
@@ -257,9 +257,9 @@ export default function CronMonitorPage() {
 
         {/* Visual Separator - Execution History */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Execution History</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Execution History */}
@@ -316,14 +316,14 @@ export default function CronMonitorPage() {
                 <p className="text-sm text-neutral-600 mb-4">
                   To ensure automated tasks run consistently, set up a cron trigger:
                 </p>
-                
+
                 <div className="space-y-8">
                   <div>
                     <p className="text-sm font-medium text-neutral-900 mb-2">Option 1: Vercel Cron (Recommended)</p>
                     <p className="text-xs text-neutral-600 mb-2">Add to vercel.json:</p>
                     <div className="bg-neutral-900 rounded-lg p-4 overflow-x-auto">
                       <pre className="text-xs text-neutral-100 font-mono">
-{`{
+                        {`{
   "crons": [{
     "path": "/functions/cronOrchestrator",
     "schedule": "*/5 * * * *"
@@ -338,7 +338,7 @@ export default function CronMonitorPage() {
                     <p className="text-xs text-neutral-600 mb-2">Use a service like cron-job.org to ping:</p>
                     <div className="bg-neutral-900 rounded-lg p-4">
                       <pre className="text-xs text-neutral-100 font-mono">
-{`POST https://yourdomain.com/api/cron
+                        {`POST https://yourdomain.com/api/cron
 Authorization: Bearer YOUR_SECRET_TOKEN`}
                       </pre>
                     </div>

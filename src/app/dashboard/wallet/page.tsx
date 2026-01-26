@@ -14,7 +14,7 @@ export default function WalletPage() {
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false)
   const [amount, setAmount] = useState("")
   const [address, setAddress] = useState("")
-  const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null)
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type })
@@ -51,7 +51,7 @@ export default function WalletPage() {
   }
 
   const getTransactionIcon = (type: string) => {
-    switch(type) {
+    switch (type) {
       case 'deposit': return <ArrowDownLeft className="h-4 w-4 text-green-600" />
       case 'withdrawal': return <ArrowUpRight className="h-4 w-4 text-red-600" />
       case 'bet_entry': return <DollarSign className="h-4 w-4 text-blue-600" />
@@ -84,9 +84,8 @@ export default function WalletPage() {
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
             className="fixed right-4 top-4 z-50"
           >
-            <div className={`flex items-center gap-3 rounded-2xl px-6 py-4 shadow-2xl backdrop-blur-md ${
-              toast.type === 'success' ? 'bg-green-500/90' : 'bg-red-500/90'
-            } text-white border border-white/20`}>
+            <div className={`flex items-center gap-3 rounded-2xl px-6 py-4 shadow-2xl backdrop-blur-md ${toast.type === 'success' ? 'bg-green-500/90' : 'bg-red-500/90'
+              } text-white border border-white/20`}>
               {toast.type === 'success' ? <Check className="h-5 w-5" /> : <X className="h-5 w-5" />}
               <p className="font-medium">{toast.message}</p>
             </div>
@@ -94,15 +93,15 @@ export default function WalletPage() {
         )}
       </AnimatePresence>
 
-      <DashboardHeader 
-        subtitle="Manage your balance and transactions" 
+      <DashboardHeader
+        subtitle="Manage your balance and transactions"
       />
 
       {/* Visual Separator - Balance Overview */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+      <div className="flex items-center gap-4 my-18">
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Balance Overview</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
       {/* Balance Cards */}
@@ -113,7 +112,7 @@ export default function WalletPage() {
         className="grid gap-6 md:grid-cols-3 mb-10"
       >
         {/* Current Balance - Blue */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -129,7 +128,7 @@ export default function WalletPage() {
         </Card>
 
         {/* Total Winnings - Green */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -145,7 +144,7 @@ export default function WalletPage() {
         </Card>
 
         {/* Total Losses - Red */}
-        <Card className="relative overflow-hidden border-none bg-gradient-to-br from-red-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+        <Card className="relative overflow-hidden border-none bg-linear-to-br from-red-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
           <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-red-100/50 blur-2xl transition-all group-hover:bg-red-200/50" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center justify-between">
@@ -161,19 +160,12 @@ export default function WalletPage() {
         </Card>
       </motion.div>
 
-      {/* Visual Separator - Quick Actions */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Quick Actions</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
-      </div>
-
       {/* Action Buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="flex gap-4 mb-10"
+        className="flex gap-4 my-18"
       >
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -197,10 +189,10 @@ export default function WalletPage() {
       </motion.div>
 
       {/* Visual Separator - Transaction History */}
-      <div className="flex items-center gap-4 mb-10">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+      <div className="flex items-center gap-4 my-18">
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Transaction History</h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
       {/* Recent Transactions - Sleek List View */}
@@ -283,7 +275,7 @@ export default function WalletPage() {
                   <X className="h-5 w-5 text-gray-500" />
                 </button>
               </div>
-              
+
               <div className="p-8 space-y-6">
                 <div className="flex items-start gap-3 rounded-xl bg-blue-50 p-4 border border-blue-100">
                   <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
@@ -308,17 +300,17 @@ export default function WalletPage() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button 
-                    onClick={() => setIsDepositModalOpen(false)} 
+                  <button
+                    onClick={() => setIsDepositModalOpen(false)}
                     className="flex-1 cursor-pointer rounded-xl px-4 py-2 font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Cancel
                   </button>
-                  <motion.button 
+                  <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleDeposit} 
-                    className="flex-[2] cursor-pointer rounded-xl bg-gray-900 px-6 py-2 font-medium text-white shadow-lg transition-all hover:bg-black"
+                    onClick={handleDeposit}
+                    className="flex-2 cursor-pointer rounded-xl bg-gray-900 px-6 py-2 font-medium text-white shadow-lg transition-all hover:bg-black"
                   >
                     Create Invoice
                   </motion.button>
@@ -391,17 +383,17 @@ export default function WalletPage() {
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button 
-                    onClick={() => setIsWithdrawModalOpen(false)} 
+                  <button
+                    onClick={() => setIsWithdrawModalOpen(false)}
                     className="flex-1 cursor-pointer rounded-xl px-4 py-2 font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                   >
                     Cancel
                   </button>
-                  <motion.button 
+                  <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleWithdraw} 
-                    className="flex-[2] cursor-pointer rounded-xl bg-gray-900 px-6 py-2 font-medium text-white shadow-lg transition-all hover:bg-black"
+                    onClick={handleWithdraw}
+                    className="flex-2 cursor-pointer rounded-xl bg-gray-900 px-6 py-2 font-medium text-white shadow-lg transition-all hover:bg-black"
                   >
                     Request Withdrawal
                   </motion.button>

@@ -13,7 +13,7 @@ const stats = [
 
 const getIcon = (iconName: string, colorClass: string) => {
   const iconProps = { className: `h-6 w-6 ${colorClass}` };
-  
+
   switch (iconName) {
     case "target":
       return <Target {...iconProps} />;
@@ -63,7 +63,7 @@ const getColorClasses = (color: string) => {
       icon: "text-orange-600"
     }
   };
-  
+
   return colorMap[color] || colorMap.blue;
 };
 
@@ -72,11 +72,11 @@ export function StatsRow() {
     <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
       {stats.map((stat) => {
         const colors = getColorClasses(stat.color);
-        
+
         return (
-          <Card 
+          <Card
             key={stat.label}
-            className={`relative overflow-hidden border-none bg-gradient-to-br ${colors.bg} shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group`}
+            className={`relative overflow-hidden border-none bg-linear-to-br ${colors.bg} shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group`}
           >
             <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full ${colors.blur} blur-2xl transition-all`} />
             <CardContent className="p-6 relative z-10">

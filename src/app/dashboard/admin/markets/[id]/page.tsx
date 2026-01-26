@@ -51,21 +51,21 @@ export default function ViewMarketPage() {
       <div className="max-w-full mx-auto px-6">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader 
-          subtitle="View market information and betting activity" 
+        <DashboardHeader
+          subtitle="View market information and betting activity"
         />
 
         <div className="flex items-center justify-end gap-2 -mt-16 mb-8 relative z-10 px-2">
-            <Link href={`/dashboard/admin/markets/${marketData.id}/edit`}>
-              <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
-                <Edit className="w-4 h-4" />
-                Edit Market
-              </button>
-            </Link>
+          <Link href={`/dashboard/admin/markets/${marketData.id}/edit`}>
             <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
-              <Share2 className="w-4 h-4" />
-              Share
+              <Edit className="w-4 h-4" />
+              Edit Market
             </button>
+          </Link>
+          <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
         </div>
 
         {/* Market Info Card */}
@@ -79,7 +79,7 @@ export default function ViewMarketPage() {
             <div className="flex-1">
               <h2 className="text-2xl font-medium text-neutral-900 mb-3">{marketData.title}</h2>
               <p className="text-neutral-600 leading-relaxed mb-4">{marketData.description}</p>
-              
+
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
                 {marketData.tags.map((tag, index) => (
@@ -142,7 +142,7 @@ export default function ViewMarketPage() {
           className="bg-white rounded-xl border border-neutral-200 p-8 mb-6"
         >
           <h3 className="text-lg font-medium text-neutral-900 mb-6">Timeline</h3>
-          
+
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <div className="p-2 rounded-lg bg-neutral-100">
@@ -198,19 +198,18 @@ export default function ViewMarketPage() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-base font-medium text-neutral-900">{outcome.name}</h4>
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                    outcome.percentage > 0 
-                      ? 'bg-green-100 text-green-700 border border-green-200' 
+                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${outcome.percentage > 0
+                      ? 'bg-green-100 text-green-700 border border-green-200'
                       : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
-                  }`}>
+                    }`}>
                     {outcome.percentage}%
                   </span>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="w-full h-2 bg-neutral-200 rounded-full mb-3 overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
+                  <div
+                    className="h-full bg-linear-to-r from-green-500 to-green-600 transition-all duration-500"
                     style={{ width: `${outcome.percentage}%` }}
                   />
                 </div>

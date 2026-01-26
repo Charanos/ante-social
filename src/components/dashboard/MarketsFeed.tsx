@@ -19,7 +19,7 @@ const mockMarkets = [
     participants: 4230,
     endingAt: "24h",
     isLive: true,
-    imageGradient: "bg-gradient-to-br from-orange-500 via-yellow-500 to-transparent",
+    imageGradient: "bg-linear-to-br from-orange-500 via-yellow-500 to-transparent",
     type: "onetime",
     odds: "2.5x",
     poolProgress: 78,
@@ -33,7 +33,7 @@ const mockMarkets = [
     participants: 1205,
     endingAt: "4h",
     isLive: true,
-    imageGradient: "bg-gradient-to-br from-blue-600 via-purple-600 to-transparent",
+    imageGradient: "bg-linear-to-br from-blue-600 via-purple-600 to-transparent",
     type: "recurring",
     odds: "1.8x",
     poolProgress: 92,
@@ -47,7 +47,7 @@ const mockMarkets = [
     participants: 560,
     endingAt: "3d",
     isLive: false,
-    imageGradient: "bg-gradient-to-br from-gray-800 via-gray-600 to-transparent",
+    imageGradient: "bg-linear-to-br from-gray-800 via-gray-600 to-transparent",
     type: "onetime",
     odds: "5.0x",
     poolProgress: 45,
@@ -61,7 +61,7 @@ const mockMarkets = [
     participants: 8900,
     endingAt: "12h",
     isLive: true,
-    imageGradient: "bg-gradient-to-br from-green-500 via-emerald-500 to-transparent",
+    imageGradient: "bg-linear-to-br from-green-500 via-emerald-500 to-transparent",
     type: "recurring",
     odds: "1.2x",
     poolProgress: 88,
@@ -75,7 +75,7 @@ const mockMarkets = [
     participants: 340,
     endingAt: "6d",
     isLive: false,
-    imageGradient: "bg-gradient-to-br from-red-500 via-orange-500 to-transparent",
+    imageGradient: "bg-linear-to-br from-red-500 via-orange-500 to-transparent",
     type: "onetime",
     odds: "3.1x",
     poolProgress: 25,
@@ -86,8 +86,8 @@ const mockMarkets = [
 export function MarketsFeed() {
   const [activeTab, setActiveTab] = useState("all")
 
-  const filteredMarkets = activeTab === "all" 
-    ? mockMarkets 
+  const filteredMarkets = activeTab === "all"
+    ? mockMarkets
     : mockMarkets.filter(m => m.type === activeTab)
 
   return (
@@ -117,11 +117,11 @@ export function MarketsFeed() {
           <MarketCard key={market.id} {...market} />
         ))}
       </div>
-      
+
       {filteredMarkets.length === 0 && (
         <div className="min-h-[300px] rounded-xl bg-neutral-50 dark:bg-neutral-900/50 flex flex-col items-center justify-center p-8 text-center border border-dashed border-neutral-200 dark:border-neutral-800">
-            <h3 className="text-lg font-medium text-black dark:text-white">No markets found.</h3>
-            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Try selecting a different category.</p>
+          <h3 className="text-lg font-medium text-black dark:text-white">No markets found.</h3>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Try selecting a different category.</p>
         </div>
       )}
     </div>

@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useParams, useRouter } from "next/navigation"
-import { 
-  DndContext, 
+import {
+  DndContext,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
@@ -66,7 +66,7 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
         <GripVertical className="w-5 h-5 text-neutral-400" />
       </div>
 
-      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-white font-medium font-mono">
+      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-500 text-white font-medium font-mono">
         {index + 1}
       </div>
 
@@ -105,7 +105,7 @@ export default function MajorityLadderPage() {
   const marketId = params.id as string
 
   const market = getMockLadderMarket(marketId)
-  
+
   const [rankedItems, setRankedItems] = useState<RankItem[]>(market.items)
   const [stakeAmount, setStakeAmount] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -156,17 +156,17 @@ export default function MajorityLadderPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle={market.description} 
+        <DashboardHeader
+          subtitle={market.description}
         />
 
         <div className="flex items-center gap-2 -mt-16 mb-8 relative z-10 px-2 justify-end">
-              <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium uppercase tracking-wide border border-purple-200 shadow-sm">
-                Majority Ladder
-              </span>
-            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
-              {market.status}
-            </span>
+          <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium uppercase tracking-wide border border-purple-200 shadow-sm">
+            Majority Ladder
+          </span>
+          <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
+            {market.status}
+          </span>
         </div>
 
         {/* Stats Cards */}
@@ -176,7 +176,7 @@ export default function MajorityLadderPage() {
           transition={{ delay: 0.05 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"
         >
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -191,7 +191,7 @@ export default function MajorityLadderPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -206,7 +206,7 @@ export default function MajorityLadderPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -221,7 +221,7 @@ export default function MajorityLadderPage() {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-100/50 blur-2xl transition-all group-hover:bg-amber-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -239,13 +239,13 @@ export default function MajorityLadderPage() {
 
         {/* Visual Separator */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Drag to Rank</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Instructions Card */}
-        <DashboardCard className="p-6 mb-10 bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200">
+        <DashboardCard className="p-6 mb-10 bg-linear-to-br from-blue-50 to-white border-2 border-blue-200">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
               <GripVertical className="w-5 h-5 text-blue-600" />
@@ -253,7 +253,7 @@ export default function MajorityLadderPage() {
             <div className="flex-1">
               <h4 className="font-medium text-blue-900 mb-1">How to Play</h4>
               <p className="text-sm text-blue-700">
-                Drag items to rank them from <strong>most inconvenient (#1)</strong> to <strong>least inconvenient</strong>. 
+                Drag items to rank them from <strong>most inconvenient (#1)</strong> to <strong>least inconvenient</strong>.
                 Your goal is to match what the <strong>majority</strong> will choose. Winners split the prize pool!
               </p>
             </div>

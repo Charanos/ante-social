@@ -61,17 +61,17 @@ export default function BetrayalMarketPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader 
-          subtitle={market.description} 
+        <DashboardHeader
+          subtitle={market.description}
         />
 
         <div className="flex items-center gap-2 -mt-16 mb-8 relative z-10 px-2 justify-end">
-             <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium uppercase tracking-wide border border-red-200 shadow-sm">
-                Betrayal Game
-              </span>
-            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
-              {market.status}
-            </span>
+          <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium uppercase tracking-wide border border-red-200 shadow-sm">
+            Betrayal Game
+          </span>
+          <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
+            {market.status}
+          </span>
         </div>
 
         {/* Stats Cards */}
@@ -82,7 +82,7 @@ export default function BetrayalMarketPage() {
           className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"
         >
           {/* Buy-in */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -98,7 +98,7 @@ export default function BetrayalMarketPage() {
           </Card>
 
           {/* Total Pool */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -114,7 +114,7 @@ export default function BetrayalMarketPage() {
           </Card>
 
           {/* Participants */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -130,7 +130,7 @@ export default function BetrayalMarketPage() {
           </Card>
 
           {/* Time Remaining */}
-          <Card className="relative overflow-hidden border-none bg-gradient-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+          <Card className="relative overflow-hidden border-none bg-linear-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-100/50 blur-2xl transition-all group-hover:bg-amber-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
@@ -148,9 +148,9 @@ export default function BetrayalMarketPage() {
 
         {/* Visual Separator */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Choose Your Strategy</h2>
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
         {/* Choice Cards */}
@@ -167,7 +167,7 @@ export default function BetrayalMarketPage() {
             className={`
               relative overflow-hidden rounded-2xl border-2 p-8 cursor-pointer transition-all
               ${selectedChoice === "cooperate"
-                ? 'border-green-500 bg-gradient-to-br from-green-50 to-white shadow-2xl'
+                ? 'border-green-500 bg-linear-to-br from-green-50 to-white shadow-2xl'
                 : 'border-neutral-200 bg-white hover:border-green-300 hover:shadow-lg'
               }
             `}
@@ -178,7 +178,7 @@ export default function BetrayalMarketPage() {
               </div>
               <h3 className="text-2xl font-medium text-neutral-900 mb-2">COOPERATE</h3>
               <p className="text-sm text-neutral-600 mb-4">Play it safe. Share the reward.</p>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <p className="text-xs text-green-700 font-medium">✓ Guaranteed small win if others cooperate</p>
                 <p className="text-xs text-green-700 font-medium">✓ Lower risk strategy</p>
                 <p className="text-xs text-red-600 font-medium">✗ Betrayers take your share</p>
@@ -202,7 +202,7 @@ export default function BetrayalMarketPage() {
             className={`
               relative overflow-hidden rounded-2xl border-2 p-8 cursor-pointer transition-all
               ${selectedChoice === "betray"
-                ? 'border-red-500 bg-gradient-to-br from-red-50 to-white shadow-2xl'
+                ? 'border-red-500 bg-linear-to-br from-red-50 to-white shadow-2xl'
                 : 'border-neutral-200 bg-white hover:border-red-300 hover:shadow-lg'
               }
             `}
@@ -213,7 +213,7 @@ export default function BetrayalMarketPage() {
               </div>
               <h3 className="text-2xl font-medium text-neutral-900 mb-2">BETRAY</h3>
               <p className="text-sm text-neutral-600 mb-4">Risk it all. Take the prize.</p>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <p className="text-xs text-green-700 font-medium">✓ Win big if minority betrays</p>
                 <p className="text-xs text-green-700 font-medium">✓ Maximum potential payout</p>
                 <p className="text-xs text-red-600 font-medium">✗ Everyone loses if majority betrays</p>
@@ -322,7 +322,7 @@ export default function BetrayalMarketPage() {
         )}
 
         {/* Info Card */}
-        <DashboardCard className="p-6 bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200">
+        <DashboardCard className="p-6 bg-linear-to-br from-blue-50 to-white border-2 border-blue-200">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
               <Shield className="w-5 h-5 text-blue-600" />

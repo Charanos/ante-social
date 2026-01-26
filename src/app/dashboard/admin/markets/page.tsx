@@ -103,8 +103,8 @@ export default function MarketManagerPage() {
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader 
-          subtitle="Manage all public betting markets" 
+        <DashboardHeader
+          subtitle="Manage all public betting markets"
         />
 
         <div className="flex justify-end -mt-16 mb-4 relative z-10 px-2">
@@ -119,11 +119,11 @@ export default function MarketManagerPage() {
         {/* Stats Overview Section */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           </div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -131,7 +131,7 @@ export default function MarketManagerPage() {
             className="grid grid-cols-1 md:grid-cols-4 gap-6"
           >
             {/* Total Markets - Blue */}
-            <Card className="relative overflow-hidden border-none bg-gradient-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+            <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
               <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
               <CardContent className="p-6 relative z-10">
                 <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export default function MarketManagerPage() {
             </Card>
 
             {/* Active Markets - Green */}
-            <Card className="relative overflow-hidden border-none bg-gradient-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+            <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
               <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
               <CardContent className="p-6 relative z-10">
                 <div className="flex items-center justify-between">
@@ -163,7 +163,7 @@ export default function MarketManagerPage() {
             </Card>
 
             {/* Total Pool - Purple */}
-            <Card className="relative overflow-hidden border-none bg-gradient-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+            <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
               <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
               <CardContent className="p-6 relative z-10">
                 <div className="flex items-center justify-between">
@@ -179,7 +179,7 @@ export default function MarketManagerPage() {
             </Card>
 
             {/* Total Participants - Orange */}
-            <Card className="relative overflow-hidden border-none bg-gradient-to-br from-orange-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
+            <Card className="relative overflow-hidden border-none bg-linear-to-br from-orange-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
               <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-orange-100/50 blur-2xl transition-all group-hover:bg-orange-200/50" />
               <CardContent className="p-6 relative z-10">
                 <div className="flex items-center justify-between">
@@ -199,11 +199,11 @@ export default function MarketManagerPage() {
         {/* Filters Section */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Filters</h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           </div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -268,9 +268,9 @@ export default function MarketManagerPage() {
         {/* Markets List Section */}
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Markets ({mockMarkets.length})</h2>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent"></div>
+            <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           </div>
 
           <div className="space-y-8">

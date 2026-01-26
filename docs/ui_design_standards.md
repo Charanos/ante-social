@@ -9,13 +9,16 @@ This document defines the design standards and patterns used throughout the ante
 ## 🎨 Design Principles
 
 ### 1. Premium Glassmorphism
+
 All UI elements use a modern glassmorphic design with:
+
 - Semi-transparent backgrounds
 - Backdrop blur effects
 - Subtle gradients
 - Soft shadows
 
 ### 2. Consistent Typography
+
 ```css
 /* Numerical Data */
 font-family: 'monospace'
@@ -30,6 +33,7 @@ font-weight: 600-700 (semibold-bold)
 ```
 
 ### 3. Color Coded Elements
+
 - **Blue:** Financial amounts, buy-ins
 - **Green:** Success, profits, pools
 - **Purple:** Users, participants
@@ -45,16 +49,19 @@ font-weight: 600-700 (semibold-bold)
 Premium gradient stats cards with glassmorphic icons:
 
 ```tsx
-<Card className="relative overflow-hidden border-none 
-  bg-gradient-to-br from-blue-50 via-white to-white 
+<Card
+  className="relative overflow-hidden border-none 
+  bg-linear-to-br from-blue-50 via-white to-white 
   shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] 
-  hover:shadow-lg transition-all cursor-pointer group">
-  
+  hover:shadow-lg transition-all cursor-pointer group"
+>
   {/* Blur blob */}
-  <div className="absolute -right-6 -top-6 h-24 w-24 
+  <div
+    className="absolute -right-6 -top-6 h-24 w-24 
     rounded-full bg-blue-100/50 blur-2xl 
-    transition-all group-hover:bg-blue-200/50" />
-  
+    transition-all group-hover:bg-blue-200/50"
+  />
+
   <CardContent className="p-6 relative z-10">
     <div className="flex items-center justify-between">
       <div>
@@ -63,7 +70,7 @@ Premium gradient stats cards with glassmorphic icons:
           {value}
         </p>
       </div>
-      
+
       {/* Glassmorphic icon */}
       <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
         <Icon className="h-6 w-6 text-blue-600" />
@@ -79,14 +86,20 @@ Gradient horizontal rules with centered labels:
 
 ```tsx
 <div className="flex items-center gap-4 mb-10">
-  <div className="h-px flex-1 bg-gradient-to-r 
-    from-transparent via-neutral-200 to-transparent" />
-  <h2 className="text-xs font-medium text-neutral-400 
-    uppercase tracking-wider">
+  <div
+    className="h-px flex-1 bg-linear-to-r 
+    from-transparent via-neutral-200 to-transparent"
+  />
+  <h2
+    className="text-xs font-medium text-neutral-400 
+    uppercase tracking-wider"
+  >
     Section Title
   </h2>
-  <div className="h-px flex-1 bg-gradient-to-r 
-    from-transparent via-neutral-200 to-transparent" />
+  <div
+    className="h-px flex-1 bg-linear-to-r 
+    from-transparent via-neutral-200 to-transparent"
+  />
 </div>
 ```
 
@@ -95,14 +108,13 @@ Gradient horizontal rules with centered labels:
 Hover effects and transitions:
 
 ```tsx
-<div className="p-6 rounded-xl border-2 border-neutral-200 
+<div
+  className="p-6 rounded-xl border-2 border-neutral-200 
   bg-white hover:border-blue-500 hover:shadow-lg 
-  transition-all cursor-pointer group">
-  
-  <h3 className="group-hover:text-blue-600 transition-colors">
-    Card Title
-  </h3>
-  
+  transition-all cursor-pointer group"
+>
+  <h3 className="group-hover:text-blue-600 transition-colors">Card Title</h3>
+
   {/* Content */}
 </div>
 ```
@@ -114,7 +126,7 @@ Hover effects and transitions:
 ### Page Transitions
 
 ```tsx
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
 <motion.div
   initial={{ opacity: 0, y: 20 }}
@@ -122,7 +134,7 @@ import { motion } from "framer-motion"
   transition={{ delay: 0.05 }}
 >
   {/* Content */}
-</motion.div>
+</motion.div>;
 ```
 
 ### Hover Effects
@@ -165,6 +177,7 @@ font-mono text-lg   /* Table values */
 ## 🎨 Color Palette
 
 ### Primary Colors
+
 ```css
 /* Blue - Trust, Primary Actions */
 bg-blue-50, text-blue-600, border-blue-200
@@ -183,6 +196,7 @@ bg-red-50, text-red-600, border-red-200
 ```
 
 ### Neutral Scale
+
 ```css
 bg-neutral-50   /* Backgrounds */
 bg-neutral-100  /* Subtle fills */
@@ -197,19 +211,21 @@ text-neutral-900 /* Primary text */
 ## 📱 Responsive Design
 
 ### Grid Layouts
-```tsx
-{/* Mobile: 1 column, Desktop: 4 columns */}
-<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-  {/* Cards */}
-</div>
 
-{/* Mobile: 1 column, Desktop: 2 columns */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {/* Cards */}
-</div>
+```tsx
+{
+  /* Mobile: 1 column, Desktop: 4 columns */
+}
+<div className="grid grid-cols-1 md:grid-cols-4 gap-6">{/* Cards */}</div>;
+
+{
+  /* Mobile: 1 column, Desktop: 2 columns */
+}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">{/* Cards */}</div>;
 ```
 
 ### Container Widths
+
 ```tsx
 /* Full width with padding */
 <div className="max-w-full mx-auto px-6">
@@ -223,6 +239,7 @@ text-neutral-900 /* Primary text */
 ## ✨ Special Effects
 
 ### Glassmorphism
+
 ```css
 backdrop-blur-xl
 bg-white/40
@@ -231,14 +248,16 @@ shadow-2xl
 ```
 
 ### Neumorphism (Subtle)
+
 ```css
 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]
 ```
 
 ### Gradients
+
 ```css
-bg-gradient-to-br from-blue-50 via-white to-white
-bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600
+bg-linear-to-br from-blue-50 via-white to-white
+bg-linear-to-r from-purple-600 via-pink-600 to-blue-600
 ```
 
 ---
@@ -246,34 +265,51 @@ bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600
 ## 🎯 Interactive States
 
 ### Buttons
+
 ```tsx
-{/* Primary */}
-<button className="bg-neutral-900 hover:bg-neutral-800 
+{
+  /* Primary */
+}
+<button
+  className="bg-neutral-900 hover:bg-neutral-800 
   text-white font-medium py-3 px-6 rounded-lg 
-  shadow-lg hover:shadow-xl transition-all cursor-pointer">
+  shadow-lg hover:shadow-xl transition-all cursor-pointer"
+>
   Action
-</button>
+</button>;
 
-{/* Secondary */}
-<button className="border-2 border-neutral-200 bg-white 
+{
+  /* Secondary */
+}
+<button
+  className="border-2 border-neutral-200 bg-white 
   hover:bg-neutral-50 font-medium py-3 px-6 rounded-lg 
-  transition-colors cursor-pointer">
+  transition-colors cursor-pointer"
+>
   Cancel
-</button>
+</button>;
 
-{/* Disabled */}
-<button disabled className="bg-neutral-300 text-neutral-500 
-  cursor-not-allowed">
+{
+  /* Disabled */
+}
+<button
+  disabled
+  className="bg-neutral-300 text-neutral-500 
+  cursor-not-allowed"
+>
   Disabled
-</button>
+</button>;
 ```
 
 ### Form Inputs
+
 ```tsx
-<input className="w-full px-4 py-3 rounded-lg 
+<input
+  className="w-full px-4 py-3 rounded-lg 
   border-2 border-neutral-200 
   focus:border-blue-500 focus:outline-none 
-  transition-colors font-mono" />
+  transition-colors font-mono"
+/>
 ```
 
 ---
