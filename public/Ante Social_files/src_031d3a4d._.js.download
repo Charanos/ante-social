@@ -1,0 +1,1001 @@
+(globalThis.TURBOPACK || (globalThis.TURBOPACK = [])).push([typeof document === "object" ? document.currentScript : undefined,
+"[project]/src/lib/utils.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "cn",
+    ()=>cn
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/clsx/dist/clsx.mjs [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tailwind$2d$merge$2f$dist$2f$bundle$2d$mjs$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/tailwind-merge/dist/bundle-mjs.mjs [app-client] (ecmascript)");
+;
+;
+function cn(...inputs) {
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tailwind$2d$merge$2f$dist$2f$bundle$2d$mjs$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["twMerge"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$clsx$2f$dist$2f$clsx$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["clsx"])(inputs));
+}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/lib/mockData.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+// Mock data for dashboard presentation
+__turbopack_context__.s([
+    "mockAchievements",
+    ()=>mockAchievements,
+    "mockAdminStats",
+    ()=>mockAdminStats,
+    "mockGroups",
+    ()=>mockGroups,
+    "mockLeaderboard",
+    ()=>mockLeaderboard,
+    "mockMarkets",
+    ()=>mockMarkets,
+    "mockNotifications",
+    ()=>mockNotifications,
+    "mockTransactions",
+    ()=>mockTransactions,
+    "mockUser",
+    ()=>mockUser
+]);
+const mockUser = {
+    id: "user123",
+    username: "@zanyfool",
+    email: "grayvector29@gmail.com",
+    full_name: "Tyler Grayson",
+    user_level: "novice",
+    role: "user",
+    wallet: {
+        balance: 1250.50,
+        total_deposits: 500,
+        total_winnings: 980.50,
+        total_losses: 230
+    }
+};
+const mockLeaderboard = [
+    {
+        username: "@lucky_winner",
+        achievement: "pulled a miracle",
+        amount: 1250,
+        rank: 1,
+        avatar: "🔥"
+    },
+    {
+        username: "@fortune_seeker",
+        achievement: "escaped the abyss",
+        amount: 980,
+        rank: 2,
+        avatar: "🎯"
+    },
+    {
+        username: "@chaos_rider",
+        achievement: "followed by chaos",
+        amount: 750,
+        rank: 3,
+        avatar: "⚡"
+    }
+];
+const mockGroups = [
+    {
+        id: "group1",
+        name: "Weekend Warriors",
+        description: "Betting enthusiasts who live for the weekend action",
+        avatar_url: null,
+        member_count: 12,
+        created_at: new Date("2025-11-20"),
+        active_bets: 3
+    },
+    {
+        id: "group2",
+        name: "High Rollers Club",
+        description: "For those who play big and win bigger",
+        avatar_url: null,
+        member_count: 8,
+        created_at: new Date("2025-11-18"),
+        active_bets: 5
+    },
+    {
+        id: "group3",
+        name: "Meme Lords",
+        description: "Betting on internet culture and viral moments",
+        avatar_url: null,
+        member_count: 24,
+        created_at: new Date("2025-11-15"),
+        active_bets: 2
+    },
+    {
+        id: "group4",
+        name: "Fortune Seekers",
+        description: "Strategic players analyzing every bet",
+        avatar_url: null,
+        member_count: 15,
+        created_at: new Date("2025-11-22"),
+        active_bets: 4
+    }
+];
+const mockNotifications = [
+    {
+        id: "notif1",
+        type: "spin",
+        title: "Wheel of Delusion",
+        message: "The cosmos grants you: +25 MP",
+        timestamp: new Date("2025-11-26T19:30:00"),
+        is_read: false,
+        icon: "🎡"
+    },
+    {
+        id: "notif2",
+        type: "withdrawal",
+        title: "Withdrawal Completed",
+        message: "Your withdrawal of $1000.00 has been sent to your wallet. Transaction: test1000",
+        amount: 1000,
+        timestamp: new Date("2025-11-17T06:11:00"),
+        is_read: true,
+        icon: "💸"
+    },
+    {
+        id: "notif3",
+        type: "withdrawal",
+        title: "Withdrawal Rejected",
+        message: "Your withdrawal request of $10.00 was rejected: suspicious",
+        amount: 10,
+        timestamp: new Date("2025-11-17T06:07:00"),
+        is_read: true,
+        icon: "❌"
+    },
+    {
+        id: "notif4",
+        type: "market",
+        title: "Market Settled",
+        message: "Your bet on 'What's your vibe?' has been settled. You won 150 MP!",
+        timestamp: new Date("2025-11-25T14:20:00"),
+        is_read: true,
+        icon: "🎯"
+    },
+    {
+        id: "notif5",
+        type: "group",
+        title: "Group Invite",
+        message: "@chaos_rider invited you to join 'High Rollers Club'",
+        timestamp: new Date("2025-11-24T10:15:00"),
+        is_read: false,
+        icon: "👥"
+    }
+];
+const mockTransactions = [
+    {
+        id: "tx1",
+        type: "deposit",
+        amount: 500,
+        description: "USDT deposit via NOWPayments",
+        status: "completed",
+        created_date: new Date("2025-11-25T08:00:00")
+    },
+    {
+        id: "tx2",
+        type: "bet_entry",
+        amount: -50,
+        description: "Bet placed on 'What's your vibe?'",
+        status: "completed",
+        created_date: new Date("2025-11-25T10:30:00")
+    },
+    {
+        id: "tx3",
+        type: "payout",
+        amount: 150,
+        description: "Won bet: 'What's your vibe?'",
+        status: "completed",
+        created_date: new Date("2025-11-25T14:20:00")
+    },
+    {
+        id: "tx4",
+        type: "withdrawal",
+        amount: -100,
+        description: "Withdrawal to TRX address TXabc...123",
+        status: "pending",
+        created_date: new Date("2025-11-26T09:00:00")
+    },
+    {
+        id: "tx5",
+        type: "bet_entry",
+        amount: -25,
+        description: "Bet placed on 'Best meme 2025'",
+        status: "completed",
+        created_date: new Date("2025-11-26T11:00:00")
+    }
+];
+const mockMarkets = [
+    {
+        id: "market1",
+        title: "What's your vibe right now?",
+        description: "Pick the one that matches your brain's current state. Trust your gut — your mood might just make you money today.",
+        tags: [
+            "memes",
+            "mood",
+            "wager"
+        ],
+        buy_in_amount: 1,
+        participant_count: 3,
+        total_pool: 1100,
+        category: "Social media",
+        status: "active",
+        outcomes: [
+            {
+                id: "o1",
+                option_text: "Chaotic energy",
+                participant_count: 12
+            },
+            {
+                id: "o2",
+                option_text: "Zen mode",
+                participant_count: 8
+            },
+            {
+                id: "o3",
+                option_text: "Procrastination nation",
+                participant_count: 15
+            },
+            {
+                id: "o4",
+                option_text: "Hustling hard",
+                participant_count: 6
+            }
+        ]
+    },
+    {
+        id: "market2",
+        title: "Most favorite meme so far",
+        description: "Select which of the two memes you believe is the best of 2025. The meme with the most votes wins.",
+        tags: [
+            "Memes",
+            "Social media"
+        ],
+        buy_in_amount: 1,
+        participant_count: 1,
+        total_pool: 10,
+        category: "Memes",
+        status: "active",
+        outcomes: [
+            {
+                id: "o1",
+                option_text: "Distracted boyfriend",
+                participant_count: 5
+            },
+            {
+                id: "o2",
+                option_text: "Woman yelling at cat",
+                participant_count: 8
+            }
+        ]
+    }
+];
+const mockAdminStats = {
+    totalUsers: 1247,
+    totalRevenue: 15840.50,
+    activeMarkets: 23,
+    totalVolume: 89500,
+    participants: 412,
+    pendingPayouts: 12,
+    pendingSettlements: 5,
+    pendingWithdrawals: 8,
+    flaggedMarkets: 3
+};
+const mockAchievements = {
+    stats: {
+        balance: 1659,
+        unlocked: 1,
+        total: 22,
+        earned: 40,
+        streak: 1
+    },
+    dailyBonus: [
+        {
+            day: 1,
+            reward: 15,
+            claimed: true
+        },
+        {
+            day: 2,
+            reward: 25,
+            claimed: false
+        },
+        {
+            day: 3,
+            reward: 30,
+            claimed: false
+        },
+        {
+            day: 4,
+            reward: 45,
+            claimed: false
+        },
+        {
+            day: 5,
+            reward: 50,
+            claimed: false
+        },
+        {
+            day: 6,
+            reward: 55,
+            claimed: false
+        },
+        {
+            day: 7,
+            reward: 100,
+            claimed: false
+        }
+    ],
+    inProgress: [
+        {
+            title: "Baby Gambler",
+            description: "Place 5 bets. You're developing a habit.",
+            reward: 15,
+            progress: 20
+        },
+        {
+            title: "You're Getting Into This",
+            description: "Log in 3 days in a row. Addiction looks good on you.",
+            reward: 20,
+            progress: 0
+        },
+        {
+            title: "Oracle of MP",
+            description: "Accumulate 1000 MP. The prophecy unfolds.",
+            reward: 100,
+            progress: 100,
+            claimable: true
+        },
+        {
+            title: "Daily Grinder",
+            description: "Log in 7 days in a row. Dedicated to delusion.",
+            reward: 30,
+            progress: 0
+        },
+        {
+            title: "Eternal Devotion",
+            description: "Log in 30 days in a row. You need help.",
+            reward: 150,
+            progress: 0
+        }
+    ],
+    unlocked: [
+        {
+            title: "First Delusion",
+            description: "Place your first bet. The journey into madness begins.",
+            reward: 10,
+            category: "Beginner",
+            date: "12/1/2025"
+        }
+    ],
+    locked: [
+        {
+            title: "Baby Gambler",
+            description: "Place 5 bets. You're developing a habit.",
+            reward: 15,
+            category: "Beginner"
+        },
+        {
+            title: "You're Getting Into This",
+            description: "Log in 3 days in a row. Addiction looks good on you.",
+            reward: 20,
+            category: "Time Based"
+        },
+        {
+            title: "Statistical Disaster",
+            description: "Lose 5 bets in a row. The universe has spoken.",
+            reward: 25,
+            category: "Bad Luck"
+        },
+        {
+            title: "Universe Hates You",
+            description: "Spin the wheel and get 0 MP. Cosmic rejection.",
+            reward: 0,
+            category: "Wheel"
+        },
+        {
+            title: "Wrong Every Time",
+            description: "Finish last place 3 times. Consistency in failure.",
+            reward: 30,
+            category: "Bad Luck"
+        },
+        {
+            title: "Prophet of Nonsense",
+            description: "Correctly predict the majority outcome. Broken clock moment.",
+            reward: 15,
+            category: "Performance"
+        },
+        {
+            title: "Clutch Victory",
+            description: "Win by a margin of 1. Heart attack fuel.",
+            reward: 40,
+            category: "Performance"
+        },
+        {
+            title: "Consistent Menace",
+            description: "Finish in the top 3 five times. You're annoyingly good.",
+            reward: 50,
+            category: "Performance"
+        },
+        {
+            title: "Oracle of MP",
+            description: "Accumulate 1000 MP. The prophecy unfolds.",
+            reward: 100,
+            category: "Prestige"
+        },
+        {
+            title: "All-In Lunatic",
+            description: "Bet 90%+ of your balance. Therapy recommended.",
+            reward: 50,
+            category: "Risk"
+        },
+        {
+            title: "Reckless Genius",
+            description: "Win an all-in bet. Sometimes stupid works.",
+            reward: 100,
+            category: "Risk"
+        },
+        {
+            title: "Reckless Idiot",
+            description: "Lose an all-in bet. We all saw it coming.",
+            reward: 10,
+            category: "Risk"
+        },
+        {
+            title: "Daily Grinder",
+            description: "Log in 7 days in a row. Dedicated to delusion.",
+            reward: 30,
+            category: "Time Based"
+        },
+        {
+            title: "Eternal Devotion",
+            description: "Log in 30 days in a row. You need help.",
+            reward: 150,
+            category: "Time Based"
+        },
+        {
+            title: "Spin Addict",
+            description: "Spin the wheel 7 times. Dopamine dependency achieved.",
+            reward: 35,
+            category: "Wheel"
+        },
+        {
+            title: "Blessed by Chaos",
+            description: "Hit the 1000 MP jackpot. The gods smile upon idiots.",
+            reward: 1000,
+            category: "Wheel"
+        },
+        {
+            title: "Influencer",
+            description: "The majority follows your prediction. Shepherd of sheep.",
+            reward: 60,
+            category: "Social"
+        },
+        {
+            title: "Echo Chamber Architect",
+            description: "Get 3+ group members to follow your bet. Cult leader energy.",
+            reward: 75,
+            category: "Social"
+        },
+        {
+            title: "MP Millionaire",
+            description: "Accumulate 2000 MP. Wealth beyond reason.",
+            reward: 200,
+            category: "Prestige"
+        },
+        {
+            title: "The Chosen One",
+            description: "Win 3 markets in a single day. Fate's favorite fool.",
+            reward: 150,
+            category: "Prestige"
+        },
+        {
+            title: "Motlaire Myth",
+            description: "Participate in 100 markets. Legend status achieved.",
+            reward: 500,
+            category: "Prestige"
+        }
+    ]
+};
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/layout/Sidebar.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "Sidebar",
+    ()=>Sidebar
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$house$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Home$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/house.js [app-client] (ecmascript) <export default as Home>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$wallet$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Wallet$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/wallet.js [app-client] (ecmascript) <export default as Wallet>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/users.js [app-client] (ecmascript) <export default as Users>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user.js [app-client] (ecmascript) <export default as User>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bell$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bell$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/bell.js [app-client] (ecmascript) <export default as Bell>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$log$2d$out$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LogOut$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/log-out.js [app-client] (ecmascript) <export default as LogOut>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/shield.js [app-client] (ecmascript) <export default as Shield>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$left$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronLeft$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/chevron-left.js [app-client] (ecmascript) <export default as ChevronLeft>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/chevron-right.js [app-client] (ecmascript) <export default as ChevronRight>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trending$2d$up$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__TrendingUp$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trending-up.js [app-client] (ecmascript) <export default as TrendingUp>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-auth/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/utils.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mockData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/mockData.ts [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+const navItems = [
+    {
+        title: "Home",
+        url: "/dashboard",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$house$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Home$3e$__["Home"]
+    },
+    {
+        title: "Markets",
+        url: "/dashboard/markets",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trending$2d$up$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__TrendingUp$3e$__["TrendingUp"]
+    },
+    {
+        title: "Groups",
+        url: "/dashboard/groups",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"]
+    },
+    {
+        title: "Wallet",
+        url: "/dashboard/wallet",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$wallet$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Wallet$3e$__["Wallet"]
+    },
+    {
+        title: "Notifications",
+        url: "/dashboard/notifications",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$bell$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Bell$3e$__["Bell"]
+    },
+    {
+        title: "Profile",
+        url: "/dashboard/profile",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"]
+    },
+    {
+        title: "Admin",
+        url: "/dashboard/admin",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"]
+    }
+];
+function Sidebar({ collapsed = false, onToggle = ()=>{}, user }) {
+    _s();
+    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
+    const { data: session } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSession"])();
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
+        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("hidden md:flex fixed left-0 top-0 z-40 h-screen flex-col border-r border-gray-100 bg-white transition-all duration-300", collapsed ? "w-20" : "w-64"),
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                onClick: onToggle,
+                className: "absolute -right-3 top-9 z-50 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition-all hover:bg-gray-50 hover:text-gray-900",
+                title: collapsed ? "Expand sidebar" : "Collapse sidebar",
+                children: collapsed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
+                    className: "h-3 w-3"
+                }, void 0, false, {
+                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                    lineNumber: 45,
+                    columnNumber: 11
+                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$left$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronLeft$3e$__["ChevronLeft"], {
+                    className: "h-3 w-3"
+                }, void 0, false, {
+                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                    lineNumber: 47,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                lineNumber: 39,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex h-full flex-col px-4 py-6 pt-12", collapsed ? "overflow-hidden" : "overflow-y-auto"),
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex items-center transition-all duration-300 h-12 pb-6", collapsed ? "justify-center" : "px-2"),
+                        children: collapsed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "relative w-8 h-8",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                src: "/ante-logo.png",
+                                alt: "Ante Social",
+                                fill: true,
+                                className: "object-contain"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                lineNumber: 62,
+                                columnNumber: 16
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                            lineNumber: 61,
+                            columnNumber: 13
+                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center gap-3",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "relative w-8 h-8",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        src: "/ante-logo.png",
+                                        alt: "Ante Social",
+                                        fill: true,
+                                        className: "object-contain"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                        lineNumber: 67,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                    lineNumber: 66,
+                                    columnNumber: 16
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-xl font-medium tracking-tight text-gray-900",
+                                    children: "Ante Social"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                    lineNumber: 69,
+                                    columnNumber: 16
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                            lineNumber: 65,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/layout/Sidebar.tsx",
+                        lineNumber: 56,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                        className: "space-y-1.5 flex-1",
+                        children: navItems.filter((item)=>item.title !== "Admin" || session?.user?.role === "admin").map((item)=>{
+                            const isActive = pathname === item.url;
+                            const isNotifications = item.title === "Notifications";
+                            const unreadCount = isNotifications ? __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$mockData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockNotifications"].filter((n)=>!n.is_read).length : 0;
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                    href: item.url,
+                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex items-center rounded-xl px-3 py-2.5 transition-all duration-200 group relative", isActive ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900', collapsed ? "justify-center px-2" : "justify-start"),
+                                    title: collapsed ? item.title : undefined,
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "relative",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(item.icon, {
+                                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("h-5 w-5 transition-colors duration-200", isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600')
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                                    lineNumber: 94,
+                                                    columnNumber: 21
+                                                }, this),
+                                                isNotifications && unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 ring-2 ring-white", collapsed && "right-0")
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                                    lineNumber: 99,
+                                                    columnNumber: 23
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                            lineNumber: 93,
+                                            columnNumber: 19
+                                        }, this),
+                                        !collapsed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-1 items-center justify-between ml-3",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("text-sm font-medium tracking-wide transition-opacity duration-200", isActive ? "text-white" : "text-gray-600 group-hover:text-gray-900"),
+                                                    children: item.title
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                                    lineNumber: 108,
+                                                    columnNumber: 23
+                                                }, this),
+                                                isNotifications && unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white",
+                                                    children: unreadCount
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                                    lineNumber: 115,
+                                                    columnNumber: 25
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                            lineNumber: 107,
+                                            columnNumber: 21
+                                        }, this),
+                                        collapsed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "absolute left-full ml-3 px-2 py-1 bg-gray-900 text-white text-xs font-medium rounded-md opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-opacity z-50 shadow-lg",
+                                            children: [
+                                                item.title,
+                                                isNotifications && unreadCount > 0 && ` (${unreadCount})`
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                            lineNumber: 124,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                    lineNumber: 82,
+                                    columnNumber: 17
+                                }, this)
+                            }, item.url, false, {
+                                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                lineNumber: 81,
+                                columnNumber: 15
+                            }, this);
+                        })
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/layout/Sidebar.tsx",
+                        lineNumber: 74,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "mt-auto pt-6 border-t border-gray-50",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: ()=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["signOut"])({
+                                    callbackUrl: '/'
+                                }),
+                            className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("flex w-full cursor-pointer items-center rounded-xl px-3 py-2.5 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group", collapsed ? "justify-center px-2" : "justify-start"),
+                            title: collapsed ? "Sign Out" : undefined,
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$log$2d$out$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LogOut$3e$__["LogOut"], {
+                                    className: "h-5 w-5 transition-colors group-hover:text-red-600"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                    lineNumber: 146,
+                                    columnNumber: 13
+                                }, this),
+                                !collapsed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "ml-3 text-sm font-medium",
+                                    children: "Sign Out"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                    lineNumber: 147,
+                                    columnNumber: 28
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                            lineNumber: 138,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/layout/Sidebar.tsx",
+                        lineNumber: 136,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                lineNumber: 51,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/layout/Sidebar.tsx",
+        lineNumber: 32,
+        columnNumber: 5
+    }, this);
+}
+_s(Sidebar, "vU8JzSd4L4Kl4BSMCCU4jwFXDNQ=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$auth$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSession"]
+    ];
+});
+_c = Sidebar;
+var _c;
+__turbopack_context__.k.register(_c, "Sidebar");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/components/layout/MobileNav.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "MobileNav",
+    ()=>MobileNav
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$house$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Home$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/house.js [app-client] (ecmascript) <export default as Home>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$wallet$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Wallet$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/wallet.js [app-client] (ecmascript) <export default as Wallet>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user.js [app-client] (ecmascript) <export default as User>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/users.js [app-client] (ecmascript) <export default as Users>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+'use client';
+;
+;
+;
+const navItems = [
+    {
+        title: 'Home',
+        url: '/dashboard',
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$house$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Home$3e$__["Home"]
+    },
+    {
+        title: 'Wallet',
+        url: '/dashboard/wallet',
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$wallet$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Wallet$3e$__["Wallet"]
+    },
+    {
+        title: 'Groups',
+        url: '/dashboard/groups',
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"]
+    },
+    {
+        title: 'Profile',
+        url: '/dashboard/profile',
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__["User"]
+    }
+];
+function MobileNav({ user }) {
+    _s();
+    const pathname = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
+        className: "md:hidden fixed bottom-0 left-0 right-0 glass-nav z-50 pb-safe",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+            className: "flex justify-around items-center h-16",
+            children: navItems.map((item)=>{
+                const isActive = pathname === item.url;
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                    className: "w-full",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        href: item.url,
+                        className: `
+                  flex flex-col items-center justify-center gap-1 h-full w-full
+                  transition-all duration-200
+                  ${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}
+                `,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: `p-1 rounded-xl transition-all ${isActive ? 'bg-gray-100' : ''}`,
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(item.icon, {
+                                    className: `w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.5px]'}`
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/layout/MobileNav.tsx",
+                                    lineNumber: 33,
+                                    columnNumber: 19
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/MobileNav.tsx",
+                                lineNumber: 32,
+                                columnNumber: 17
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-[10px] font-medium",
+                                children: item.title
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/MobileNav.tsx",
+                                lineNumber: 35,
+                                columnNumber: 17
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/layout/MobileNav.tsx",
+                        lineNumber: 24,
+                        columnNumber: 15
+                    }, this)
+                }, item.title, false, {
+                    fileName: "[project]/src/components/layout/MobileNav.tsx",
+                    lineNumber: 23,
+                    columnNumber: 13
+                }, this);
+            })
+        }, void 0, false, {
+            fileName: "[project]/src/components/layout/MobileNav.tsx",
+            lineNumber: 19,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/src/components/layout/MobileNav.tsx",
+        lineNumber: 18,
+        columnNumber: 5
+    }, this);
+}
+_s(MobileNav, "xbyQPtUVMO7MNj7WjJlpdWqRcTo=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
+    ];
+});
+_c = MobileNav;
+var _c;
+__turbopack_context__.k.register(_c, "MobileNav");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/app/dashboard/layout.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>DashboardLayout
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$layout$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/layout/Sidebar.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$layout$2f$MobileNav$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/layout/MobileNav.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+function DashboardLayout({ children }) {
+    _s();
+    const [sidebarCollapsed, setSidebarCollapsed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "min-h-screen",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$layout$2f$Sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Sidebar"], {
+                collapsed: sidebarCollapsed,
+                onToggle: ()=>setSidebarCollapsed(!sidebarCollapsed)
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/layout.tsx",
+                lineNumber: 16,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: `p-4 pb-24 md:pb-4 transition-all duration-300 ${sidebarCollapsed ? 'sm:ml-20' : 'sm:ml-64'}`,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mt-0 rounded-lg p-4",
+                    children: children
+                }, void 0, false, {
+                    fileName: "[project]/src/app/dashboard/layout.tsx",
+                    lineNumber: 18,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/layout.tsx",
+                lineNumber: 17,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$layout$2f$MobileNav$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MobileNav"], {
+                user: null
+            }, void 0, false, {
+                fileName: "[project]/src/app/dashboard/layout.tsx",
+                lineNumber: 22,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/app/dashboard/layout.tsx",
+        lineNumber: 15,
+        columnNumber: 5
+    }, this);
+}
+_s(DashboardLayout, "RBWGVlQtqnwMoScoawcFwyZtGjQ=");
+_c = DashboardLayout;
+var _c;
+__turbopack_context__.k.register(_c, "DashboardLayout");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+]);
+
+//# sourceMappingURL=src_031d3a4d._.js.map

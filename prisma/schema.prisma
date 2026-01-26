@@ -1,0 +1,427 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  // Warning: 'url' property deprecated in Prisma 7+, but valid for 5.x
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  emailVerified DateTime?
+  full_name     String?
+  username      String?   @unique
+  password_hash String? // For CredentialsProvider
+  avatar_url    String?
+  role          String    @default("user") // "user" or "admin"
+
+  // Account settings
+  user_level     String  @default("novice") // "novice" or "high_roller"
+  kyc_status     String? // "none", "pending", "approved", "rejected"
+  email_verified Boolean @default(false)
+
+  // 2FA Security
+  two_factor_enabled Boolean  @default(false)
+  two_factor_secret  String?
+  backup_codes       String[] @default([])
+
+  // Notification preferences
+  notification_email Boolean @default(true)
+  notification_push  Boolean @default(true)
+
+  // Timezone
+  timezone String @default("UTC")
+
+  // Timestamps
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  // Relations
+  wallet                    Wallet?
+  marketParticipants        MarketParticipant[]
+  transactions              Transaction[]
+  notifications             UserNotification[]
+  groupMembers              GroupMember[]
+  privateMarketParticipants PrivateMarketParticipant[]
+
+  @@map("users")
+}
+
+model Wallet {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id String @unique @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  balance        Float @default(0) // Balance in USD
+  balance_ksh    Float @default(0) // Balance in KSH
+  total_deposits Float @default(0)
+  total_winnings Float @default(0)
+  total_losses   Float @default(0)
+
+  // Rolling 24h limits tracking (normalized to USD)
+  daily_deposit_total    Float    @default(0)
+  daily_withdrawal_total Float    @default(0)
+  last_reset_date        DateTime @default(now())
+
+  version       Int       @default(1) // Optimistic locking
+  is_frozen     Boolean   @default(false)
+  frozen_reason String?
+  frozen_at     DateTime?
+
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  @@map("wallets")
+}
+
+model Group {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  avatar_url  String?
+
+  created_by String   @db.ObjectId
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  members GroupMember[]
+  markets PrivateGroupMarket[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  group_id String @db.ObjectId
+  group    Group  @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  user_id String @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  role      String   @default("member") // "admin", "member"
+  joined_at DateTime @default(now())
+
+  @@unique([group_id, user_id])
+  @@map("group_members")
+}
+
+model PrivateGroupMarket {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  group_id String @db.ObjectId
+  group    Group  @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  title         String
+  description   String?
+  market_type   String // "winner_takes_all", "odd_one_out"
+  buy_in_amount Float
+
+  status String @default("active") // "active", "pending_confirmation", "disputed", "settled", "cancelled"
+
+  created_by String   @db.ObjectId
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Winner Takes All specific
+  declared_winner_id String? @db.ObjectId
+  confirmations      Int     @default(0)
+  disagreements      Int     @default(0)
+
+  participants PrivateMarketParticipant[]
+
+  @@map("private_group_markets")
+}
+
+model PrivateMarketParticipant {
+  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  market_id String             @db.ObjectId
+  market    PrivateGroupMarket @relation(fields: [market_id], references: [id], onDelete: Cascade)
+
+  user_id String @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  selected_option String? // For "odd_one_out"
+  has_confirmed   Boolean @default(false) // For "winner_takes_all" confirmation
+  has_disagreed   Boolean @default(false)
+
+  is_winner     Boolean @default(false)
+  payout_amount Float   @default(0)
+
+  joined_at DateTime @default(now())
+
+  @@unique([market_id, user_id])
+  @@map("private_market_participants")
+}
+
+model PublicBetMarket {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Basic Info
+  title       String
+  description String
+  tags        String[] @default([])
+
+  // Betting Configuration
+  bet_type         String @default("poll") // "poll", "betrayal", "reflex", "ladder"
+  market_duration  String @default("daily") // "daily" or "weekly"
+  buy_in_amount    Float
+  min_participants Int    @default(2)
+  max_participants Int?
+
+  // Timing
+  start_time             DateTime?
+  close_time             DateTime
+  settlement_time        DateTime
+  scheduled_publish_time DateTime?
+
+  // Status
+  status String @default("draft") // "draft", "scheduled", "published", "active", "closed", "settling", "settled", "cancelled"
+
+  // Settlement
+  settlement_method     String  @default("admin_report") // "external_api" or "admin_report"
+  external_api_endpoint String?
+
+  // Odds Configuration
+  odds_type  String @default("pari_mutuel") // "fixed" or "pari_mutuel"
+  fixed_odds Json?
+
+  // Geographic Restrictions
+  regions_allowed         String[] @default([])
+  regions_blocked         String[] @default([])
+  age_restriction         Int      @default(18)
+  requires_identity_check Boolean  @default(false)
+
+  // Market Stats
+  total_pool         Float   @default(0)
+  participant_count  Int     @default(0)
+  winning_outcome_id String? @db.ObjectId
+
+  // Admin Settlement
+  admin_report           String?
+  reported_at            DateTime?
+  reported_by            String?   @db.ObjectId
+  confirmations_needed   Int       @default(0)
+  confirmations_received Int       @default(0)
+
+  // Compliance & Flags
+  is_flagged      Boolean @default(false)
+  compliance_hold Boolean @default(false)
+  hold_reason     String?
+
+  // Financial
+  payout_processed       Boolean @default(false)
+  platform_fee_collected Float?
+  prize_pool_after_fees  Float?
+
+  // Media
+  media_url  String?
+  media_type String  @default("none") // "image", "gif", "video", "none"
+
+  // Metadata
+  created_by             String?  @db.ObjectId
+  last_edited_by         String?  @db.ObjectId
+  assigned_market_makers String[] @default([]) @db.ObjectId
+  recurring_template_id  String?  @db.ObjectId
+
+  // Soft Delete
+  is_deleted Boolean   @default(false)
+  deleted_at DateTime?
+  deleted_by String?   @db.ObjectId
+
+  // Optimistic Locking
+  version Int @default(1)
+
+  // Timestamps
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  // Relations
+  outcomes     MarketOutcome[]
+  participants MarketParticipant[]
+
+  @@map("public_bet_markets")
+}
+
+model MarketOutcome {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  market_id String          @db.ObjectId
+  market    PublicBetMarket @relation(fields: [market_id], references: [id], onDelete: Cascade)
+
+  option_text        String
+  participant_count  Int     @default(0)
+  total_amount       Float   @default(0)
+  fixed_odds         Float?
+  is_winning_outcome Boolean @default(false)
+  payout_per_winner  Float   @default(0)
+
+  // Media
+  media_url  String?
+  media_type String  @default("none") // "image", "gif", "video", "none"
+
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  // Relations
+  participants MarketParticipant[]
+
+  @@map("market_outcomes")
+}
+
+model MarketParticipant {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  market_id String          @db.ObjectId
+  market    PublicBetMarket @relation(fields: [market_id], references: [id], onDelete: Cascade)
+
+  user_id String @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  selected_outcome_id String        @db.ObjectId
+  outcome             MarketOutcome @relation(fields: [selected_outcome_id], references: [id], onDelete: Cascade)
+
+  amount_contributed Float
+  quantity           Int   @default(1)
+
+  // Bet Context Snapshot (immutable at time of bet)
+  bet_context_snapshot Json? // Stores payout_weight, dominance, early_bettor status, etc.
+
+  potential_payout Float?
+  actual_payout    Float   @default(0)
+  is_winner        Boolean @default(false)
+  payout_processed Boolean @default(false)
+
+  confirmed_outcome Boolean?
+
+  // User Info Cache
+  identity_verified Boolean @default(false)
+  region            String?
+  full_name_cached  String?
+  username_cached   String?
+
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  @@map("market_participants")
+}
+
+model Transaction {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id String @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  type        String // "deposit", "withdrawal", "bet_entry", "payout", "refund"
+  currency    String @default("USD") // "USD" or "KSH"
+  amount      Float
+  description String
+  status      String @default("completed") // "pending", "completed", "failed"
+
+  bet_pool_id String? @db.ObjectId
+
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  @@map("transactions")
+}
+
+model UserNotification {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  user_id String @db.ObjectId
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  notification_type String // "bet_placed", "market_closing_soon", "payout_received", etc.
+  title             String
+  message           String
+
+  market_id    String? @db.ObjectId
+  market_title String?
+  amount       Float?
+
+  is_read  Boolean @default(false)
+  metadata Json?
+
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  @@map("user_notifications")
+}
+
+model AdminActivity {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  admin_user_id String @db.ObjectId
+
+  action_type String // "market_created", "market_edited", "outcome_reported", etc.
+  entity_type String // "market", "user", "payout", "system"
+  entity_id   String? @db.ObjectId
+
+  description String
+  reason      String?
+  metadata    Json?
+
+  ip_address String?
+  user_agent String?
+
+  created_date DateTime @default(now())
+
+  @@map("admin_activities")
+}
+
+model AuditLog {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  sequence_number Int      @unique
+  timestamp       DateTime @default(now())
+
+  event_type String // "bet_placement", "payout", "market_settled", etc.
+  actor_id   String @db.ObjectId
+  actor_type String @default("user") // "user", "admin", "system"
+
+  entity_type String?
+  entity_id   String? @db.ObjectId
+
+  action       String
+  before_state Json?
+  after_state  Json?
+
+  amount_cents Int?
+
+  related_entity_type String?
+  related_entity_id   String? @db.ObjectId
+
+  metadata   Json?
+  ip_address String?
+  user_agent String?
+
+  // Chain Integrity
+  previous_hash       String?
+  current_hash        String?
+  verification_status String  @default("unverified") // "unverified", "verified", "tampered"
+
+  @@map("audit_logs")
+}
+
+model RecurringMarketTemplate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  title_template       String // e.g., "Daily Market - {date}"
+  description_template String
+
+  recurrence_pattern String // "daily", "weekly", "custom"
+  custom_cron        String? // Cron expression for custom patterns
+
+  bet_type        String @default("poll_style")
+  buy_in_amount   Float
+  market_duration String @default("daily")
+
+  outcomes Json // Array of outcome options
+
+  is_active Boolean @default(true)
+
+  created_by   String   @db.ObjectId
+  created_date DateTime @default(now())
+  updated_date DateTime @updatedAt
+
+  @@map("recurring_market_templates")
+}
