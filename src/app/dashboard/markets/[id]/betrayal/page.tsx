@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useParams } from "next/navigation"
-import { Users, Clock, TrendingUp, Shield, Swords, CheckCircle2, ArrowRight, ScanEye } from "lucide-react"
+import { Users, Clock, TrendingUp, Shield, Swords, CheckCircle2, ArrowRight, ScanEye, Handshake, Scale, Skull } from "lucide-react"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { useToast } from "@/hooks/useToast"
 import { mockUser } from "@/lib/mockData"
@@ -190,7 +190,7 @@ export default function BetrayalMarketPage() {
               >
                 <div className="text-center space-y-4">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100">
-                    <span className="text-4xl">🤝</span>
+                    <Handshake className="w-10 h-10 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-semibold text-black/90">COOPERATE</h3>
                   <p className="text-sm text-black/60 font-medium">Play it safe. Share the reward.</p>
@@ -254,7 +254,7 @@ export default function BetrayalMarketPage() {
                 <h3 className="text-lg font-semibold text-black/90 mb-4">How Payouts Work</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-4 rounded-2xl bg-green-50/60 border border-green-200/50">
-                    <span className="text-2xl shrink-0">🤝</span>
+                    <Handshake className="w-6 h-6 text-green-600 shrink-0" />
                     <div className="flex-1">
                       <p className="font-semibold text-green-900">All Cooperate</p>
                       <p className="text-sm text-green-700 font-medium">Everyone wins a small amount. Prize pool divided equally.</p>
@@ -262,7 +262,7 @@ export default function BetrayalMarketPage() {
                   </div>
 
                   <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/50">
-                    <span className="text-2xl shrink-0">⚖️</span>
+                    <Scale className="w-6 h-6 text-amber-600 shrink-0" />
                     <div className="flex-1">
                       <p className="font-semibold text-amber-900">Majority Cooperate, Minority Betray</p>
                       <p className="text-sm text-amber-700 font-medium">Betrayers win BIG. They split the entire prize pool.</p>
@@ -270,7 +270,7 @@ export default function BetrayalMarketPage() {
                   </div>
 
                   <div className="flex items-start gap-3 p-4 rounded-2xl bg-red-50/60 border border-red-200/50">
-                    <span className="text-2xl shrink-0">⚔️</span>
+                    <Swords className="w-6 h-6 text-red-600 shrink-0" />
                     <div className="flex-1">
                       <p className="font-semibold text-red-900">Majority Betray</p>
                       <p className="text-sm text-red-700 font-medium">Everyone loses. No payouts. Greed destroyed the pool.</p>
@@ -278,7 +278,7 @@ export default function BetrayalMarketPage() {
                   </div>
 
                   <div className="flex items-start gap-3 p-4 rounded-2xl bg-black border border-black/20">
-                    <span className="text-2xl shrink-0">💀</span>
+                    <Skull className="w-6 h-6 text-white shrink-0" />
                     <div className="flex-1">
                       <p className="font-semibold text-white">All Betray</p>
                       <p className="text-sm text-white/70 font-medium">Zero for everyone. Complete mutual destruction.</p>

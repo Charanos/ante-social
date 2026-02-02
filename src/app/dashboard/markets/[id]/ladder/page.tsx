@@ -20,7 +20,7 @@ import {
   useSortable
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Users, Clock, TrendingUp, GripVertical, CheckCircle2, Shield, ArrowRight, ScanEye } from "lucide-react"
+import { Users, Clock, TrendingUp, GripVertical, CheckCircle2, Shield, ArrowRight, ScanEye, Mic, Headphones, Music, Music2, Guitar } from "lucide-react"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { useToast } from "@/hooks/useToast"
 import { mockUser } from "@/lib/mockData"
@@ -29,7 +29,7 @@ import Image from "next/image"
 interface RankItem {
   id: string
   text: string
-  emoji: string
+  icon: any
 }
 
 // Sortable Item Component
@@ -71,7 +71,9 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
       </div>
 
       <div className="flex-1 flex items-center gap-3">
-        <span className="text-3xl">{item.emoji}</span>
+        <div className="shrink-0 w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center">
+          <item.icon className="w-5 h-5 text-black/70" />
+        </div>
         <span className="font-medium text-black/90">{item.text}</span>
       </div>
     </div>
@@ -92,11 +94,11 @@ const getMockLadderMarket = (id: string) => ({
   status: "active",
   close_date: new Date(Date.now() + 97200000), // 1d 3h
   items: [
-    { id: "item1", text: "Sauti Sol", emoji: "🎤" },
-    { id: "item2", text: "Nyashinski", emoji: "🎧" },
-    { id: "item3", text: "Khaligraph Jones", emoji: "🎵" },
-    { id: "item4", text: "Nadia Mukami", emoji: "🎶" },
-    { id: "item5", text: "Otile Brown", emoji: "🎸" }
+    { id: "item1", text: "Sauti Sol", icon: Mic },
+    { id: "item2", text: "Nyashinski", icon: Headphones },
+    { id: "item3", text: "Khaligraph Jones", icon: Music },
+    { id: "item4", text: "Nadia Mukami", icon: Music2 },
+    { id: "item5", text: "Otile Brown", icon: Guitar }
   ],
   participants: [
     { username: "@music_fan", total_stake: 2500, timestamp: new Date(Date.now() - 21600000) },
@@ -380,7 +382,8 @@ export default function LadderMarketPage() {
                             {index + 1}
                           </span>
                           <span className="text-base font-semibold text-black/90">
-                            {item.emoji} {item.text}
+                            <item.icon className="w-4 h-4 inline mr-2" />
+                            {item.text}
                           </span>
                         </div>
                       ))}

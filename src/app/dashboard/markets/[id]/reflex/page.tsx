@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useParams } from "next/navigation"
-import { Users, Clock, TrendingUp, CheckCircle2, Shield, ArrowRight, Zap, ScanEye } from "lucide-react"
+import { Users, Clock, TrendingUp, CheckCircle2, Shield, ArrowRight, Zap, ScanEye, LogOut, BellOff, HelpCircle, EyeOff, PartyPopper } from "lucide-react"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { useToast } from "@/hooks/useToast"
 import { mockUser } from "@/lib/mockData"
@@ -24,11 +24,11 @@ const getMockReflexMarket = (id: string) => ({
   status: "active",
   close_date: new Date(Date.now() + 2700000), // 45 min
   options: [
-    { id: "opt1", option_text: "Leave immediately", emoji: "🏃", votes: 45, percentage: 29 },
-    { id: "opt2", option_text: "Mute notifications", emoji: "🔕", votes: 52, percentage: 33 },
-    { id: "opt3", option_text: "Ask \"who's this?\"", emoji: "❓", votes: 38, percentage: 24 },
-    { id: "opt4", option_text: "Pretend not seeing it", emoji: "🙈", votes: 15, percentage: 10 },
-    { id: "opt5", option_text: "Participate for fun", emoji: "🎉", votes: 6, percentage: 4 }
+    { id: "opt1", option_text: "Leave immediately", icon: LogOut, votes: 45, percentage: 29 },
+    { id: "opt2", option_text: "Mute notifications", icon: BellOff, votes: 52, percentage: 33 },
+    { id: "opt3", option_text: "Ask \"who's this?\"", icon: HelpCircle, votes: 38, percentage: 24 },
+    { id: "opt4", option_text: "Pretend not seeing it", icon: EyeOff, votes: 15, percentage: 10 },
+    { id: "opt5", option_text: "Participate for fun", icon: PartyPopper, votes: 6, percentage: 4 }
   ],
   participants: [
     { username: "@quick_exit", total_stake: 1000, timestamp: new Date(Date.now() - 1200000) },
@@ -197,8 +197,9 @@ export default function ReflexMarketPage() {
                   <p className="text-lg font-medium text-amber-900 leading-relaxed">
                     {market.scenario}
                   </p>
-                  <p className="text-sm text-amber-700 mt-3 font-medium">
-                    ⚡ You have 5 seconds to decide. What will the majority choose?
+                  <p className="text-sm text-amber-700 mt-3 font-medium flex items-center gap-2">
+                    <Zap className="w-4 h-4" />
+                    You have 5 seconds to decide. What will the majority choose?
                   </p>
                 </div>
               </div>
@@ -229,7 +230,9 @@ export default function ReflexMarketPage() {
                       }`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="text-4xl">{option.emoji}</div>
+                      <div className="shrink-0 w-12 h-12 rounded-xl bg-black/5 flex items-center justify-center">
+                        <option.icon className="w-6 h-6 text-black/70" />
+                      </div>
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
                           <h4 className="text-base font-semibold text-black/90">

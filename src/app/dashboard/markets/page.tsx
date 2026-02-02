@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { mockUser } from "@/lib/mockData";
+import { MarketCard } from "@/components/markets/MarketCard";
 
 // Mock markets data with Kenyan context
 const mockMarkets = [
@@ -98,104 +99,8 @@ const getTypeStyles = (type: string) => {
     default:
       return { label: type };
   }
-};
-
-function MarketCard({ market, index }: any) {
-  const typeInfo = getTypeStyles(market.type);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500"
-    >
-      <Link href={`/dashboard/markets/${market.id}`} className="block">
-        <div className="flex flex-col justify-between">
-
-          {/* Shine effect */}
-          <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-          {/* Top border accent */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
-
-          {/* Image Section */}
-          <div className="relative h-48 overflow-hidden bg-linear-to-br from-black/5 to-black/10">
-            <Image
-              src={market.image}
-              alt={market.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-
-            {/* Type Badge */}
-            <div className="absolute top-4 left-4 px-2 flex items-center py-1 bg-white/90 backdrop-blur-sm rounded-full border border-black/10">
-              <span className="text-xs font-semibold text-black/70 uppercase tracking-wider">
-                {typeInfo.label}
-              </span>
-            </div>
-
-            {/* Time Badge */}
-            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-black/80 backdrop-blur-sm rounded-full">
-              <Clock className="w-3 h-3 text-white" />
-              <span className="text-xs font-semibold font-mono text-white">
-                {market.timeLeft}
-              </span>
-            </div>
-
-            {/* Status Badge */}
-            <div className="absolute bottom-4 left-4 px-3 py-1 bg-green-500/40 backdrop-blur-sm rounded-full border border-green-400/50">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                <span className="text-xs font-normal text-white uppercase tracking-wider">
-                  {market.status}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Content Section */}
-          <div className="relative p-6 h-full min-h-[250px] flex flex-col justify-between">
-            <div className="">
-              <h3 className="text-lg font-semibold text-black/90 tracking-tight mb-2 line-clamp-1 group-hover:text-black transition-colors">
-                {market.title}
-              </h3>
-              <p className="text-sm text-black/60 font-medium line-clamp-2 leading-relaxed">
-                {market.description}
-              </p>
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 border-y py-3 my-6 border-gray-100/50">
-              <div className="">
-                <p className="text-xs text-black/40 font-semibold uppercase tracking-wider mb-1">Buy-in</p>
-                <p className="text-sm font-semibold font-mono text-black/80">{market.buyIn}</p>
-              </div>
-              <div className="">
-                <p className="text-xs text-black/40 font-semibold uppercase tracking-wider mb-1">Pool</p>
-                <p className="text-sm font-semibold font-mono text-black/80">{market.pool}</p>
-              </div>
-              <div className="">
-                <p className="text-xs text-black/40 font-semibold uppercase tracking-wider mb-1">Players</p>
-                <p className="text-sm font-semibold font-mono text-black/80">{market.participants}</p>
-              </div>
-            </div>
-
-            {/* CTA Button */}
-            <motion.button
-              className="mt-auto w-full absolute bottom-0 left-0 flex items-center justify-center gap-2 px-6 py-2 cursor-pointer bg-black text-white rounded-xl font-normal tracking-wider text-sm hover:bg-black/90 transition-colors group/btn"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Join Market
-              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-            </motion.button>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  );
 }
+  ;
 
 export default function MarketsPage() {
   const [searchQuery, setSearchQuery] = useState("");
