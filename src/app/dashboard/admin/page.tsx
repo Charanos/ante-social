@@ -91,7 +91,7 @@ export default function AdminPage() {
       {/* Visual Separator - Overview */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Platform Overview</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Platform Overview</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -175,7 +175,7 @@ export default function AdminPage() {
       {/* Visual Separator - Quick Actions */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Quick Actions</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Quick Actions</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -333,7 +333,7 @@ export default function AdminPage() {
       {/* Visual Separator - System Maintenance */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">System Maintenance</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">System Maintenance</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -352,7 +352,7 @@ export default function AdminPage() {
               <div>
                 <h3 className="text-lg font-medium text-neutral-900">Data Maintenance</h3>
                 <p className="mt-1 text-sm font-medium text-neutral-600">System Maintenance</p>
-                <p className="text-xs text-neutral-400 mt-1">Data repair, integrity checks, and reconciliation tools</p>
+                <p className="text-xs text-neutral-500 mt-1">Data repair, integrity checks, and reconciliation tools</p>
               </div>
             </div>
             <Link href="/dashboard/admin/maintenance">
@@ -371,7 +371,7 @@ export default function AdminPage() {
       {/* Visual Separator - Recent Markets */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Recent Markets ({mockMarkets.length})</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Recent Markets ({mockMarkets.length})</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 

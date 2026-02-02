@@ -1,43 +1,133 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { Home, Wallet, User, Bell, Users } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import {
+  Home,
+  Wallet,
+  User,
+  Bell,
+  Users,
+  Menu,
+  X,
+  LogOut,
+  Settings,
+  Shield,
+  TrendingUp
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { signOut } from 'next-auth/react';
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
-const navItems = [
+const mainNavItems = [
   { title: 'Home', url: '/dashboard', icon: Home },
-  { title: 'Wallet', url: '/dashboard/wallet', icon: Wallet },
+  { title: 'Markets', url: "/dashboard/markets", icon: TrendingUp },
   { title: 'Groups', url: '/dashboard/groups', icon: Users },
+  { title: 'Wallet', url: '/dashboard/wallet', icon: Wallet },
+];
+
+const secondaryNavItems = [
   { title: 'Profile', url: '/dashboard/profile', icon: User },
+  { title: 'Notifications', url: '/dashboard/notifications', icon: Bell },
+  { title: 'Settings', url: '/settings', icon: Settings },
+  { title: 'Admin', url: '/dashboard/admin', icon: Shield },
 ];
 
 export function MobileNav({ user }: { user: any }) {
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-nav z-50 pb-safe">
-      <ul className="flex justify-around items-center h-16">
-        {navItems.map((item) => {
-          const isActive = pathname === item.url;
-          return (
-            <li key={item.title} className="w-full">
-              <Link
-                href={item.url}
-                className={`
-                  flex flex-col items-center justify-center gap-1 h-full w-full
-                  transition-all duration-200
-                  ${isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}
-                `}
+    <>
+      <nav className="md:hidden fixed bottom-6 left-4 right-4 z-50">
+        <div className="glass-panel rounded-2xl border border-white/40 shadow-xl bg-white/80 backdrop-blur-xl p-2">
+          <ul className="flex justify-between items-center px-2">
+            {mainNavItems.map((item) => {
+              const isActive = pathname === item.url;
+              return (
+                <li key={item.title} className="">
+                  <Link
+                    href={item.url}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={cn(
+                      "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300",
+                      isActive ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    <item.icon className={cn("w-6 h-6", isActive && "fill-current")} strokeWidth={isActive ? 2.5 : 2} />
+                  </Link>
+                </li>
+              );
+            })}
+
+            {/* More Menu Toggle */}
+            <li>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className={cn(
+                  "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300",
+                  isMenuOpen ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-gray-600"
+                )}
               >
-                <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-gray-100' : ''}`}>
-                  <item.icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.5px]'}`} />
-                </div>
-                <span className="text-[10px] font-medium">{item.title}</span>
-              </Link>
+                {isMenuOpen ? (
+                  <X className="w-6 h-6" strokeWidth={2.5} />
+                ) : (
+                  <Menu className="w-6 h-6" strokeWidth={2} />
+                )}
+              </button>
             </li>
-          );
-        })}
-      </ul>
-    </nav>
+          </ul>
+        </div>
+      </nav>
+
+      {/* Full Screen Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="md:hidden fixed inset-0 z-40 bg-white/95 backdrop-blur-3xl pt-24 px-6 pb-32 overflow-y-auto"
+          >
+            <div className="flex flex-col items-center mb-10">
+              <div className="relative w-16 h-16 mb-4">
+                <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900">Ante Social</h2>
+              <p className="text-gray-500">Bet with your friends.</p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">Menu</h3>
+              {secondaryNavItems.filter(item => item.title !== "Admin" || user?.role === "admin").map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.url}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all"
+                >
+                  <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                    <item.icon className="w-5 h-5" />
+                  </div>
+                  <span className="font-medium text-lg text-gray-900">{item.title}</span>
+                </Link>
+              ))}
+
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 border border-transparent hover:border-red-100 transition-all mt-4 text-red-600"
+              >
+                <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <LogOut className="w-5 h-5" />
+                </div>
+                <span className="font-medium text-lg">Sign Out</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

@@ -18,12 +18,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-
-const mockUser = {
-  username: "HighRoller",
-  user_level: "high_roller",
-  balance: 165432.50
-};
+import { mockUser } from "@/lib/mockData";
 
 const mockAchievements = {
   stats: {
@@ -96,7 +91,7 @@ export default function AchievementsPage() {
       {/* Visual Separator */}
       <div className="flex items-center gap-4 my-18">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Overview</h2>
+        <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Overview</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -238,7 +233,7 @@ export default function AchievementsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">In Progress</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">In Progress</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -259,7 +254,7 @@ export default function AchievementsPage() {
                     <h4 className="font-semibold text-black/90 text-base">{item.title}</h4>
                     <p className="text-sm text-black/60 font-medium mt-1">{item.description}</p>
                   </div>
-                  <span className="text-green-600 font-mono font-bold text-sm whitespace-nowrap">+{item.reward} KSH</span>
+                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">+{item.reward} KSH</span>
                 </div>
 
                 <div className="space-y-2">
@@ -284,7 +279,7 @@ export default function AchievementsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Unlocked</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Unlocked</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -321,7 +316,7 @@ export default function AchievementsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Locked</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Locked</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -395,7 +390,7 @@ export default function AchievementsPage() {
 
                 <div className="p-6 rounded-2xl bg-linear-to-br from-amber-50 to-yellow-50 border border-amber-200">
                   <p className="text-sm font-semibold text-amber-900/60 mb-2">Today's Reward</p>
-                  <p className="text-4xl font-bold font-mono text-amber-900">
+                  <p className="text-4xl font-semibold font-mono text-amber-900">
                     100 <span className="text-2xl">KSH</span>
                   </p>
                 </div>

@@ -100,7 +100,7 @@ export default function WalletPage() {
       {/* Visual Separator - Balance Overview */}
       <div className="flex items-center gap-4 my-18">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Balance Overview</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Balance Overview</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -191,7 +191,7 @@ export default function WalletPage() {
       {/* Visual Separator - Transaction History */}
       <div className="flex items-center gap-4 my-18">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Transaction History</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Transaction History</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 

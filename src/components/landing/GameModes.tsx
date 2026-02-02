@@ -1,12 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Users, 
-  Zap, 
-  Brain, 
-  ShieldAlert, 
-  Trophy, 
+import {
+  Users,
+  Zap,
+  Brain,
+  ShieldAlert,
+  Trophy,
   ArrowRight
 } from "lucide-react";
 import { useState } from "react";
@@ -64,13 +64,13 @@ export function GameModes() {
   const currentMode = gameModes[activeMode];
 
   return (
-    <section className="relative py-24 md:py-32 px-4 md:px-6 bg-gradient-to-b from-neutral-50/50 via-white to-neutral-50/50 overflow-hidden">
-      
+    <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-neutral-50/50 via-white to-neutral-50/50 overflow-hidden">
+
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-black/[0.02] via-transparent to-transparent pointer-events-none" />
-      
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,var(--tw-gradient-stops))] from-black/2 via-transparent to-transparent pointer-events-none" />
+
       <div className="relative max-w-7xl mx-auto">
-        
+
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -89,7 +89,7 @@ export function GameModes() {
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          
+
           {/* Left: Navigation Menu */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             {gameModes.map((mode, index) => (
@@ -100,43 +100,37 @@ export function GameModes() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className={`group relative cursor-pointer flex items-center gap-4 p-5 md:p-6 rounded-2xl text-left transition-all duration-300 ${
-                  activeMode === index
-                    ? "bg-white/60 backdrop-blur-xl border border-black/10 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12)]"
-                    : "bg-white/30 backdrop-blur-sm border border-black/5 hover:bg-white/50 hover:border-black/8 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
-                }`}
+                className={`group relative cursor-pointer flex items-center gap-4 p-5 md:p-6 rounded-2xl text-left transition-all duration-300 ${activeMode === index
+                  ? "bg-white/60 backdrop-blur-xl border border-black/10 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12)]"
+                  : "bg-white/30 backdrop-blur-sm border border-black/5 hover:bg-white/50 hover:border-black/8 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
+                  }`}
               >
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
-                  activeMode === index
-                    ? "bg-black/8 border border-black/10"
-                    : "bg-black/5 border border-black/5 group-hover:bg-black/8"
-                }`}>
-                  <mode.icon className={`w-6 h-6 transition-colors ${
-                    activeMode === index ? "text-black/80" : "text-black/40 group-hover:text-black/60"
-                  }`} />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${activeMode === index
+                  ? "bg-black/8 border border-black/10"
+                  : "bg-black/5 border border-black/5 group-hover:bg-black/8"
+                  }`}>
+                  <mode.icon className={`w-6 h-6 transition-colors ${activeMode === index ? "text-black/80" : "text-black/40 group-hover:text-black/60"
+                    }`} />
                 </div>
-                
+
                 {/* Text */}
                 <div className="flex-1 min-w-0">
-                  <h3 className={`text-base md:text-lg font-semibold tracking-tight transition-colors ${
-                    activeMode === index ? "text-black/90" : "text-black/50 group-hover:text-black/70"
-                  }`}>
+                  <h3 className={`text-base md:text-lg font-semibold tracking-tight transition-colors ${activeMode === index ? "text-black/90" : "text-black/50 group-hover:text-black/70"
+                    }`}>
                     {mode.title}
                   </h3>
-                  <p className={`text-xs md:text-sm font-medium mt-0.5 transition-colors ${
-                    activeMode === index ? "text-black/50" : "text-black/30 group-hover:text-black/40"
-                  }`}>
+                  <p className={`text-xs md:text-sm font-medium mt-0.5 transition-colors ${activeMode === index ? "text-black/50" : "text-black/30 group-hover:text-black/40"
+                    }`}>
                     {mode.subtitle}
                   </p>
                 </div>
 
                 {/* Arrow Indicator */}
-                <ArrowRight className={`w-5 h-5 transition-all ${
-                  activeMode === index 
-                    ? "opacity-100 translate-x-0 text-black/60" 
-                    : "opacity-0 -translate-x-2 text-black/30"
-                }`} />
+                <ArrowRight className={`w-5 h-5 transition-all ${activeMode === index
+                  ? "opacity-100 translate-x-0 text-black/60"
+                  : "opacity-0 -translate-x-2 text-black/30"
+                  }`} />
               </motion.button>
             ))}
           </div>
@@ -161,7 +155,7 @@ export function GameModes() {
                 >
                   <currentMode.icon className="w-8 h-8 text-black/70" />
                 </motion.div>
-                
+
                 {/* Content */}
                 <div className="flex-1 space-y-6">
                   <div>
@@ -211,7 +205,7 @@ export function GameModes() {
                     ))}
                   </motion.div>
                 </div>
-                
+
                 {/* Quote Footer */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}

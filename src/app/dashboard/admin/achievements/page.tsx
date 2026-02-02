@@ -91,7 +91,7 @@ export default function AchievementManagerPage() {
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -154,7 +154,7 @@ export default function AchievementManagerPage() {
         {/* Visual Separator - Search */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Search User Badge History</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Search User Badge History</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -167,7 +167,7 @@ export default function AchievementManagerPage() {
           <DashboardCard className="p-5 mb-10">
             <div className="flex gap-3">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
                 <input
                   type="text"
                   placeholder="Search by email, username, or name..."
@@ -186,7 +186,7 @@ export default function AchievementManagerPage() {
         {/* Visual Separator - Achievements */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Achievements ({mockAchievements.length})</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Achievements ({mockAchievements.length})</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -216,7 +216,7 @@ export default function AchievementManagerPage() {
                       <td className="px-6 py-4">
                         <div>
                           <p className="text-sm font-medium text-neutral-900">{achievement.name}</p>
-                          <p className="text-xs text-neutral-500 font-mono">{achievement.slug}</p>
+                          <p className="text-xs text-neutral-600 font-mono">{achievement.slug}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -243,7 +243,7 @@ export default function AchievementManagerPage() {
                       </td>
                       <td className="px-6 py-4">
                         <button className="p-2 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer group">
-                          <Edit className="w-4 h-4 text-neutral-400 group-hover:text-neutral-700" />
+                          <Edit className="w-4 h-4 text-neutral-500 group-hover:text-neutral-700" />
                         </button>
                       </td>
                     </tr>

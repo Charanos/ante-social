@@ -63,11 +63,11 @@ export default function GroupDetailsPage() {
 
                 <div className="relative z-10 flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-6">
-                        <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-md text-5xl font-bold shadow-inner border border-white/20">
+                        <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-md text-5xl font-semibold shadow-inner border border-white/20">
                             {groupId.charAt(0).toUpperCase()}
                         </div>
                         <div className="space-y-2">
-                            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">High Rollers Club</h1>
+                            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white">High Rollers Club</h1>
                             <div className="flex items-center gap-3 text-purple-200">
                                 <span className="flex items-center gap-1.5 text-sm font-semibold bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-md">
                                     <Users className="h-4 w-4" />
@@ -85,7 +85,7 @@ export default function GroupDetailsPage() {
                         whileHover={{ scale: 1.02, backgroundColor: "rgba(255, 255, 255, 1)" }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setIsCreateMarketModalOpen(true)}
-                        className="group flex cursor-pointer items-center gap-2 rounded-2xl bg-white/90 backdrop-blur-sm px-6 py-4 text-purple-900 shadow-xl transition-all hover:shadow-2xl font-bold"
+                        className="group flex cursor-pointer items-center gap-2 rounded-2xl bg-white/90 backdrop-blur-sm px-6 py-4 text-purple-900 shadow-xl transition-all hover:shadow-2xl font-semibold"
                     >
                         <div className="p-1.5 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
                             <Plus className="h-5 w-5 text-purple-700" />
@@ -132,7 +132,7 @@ export default function GroupDetailsPage() {
                                                 <Trophy className="h-6 w-6" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-black transition-colors">{market.title}</h3>
+                                                <h3 className="text-xl font-semibold text-gray-900 group-hover:text-black transition-colors">{market.title}</h3>
                                                 <div className="mt-2 flex items-center gap-3">
                                                     <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 uppercase tracking-wide">
                                                         {market.type.replace(/_/g, ' ')}
@@ -146,7 +146,7 @@ export default function GroupDetailsPage() {
                                             <div>
                                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Pool Size</p>
                                                 <div className="flex items-baseline gap-1">
-                                                    <span className="text-2xl font-bold font-mono text-gray-900">${market.pool}</span>
+                                                    <span className="text-2xl font-semibold font-mono text-gray-900">${market.pool}</span>
                                                     <span className="text-xs text-gray-500 font-medium">USD</span>
                                                 </div>
                                             </div>
@@ -156,7 +156,7 @@ export default function GroupDetailsPage() {
                                             <div>
                                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Entry</p>
                                                 <div className="flex items-baseline gap-1">
-                                                    <span className="text-2xl font-bold font-mono text-gray-900">${market.buy_in}</span>
+                                                    <span className="text-2xl font-semibold font-mono text-gray-900">${market.buy_in}</span>
                                                     <span className="text-xs text-gray-500 font-medium">USD</span>
                                                 </div>
                                             </div>

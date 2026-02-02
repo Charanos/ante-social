@@ -49,7 +49,7 @@ export default function EditMarketPage() {
           className="flex items-center justify-between mb-8"
         >
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => router.back()}
               className="w-10 h-10 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors flex items-center justify-center cursor-pointer"
             >
@@ -57,7 +57,7 @@ export default function EditMarketPage() {
             </button>
             <div>
               <h1 className="text-2xl font-medium text-neutral-900">Edit Market</h1>
-              <p className="text-sm text-neutral-500 mt-0.5">Update market details and outcomes</p>
+              <p className="text-sm text-neutral-600 mt-0.5">Update market details and outcomes</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100">
@@ -74,14 +74,14 @@ export default function EditMarketPage() {
           className="bg-white rounded-xl border border-neutral-200 p-8 mb-6"
         >
           <h2 className="text-lg font-medium text-neutral-900 mb-6">Market Details</h2>
-          
+
           {/* Title */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-neutral-900 mb-2">
               Market Title <span className="text-red-500">*</span>
             </label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               defaultValue="What's your vibe right now?"
               className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
             />
@@ -92,13 +92,13 @@ export default function EditMarketPage() {
             <label className="block text-sm font-medium text-neutral-900 mb-2">
               Description <span className="text-red-500">*</span>
             </label>
-            <textarea 
+            <textarea
               rows={4}
               defaultValue="Pick the one that matches your brain's current state. Trust your gut — your mood might just make you money today."
               className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all resize-none"
             />
             <div className="flex justify-end mt-1.5">
-              <span className="text-xs text-neutral-400">113 / 2000 characters</span>
+              <span className="text-xs text-neutral-500">113 / 2000 characters</span>
             </div>
           </div>
 
@@ -114,11 +114,11 @@ export default function EditMarketPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-neutral-900">Image attached</p>
-                  <p className="text-xs text-neutral-500">23cc01c4e_49b.jpg</p>
+                  <p className="text-xs text-neutral-600">23cc01c4e_49b.jpg</p>
                 </div>
               </div>
               <button className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors">
-                <X className="w-4 h-4 text-neutral-500" />
+                <X className="w-4 h-4 text-neutral-600" />
               </button>
             </div>
           </div>
@@ -129,15 +129,15 @@ export default function EditMarketPage() {
               Tags (Optional)
             </label>
             <div className="flex gap-2 mb-3">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Add tags..."
                 value={currentTag}
                 onChange={(e) => setCurrentTag(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
                 className="flex-1 px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
-              <button 
+              <button
                 onClick={handleAddTag}
                 className="px-4 py-2.5 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-700 transition-all cursor-pointer"
               >
@@ -147,8 +147,8 @@ export default function EditMarketPage() {
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {tags.map(tag => (
-                  <span 
-                    key={tag} 
+                  <span
+                    key={tag}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-100 text-xs font-medium text-neutral-700 border border-neutral-200"
                   >
                     {tag}
@@ -169,8 +169,8 @@ export default function EditMarketPage() {
               <label className="block text-sm font-medium text-neutral-900 mb-2">
                 Buy-in Amount (MP) <span className="text-red-500">*</span>
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 defaultValue={1}
                 className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
@@ -187,7 +187,7 @@ export default function EditMarketPage() {
                 <option>Monthly (30d)</option>
                 <option>Custom</option>
               </select>
-              <p className="text-xs text-neutral-500 mt-1.5">Affects early bettor bonus calculations</p>
+              <p className="text-xs text-neutral-600 mt-1.5">Affects early bettor bonus calculations</p>
             </div>
           </div>
 
@@ -197,8 +197,8 @@ export default function EditMarketPage() {
               <label className="block text-sm font-medium text-neutral-900 mb-2">
                 Min Participants <span className="text-red-500">*</span>
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 defaultValue={5}
                 className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
@@ -209,8 +209,8 @@ export default function EditMarketPage() {
               <label className="block text-sm font-medium text-neutral-900 mb-2">
                 Max Participants (Optional)
               </label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 defaultValue={1000}
                 className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
@@ -226,12 +226,12 @@ export default function EditMarketPage() {
                 <Calendar className="w-4 h-4" />
                 Close Time <span className="text-red-500">*</span>
               </label>
-              <input 
+              <input
                 type="datetime-local"
                 defaultValue="2025-12-02T08:30"
                 className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
-              <p className="text-xs text-neutral-500 mt-1.5">in 7 hours</p>
+              <p className="text-xs text-neutral-600 mt-1.5">in 7 hours</p>
             </div>
 
             {/* Settlement Time */}
@@ -240,12 +240,12 @@ export default function EditMarketPage() {
                 <Calendar className="w-4 h-4" />
                 Settlement Time <span className="text-red-500">*</span>
               </label>
-              <input 
+              <input
                 type="datetime-local"
                 defaultValue="2025-12-02T10:00"
                 className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
-              <p className="text-xs text-neutral-500 mt-1.5">in 8 hours</p>
+              <p className="text-xs text-neutral-600 mt-1.5">in 8 hours</p>
             </div>
 
             {/* Publish Time */}
@@ -254,12 +254,12 @@ export default function EditMarketPage() {
                 <Calendar className="w-4 h-4" />
                 Scheduled Publish Time (Optional)
               </label>
-              <input 
+              <input
                 type="text"
                 placeholder="dd/mm/yyyy --:--"
                 className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
-              <p className="text-xs text-neutral-500 mt-1.5">If set, market will automatically publish at this time</p>
+              <p className="text-xs text-neutral-600 mt-1.5">If set, market will automatically publish at this time</p>
             </div>
           </div>
         </motion.div>
@@ -273,7 +273,7 @@ export default function EditMarketPage() {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-medium text-neutral-900">Outcome Options</h2>
-            <button 
+            <button
               onClick={handleAddOutcome}
               className="text-sm font-medium text-neutral-700 hover:text-neutral-900 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-all cursor-pointer"
             >
@@ -290,21 +290,21 @@ export default function EditMarketPage() {
                     Option {index + 1} <span className="text-red-500">*</span>
                   </label>
                   {outcomes.length > 2 && (
-                    <button 
-                      onClick={() => handleRemoveOutcome(outcome.id)} 
+                    <button
+                      onClick={() => handleRemoveOutcome(outcome.id)}
                       className="p-1.5 rounded text-red-500 hover:bg-red-50 transition-all cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   defaultValue={outcome.name}
                   placeholder="Option text..."
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all mb-4"
                 />
-                
+
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Option Image/GIF (Optional)
@@ -319,16 +319,16 @@ export default function EditMarketPage() {
                           <p className="text-sm font-medium text-neutral-900">
                             {outcome.image.includes('.gif') ? 'GIF attached' : 'Image attached'}
                           </p>
-                          <p className="text-xs text-neutral-500">{outcome.image}</p>
+                          <p className="text-xs text-neutral-600">{outcome.image}</p>
                         </div>
                       </div>
                       <button className="p-1.5 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer">
-                        <X className="w-4 h-4 text-neutral-500" />
+                        <X className="w-4 h-4 text-neutral-600" />
                       </button>
                     </div>
                   ) : (
                     <button className="w-full px-3.5 py-2.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 transition-all flex items-center justify-center gap-2 group cursor-pointer">
-                      <Upload className="w-4 h-4 text-neutral-500 group-hover:text-neutral-700 transition-colors" />
+                      <Upload className="w-4 h-4 text-neutral-600 group-hover:text-neutral-700 transition-colors" />
                       <span className="text-sm font-medium text-neutral-600 group-hover:text-neutral-900 transition-colors">Upload Media</span>
                     </button>
                   )}
@@ -342,7 +342,7 @@ export default function EditMarketPage() {
       {/* Floating Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-end gap-3">
-          <button 
+          <button
             onClick={() => router.back()}
             className="px-5 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg transition-all cursor-pointer"
           >

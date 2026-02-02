@@ -156,7 +156,7 @@ export function FeatureGrid() {
   return (
     <section
       id="features"
-      className="relative py-24 md:py-32 px-4 md:px-6 bg-gradient-to-b from-white via-neutral-50/50 to-white overflow-hidden"
+      className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-white via-neutral-50/50 to-white overflow-hidden"
     >
       {/* Background Decor */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-black/[0.02] via-transparent to-transparent pointer-events-none" />

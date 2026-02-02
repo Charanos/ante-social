@@ -19,15 +19,7 @@ import {
   TrendingUp,
   Wallet
 } from "lucide-react";
-
-const mockUser = {
-  id: "usr_abc123",
-  username: "HighRoller",
-  full_name: "Alex Mwangi",
-  email: "alex@example.com",
-  user_level: "high_roller",
-  balance: 165432.50
-};
+import { mockUser } from "@/lib/mockData";
 
 export default function ProfilePage() {
   const [timezone, setTimezone] = useState("Africa/Nairobi");
@@ -141,7 +133,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-black/50 uppercase tracking-wider mb-1">Current Tier</p>
-                  <p className="text-2xl font-bold text-black/90 capitalize">
+                  <p className="text-2xl font-semibold text-black/90 capitalize">
                     {mockUser.user_level.replace('_', ' ')}
                   </p>
                 </div>
@@ -185,7 +177,7 @@ export default function ProfilePage() {
                   <TrendingUp className="w-4 h-4 text-black/40" />
                   <span className="text-sm font-semibold text-black/70">Deposits</span>
                 </div>
-                <span className="font-mono font-bold text-black/90">
+                <span className="font-mono font-semibold text-black/90">
                   {mockUser.user_level === 'high_roller' ? '662,250' : '66,225'} KSH
                 </span>
               </div>
@@ -195,7 +187,7 @@ export default function ProfilePage() {
                   <Wallet className="w-4 h-4 text-black/40" />
                   <span className="text-sm font-semibold text-black/70">Withdrawals</span>
                 </div>
-                <span className="font-mono font-bold text-black/90">
+                <span className="font-mono font-semibold text-black/90">
                   {mockUser.user_level === 'high_roller' ? '132,450' : '33,113'} KSH
                 </span>
               </div>

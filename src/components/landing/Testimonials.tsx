@@ -96,7 +96,7 @@ function TestimonialCard({ testimonial, index }: any) {
                 <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
                   Wins
                 </span>
-                <span className="text-xs font-bold font-mono text-black/70">
+                <span className="text-xs font-semibold font-mono text-black/70">
                   {testimonial.stats.wins}
                 </span>
               </div>
@@ -104,7 +104,7 @@ function TestimonialCard({ testimonial, index }: any) {
                 <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
                   Streak
                 </span>
-                <span className="text-xs font-bold font-mono text-black/70">
+                <span className="text-xs font-semibold font-mono text-black/70">
                   {testimonial.stats.streak}x
                 </span>
               </div>
@@ -121,7 +121,7 @@ export function Testimonials() {
   const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
 
   return (
-    <section className="relative py-24 md:py-32 px-4 md:px-6 bg-gradient-to-b from-white via-neutral-50/30 to-white overflow-hidden">
+    <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-white via-neutral-50/30 to-white overflow-hidden">
 
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-black/[0.02] via-transparent to-transparent pointer-events-none" />
@@ -155,7 +155,7 @@ export function Testimonials() {
         <div className="relative w-full overflow-hidden">
           {/* Fade Edges */}
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
 
           {/* Scrolling Track */}
           <motion.div
@@ -192,7 +192,7 @@ export function Testimonials() {
         >
           <div className="flex flex-wrap justify-center gap-8 md:gap-12 p-8 md:p-10 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold font-mono text-black/90 mb-1">
+              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
                 12.5K+
               </div>
               <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
@@ -201,7 +201,7 @@ export function Testimonials() {
             </div>
             <div className="w-px bg-black/5 hidden md:block" />
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold font-mono text-black/90 mb-1">
+              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
                 KSH 8.2M
               </div>
               <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
@@ -210,7 +210,7 @@ export function Testimonials() {
             </div>
             <div className="w-px bg-black/5 hidden md:block" />
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold font-mono text-black/90 mb-1">
+              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
                 98%
               </div>
               <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
@@ -219,7 +219,7 @@ export function Testimonials() {
             </div>
             <div className="w-px bg-black/5 hidden md:block" />
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold font-mono text-black/90 mb-1">
+              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
                 342
               </div>
               <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">

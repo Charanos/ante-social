@@ -71,7 +71,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer"
           >
-            <X className="w-4 h-4 text-neutral-500 hover:text-neutral-900" />
+            <X className="w-4 h-4 text-neutral-600 hover:text-neutral-900" />
           </button>
 
           {/* Header */}
@@ -80,7 +80,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <h2 className="text-xl font-medium text-neutral-900 mb-1">Wheel of Fortune</h2>
-            <p className="text-sm text-neutral-500">Spin daily to win MP rewards!</p>
+            <p className="text-sm text-neutral-600">Spin daily to win MP rewards!</p>
           </div>
 
           {/* Wheel Container */}
@@ -174,7 +174,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
             className={`
               w-full py-3 rounded-xl font-medium text-sm shadow-sm transition-all
               ${isSpinning || hasSpunToday
-                ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed border border-neutral-200'
+                ? 'bg-neutral-100 text-neutral-500 cursor-not-allowed border border-neutral-200'
                 : 'bg-linear-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-md cursor-pointer'
               }
             `}
@@ -183,7 +183,7 @@ export function SpinWheelModal({ isOpen, onClose }: SpinWheelModalProps) {
           </button>
 
           {!hasSpunToday && !isSpinning && (
-            <p className="text-center text-xs text-neutral-500 mt-3">
+            <p className="text-center text-xs text-neutral-600 mt-3">
               One free spin per day • Rewards from 0 to 1000 MP
             </p>
           )}

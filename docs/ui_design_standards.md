@@ -91,7 +91,7 @@ Gradient horizontal rules with centered labels:
     from-transparent via-neutral-200 to-transparent"
   />
   <h2
-    className="text-xs font-medium text-neutral-400 
+    className="text-xs font-medium text-neutral-500 
     uppercase tracking-wider"
   >
     Section Title
@@ -155,8 +155,8 @@ import { motion } from "framer-motion";
 
 ```css
 /* Display */
-text-4xl font-bold      /* 36px, Hero headers */
-text-3xl font-bold      /* 30px, Page titles */
+text-4xl font-semibold      /* 36px, Hero headers */
+text-3xl font-semibold      /* 30px, Page titles */
 text-2xl font-medium  /* 24px, Section headers */
 text-xl font-medium   /* 20px, Card headers */
 text-lg font-medium   /* 18px, Subsections */
@@ -201,7 +201,7 @@ bg-red-50, text-red-600, border-red-200
 bg-neutral-50   /* Backgrounds */
 bg-neutral-100  /* Subtle fills */
 bg-neutral-200  /* Borders */
-text-neutral-400 /* Muted text */
+text-neutral-500 /* Muted text */
 text-neutral-600 /* Secondary text */
 text-neutral-900 /* Primary text */
 ```
@@ -294,7 +294,7 @@ bg-linear-to-r from-purple-600 via-pink-600 to-blue-600
 }
 <button
   disabled
-  className="bg-neutral-300 text-neutral-500 
+  className="bg-neutral-300 text-neutral-600 
   cursor-not-allowed"
 >
   Disabled

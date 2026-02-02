@@ -123,7 +123,7 @@ export default function CronMonitorPage() {
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview (24h)</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview (24h)</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -202,7 +202,7 @@ export default function CronMonitorPage() {
         {/* Visual Separator - Current Jobs */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Current Job Status</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Current Job Status</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -229,22 +229,22 @@ export default function CronMonitorPage() {
 
                     <div className="flex items-center gap-6 text-xs">
                       <div className="flex items-center gap-2">
-                        <Code className="w-3.5 h-3.5 text-neutral-400" />
-                        <span className="text-neutral-500 font-medium">Schedule:</span>
+                        <Code className="w-3.5 h-3.5 text-neutral-500" />
+                        <span className="text-neutral-600 font-medium">Schedule:</span>
                         <span className="font-mono text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded">{job.schedule}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-neutral-400" />
-                        <span className="text-neutral-500 font-medium">Last run:</span>
+                        <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                        <span className="text-neutral-600 font-medium">Last run:</span>
                         <span className="font-mono text-neutral-700">{job.lastRun}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="w-3.5 h-3.5 text-neutral-400" />
-                        <span className="text-neutral-500 font-medium">Next run:</span>
+                        <TrendingUp className="w-3.5 h-3.5 text-neutral-500" />
+                        <span className="text-neutral-600 font-medium">Next run:</span>
                         <span className="font-mono text-neutral-700">{job.nextRun}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-neutral-500 font-medium">Duration:</span>
+                        <span className="text-neutral-600 font-medium">Duration:</span>
                         <span className="font-mono text-neutral-700 font-medium">{job.duration}</span>
                       </div>
                     </div>
@@ -258,7 +258,7 @@ export default function CronMonitorPage() {
         {/* Visual Separator - Execution History */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Execution History</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Execution History</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 

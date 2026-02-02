@@ -154,7 +154,7 @@ className="font-mono text-2xl"
     from-transparent via-neutral-200 to-transparent"
   />
   <h2
-    className="text-xs font-medium text-neutral-400 
+    className="text-xs font-medium text-neutral-500 
     uppercase tracking-wider"
   >
     Section Title

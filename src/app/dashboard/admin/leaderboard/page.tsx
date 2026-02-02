@@ -76,11 +76,11 @@ export default function LeaderboardPage() {
       case 1:
         return <Trophy className="w-5 h-5 text-amber-500" />
       case 2:
-        return <Award className="w-5 h-5 text-neutral-400" />
+        return <Award className="w-5 h-5 text-neutral-500" />
       case 3:
         return <Medal className="w-5 h-5 text-amber-700" />
       default:
-        return <span className="text-sm font-medium text-neutral-500">#{rank}</span>
+        return <span className="text-sm font-medium text-neutral-600">#{rank}</span>
     }
   }
 
@@ -122,7 +122,7 @@ export default function LeaderboardPage() {
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -185,7 +185,7 @@ export default function LeaderboardPage() {
         {/* Visual Separator - Search */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Search</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Search</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -197,7 +197,7 @@ export default function LeaderboardPage() {
         >
           <DashboardCard className="p-5 mb-10">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
               <input
                 type="text"
                 placeholder="Search by username, name, email, or user ID..."
@@ -212,7 +212,7 @@ export default function LeaderboardPage() {
         {/* Visual Separator - Rankings */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Rankings ({mockLeaderboard.length})</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Rankings ({mockLeaderboard.length})</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -257,8 +257,8 @@ export default function LeaderboardPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-neutral-500">{entry.user.email}</p>
-                            <p className="text-xs text-neutral-400 font-mono">{entry.user.id}</p>
+                            <p className="text-xs text-neutral-600">{entry.user.email}</p>
+                            <p className="text-xs text-neutral-500 font-mono">{entry.user.id}</p>
                           </div>
                         </div>
                       </td>

@@ -187,11 +187,11 @@ export default function NotificationsPage() {
                   >
                     {/* Unread Indicator Bar */}
                     {!notification.is_read && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-gray-500 to-indigo-500" />
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-linear-to-b from-gray-500 to-indigo-500" />
                     )}
 
                     {/* Icon */}
-                    <div className={`relative flex-shrink-0 rounded-xl p-3.5 transition-all border ${!notification.is_read
+                    <div className={`relative shrink-0 rounded-xl p-3.5 transition-all border ${!notification.is_read
                       ? getTypeColor(notification.type) + ' shadow-sm'
                       : 'bg-white border-gray-200 group-hover:shadow-md group-hover:border-gray-300'
                       }`}>
@@ -267,7 +267,7 @@ export default function NotificationsPage() {
                           e.stopPropagation()
                           markAsRead(notification.id)
                         }}
-                        className="cursor-pointer flex-shrink-0 self-center rounded-full bg-white border-2 border-gray-200 p-1 transition-all hover:bg-gray-50 hover:border-gray-400"
+                        className="cursor-pointer shrink-0 self-center rounded-full bg-white border-2 border-gray-200 p-1 transition-all hover:bg-gray-50 hover:border-gray-400"
                       >
                         <Check className="h-3.5 w-3.5 text-gray-600" />
                       </motion.button>

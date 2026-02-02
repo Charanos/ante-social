@@ -2,29 +2,36 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
+import { Users, Clock, TrendingUp, Shield, Swords, CheckCircle2, ArrowRight, ScanEye } from "lucide-react"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
-import { ArrowLeft, Users, Clock, DollarSign, Shield, Swords } from "lucide-react"
-import { DashboardCard } from "@/components/dashboard/DashboardCard"
-import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/useToast"
+import { mockUser } from "@/lib/mockData"
+import Image from "next/image"
 
-// Mock market data
+// Mock betrayal market data
 const getMockBetrayalMarket = (id: string) => ({
   id,
-  title: "Trust or Betray: The Ultimate Social Experiment",
+  title: "Betrayal Game: Trust or Cash",
   description: "Will you cooperate for a small win, or betray for the chance at it all? Choose wisely — the crowd's decision determines your fate.",
+  image: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=1200&auto=format&fit=crop",
+  category: "Betrayal",
   market_type: "betrayal",
-  buy_in_amount: 10,
-  total_pool: 500,
-  participant_count: 50,
+  buy_in_amount: 2000,
+  total_pool: 324100,
+  participant_count: 121,
   status: "active",
-  close_date: new Date(Date.now() + 86400000), // 1 day from now
+  close_date: new Date(Date.now() + 13500000), // 3h 45m
+  participants: [
+    { username: "@trust_builder", total_stake: 5000, timestamp: new Date(Date.now() - 10800000) },
+    { username: "@betrayer_001", total_stake: 8000, timestamp: new Date(Date.now() - 7200000) },
+    { username: "@gambler_pro", total_stake: 3000, timestamp: new Date(Date.now() - 3600000) },
+    { username: "@risk_taker", total_stake: 6000, timestamp: new Date(Date.now() - 1800000) }
+  ]
 })
 
 export default function BetrayalMarketPage() {
   const params = useParams()
-  const router = useRouter()
   const toast = useToast()
   const marketId = params.id as string
 
@@ -37,13 +44,12 @@ export default function BetrayalMarketPage() {
 
   const handlePlaceBet = async () => {
     if (!selectedChoice || !stakeAmount || parseFloat(stakeAmount) < market.buy_in_amount) {
-      toast.error("Invalid Bet", `Minimum stake is $${market.buy_in_amount}`)
+      toast.error("Invalid Bet", `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`)
       return
     }
 
     setIsSubmitting(true)
 
-    // Simulate API call
     setTimeout(() => {
       toast.success("Choice Locked In!", `You chose to ${selectedChoice}`)
       setIsSubmitting(false)
@@ -57,284 +63,406 @@ export default function BetrayalMarketPage() {
     return `${hours}h ${minutes}m`
   }
 
+  const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0
+  const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0
+
   return (
-    <div className="min-h-screen pb-12">
-      <div className="max-w-full mx-auto px-6 pb-8">
-        {/* Header */}
-        <DashboardHeader
-          subtitle={market.description}
-        />
+    <div className="min-h-screen pb-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
 
-        <div className="flex items-center gap-2 -mt-16 mb-8 relative z-10 px-2 justify-end">
-          <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium uppercase tracking-wide border border-red-200 shadow-sm">
-            Betrayal Game
-          </span>
-          <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium uppercase tracking-wide border border-green-200 shadow-sm">
-            {market.status}
-          </span>
-        </div>
+        {/* Dashboard Header */}
+        <DashboardHeader user={mockUser} />
 
-        {/* Stats Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10"
-        >
-          {/* Buy-in */}
-          <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-900/60">Buy-in</p>
-                  <p className="mt-2 text-2xl font-medium numeric text-blue-900">${market.buy_in_amount}</p>
-                </div>
-                <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <DollarSign className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-          {/* Total Pool */}
-          <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-900/60">Total Pool</p>
-                  <p className="mt-2 text-2xl font-medium numeric text-green-900">${market.total_pool}</p>
-                </div>
-                <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Shield className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Main Content */}
+          <div className="lg:col-span-8 space-y-8">
 
-          {/* Participants */}
-          <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-purple-900/60">Players</p>
-                  <p className="mt-2 text-2xl font-medium font-mono text-purple-900">{market.participant_count}</p>
-                </div>
-                <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Users className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Hero Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="relative overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]"
+            >
+              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
 
-          {/* Time Remaining */}
-          <Card className="relative overflow-hidden border-none bg-linear-to-br from-amber-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
-            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-100/50 blur-2xl transition-all group-hover:bg-amber-200/50" />
-            <CardContent className="p-6 relative z-10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-amber-900/60">Closes In</p>
-                  <p className="mt-2 text-2xl font-medium font-mono text-amber-900">{getTimeRemaining()}</p>
-                </div>
-                <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Clock className="h-6 w-6 text-amber-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 mb-10">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Choose Your Strategy</h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
-
-        {/* Choice Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10"
-        >
-          {/* Cooperate */}
-          <motion.div
-            whileHover={{ scale: 1.02, y: -4 }}
-            onClick={() => setSelectedChoice("cooperate")}
-            className={`
-              relative overflow-hidden rounded-2xl border-2 p-8 cursor-pointer transition-all
-              ${selectedChoice === "cooperate"
-                ? 'border-green-500 bg-linear-to-br from-green-50 to-white shadow-2xl'
-                : 'border-neutral-200 bg-white hover:border-green-300 hover:shadow-lg'
-              }
-            `}
-          >
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-4">
-                <span className="text-4xl">🤝</span>
-              </div>
-              <h3 className="text-2xl font-medium text-neutral-900 mb-2">COOPERATE</h3>
-              <p className="text-sm text-neutral-600 mb-4">Play it safe. Share the reward.</p>
-              <div className="space-y-4">
-                <p className="text-xs text-green-700 font-medium">✓ Guaranteed small win if others cooperate</p>
-                <p className="text-xs text-green-700 font-medium">✓ Lower risk strategy</p>
-                <p className="text-xs text-red-600 font-medium">✗ Betrayers take your share</p>
-              </div>
-            </div>
-            {selectedChoice === "cooperate" && (
-              <div className="absolute top-4 right-4">
-                <div className="rounded-full bg-green-500 p-2">
-                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Betray */}
-          <motion.div
-            whileHover={{ scale: 1.02, y: -4 }}
-            onClick={() => setSelectedChoice("betray")}
-            className={`
-              relative overflow-hidden rounded-2xl border-2 p-8 cursor-pointer transition-all
-              ${selectedChoice === "betray"
-                ? 'border-red-500 bg-linear-to-br from-red-50 to-white shadow-2xl'
-                : 'border-neutral-200 bg-white hover:border-red-300 hover:shadow-lg'
-              }
-            `}
-          >
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-4">
-                <Swords className="w-10 h-10 text-red-600" />
-              </div>
-              <h3 className="text-2xl font-medium text-neutral-900 mb-2">BETRAY</h3>
-              <p className="text-sm text-neutral-600 mb-4">Risk it all. Take the prize.</p>
-              <div className="space-y-4">
-                <p className="text-xs text-green-700 font-medium">✓ Win big if minority betrays</p>
-                <p className="text-xs text-green-700 font-medium">✓ Maximum potential payout</p>
-                <p className="text-xs text-red-600 font-medium">✗ Everyone loses if majority betrays</p>
-              </div>
-            </div>
-            {selectedChoice === "betray" && (
-              <div className="absolute top-4 right-4">
-                <div className="rounded-full bg-red-500 p-2">
-                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        </motion.div>
-
-        {/* Stake Input & Submit */}
-        <DashboardCard className="p-6 mb-10">
-          <div className="space-y-8">
-            <div>
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
-                Your Stake Amount
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={stakeAmount}
-                  onChange={(e) => setStakeAmount(e.target.value)}
-                  min={market.buy_in_amount}
-                  step="1"
-                  placeholder={`Minimum $${market.buy_in_amount}`}
-                  className="w-full px-4 py-3 rounded-lg border-2 border-neutral-200 focus:border-blue-500 focus:outline-none transition-colors numeric text-lg"
+              {/* Hero Image */}
+              <div className="relative h-64 md:h-80 overflow-hidden">
+                <Image
+                  src={market.image}
+                  alt={market.title}
+                  fill
+                  className="object-cover"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 font-medium">USD</span>
-              </div>
-            </div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
 
-            <button
-              onClick={handlePlaceBet}
-              disabled={!selectedChoice || isSubmitting}
-              className={`
-                w-full py-3 rounded-lg font-medium text-white transition-all cursor-pointer
-                ${!selectedChoice || isSubmitting
-                  ? 'bg-neutral-300 cursor-not-allowed'
-                  : 'bg-neutral-900 hover:bg-neutral-800 shadow-lg hover:shadow-xl'
-                }
-              `}
-            >
-              {isSubmitting ? 'Locking In...' : `Lock In: ${selectedChoice ? selectedChoice.toUpperCase() : 'Make Your Choice'}`}
-            </button>
-
-            <button
-              onClick={() => setShowOutcomes(!showOutcomes)}
-              className="w-full py-2 text-sm text-neutral-600 hover:text-neutral-900 font-medium cursor-pointer transition-colors"
-            >
-              {showOutcomes ? 'Hide' : 'Show'} Possible Outcomes
-            </button>
-          </div>
-        </DashboardCard>
-
-        {/* Outcomes Explanation */}
-        {showOutcomes && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <DashboardCard className="p-6 mb-10">
-              <h3 className="text-lg font-medium text-neutral-900 mb-4">How Payouts Work</h3>
-              <div className="space-y-8">
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 border border-green-200">
-                  <span className="text-2xl">🤝</span>
-                  <div className="flex-1">
-                    <p className="font-medium text-green-900">All Cooperate</p>
-                    <p className="text-sm text-green-700">Everyone wins a small amount. Prize pool divided equally.</p>
+                {/* Badges on Image */}
+                <div className="absolute top-6 left-6 flex items-center gap-3">
+                  <div className="px-3 py-1 rounded-full flex items-center bg-white/90 backdrop-blur-sm border border-black/10">
+                    <span className="text-xs font-semibold text-black/70 uppercase tracking-wider">
+                      {market.category}
+                    </span>
                   </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200">
-                  <span className="text-2xl">⚖️</span>
-                  <div className="flex-1">
-                    <p className="font-medium text-amber-900">Majority Cooperate, Minority Betray</p>
-                    <p className="text-sm text-amber-700">Betrayers win BIG. They split the entire prize pool.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
-                  <span className="text-2xl">⚔️</span>
-                  <div className="flex-1">
-                    <p className="font-medium text-red-900">Majority Betray</p>
-                    <p className="text-sm text-red-700">Everyone loses. No payouts. Greed destroyed the pool.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-neutral-900 border border-neutral-700">
-                  <span className="text-2xl">💀</span>
-                  <div className="flex-1">
-                    <p className="font-medium text-white">All Betray</p>
-                    <p className="text-sm text-neutral-300">Zero for everyone. Complete mutual destruction. Dramatic.</p>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/90 backdrop-blur-sm">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span className="text-xs font-semibold text-white uppercase tracking-wider">
+                      {market.status}
+                    </span>
                   </div>
                 </div>
               </div>
-            </DashboardCard>
-          </motion.div>
-        )}
 
-        {/* Info Card */}
-        <DashboardCard className="p-6 bg-linear-to-br from-blue-50 to-white border-2 border-blue-200">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-blue-600" />
+              {/* Content */}
+              <div className="p-6 md:p-8 space-y-6">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-semibold text-black/90 tracking-tight mb-3">
+                    {market.title}
+                  </h2>
+                  <p className="text-base text-black/60 font-medium leading-relaxed">
+                    {market.description}
+                  </p>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Pool</span>
+                    </div>
+                    <p className="text-xl font-semibold font-mono text-black/90">
+                      {market.total_pool.toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium text-black/40 mt-1">KSH</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Users className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Players</span>
+                    </div>
+                    <p className="text-xl font-semibold font-mono text-black/90">
+                      {market.participant_count}
+                    </p>
+                    <p className="text-xs font-medium text-black/40 mt-1">Active</p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Closes In</span>
+                    </div>
+                    <p className="text-xl font-semibold font-mono text-black/90">
+                      {getTimeRemaining()}
+                    </p>
+                    <p className="text-xs font-medium text-black/40 mt-1">Remaining</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Visual Separator */}
+            <div className="flex items-center gap-4 my-18">
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
+              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Choose Your Strategy</h2>
+              <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-blue-900 mb-1">Your Choice is Secret</h4>
-              <p className="text-sm text-blue-700">
-                No one knows what you picked until the market settles. Results revealed simultaneously to all participants.
-              </p>
+
+            {/* Choice Cards */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              {/* Cooperate */}
+              <motion.div
+                whileHover={{ scale: 1.02, y: -4 }}
+                onClick={() => setSelectedChoice("cooperate")}
+                className={`
+                  relative overflow-hidden rounded-3xl border-2 p-8 cursor-pointer transition-all
+                  ${selectedChoice === "cooperate"
+                    ? 'border-green-500/50 bg-green-50/60 backdrop-blur-xl shadow-[0_16px_48px_-8px_rgba(34,197,94,0.3)]'
+                    : 'border-black/10 bg-white/40 backdrop-blur-sm hover:border-green-300/50 hover:bg-green-50/30 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]'
+                  }
+                `}
+              >
+                <div className="text-center space-y-4">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100">
+                    <span className="text-4xl">🤝</span>
+                  </div>
+                  <h3 className="text-2xl font-semibold text-black/90">COOPERATE</h3>
+                  <p className="text-sm text-black/60 font-medium">Play it safe. Share the reward.</p>
+                  <div className="space-y-2 text-left">
+                    <p className="text-xs text-green-700 font-medium">✓ Guaranteed small win if others cooperate</p>
+                    <p className="text-xs text-green-700 font-medium">✓ Lower risk strategy</p>
+                    <p className="text-xs text-red-600 font-medium">✗ Betrayers take your share</p>
+                  </div>
+                </div>
+                {selectedChoice === "cooperate" && (
+                  <div className="absolute top-4 right-4">
+                    <div className="rounded-full bg-green-500 p-2">
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+
+              {/* Betray */}
+              <motion.div
+                whileHover={{ scale: 1.02, y: -4 }}
+                onClick={() => setSelectedChoice("betray")}
+                className={`
+                  relative overflow-hidden rounded-3xl border-2 p-8 cursor-pointer transition-all
+                  ${selectedChoice === "betray"
+                    ? 'border-red-500/50 bg-red-50/60 backdrop-blur-xl shadow-[0_16px_48px_-8px_rgba(239,68,68,0.3)]'
+                    : 'border-black/10 bg-white/40 backdrop-blur-sm hover:border-red-300/50 hover:bg-red-50/30 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]'
+                  }
+                `}
+              >
+                <div className="text-center space-y-4">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100">
+                    <Swords className="w-10 h-10 text-red-600" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-black/90">BETRAY</h3>
+                  <p className="text-sm text-black/60 font-medium">Risk it all. Take the prize.</p>
+                  <div className="space-y-2 text-left">
+                    <p className="text-xs text-green-700 font-medium">✓ Win big if minority betrays</p>
+                    <p className="text-xs text-green-700 font-medium">✓ Maximum potential payout</p>
+                    <p className="text-xs text-red-600 font-medium">✗ Everyone loses if majority betrays</p>
+                  </div>
+                </div>
+                {selectedChoice === "betray" && (
+                  <div className="absolute top-4 right-4">
+                    <div className="rounded-full bg-red-500 p-2">
+                      <CheckCircle2 className="w-5 h-5 text-white" />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
+
+            {/* Outcomes Explanation */}
+            {showOutcomes && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="p-6 rounded-3xl bg-white/40 backdrop-blur-sm border border-black/5"
+              >
+                <h3 className="text-lg font-semibold text-black/90 mb-4">How Payouts Work</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-green-50/60 border border-green-200/50">
+                    <span className="text-2xl shrink-0">🤝</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-green-900">All Cooperate</p>
+                      <p className="text-sm text-green-700 font-medium">Everyone wins a small amount. Prize pool divided equally.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/50">
+                    <span className="text-2xl shrink-0">⚖️</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-amber-900">Majority Cooperate, Minority Betray</p>
+                      <p className="text-sm text-amber-700 font-medium">Betrayers win BIG. They split the entire prize pool.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-red-50/60 border border-red-200/50">
+                    <span className="text-2xl shrink-0">⚔️</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-red-900">Majority Betray</p>
+                      <p className="text-sm text-red-700 font-medium">Everyone loses. No payouts. Greed destroyed the pool.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 rounded-2xl bg-black border border-black/20">
+                    <span className="text-2xl shrink-0">💀</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-white">All Betray</p>
+                      <p className="text-sm text-white/70 font-medium">Zero for everyone. Complete mutual destruction.</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            <div className="text-center">
+              <button
+                onClick={() => setShowOutcomes(!showOutcomes)}
+                className="px-6 py-2 text-sm text-black/60 hover:text-black/90 font-medium cursor-pointer transition-colors underline"
+              >
+                {showOutcomes ? 'Hide' : 'Show'} Possible Outcomes
+              </button>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <ScanEye className="w-5 h-5 text-black/40" />
+                <h3 className="text-lg font-semibold text-black/90">Recent Activity</h3>
+              </div>
+
+              <div className="space-y-3">
+                {market.participants.map((participant: any, idx: number) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + idx * 0.05 }}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 hover:border-black/10 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-sm font-semibold text-black/70">
+                        {participant.username.substring(1, 3).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-black/90">{participant.username}</p>
+                        <p className="text-xs text-black/50 font-medium">Made choice</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold font-mono text-black/90">
+                        {participant.total_stake.toLocaleString()} KSH
+                      </p>
+                      <p className="text-xs text-black/40 font-medium">
+                        {new Date(participant.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
-        </DashboardCard>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-4">
+            <div className="sticky top-6 space-y-6">
+
+              {/* Bet Placement Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="overflow-hidden rounded-3xl bg-white/60 backdrop-blur-xl border border-black/5 shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)]"
+              >
+                {/* Header */}
+                <div className="p-6 bg-black">
+                  <h3 className="text-xl font-semibold text-white mb-1">Place Your Bet</h3>
+                  <p className="text-sm text-white/60 font-medium">Make your choice</p>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+
+                  {/* Selected Choice */}
+                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
+                    <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-2">
+                      Selected Strategy
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {selectedChoice ? (
+                        <>
+                          <span className={`text-base font-semibold ${selectedChoice === "cooperate" ? "text-green-700" : "text-red-700"
+                            }`}>
+                            {selectedChoice.toUpperCase()}
+                          </span>
+                          <CheckCircle2 className={`w-4 h-4 ${selectedChoice === "cooperate" ? "text-green-600" : "text-red-600"
+                            }`} />
+                        </>
+                      ) : (
+                        <span className="text-base text-black/40 italic">No choice selected</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stake Input */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-semibold text-black/70">Your Stake</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        placeholder={market.buy_in_amount.toLocaleString()}
+                        min={market.buy_in_amount}
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
+                        KSH
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs px-1">
+                      <span className="text-black/40 font-medium">Minimum buy-in</span>
+                      <span className="font-mono font-semibold text-black/70">
+                        {market.buy_in_amount.toLocaleString()} KSH
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Summary */}
+                  <div className="pt-6 border-t border-black/5 space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-black/60 font-medium">Platform Fee (5%)</span>
+                      <span className="font-mono font-semibold text-black/80">
+                        {platformFee.toLocaleString()} KSH
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-base">
+                      <span className="text-black/90 font-semibold">Total Amount</span>
+                      <span className="font-mono font-semibold text-black/90">
+                        {totalAmount.toLocaleString()} KSH
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <motion.button
+                    onClick={handlePlaceBet}
+                    disabled={isSubmitting || !selectedChoice || !stakeAmount}
+                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${isSubmitting || !selectedChoice || !stakeAmount
+                      ? "bg-black/10 text-black/30 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
+                      }`}
+                    whileHover={!isSubmitting && selectedChoice && stakeAmount ? { scale: 1.02 } : {}}
+                    whileTap={!isSubmitting && selectedChoice && stakeAmount ? { scale: 0.98 } : {}}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Locking In...
+                      </>
+                    ) : (
+                      <>
+                        Lock In Choice
+                        <ArrowRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              {/* Info Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5"
+              >
+                <div className="flex gap-3">
+                  <Shield className="w-5 h-5 text-black/60 shrink-0" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-black/90">Your Choice is Secret</p>
+                    <p className="text-xs text-black/60 font-medium leading-relaxed">
+                      No one knows what you picked until the market settles. Results revealed simultaneously to all participants.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

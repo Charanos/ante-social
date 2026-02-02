@@ -109,7 +109,7 @@ export default function DailySpinLogsPage() {
     if (value >= 50) return "text-purple-600 font-medium"
     if (value >= 10) return "text-green-600 font-medium"
     if (value > 0) return "text-blue-600 font-medium"
-    return "text-neutral-500"
+    return "text-neutral-600"
   }
 
   return (
@@ -141,7 +141,7 @@ export default function DailySpinLogsPage() {
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -220,7 +220,7 @@ export default function DailySpinLogsPage() {
         {/* Visual Separator - Filters */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Filters</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Filters</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -233,7 +233,7 @@ export default function DailySpinLogsPage() {
           <DashboardCard className="p-5 mb-10">
             <div className="flex gap-3">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
                 <input
                   type="text"
                   placeholder="Search by user ID, username, or email..."
@@ -254,7 +254,7 @@ export default function DailySpinLogsPage() {
                   <option value="week">This Week</option>
                   <option value="month">This Month</option>
                 </select>
-                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
           </DashboardCard>
@@ -263,7 +263,7 @@ export default function DailySpinLogsPage() {
         {/* Visual Separator - Spin Logs */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Spin Logs ({mockSpinLogs.length})</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Spin Logs ({mockSpinLogs.length})</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -295,7 +295,7 @@ export default function DailySpinLogsPage() {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-neutral-900">{log.user.name}</p>
-                            <p className="text-xs text-neutral-500">{log.user.email}</p>
+                            <p className="text-xs text-neutral-600">{log.user.email}</p>
                           </div>
                         </div>
                       </td>

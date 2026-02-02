@@ -2,9 +2,9 @@
 
 export const mockUser = {
   id: "user123",
-  username: "@zanyfool",
-  email: "grayvector29@gmail.com",
-  full_name: "Tyler Grayson",
+  username: "wormwood",
+  email: "wormwood.p9@gmail.com",
+  full_name: "TDewalt Mowtang",
   user_level: "novice",
   role: "user",
   wallet: {

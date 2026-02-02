@@ -35,11 +35,11 @@ export default function DashboardHeader({ user, subtitle }: DashboardHeaderProps
 
       {/* Left: Breadcrumbs & Title */}
       <div className="space-y-1">
-        <nav className="flex items-center gap-1 text-xs text-neutral-500 font-medium mb-1">
+        <nav className="flex items-center gap-1 text-xs text-neutral-600 font-medium mb-1">
           <Link href="/" className="hover:text-neutral-900 transition-colors"><Home className="w-3 h-3" /></Link>
           {paths.map((path, idx) => (
             <div key={path} className="flex items-center gap-1">
-              <ChevronRight className="w-3 h-3 text-neutral-400" />
+              <ChevronRight className="w-3 h-3 text-neutral-500" />
               <Link
                 href={`/${paths.slice(0, idx + 1).join('/')}`}
                 className={`capitalize text-2xl hover:text-neutral-900 transition-colors ${idx === paths.length - 1 ? "text-neutral-900 font-semibold" : ""}`}
@@ -49,7 +49,7 @@ export default function DashboardHeader({ user, subtitle }: DashboardHeaderProps
             </div>
           ))}
         </nav>
-        <p className="text-md text-neutral-500 font-medium hidden md:block">
+        <p className="text-md text-neutral-600 font-medium hidden md:block">
           {subtitle || "Track bets, manage wallet, explore markets"}
         </p>
       </div>
@@ -99,7 +99,7 @@ export default function DashboardHeader({ user, subtitle }: DashboardHeaderProps
           {/* Notification Badge */}
           {stats.unreadNotifications > 0 && (
             <motion.span
-              className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-linear-to-br from-red-500 to-red-600 text-white text-[10px] font-bold font-mono rounded-full border-2 border-white shadow-sm"
+              className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-linear-to-br from-red-500 to-red-600 text-white text-[10px] font-semibold font-mono rounded-full border-2 border-white shadow-sm"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 15 }}
@@ -116,7 +116,7 @@ export default function DashboardHeader({ user, subtitle }: DashboardHeaderProps
           whileTap={{ scale: 0.98 }}
         >
           {/* Avatar */}
-          <div className="relative w-6 h-6 rounded-full bg-linear-to-br from-neutral-900 to-neutral-700 flex items-center justify-center text-white text-sm font-bold overflow-hidden border-2 border-white shadow-sm">
+          <div className="relative w-6 h-6 rounded-full bg-linear-to-br from-neutral-900 to-neutral-700 flex items-center justify-center text-white text-sm font-semibold overflow-hidden border-2 border-white shadow-sm">
             {user?.image ? (
               <Image
                 src={user.image}
@@ -141,7 +141,7 @@ export default function DashboardHeader({ user, subtitle }: DashboardHeaderProps
             {user?.username || "Guest"}
           </span>
 
-          <ChevronRight className="w-3 h-3 text-neutral-400" />
+          <ChevronRight className="w-3 h-3 text-neutral-500" />
         </motion.button>
       </div>
     </div>

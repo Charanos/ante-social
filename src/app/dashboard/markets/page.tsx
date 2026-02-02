@@ -7,12 +7,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-
-// Mock user data - replace with real session
-const mockUser = {
-  username: "HighRoller",
-  user_level: "high_roller",
-};
+import { mockUser } from "@/lib/mockData";
 
 // Mock markets data with Kenyan context
 const mockMarkets = [
@@ -32,7 +27,7 @@ const mockMarkets = [
     id: "2",
     title: "Trust or Betray: Social Experiment",
     description: "Cooperate for small win or betray for jackpot - choose wisely",
-    image: "https://images.unsplash.com/photo-1556817411-92e97d73049f?w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
     type: "betrayal",
     buyIn: "1,000 KSH",
     pool: "66,250 KSH",
@@ -113,10 +108,10 @@ function MarketCard({ market, index }: any) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="group"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500"
     >
       <Link href={`/dashboard/markets/${market.id}`} className="block">
-        <div className="relative overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500 cursor-pointer">
+        <div className="flex flex-col justify-between">
 
           {/* Shine effect */}
           <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -135,7 +130,7 @@ function MarketCard({ market, index }: any) {
 
             {/* Type Badge */}
             <div className="absolute top-4 left-4 px-2 flex items-center py-1 bg-white/90 backdrop-blur-sm rounded-full border border-black/10">
-              <span className="text-xs font-bold text-black/70 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-black/70 uppercase tracking-wider">
                 {typeInfo.label}
               </span>
             </div>
@@ -143,7 +138,7 @@ function MarketCard({ market, index }: any) {
             {/* Time Badge */}
             <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-black/80 backdrop-blur-sm rounded-full">
               <Clock className="w-3 h-3 text-white" />
-              <span className="text-xs font-bold font-mono text-white">
+              <span className="text-xs font-semibold font-mono text-white">
                 {market.timeLeft}
               </span>
             </div>
@@ -160,8 +155,8 @@ function MarketCard({ market, index }: any) {
           </div>
 
           {/* Content Section */}
-          <div className="relative p-6 space-y-6">
-            <div>
+          <div className="relative p-6 h-full min-h-[250px] flex flex-col justify-between">
+            <div className="">
               <h3 className="text-lg font-semibold text-black/90 tracking-tight mb-2 line-clamp-1 group-hover:text-black transition-colors">
                 {market.title}
               </h3>
@@ -171,24 +166,24 @@ function MarketCard({ market, index }: any) {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="px-2 py-1 rounded-xl bg-gray-50/40 backdrop-blur-sm border border-black/5">
+            <div className="grid grid-cols-3 gap-3 border-y py-3 my-6 border-gray-100/50">
+              <div className="">
                 <p className="text-xs text-black/40 font-semibold uppercase tracking-wider mb-1">Buy-in</p>
-                <p className="text-sm font-bold font-mono text-black/80">{market.buyIn}</p>
+                <p className="text-sm font-semibold font-mono text-black/80">{market.buyIn}</p>
               </div>
-              <div className="px-2 py-1 rounded-xl bg-gray-50/40 backdrop-blur-sm border border-black/5">
+              <div className="">
                 <p className="text-xs text-black/40 font-semibold uppercase tracking-wider mb-1">Pool</p>
-                <p className="text-sm font-bold font-mono text-black/80">{market.pool}</p>
+                <p className="text-sm font-semibold font-mono text-black/80">{market.pool}</p>
               </div>
-              <div className="px-2 py-1 rounded-xl bg-gray-50/40 backdrop-blur-sm border border-black/5">
+              <div className="">
                 <p className="text-xs text-black/40 font-semibold uppercase tracking-wider mb-1">Players</p>
-                <p className="text-sm font-bold font-mono text-black/80">{market.participants}</p>
+                <p className="text-sm font-semibold font-mono text-black/80">{market.participants}</p>
               </div>
             </div>
 
             {/* CTA Button */}
             <motion.button
-              className="w-full flex items-center justify-center gap-2 px-6 py-2 cursor-pointer bg-black text-white rounded-xl font-normal tracking-wider text-sm hover:bg-black/90 transition-colors group/btn"
+              className="mt-auto w-full absolute bottom-0 left-0 flex items-center justify-center gap-2 px-6 py-2 cursor-pointer bg-black text-white rounded-xl font-normal tracking-wider text-sm hover:bg-black/90 transition-colors group/btn"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -220,7 +215,7 @@ export default function MarketsPage() {
 
   return (
     <div className="min-h-screen pb-12">
-      <div className="max-w-full mx-auto px-6 pb-8 space-y-8">
+      <div className="max-w-full mx-auto pl-8 pb-8 space-y-8">
         <DashboardHeader user={mockUser} subtitle="Explore active betting markets and join the action" />
 
 
@@ -269,7 +264,7 @@ export default function MarketsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Available Markets</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Available Markets</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -283,13 +278,13 @@ export default function MarketsPage() {
           <div className="flex flex-col md:flex-row gap-3 p-2 bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl ring-1 ring-black/5 mb-18">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
               <input
                 type="text"
                 placeholder="Search markets, tags, or pools..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-neutral-100/70 hover:bg-neutral-100 focus:bg-white text-sm font-medium text-neutral-900 rounded-xl border-none outline-none ring-1 ring-transparent focus:ring-black/5 transition-all placeholder:text-neutral-500"
+                className="w-full pl-10 pr-4 py-2.5 bg-neutral-100/70 hover:bg-neutral-100 focus:bg-white text-sm font-medium text-neutral-900 rounded-xl border-none outline-none ring-1 ring-transparent focus:ring-black/5 transition-all placeholder:text-neutral-600"
               />
             </div>
 
@@ -303,7 +298,7 @@ export default function MarketsPage() {
                                 relative px-4 py-2 rounded-xl text-sm cursor-pointer font-medium transition-all whitespace-nowrap select-none
                                 ${filterType === type
                       ? "text-neutral-200 bg-black shadow-sm ring-1 ring-black/5"
-                      : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100/50"
+                      : "text-neutral-600 hover:text-neutral-700 hover:bg-neutral-100/50"
                     }
                             `}
                 >
@@ -322,7 +317,7 @@ export default function MarketsPage() {
         </motion.div>
 
         {/* Markets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredMarkets.length > 0 ? (
             filteredMarkets.map((market, index) => (
               <MarketCard key={market.id} market={market} index={index} />

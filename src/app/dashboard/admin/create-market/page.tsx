@@ -82,7 +82,7 @@ export default function CreateMarketPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Select Market Type</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Select Market Type</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -145,7 +145,7 @@ export default function CreateMarketPage() {
               {/* Visual Separator */}
               <div className="flex items-center gap-4 mb-10">
                 <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-                <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Market Configuration</h2>
+                <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Market Configuration</h2>
                 <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
               </div>
 
@@ -190,7 +190,7 @@ export default function CreateMarketPage() {
                         Buy-in Amount <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                        <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
                         <input
                           type="number"
                           value={buyIn}
@@ -199,7 +199,7 @@ export default function CreateMarketPage() {
                           placeholder="10"
                           className="w-full pl-10 pr-12 py-3 rounded-lg border-2 border-neutral-200 focus:border-blue-500 focus:outline-none transition-colors font-mono"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 font-medium">MP</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 font-medium">MP</span>
                       </div>
                     </div>
 
@@ -209,7 +209,7 @@ export default function CreateMarketPage() {
                         Close Date <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
                         <input
                           type="datetime-local"
                           value={closeDate}
@@ -439,7 +439,7 @@ export default function CreateMarketPage() {
           <div className="text-center py-12">
             <Trophy className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-neutral-900 mb-2">Choose a Market Type</h3>
-            <p className="text-sm text-neutral-500">Select a market type above to begin configuration</p>
+            <p className="text-sm text-neutral-600">Select a market type above to begin configuration</p>
           </div>
         )}
       </div>

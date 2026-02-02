@@ -76,7 +76,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   defaultValue="Daily Question - {date}"
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
-                <p className="text-xs text-neutral-500 mt-1.5">
+                <p className="text-xs text-neutral-600 mt-1.5">
                   Use variables: <span className="font-mono bg-neutral-100 px-1 py-0.5 rounded">{"{date}"}</span> for date, <span className="font-mono bg-neutral-100 px-1 py-0.5 rounded">{"{week}"}</span> for week number
                 </p>
               </div>
@@ -136,7 +136,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   defaultValue="09:00"
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
-                <p className="text-xs text-neutral-500 mt-1.5">
+                <p className="text-xs text-neutral-600 mt-1.5">
                   Local: <span className="text-blue-600">09:00 (Africa/Nairobi)</span> | UTC: <span className="text-neutral-600">06:00</span>
                 </p>
               </div>
@@ -150,7 +150,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   defaultValue="17:00"
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
-                <p className="text-xs text-neutral-500 mt-1.5">
+                <p className="text-xs text-neutral-600 mt-1.5">
                   Local: <span className="text-blue-600">17:00 (Africa/Nairobi)</span> | UTC: <span className="text-neutral-600">14:00</span>
                 </p>
               </div>
@@ -182,7 +182,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                     <option>Daily</option>
                     <option>Weekly</option>
                   </select>
-                  <p className="text-xs text-neutral-500 mt-1.5">
+                  <p className="text-xs text-neutral-600 mt-1.5">
                     Daily: 24 hours | Weekly: 168 hours (7 days)
                   </p>
                 </div>
@@ -237,7 +237,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                     {outcomes.length > 2 && (
                       <button
                         onClick={() => handleRemoveOutcome(outcome.id)}
-                        className="p-1 rounded text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                        className="p-1 rounded text-neutral-500 hover:text-red-500 hover:bg-red-50 transition-all"
                       >
                         <X className="w-4 h-4" />
                       </button>

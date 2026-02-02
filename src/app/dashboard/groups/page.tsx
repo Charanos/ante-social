@@ -68,7 +68,7 @@ export default function GroupsPage() {
       {/* Visual Separator - Overview */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -131,7 +131,7 @@ export default function GroupsPage() {
       {/* Visual Separator - Your Groups */}
       <div className="flex items-center gap-4 mb-10">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Your Groups</h2>
+        <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Your Groups</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -152,11 +152,11 @@ export default function GroupsPage() {
                 <div className="p-6 space-y-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-xl font-bold text-white shadow-md group-hover:scale-110 transition-transform duration-500">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-xl font-semibold text-white shadow-md group-hover:scale-110 transition-transform duration-500">
                         {group.name.charAt(0)}
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-black/90 group-hover:text-black transition-colors">
+                        <h3 className="text-lg font-semibold text-black/90 group-hover:text-black transition-colors">
                           {group.name}
                         </h3>
                         <p className="text-xs font-medium text-black/40 mt-1 flex items-center gap-1">
@@ -178,12 +178,12 @@ export default function GroupsPage() {
                           <div key={i} className="h-6 w-6 rounded-full border-2 border-white bg-black/10" />
                         ))}
                       </div>
-                      <span className="font-bold text-black/70 ml-1">{group.member_count}</span>
+                      <span className="font-semibold text-black/70 ml-1">{group.member_count}</span>
                       <span className="text-black/40 text-xs font-semibold uppercase tracking-wider">members</span>
                     </div>
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-green-700">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-green-700">
                         {group.active_bets} Live
                       </span>
                     </div>

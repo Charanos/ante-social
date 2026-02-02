@@ -120,7 +120,7 @@ export default function MarketManagerPage() {
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-            <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
             <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           </div>
 
@@ -200,7 +200,7 @@ export default function MarketManagerPage() {
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-            <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Filters</h2>
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider">Filters</h2>
             <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           </div>
 
@@ -213,7 +213,7 @@ export default function MarketManagerPage() {
               <div className="grid md:grid-cols-4 gap-4">
                 {/* Search */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
                   <input
                     type="text"
                     placeholder="Search markets..."
@@ -269,7 +269,7 @@ export default function MarketManagerPage() {
         <div>
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-            <h2 className="text-sm font-medium text-neutral-400 uppercase tracking-wider">Markets ({mockMarkets.length})</h2>
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider">Markets ({mockMarkets.length})</h2>
             <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           </div>
 
@@ -343,7 +343,7 @@ export default function MarketManagerPage() {
                           <DollarSign className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
-                          <p className="text-xs text-neutral-500 font-medium">Buy-in</p>
+                          <p className="text-xs text-neutral-600 font-medium">Buy-in</p>
                           <p className="text-sm font-medium text-neutral-900 font-mono">{market.buyIn} MP</p>
                         </div>
                       </div>
@@ -353,7 +353,7 @@ export default function MarketManagerPage() {
                           <Users className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
-                          <p className="text-xs text-neutral-500 font-medium">Participants</p>
+                          <p className="text-xs text-neutral-600 font-medium">Participants</p>
                           <p className="text-sm font-medium text-neutral-900 font-mono">{market.participants}</p>
                         </div>
                       </div>
@@ -363,7 +363,7 @@ export default function MarketManagerPage() {
                           <TrendingUp className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
-                          <p className="text-xs text-neutral-500 font-medium">Pool</p>
+                          <p className="text-xs text-neutral-600 font-medium">Pool</p>
                           <p className="text-sm font-medium text-neutral-900 font-mono">{market.pool} MP</p>
                         </div>
                       </div>
@@ -373,7 +373,7 @@ export default function MarketManagerPage() {
                           <Calendar className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
-                          <p className="text-xs text-neutral-500 font-medium">Closes</p>
+                          <p className="text-xs text-neutral-600 font-medium">Closes</p>
                           <p className="text-sm font-medium text-neutral-900 font-mono">{market.closeDate}</p>
                         </div>
                       </div>
@@ -393,10 +393,10 @@ export default function MarketManagerPage() {
           >
             <DashboardCard className="p-12 text-center">
               <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-neutral-400" />
+                <TrendingUp className="w-8 h-8 text-neutral-500" />
               </div>
               <h3 className="text-lg font-medium text-neutral-900 mb-2">No markets found</h3>
-              <p className="text-sm text-neutral-500 mb-6">Get started by creating your first market</p>
+              <p className="text-sm text-neutral-600 mb-6">Get started by creating your first market</p>
               <Link href="/dashboard/admin/create-market">
                 <button className="px-5 py-2.5 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg transition-all flex items-center gap-2 mx-auto cursor-pointer">
                   <Plus className="w-4 h-4" />

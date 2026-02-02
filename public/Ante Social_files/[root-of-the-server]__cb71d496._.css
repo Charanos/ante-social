@@ -3398,7 +3398,7 @@
     background-color: var(--color-zinc-100);
   }
 
-  .bg-gradient-to-b {
+  .bg-linear-to-b {
     --tw-gradient-position: to bottom in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
@@ -3413,7 +3413,7 @@
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
 
-  .bg-gradient-to-t {
+  .bg-linear-to-t {
     --tw-gradient-position: to top in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
@@ -4529,11 +4529,11 @@
     color: var(--color-neutral-300);
   }
 
-  .text-neutral-400 {
+  .text-neutral-500 {
     color: var(--color-neutral-400);
   }
 
-  .text-neutral-500 {
+  .text-neutral-600 {
     color: var(--color-neutral-500);
   }
 
@@ -5327,7 +5327,7 @@
     color: var(--color-gray-400);
   }
 
-  .placeholder\:text-neutral-500::placeholder {
+  .placeholder\:text-neutral-600::placeholder {
     color: var(--color-neutral-500);
   }
 
@@ -6309,7 +6309,7 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    .dark\:text-neutral-400 {
+    .dark\:text-neutral-500 {
       color: var(--color-neutral-400);
     }
   }

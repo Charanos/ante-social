@@ -99,11 +99,11 @@ export default function UserManagementPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative whitespace-nowrap cursor-pointer ${isActive
-                      ? "text-neutral-900"
-                      : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50"
+                    ? "text-neutral-900"
+                    : "text-neutral-600 hover:text-neutral-700 hover:bg-neutral-50"
                     }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-neutral-900" : "text-neutral-400"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-neutral-900" : "text-neutral-500"}`} />
                   {tab.label}
                   {isActive && (
                     <motion.div
@@ -131,7 +131,7 @@ export default function UserManagementPage() {
                     <h3 className="text-sm font-medium text-neutral-900 mb-4">Search for a user</h3>
                     <div className="flex gap-3">
                       <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
                         <input
                           type="text"
                           placeholder="Enter user ID, email, or username..."
@@ -142,7 +142,7 @@ export default function UserManagementPage() {
                         Search
                       </button>
                     </div>
-                    <p className="text-xs text-neutral-500 mt-2">Search by user ID, email address, or username to view detailed information</p>
+                    <p className="text-xs text-neutral-600 mt-2">Search by user ID, email address, or username to view detailed information</p>
                   </div>
                 </motion.div>
               )}
@@ -159,7 +159,7 @@ export default function UserManagementPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-neutral-500">Total Users</span>
+                        <span className="text-sm font-medium text-neutral-600">Total Users</span>
                         <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
                           <Users className="w-4 h-4 text-neutral-600" />
                         </div>
@@ -169,7 +169,7 @@ export default function UserManagementPage() {
 
                     <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-neutral-500">Novice</span>
+                        <span className="text-sm font-medium text-neutral-600">Novice</span>
                         <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
                           <UserCheck className="w-4 h-4 text-blue-600" />
                         </div>
@@ -179,7 +179,7 @@ export default function UserManagementPage() {
 
                     <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-neutral-500">High Roller</span>
+                        <span className="text-sm font-medium text-neutral-600">High Roller</span>
                         <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
                           <Crown className="w-4 h-4 text-amber-600" />
                         </div>
@@ -200,9 +200,9 @@ export default function UserManagementPage() {
                         <option value="Novice">Novice</option>
                         <option value="High Roller">High Roller</option>
                       </select>
-                      <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <ChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
-                    <span className="text-sm text-neutral-500 font-mono">{filteredUsers.length} users</span>
+                    <span className="text-sm text-neutral-600 font-mono">{filteredUsers.length} users</span>
                   </div>
 
                   {/* Users List */}
@@ -213,18 +213,18 @@ export default function UserManagementPage() {
                         className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all group"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-500 flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-600 flex-shrink-0">
                             <User className="w-5 h-5" />
                           </div>
                           <div>
                             <h3 className="text-sm font-medium text-neutral-900">{user.name}</h3>
                             <div className="flex items-center gap-3 mt-1">
-                              <span className="text-xs text-neutral-500 flex items-center gap-1.5">
+                              <span className="text-xs text-neutral-600 flex items-center gap-1.5">
                                 <Mail className="w-3 h-3" />
                                 {user.email}
                               </span>
                               <span className="text-xs text-neutral-300">•</span>
-                              <span className="text-xs text-neutral-500 flex items-center gap-1.5">
+                              <span className="text-xs text-neutral-600 flex items-center gap-1.5">
                                 <Calendar className="w-3 h-3" />
                                 Joined {user.joinedDate}
                               </span>
@@ -236,7 +236,7 @@ export default function UserManagementPage() {
                           <span className="text-xs font-medium text-neutral-600">{user.level.toLowerCase()}</span>
                           <div className="h-4 w-px bg-neutral-200"></div>
                           <span className="text-sm font-medium text-neutral-900">{user.level}</span>
-                          <ChevronDown className="w-3.5 h-3.5 text-neutral-400 ml-1" />
+                          <ChevronDown className="w-3.5 h-3.5 text-neutral-500 ml-1" />
                         </div>
                       </div>
                     ))}
@@ -248,7 +248,7 @@ export default function UserManagementPage() {
                         <Users className="w-8 h-8 text-neutral-300" />
                       </div>
                       <h3 className="text-base font-medium text-neutral-900 mb-2">No users found</h3>
-                      <p className="text-sm text-neutral-500">Try adjusting your filters</p>
+                      <p className="text-sm text-neutral-600">Try adjusting your filters</p>
                     </div>
                   )}
                 </motion.div>
@@ -273,7 +273,7 @@ export default function UserManagementPage() {
                   <h3 className="text-lg font-medium text-neutral-900 mb-2">
                     {activeTab === "kyc" ? "KYC Review" : "AML & Clusters"}
                   </h3>
-                  <p className="text-sm text-neutral-500 max-w-sm">
+                  <p className="text-sm text-neutral-600 max-w-sm">
                     This module is currently under development. Check back later for updates.
                   </p>
                 </motion.div>

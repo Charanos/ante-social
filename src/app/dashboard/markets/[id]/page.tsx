@@ -15,12 +15,7 @@ import {
   Shield
 } from "lucide-react";
 import Image from "next/image";
-
-const mockUser = {
-  username: "HighRoller",
-  user_level: "high_roller",
-  balance: 165432.50
-};
+import { mockUser } from "@/lib/mockData";
 
 const getMockMarket = (id: string) => ({
   id,
@@ -56,7 +51,7 @@ const getMockMarket = (id: string) => ({
       id: "opt4",
       option_text: "Route 58 (Buruburu)",
       votes: 18,
-      image: "https://images.unsplash.com/photo-1506466904631-f050ceba6463?w=800&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop"
     }
   ],
   participants: [
@@ -183,7 +178,7 @@ export default function MarketDetailPage() {
                       <TrendingUp className="w-4 h-4 text-black/40" />
                       <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Pool</span>
                     </div>
-                    <p className="text-xl font-bold font-mono text-black/90">
+                    <p className="text-xl font-semibold font-mono text-black/90">
                       {market.total_pool.toLocaleString()}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">KSH</p>
@@ -194,7 +189,7 @@ export default function MarketDetailPage() {
                       <Users className="w-4 h-4 text-black/40" />
                       <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Players</span>
                     </div>
-                    <p className="text-xl font-bold font-mono text-black/90">
+                    <p className="text-xl font-semibold font-mono text-black/90">
                       {market.participant_count}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">Active</p>
@@ -205,7 +200,7 @@ export default function MarketDetailPage() {
                       <Clock className="w-4 h-4 text-black/40" />
                       <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Closes In</span>
                     </div>
-                    <p className="text-xl font-bold font-mono text-black/90">
+                    <p className="text-xl font-semibold font-mono text-black/90">
                       {getTimeRemaining()}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">Remaining</p>
@@ -217,7 +212,7 @@ export default function MarketDetailPage() {
             {/* Visual Separator */}
             <div className="flex items-center gap-4 my-18">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-              <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Select Your Choice</h2>
+              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Select Your Choice</h2>
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             </div>
 
@@ -263,7 +258,7 @@ export default function MarketDetailPage() {
                           <h4 className="text-base font-semibold text-black/90 leading-tight">
                             {option.option_text}
                           </h4>
-                          <span className="text-lg font-bold font-mono text-black/80 shrink-0">
+                          <span className="text-lg font-semibold font-mono text-black/80 shrink-0">
                             {votePercentage}%
                           </span>
                         </div>
@@ -319,7 +314,7 @@ export default function MarketDetailPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold font-mono text-black/90">
+                      <p className="text-sm font-semibold font-mono text-black/90">
                         {participant.total_stake.toLocaleString()} KSH
                       </p>
                       <p className="text-xs text-black/40 font-medium">
@@ -383,7 +378,7 @@ export default function MarketDetailPage() {
                         onChange={(e) => setStakeAmount(e.target.value)}
                         className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-black/40">
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
                         KSH
                       </span>
                     </div>
@@ -405,7 +400,7 @@ export default function MarketDetailPage() {
                     </div>
                     <div className="flex justify-between text-base">
                       <span className="text-black/90 font-semibold">Total Amount</span>
-                      <span className="font-mono font-bold text-black/90">
+                      <span className="font-mono font-semibold text-black/90">
                         {totalAmount.toLocaleString()} KSH
                       </span>
                     </div>

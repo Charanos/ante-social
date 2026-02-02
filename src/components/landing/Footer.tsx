@@ -112,28 +112,28 @@ function WaveBackground() {
 
 const footerLinks = {
   product: [
-    { label: "Features", href: "#features" },
-    { label: "Game Modes", href: "#game-modes" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Roadmap", href: "#roadmap" },
+    { label: "Features", href: "/product/features" },
+    { label: "Game Modes", href: "/product/game-modes" },
+    { label: "Pricing", href: "/product/pricing" },
+    { label: "Roadmap", href: "/product/roadmap" },
   ],
   resources: [
-    { label: "Documentation", href: "#docs" },
-    { label: "API Reference", href: "#api" },
-    { label: "Help Center", href: "#help" },
-    { label: "Blog", href: "#blog" },
+    { label: "Documentation", href: "/resources/docs" },
+    { label: "API Reference", href: "/resources/api" },
+    { label: "Help Center", href: "/resources/help" },
+    { label: "Blog", href: "/resources/blog" },
   ],
   company: [
-    { label: "About Us", href: "#about" },
-    { label: "Careers", href: "#careers" },
-    { label: "Contact", href: "#contact" },
-    { label: "Press Kit", href: "#press" },
+    { label: "About Us", href: "/company/about" },
+    { label: "Careers", href: "/company/careers" },
+    { label: "Contact", href: "/company/contact" },
+    { label: "Press Kit", href: "/company/press" },
   ],
   legal: [
-    { label: "Terms of Service", href: "#terms" },
-    { label: "Privacy Policy", href: "#privacy" },
-    { label: "Cookie Policy", href: "#cookies" },
-    { label: "Responsible Gaming", href: "#responsible" },
+    { label: "Terms of Service", href: "/legal/terms-of-service" },
+    { label: "Privacy Policy", href: "/legal/privacy-policy" },
+    { label: "Cookie Policy", href: "/legal/cookie-policy" },
+    { label: "Responsible Gaming", href: "/legal/responsible-gaming" },
   ],
 };
 
@@ -146,13 +146,13 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative py-16 md:py-20 px-4 md:px-6 bg-gradient-to-b from-neutral-50/30 to-white border-t border-black/5 overflow-hidden">
+    <footer className="relative py-16 md:py-20 px-4 md:px-6 bg-linear-to-b from-neutral-50/30 to-white border-t border-black/5 overflow-hidden">
 
       {/* Wave Background */}
       <WaveBackground />
 
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-black/[0.01] via-transparent to-transparent pointer-events-none" style={{ zIndex: 1 }} />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,var(--tw-gradient-stops))] from-black/1 via-transparent to-transparent pointer-events-none" style={{ zIndex: 1 }} />
 
       <div className="relative max-w-7xl mx-auto" style={{ zIndex: 2 }}>
 
@@ -165,7 +165,7 @@ export function Footer() {
               <div className="relative w-24 h-24 -mr-4 -ml-6">
                 <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
               </div>
-              <span className="text-2xl font-bold tracking-tight text-black">
+              <span className="text-2xl font-semibold tracking-tight text-black">
                 ANTE SOCIAL
               </span>
             </Link>
@@ -316,29 +316,24 @@ export function Footer() {
 
             {/* Payment Methods */}
             <div className="flex items-center gap-4">
-              <span className="text-xs text-black/40 font-semibold uppercase tracking-wider">
+              <span className="text-xs text-black/50 font-semibold uppercase tracking-wider">
                 We Accept
               </span>
               <div className="flex items-center gap-3">
                 <div className="px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-lg">
-                  <span className="text-xs font-bold text-black/70">M-PESA</span>
+                  <span className="text-xs font-semibold text-black/70">M-PESA</span>
                 </div>
                 <div className="px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-lg">
-                  <span className="text-xs font-bold font-mono text-black/70">USDT</span>
+                  <span className="text-xs font-semibold font-mono text-black/70">USDT</span>
                 </div>
               </div>
-            </div>
-
-            {/* Language Selector (Optional) */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-lg cursor-pointer hover:bg-white/60 transition-all">
-              <span className="text-xs font-semibold text-black/70">🇰🇪 EN</span>
             </div>
           </div>
         </div>
 
         {/* Disclaimer */}
         <div className="mt-8 p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
-          <p className="text-xs text-black/40 font-medium leading-relaxed text-center">
+          <p className="text-xs text-black/60 font-medium leading-relaxed text-center">
             Gambling can be addictive. Please play responsibly. Ante Social is licensed and regulated
             in Kenya. Players must be 18 years or older. If you or someone you know has a gambling
             problem, please seek help.

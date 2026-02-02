@@ -192,7 +192,7 @@ function FloatingStats() {
           <stat.icon className="w-4 h-4 text-black/60" />
           <div className="flex flex-col items-start">
             <span className="text-xs text-black/50 font-medium">{stat.label}</span>
-            <span className="font-mono text-sm md:text-base font-bold text-black">{stat.value}</span>
+            <span className="font-mono text-sm md:text-base font-semibold text-black">{stat.value}</span>
           </div>
         </motion.div>
       ))}
@@ -401,13 +401,13 @@ export function Hero() {
                   </span>
                   Dashboard Preview
                 </div>
-                <p className="text-neutral-500 font-medium">Your betting command center</p>
+                <p className="text-neutral-600 font-medium">Your betting command center</p>
               </div>
             </div>
           </div>
 
           {/* Overlay effects */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/5 via-transparent to-transparent pointer-events-none" />
 
           {/* Shimmer effect on hover */}
           <motion.div

@@ -4,9 +4,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Eye, EyeOff, Loader2, ArrowRight, Wallet, User, Calendar, Phone, Lock, CheckCircle2 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Eye, EyeOff, LoaderPinwheel, ArrowRight } from "lucide-react"
 import { useToast } from "@/hooks/useToast"
+import Image from "next/image"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -14,15 +14,14 @@ export default function RegisterPage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [currency, setCurrency] = useState<"KSH" | "USD">("KSH")
 
-  // Form State
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     phone: "",
     password: "",
     dob: "",
+    currency: "KSH",
     agreed: false
   })
 
@@ -30,243 +29,219 @@ export default function RegisterPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Basic Validation
     if (!formData.agreed) {
-      toast.error("Agreement Required", "You must be 18+ and agree to the terms.")
+      toast.error("Agreement Required", "You must agree to the terms.")
       setIsLoading(false)
       return
     }
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-          dob: formData.dob,
-          currency: currency
-        })
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.error || "Registration failed")
-      }
-
-      // Success
-      toast.success("Account Created!", "Welcome to Ante Social. Please log in.")
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success("Identity Created", "Welcome to the inner circle.")
       router.push("/login")
-    } catch (error: any) {
-      toast.error("Registration Failed", error.message)
+    } catch (error) {
+      toast.error("Registration Failed", "System error.")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Form Side */}
-      <div className="flex items-center justify-center p-6 bg-neutral-50 order-2 lg:order-1">
-        <Card className="w-full max-w-md border-none shadow-none bg-transparent">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold tracking-tight">Create an account</CardTitle>
-            <CardDescription>
-              Join the social betting revolution.
-            </CardDescription>
-          </CardHeader>
+    <div className="min-h-screen w-full grid lg:grid-cols-2 relative overflow-hidden">
 
-          <CardContent>
-            <form onSubmit={handleRegister} className="space-y-8">
-              {/* Username & Email */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <label className="text-sm font-medium leading-none" htmlFor="username">Username</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                    <input
-                      id="username"
-                      type="text"
-                      placeholder="jdoe_bets"
-                      className="flex h-11 w-full rounded-xl border border-neutral-200 bg-white pl-10 px-3 py-2 text-sm placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 font-medium"
-                      value={formData.username}
-                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <label className="text-sm font-medium leading-none" htmlFor="dob">Date of Birth</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                    <input
-                      id="dob"
-                      type="date"
-                      className="flex h-11 w-full rounded-xl border border-neutral-200 bg-white pl-10 px-3 py-2 text-sm placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 font-medium"
-                      value={formData.dob}
-                      onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  className="flex h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 font-medium"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-
-              {/* Phone & Currency */}
-              <div className="space-y-4">
-                <label className="text-sm font-medium leading-none">Phone Number (M-Pesa)</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                  <input
-                    type="tel"
-                    placeholder="+254 700 000 000"
-                    className="flex h-11 w-full rounded-xl border border-neutral-200 bg-white pl-10 px-3 py-2 text-sm font-mono placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-sm font-medium leading-none">Primary Currency</label>
-                <div className="grid grid-cols-2 gap-3 h-11">
-                  <button
-                    type="button"
-                    onClick={() => setCurrency("KSH")}
-                    className={`flex items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium transition-all ${currency === "KSH"
-                        ? "border-green-600 bg-green-50 text-green-700 ring-2 ring-green-600 ring-offset-2"
-                        : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                      }`}
-                  >
-                    <span className="font-mono">KSH</span>
-                    {currency === "KSH" && <CheckCircle2 className="w-4 h-4" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCurrency("USD")}
-                    className={`flex items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium transition-all ${currency === "USD"
-                        ? "border-blue-600 bg-blue-50 text-blue-700 ring-2 ring-blue-600 ring-offset-2"
-                        : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                      }`}
-                  >
-                    <span className="font-mono">USD</span>
-                    {currency === "USD" && <CheckCircle2 className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="space-y-4">
-                <label className="text-sm font-medium leading-none" htmlFor="password">Password</label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    className="flex h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 font-medium pr-10"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Terms */}
-              <div className="flex items-start space-x-3 pt-2">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                  checked={formData.agreed}
-                  onChange={(e) => setFormData({ ...formData, agreed: e.target.checked })}
-                />
-                <label htmlFor="terms" className="text-sm text-neutral-500 leading-normal">
-                  I confirm I am over 18 years of age and I agree to the Terms of Service and Privacy Policy.
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-black px-8 text-sm font-medium text-white ring-offset-white transition-colors hover:bg-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 mt-4"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    Create Account <ArrowRight className="ml-2 w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </form>
-          </CardContent>
-
-          <CardFooter className="flex flex-col space-y-8 text-center text-sm text-neutral-500">
-            <p>
-              Already have an account?{" "}
-              <Link href="/login" className="font-medium text-black hover:underline underline-offset-4">
-                Sign in
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
-      </div>
-
-      {/* Visual Side */}
-      <div className="hidden lg:flex relative bg-neutral-900 items-center justify-center overflow-hidden order-1 lg:order-2">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-800 via-neutral-950 to-black opacity-80" />
-        <div className="relative z-10 p-12 text-white max-w-xl">
-          <div className="mb-8 p-3 bg-white/10 w-fit rounded-xl backdrop-blur-md border border-white/10">
-            <Wallet className="w-8 h-8" />
-          </div>
-          <h1 className="text-5xl font-bold tracking-tighter mb-6">
-            Join the High Rollers.
-          </h1>
-          <div className="space-y-6 text-lg text-neutral-400">
-            <div className="flex items-center gap-4">
-              <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-              <p>Instant M-Pesa Withdrawals</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
-              <p>Secure Crypto Deposits</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="h-2 w-2 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
-              <p>Private Group Betting</p>
-            </div>
+      {/* LEFT SIDE: Brand (White) */}
+      <div className="relative bg-white text-black flex flex-col justify-between p-12 lg:p-20 z-10 order-last lg:order-first">
+        <div>
+          <div className="relative w-24 h-24 md:w-36 md:h-36 mb-2">
+            <Image src="/ante-logo.png" alt="Ante Logo" fill className="object-contain" />
           </div>
         </div>
 
-        {/* Abstract shapes */}
-        <motion.div
-          className="absolute top-1/3 left-1/4 w-72 h-72 bg-green-500/10 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.4, 1], opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 12, repeat: Infinity }}
+        <div className="max-w-md z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-3xl md:text-5xl font-normal tracking-tight leading-tight mb-6">
+              Join the house.
+            </h1>
+            <p className="text-lg text-neutral-600 font-normal leading-relaxed mb-12 md:mb-0">
+              Start your journey. High stakes, zero compromise. The table is set.
+            </p>
+          </motion.div>
+        </div>
+
+        <div className="text-sm font-medium text-neutral-500">
+          © {new Date().getFullYear()} Ante Social. All rights reserved.
+        </div>
+
+        {/* Subtle background texture */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
         />
       </div>
+
+      {/* RIGHT SIDE: Form (Dark) */}
+      <div className="relative bg-[#080808] text-white flex flex-col justify-center p-8 lg:p-24 z-10 order-first lg:order-last">
+        <div className="max-w-md w-full mx-auto">
+          <div className="mb-10 lg:mt-0 mt-8">
+            <h2 className="text-3xl font-normal mb-2">Create Account</h2>
+            <p className="text-neutral-600">Initialize your profile to begin.</p>
+          </div>
+
+          <form onSubmit={handleRegister} className="space-y-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">Username</label>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal"
+                  placeholder="jdoe"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">DOB</label>
+                <input
+                  type="date"
+                  value={formData.dob}
+                  onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+                  className="w-full bg-transparent border-b border-neutral-800 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal scheme-dark"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">Email Address</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal"
+                placeholder="name@example.com"
+                required
+              />
+            </div>
+
+            {/* M-Pesa / Currency Row */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">M-Pesa Number</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal"
+                  placeholder="+254..."
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">Currency</label>
+                <div className="flex gap-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, currency: "KSH" })}
+                    className={`text-sm font-medium transition-colors ${formData.currency === "KSH" ? "text-orange-500 border-b border-orange-500" : "text-neutral-600 hover:text-white"}`}
+                  >
+                    KSH
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, currency: "USD" })}
+                    className={`text-sm font-medium transition-colors ${formData.currency === "USD" ? "text-orange-500 border-b border-orange-500" : "text-neutral-600 hover:text-white"}`}
+                  >
+                    USD
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal pr-10"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-600 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className={`w-4 h-4 border transition-colors flex items-center justify-center ${formData.agreed ? "bg-orange-500 border-orange-500" : "border-neutral-700 group-hover:border-white"}`}>
+                  {formData.agreed && <ArrowRight className="w-3 h-3 text-black" />}
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={formData.agreed}
+                    onChange={(e) => setFormData({ ...formData, agreed: e.target.checked })}
+                  />
+                </div>
+                <span className="text-xs text-neutral-600 group-hover:text-neutral-300 transition-colors">
+                  I agree to the Terms & Privacy Policy
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-white text-black font-semibold py-3 tracking-wider rounded-full mt-4 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? <LoaderPinwheel className="w-5 h-5 animate-spin mx-auto" /> : "Create Account"}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center pb-8 lg:pb-0">
+            <p className="text-neutral-600 text-sm">
+              Already have an account?{" "}
+              <Link href="/login" className="text-white hover:text-orange-500 transition-colors font-medium border-b border-transparent hover:border-orange-500">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* FLOATING BLOB w/ PARALLAX - ABSOLUTE CENTER */}
+      {/* <div className="absolute left-1/2 top-50 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none z-20 opacity-90 hidden lg:block">
+        <motion.div
+          animate={{
+            y: [20, -20, 20],
+            rotate: [0, -5, 0],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="relative w-full h-full"
+        >
+          <Image
+            src="/login-blob.png"
+            alt="Ante Blob"
+            fill
+            className="object-contain"
+            priority
+          />
+        </motion.div>
+      </div> */}
+
     </div>
   )
 }

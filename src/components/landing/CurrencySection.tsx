@@ -8,7 +8,7 @@ export function CurrencySection() {
     <section className="py-32 px-6 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
+
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -20,36 +20,36 @@ export function CurrencySection() {
               <Wallet className="w-4 h-4" />
               <span>Real Money Betting</span>
             </div>
-            
+
             <h2 className="text-5xl md:text-7xl font-medium tracking-tighter text-black leading-[1.1]">
               Bet with real money. <br />
-              <span className="text-neutral-400">Win real rewards.</span>
+              <span className="text-neutral-500">Win real rewards.</span>
             </h2>
-            
+
             <p className="text-xl text-neutral-600 leading-relaxed max-w-xl font-medium">
-              Ante Social is a social casino platform for the Kenyan market featuring real money betting with USD and KSH. 
+              Ante Social is a social casino platform for the Kenyan market featuring real money betting with USD and KSH.
               Secure deposits via M-Pesa and crypto, with transparent tier-based limits.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-               <div className="flex items-center gap-4 p-4 rounded-xl bg-green-50 border border-green-100">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                    <ArrowUpRight className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-green-700 uppercase tracking-wider">Novice Tier Deposit</p>
-                    <p className="text-lg font-medium text-green-900 numeric">Up to $500/day</p>
-                  </div>
-               </div>
-               <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                    <Coins className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-blue-700 uppercase tracking-wider">High Roller Tier</p>
-                    <p className="text-lg font-medium text-blue-900 numeric">Up to $5,000/day</p>
-                  </div>
-               </div>
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-green-50 border border-green-100">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                  <ArrowUpRight className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-green-700 uppercase tracking-wider">Novice Tier Deposit</p>
+                  <p className="text-lg font-medium text-green-900 numeric">Up to $500/day</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <Coins className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-blue-700 uppercase tracking-wider">High Roller Tier</p>
+                  <p className="text-lg font-medium text-blue-900 numeric">Up to $5,000/day</p>
+                </div>
+              </div>
             </div>
           </motion.div>
 
@@ -62,7 +62,7 @@ export function CurrencySection() {
           >
             {/* Wallet Dashboard Mockup */}
             <div className="relative z-10 p-8 rounded-3xl bg-white border border-neutral-100 shadow-2xl">
-              
+
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-2xl font-medium text-black">Wallet</h3>
                 <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
@@ -72,7 +72,7 @@ export function CurrencySection() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div className="p-6 rounded-2xl bg-neutral-50 border border-neutral-100">
-                  <p className="text-sm text-neutral-500 font-medium mb-1">Current Balance (USD)</p>
+                  <p className="text-sm text-neutral-600 font-medium mb-1">Current Balance (USD)</p>
                   <p className="text-3xl font-medium text-black tracking-tight numeric">$1,250.50</p>
                 </div>
                 <div className="p-6 rounded-2xl bg-green-50/50 border border-green-100/50">
@@ -93,7 +93,7 @@ export function CurrencySection() {
                         <p className="text-sm font-medium text-black">
                           {i === 0 ? "M-Pesa Deposit" : i === 1 ? "Won Bet: 'Best Meme'" : "Bet Entry: 'Risk It All'"}
                         </p>
-                        <p className="text-xs text-neutral-500">Today, 10:2{i} AM</p>
+                        <p className="text-xs text-neutral-600">Today, 10:2{i} AM</p>
                       </div>
                     </div>
                     <span className={`text-sm font-medium numeric ${i === 2 ? 'text- red-500' : 'text-green-600'}`}>

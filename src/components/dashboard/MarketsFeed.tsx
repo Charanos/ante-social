@@ -102,7 +102,7 @@ export function MarketsFeed() {
                 "cursor-pointer whitespace-nowrap border-b-2 py-3 px-3 text-sm font-medium transition-all rounded-t-md focus:outline-none",
                 activeTab === tab.id
                   ? "border-amber-400 text-zinc-900 bg-white/60 shadow-sm"
-                  : "border-transparent text-neutral-500 hover:border-neutral-200 hover:text-zinc-900"
+                  : "border-transparent text-neutral-600 hover:border-neutral-200 hover:text-zinc-900"
               )}
               aria-current={activeTab === tab.id ? 'page' : undefined}
             >
@@ -121,7 +121,7 @@ export function MarketsFeed() {
       {filteredMarkets.length === 0 && (
         <div className="min-h-[300px] rounded-xl bg-neutral-50 dark:bg-neutral-900/50 flex flex-col items-center justify-center p-8 text-center border border-dashed border-neutral-200 dark:border-neutral-800">
           <h3 className="text-lg font-medium text-black dark:text-white">No markets found.</h3>
-          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Try selecting a different category.</p>
+          <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-500">Try selecting a different category.</p>
         </div>
       )}
     </div>

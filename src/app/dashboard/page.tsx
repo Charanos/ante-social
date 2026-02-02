@@ -8,23 +8,18 @@ import {
     HelpCircle,
     ChevronLeft,
     ChevronRight,
-    Loader2,
     ScanEye,
     TrendingUp,
     Users,
     Clock,
     ArrowRight,
-    CheckCircle2
+    CheckCircle2,
+    LoaderPinwheel
 } from "lucide-react";
 import Image from "next/image";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
-
-// Mock user data - replace with real session
-const mockUser = {
-    username: "HighRoller",
-    user_level: "high_roller",
-};
+import { mockUser } from "@/lib/mockData";
 
 const liveWins = [
     { id: 1, name: "CryptoKing", game: "Bitcoin Binary", amount: "12,450", currency: "KSH", avatar: "🦁" },
@@ -48,7 +43,7 @@ function LiveWinCard({ win }: any) {
                 </div>
                 <div className="flex flex-col items-end">
                     <span className="text-xs font-semibold text-green-700">Won</span>
-                    <span className="text-sm font-bold font-mono text-green-600">
+                    <span className="text-sm font-semibold font-mono text-green-600">
                         {win.amount} <span className="text-xs">{win.currency}</span>
                     </span>
                 </div>
@@ -64,7 +59,7 @@ function MarketCard({ market }: any) {
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -4 }}
             transition={{ duration: 0.3 }}
-            className="group relative overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500"
+            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500"
         >
             {/* Shine effect */}
             <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -83,7 +78,7 @@ function MarketCard({ market }: any) {
 
                 {/* Tag Badge */}
                 <div className="absolute top-4 left-4 px-3 flex items-center py-1 bg-white/90 backdrop-blur-sm rounded-full border border-black/10">
-                    <span className="text-xs font-bold text-black/70 uppercase tracking-wider">
+                    <span className="text-xs font-semibold text-black/70 uppercase tracking-wider">
                         {market.tag}
                     </span>
                 </div>
@@ -91,7 +86,7 @@ function MarketCard({ market }: any) {
                 {/* Time Left Badge */}
                 <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-black/80 backdrop-blur-sm rounded-full">
                     <Clock className="w-3 h-3 text-white" />
-                    <span className="text-xs font-bold font-mono text-white">
+                    <span className="text-xs font-semibold font-mono text-white">
                         {market.timeLeft}
                     </span>
                 </div>
@@ -114,7 +109,7 @@ function MarketCard({ market }: any) {
                         <TrendingUp className="w-4 h-4 text-black/40" />
                         <div className="flex flex-col">
                             <span className="text-xs text-black/40 font-semibold uppercase tracking-wider">Pool</span>
-                            <span className="text-sm font-bold font-mono text-black/80">{market.pool}</span>
+                            <span className="text-sm font-semibold font-mono text-black/80">{market.pool}</span>
                         </div>
                     </div>
 
@@ -124,7 +119,7 @@ function MarketCard({ market }: any) {
                         <Users className="w-4 h-4 text-black/40" />
                         <div className="flex flex-col">
                             <span className="text-xs text-black/40 font-semibold uppercase tracking-wider">Bets</span>
-                            <span className="text-sm font-bold font-mono text-black/80">{market.bets}</span>
+                            <span className="text-sm font-semibold font-mono text-black/80">{market.bets}</span>
                         </div>
                     </div>
                 </div>
@@ -168,7 +163,8 @@ export default function DashboardPage() {
         // Mock data for demo
         const mockMarkets = [
             {
-                id: 1,
+                id: "poll-001",
+                type: "poll",
                 title: "Best Nairobi Matatu Route",
                 description: "Vote for the most reliable and comfortable matatu route in Nairobi",
                 image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
@@ -178,17 +174,19 @@ export default function DashboardPage() {
                 tag: "Poll"
             },
             {
-                id: 2,
+                id: "poll-002",
+                type: "poll",
                 title: "Who Wins the Derby?",
                 description: "AFC Leopards vs Gor Mahia - predict the winner of Kenya's biggest rivalry",
                 image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
                 pool: "182,500 KSH",
                 bets: 93,
                 timeLeft: "5h 30m",
-                tag: "Market"
+                tag: "Poll"
             },
             {
-                id: 3,
+                id: "reflex-001",
+                type: "reflex",
                 title: "Reflex Test: First Instinct",
                 description: "When suddenly added to a group chat, what would you do? 5 seconds to decide",
                 image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
@@ -198,7 +196,8 @@ export default function DashboardPage() {
                 tag: "Reflex"
             },
             {
-                id: 4,
+                id: "ladder-001",
+                type: "ladder",
                 title: "Top Kenyan Musician 2024",
                 description: "Rank the top 5 Kenyan musicians based on what the crowd thinks",
                 image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
@@ -208,7 +207,8 @@ export default function DashboardPage() {
                 tag: "Ladder"
             },
             {
-                id: 5,
+                id: "poll-003",
+                type: "poll",
                 title: "Nairobi Traffic Chaos",
                 description: "Which time of day has the worst traffic in Nairobi CBD?",
                 image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
@@ -218,10 +218,11 @@ export default function DashboardPage() {
                 tag: "Poll"
             },
             {
-                id: 6,
+                id: "betrayal-001",
+                type: "betrayal",
                 title: "Betrayal Game: Trust or Cash",
                 description: "Cooperate for small win or betray for jackpot - what will you choose?",
-                image: "https://images.unsplash.com/photo-1556817411-92e97d73049f?w=800&auto=format&fit=crop",
+                image: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop",
                 pool: "324,100 KSH",
                 bets: 121,
                 timeLeft: "3h 45m",
@@ -240,10 +241,10 @@ export default function DashboardPage() {
     const currentMarkets = activeMarkets.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     return (
-        <div className="space-y-10 pb-12 overflow-x-hidden w-full max-w-[100vw]">
+        <div className="space-y-10 pb-12 pl-8 overflow-x-hidden w-full max-w-[100vw]">
             <DashboardHeader user={user} />
 
-            {/* Hero Section - Keep as is */}
+            {/* Hero Section */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -255,15 +256,15 @@ export default function DashboardPage() {
                     <div className="flex-1 space-y-6">
                         <div className="space-y-4">
                             <h1 className="text-4xl md:text-5xl font-medium tracking-tight">
-                                Hi, <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-200 to-yellow-500">{user?.username || "High Roller"}</span>
+                                Hi, <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-200 to-yellow-500">{user?.username || "Guest"}</span>
                             </h1>
-                            <p className="text-neutral-400 text-lg">Your fortune favors the bold.</p>
+                            <p className="text-neutral-500 text-lg">Your fortune favors the bold.</p>
                         </div>
 
                         <div className="space-y-3 max-w-lg">
                             <div className="flex justify-between text-sm font-medium tracking-wide">
                                 <span className="text-amber-400">Current Rank: <span className="text-neutral-300">{rank}</span></span>
-                                <span className="text-neutral-500">Next: {nextRank}</span>
+                                <span className="text-neutral-600">Next: {nextRank}</span>
                             </div>
                             <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
                                 <motion.div
@@ -273,7 +274,7 @@ export default function DashboardPage() {
                                     transition={{ duration: 1.5, ease: "easeOut" }}
                                 />
                             </div>
-                            <div className="flex justify-between text-xs text-neutral-400 font-mono">
+                            <div className="flex justify-between text-xs text-neutral-500 font-mono">
                                 <span>99,375 KSH earned</span>
                                 <span>Goal: 132,500 KSH</span>
                             </div>
@@ -383,12 +384,14 @@ export default function DashboardPage() {
 
                 {isLoading ? (
                     <div className="flex h-64 items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-black/40" />
+                        <LoaderPinwheel className="w-8 h-8 animate-spin text-black/40" />
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {currentMarkets.map((market) => (
-                            <MarketCard key={market.id} market={market} />
+                            <Link key={market.id} href={`/dashboard/markets/${market.id}/${market.type}`}>
+                                <MarketCard market={market} />
+                            </Link>
                         ))}
                     </div>
                 )}
@@ -462,7 +465,7 @@ export default function DashboardPage() {
                                     ].map((item) => (
                                         <div key={item.step} className="flex items-start gap-4">
                                             <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center shrink-0">
-                                                <span className="text-sm font-bold font-mono text-black/70">{item.step}</span>
+                                                <span className="text-sm font-semibold font-mono text-black/70">{item.step}</span>
                                             </div>
                                             <p className="text-sm text-black/70 font-medium leading-relaxed pt-1">
                                                 {item.text}

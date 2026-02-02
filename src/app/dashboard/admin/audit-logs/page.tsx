@@ -140,7 +140,7 @@ export default function AuditLogsPage() {
         {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Overview</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -203,7 +203,7 @@ export default function AuditLogsPage() {
         {/* Visual Separator - Filters */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Filters</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Filters</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -216,7 +216,7 @@ export default function AuditLogsPage() {
           <DashboardCard className="p-5 mb-10">
             <div className="flex gap-3">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
                 <input
                   type="text"
                   placeholder="Search logs..."
@@ -238,7 +238,7 @@ export default function AuditLogsPage() {
                   <option value="deposit">Deposit</option>
                   <option value="registration">User Registration</option>
                 </select>
-                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
 
               <div className="relative">
@@ -252,7 +252,7 @@ export default function AuditLogsPage() {
                   <option value="system">System</option>
                   <option value="admin">Admin</option>
                 </select>
-                <ChevronDown className="w-4 h-4 text-neutral-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
           </DashboardCard>
@@ -261,7 +261,7 @@ export default function AuditLogsPage() {
         {/* Visual Separator - Audit Logs */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Audit Logs ({mockAuditLogs.length})</h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Audit Logs ({mockAuditLogs.length})</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -278,7 +278,7 @@ export default function AuditLogsPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-mono text-neutral-400">#{log.id}</span>
+                    <span className="text-sm font-mono text-neutral-500">#{log.id}</span>
                     <span className={`px-2.5 py-1 text-xs font-medium rounded-full border uppercase tracking-wide ${getEventBadgeStyles(log.eventType)}`}>
                       {log.eventType}
                     </span>
@@ -286,7 +286,7 @@ export default function AuditLogsPage() {
                       {log.actor}
                     </span>
                   </div>
-                  <span className="text-xs text-neutral-500 font-mono flex items-center gap-1.5">
+                  <span className="text-xs text-neutral-600 font-mono flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5" />
                     {log.timestamp}
                   </span>
@@ -299,18 +299,18 @@ export default function AuditLogsPage() {
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                     <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                      <User className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+                      <User className="w-4 h-4 text-neutral-600 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs text-neutral-500 font-medium">User ID</p>
+                        <p className="text-xs text-neutral-600 font-medium">User ID</p>
                         <p className="text-xs font-mono text-neutral-900 truncate">{log.userId}</p>
                       </div>
                     </div>
 
                     {log.wallet && (
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <Wallet className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+                        <Wallet className="w-4 h-4 text-neutral-600 flex-shrink-0" />
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs text-neutral-500 font-medium">Wallet</p>
+                          <p className="text-xs text-neutral-600 font-medium">Wallet</p>
                           <p className="text-xs font-mono text-neutral-900 truncate">{log.wallet}</p>
                         </div>
                       </div>
@@ -333,11 +333,11 @@ export default function AuditLogsPage() {
                   <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4 mb-4">
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <span className="text-xs text-neutral-500 font-medium w-20 flex-shrink-0 pt-0.5">Previous:</span>
+                        <span className="text-xs text-neutral-600 font-medium w-20 flex-shrink-0 pt-0.5">Previous:</span>
                         <span className="text-xs font-mono text-neutral-700 break-all">{log.previousHash}</span>
                       </div>
                       <div className="flex items-start gap-3">
-                        <span className="text-xs text-neutral-500 font-medium w-20 flex-shrink-0 pt-0.5">Current:</span>
+                        <span className="text-xs text-neutral-600 font-medium w-20 flex-shrink-0 pt-0.5">Current:</span>
                         <span className="text-xs font-mono text-neutral-700 break-all">{log.currentHash}</span>
                       </div>
                     </div>
@@ -361,10 +361,10 @@ export default function AuditLogsPage() {
           >
             <DashboardCard className="p-12 text-center">
               <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-neutral-400" />
+                <Shield className="w-8 h-8 text-neutral-500" />
               </div>
               <h3 className="text-lg font-medium text-neutral-900 mb-2">No audit logs found</h3>
-              <p className="text-sm text-neutral-500">Audit logs will appear here as events occur in the system</p>
+              <p className="text-sm text-neutral-600">Audit logs will appear here as events occur in the system</p>
             </DashboardCard>
           </motion.div>
         )}

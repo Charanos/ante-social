@@ -150,7 +150,7 @@ export default function ViewMarketPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-neutral-900">Created</p>
-                <p className="text-sm text-neutral-500">{marketData.createdDate}</p>
+                <p className="text-sm text-neutral-600">{marketData.createdDate}</p>
               </div>
             </div>
 
@@ -160,7 +160,7 @@ export default function ViewMarketPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-neutral-900">Closes</p>
-                <p className="text-sm text-neutral-500">{marketData.closeDate}</p>
+                <p className="text-sm text-neutral-600">{marketData.closeDate}</p>
                 <p className="text-xs text-red-600 mt-0.5">in 7 hours</p>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function ViewMarketPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-neutral-900">Settlement</p>
-                <p className="text-sm text-neutral-500">{marketData.settlementDate}</p>
+                <p className="text-sm text-neutral-600">{marketData.settlementDate}</p>
                 <p className="text-xs text-blue-600 mt-0.5">in 8 hours</p>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function ViewMarketPage() {
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-neutral-900">Outcomes</h3>
-            <span className="text-sm text-neutral-500">{marketData.outcomes.length} options</span>
+            <span className="text-sm text-neutral-600">{marketData.outcomes.length} options</span>
           </div>
 
           <div className="space-y-8">
@@ -199,8 +199,8 @@ export default function ViewMarketPage() {
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-base font-medium text-neutral-900">{outcome.name}</h4>
                   <span className={`px-3 py-1 text-xs font-medium rounded-full ${outcome.percentage > 0
-                      ? 'bg-green-100 text-green-700 border border-green-200'
-                      : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
+                    ? 'bg-green-100 text-green-700 border border-green-200'
+                    : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
                     }`}>
                     {outcome.percentage}%
                   </span>
