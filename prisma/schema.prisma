@@ -85,10 +85,13 @@ model Group {
   name        String
   description String?
   avatar_url  String?
+  is_public   Boolean @default(true)
+  invite_code String? @unique
 
-  created_by String   @db.ObjectId
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_by        String   @db.ObjectId
+  initial_market_id String?  @db.ObjectId
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   members GroupMember[]
   markets PrivateGroupMarket[]

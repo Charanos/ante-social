@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy,
   Lock,
-  Zap,
+  Activity,
   Gift,
   Star,
   Medal,
@@ -63,7 +63,7 @@ const getCategoryIcon = (category: string) => {
     case 'time based': return <Clock className="w-4 h-4" />;
     case 'performance': return <Trophy className="w-4 h-4" />;
     case 'prestige': return <Medal className="w-4 h-4" />;
-    case 'risk': return <Zap className="w-4 h-4" />;
+    case 'risk': return <Activity className="w-4 h-4" />;
     case 'social': return <Users className="w-4 h-4" />;
     default: return <Target className="w-4 h-4" />;
   }
@@ -175,7 +175,7 @@ export default function AchievementsPage() {
                 <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{mockAchievements.stats.streak}</p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <Zap className="h-6 w-6 text-purple-600" />
+                <Activity className="h-6 w-6 text-purple-600" />
               </div>
             </div>
           </div>

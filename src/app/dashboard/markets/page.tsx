@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { TrendingUp, Users, Clock, Search, ArrowRight, Zap, Trophy, Filter } from "lucide-react";
+import { TrendingUp, Users, Clock, Search, ArrowRight, Activity, Trophy, Filter } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
@@ -9,6 +9,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { mockUser } from "@/lib/mockData";
 import { MarketCard } from "@/components/markets/MarketCard";
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { useEffect } from "react";
 
 // Mock markets data with Kenyan context
 const mockMarkets = [
@@ -105,6 +108,20 @@ const getTypeStyles = (type: string) => {
 export default function MarketsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFiltering, setIsFiltering] = useState(false);
+
+  useEffect(() => {
+    // Simulate initial loading
+    const timer = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    setIsFiltering(true);
+    const timer = setTimeout(() => setIsFiltering(false), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, filterType]);
 
   const totalParticipants = mockMarkets.reduce((sum, m) => sum + m.participants, 0);
   const totalPool = mockMarkets.reduce((sum, m) => {
@@ -118,9 +135,13 @@ export default function MarketsPage() {
     return matchesSearch && matchesFilter;
   });
 
+  if (isLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+
   return (
     <div className="min-h-screen pb-12">
-      <div className="max-w-full mx-auto pl-8 pb-8 space-y-8">
+      <div className="max-w-full mx-auto md:pl-8 pl-0 pb-8 space-y-2">
         <DashboardHeader user={mockUser} subtitle="Explore active betting markets and join the action" />
 
 
@@ -223,7 +244,21 @@ export default function MarketsPage() {
 
         {/* Markets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredMarkets.length > 0 ? (
+          {isFiltering ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-3xl border border-neutral-100 bg-white p-4 space-y-4">
+                <Skeleton className="h-48 w-full rounded-2xl" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+                <div className="flex justify-between pt-4">
+                  <Skeleton className="h-10 w-24 rounded-xl" />
+                  <Skeleton className="h-10 w-24 rounded-xl" />
+                </div>
+              </div>
+            ))
+          ) : filteredMarkets.length > 0 ? (
             filteredMarkets.map((market, index) => (
               <MarketCard key={market.id} market={market} index={index} />
             ))

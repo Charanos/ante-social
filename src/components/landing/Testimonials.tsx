@@ -56,7 +56,7 @@ const testimonials = [
 
 function TestimonialCard({ testimonial, index }: any) {
   return (
-    <div className="w-[380px] flex-shrink-0 px-3">
+    <div className="w-[380px] shrink-0 px-3">
       <div className="relative h-full p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
 
         {/* Subtle shine effect on hover */}

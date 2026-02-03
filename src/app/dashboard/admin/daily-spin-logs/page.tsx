@@ -290,7 +290,7 @@ export default function DailySpinLogsPage() {
                     <tr key={log.id} className="hover:bg-neutral-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center text-neutral-600 flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center text-neutral-600 shrink-0">
                             <User className="w-5 h-5" />
                           </div>
                           <div>

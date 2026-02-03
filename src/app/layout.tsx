@@ -5,7 +5,7 @@ import { Providers } from "@/components/Providers";
 
 // Mona Sans is loaded via CSS import in globals.css
 // Using Outfit as a Google Fonts alternative similar to Mona Sans
-const outfit = Outfit({ 
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans",
   weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${outfit.variable} ${jetbrainsMono.variable} ${outfit.className}`}>
+      <body className={`${outfit.variable} ${jetbrainsMono.variable} ${outfit.className} bg-white`}>
         <Providers>{children}</Providers>
       </body>
     </html>

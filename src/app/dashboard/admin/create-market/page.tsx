@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   ArrowLeft, Plus, X, Save, Image as ImageIcon,
-  Users, Zap, Brain, ShieldAlert, Trophy, Calendar, DollarSign, Clock
+  Users, Activity, Brain, ShieldAlert, Trophy, Calendar, DollarSign, Clock
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { DashboardCard } from "@/components/dashboard/DashboardCard"
@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/useToast"
 const marketTypes = [
   { id: "poll", name: "Poll-Style", icon: Users, description: "Option with most votes wins", color: "blue" },
   { id: "betrayal", name: "Betrayal Game", icon: ShieldAlert, description: "Cooperate or betray", color: "red" },
-  { id: "reflex", name: "Reflex Reaction", icon: Zap, description: "5-second prediction test", color: "amber" },
+  { id: "reflex", name: "Reflex Reaction", icon: Activity, description: "5-second prediction test", color: "amber" },
   { id: "ladder", name: "Majority Ladder", icon: Brain, description: "Rank items by prediction", color: "purple" }
 ]
 
@@ -119,7 +119,7 @@ export default function CreateMarketPage() {
                     <p className="text-sm text-neutral-600">{type.description}</p>
                   </div>
                   {isSelected && (
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <div className={`rounded-full bg-${type.color}-500 p-1`}>
                         <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -231,7 +231,7 @@ export default function CreateMarketPage() {
                   <div className="space-y-3">
                     {options.map((option, index) => (
                       <div key={option.id} className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-medium text-blue-700 text-sm">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-medium text-blue-700 text-sm">
                           {index + 1}
                         </div>
                         <input
@@ -348,7 +348,7 @@ export default function CreateMarketPage() {
                   <div className="space-y-3">
                     {ladderItems.map((item, index) => (
                       <div key={item.id} className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center font-medium text-purple-700 text-sm">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center font-medium text-purple-700 text-sm">
                           {index + 1}
                         </div>
                         <input

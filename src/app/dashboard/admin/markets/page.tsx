@@ -339,7 +339,7 @@ export default function MarketManagerPage() {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center shrink-0">
                           <DollarSign className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
@@ -349,7 +349,7 @@ export default function MarketManagerPage() {
                       </div>
 
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center shrink-0">
                           <Users className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
@@ -359,7 +359,7 @@ export default function MarketManagerPage() {
                       </div>
 
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center shrink-0">
                           <TrendingUp className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>
@@ -369,7 +369,7 @@ export default function MarketManagerPage() {
                       </div>
 
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center shrink-0">
                           <Calendar className="w-4 h-4 text-neutral-600" />
                         </div>
                         <div>

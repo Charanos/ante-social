@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bell, Trophy, ChevronRight, TrendingUp, Zap, Home } from "lucide-react";
+import { Bell, Trophy, ChevronRight, TrendingUp, Activity, Home } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -64,7 +64,7 @@ export default function DashboardHeader({ user, subtitle }: DashboardHeaderProps
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Zap className="w-3.5 h-3.5 text-amber-600" />
+            <Activity className="w-3.5 h-3.5 text-amber-600" />
             <span className="text-xs font-semibold text-amber-700 tracking-wide uppercase">
               {stats.winStreak}x Streak
             </span>

@@ -6,7 +6,7 @@ import {
   Smartphone,
   Shield,
   Users,
-  Zap,
+  Activity,
   ArrowRight,
   Target,
   Coins,
@@ -66,7 +66,7 @@ const features: Feature[] = [
   {
     title: "Live Updates",
     description: "Real-time market changes, instant notifications, live settlement.",
-    icon: Zap,
+    icon: Activity,
     stats: { label: "Settlement", value: "<5min" },
     highlights: ["Real-time Updates", "Push Alerts"],
     colSpan: "md:col-span-12 lg:col-span-6",

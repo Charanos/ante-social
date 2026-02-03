@@ -308,7 +308,7 @@ export default function CronMonitorPage() {
         >
           <DashboardCard className="p-6 bg-blue-50/30 border-blue-100">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
                 <Info className="w-4 h-4 text-blue-600" />
               </div>
               <div className="flex-1">

@@ -58,7 +58,7 @@ export function MarketCard({
               )}
             </div>
 
-            <div tabIndex={0} role="button" className="flex-shrink-0 flex items-center gap-2 px-3 py-1 rounded-full bg-linear-to-br from-zinc-900 to-zinc-800 text-white shadow-md cursor-pointer transform transition-transform duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300">
+            <div tabIndex={0} role="button" className="shrink-0 flex items-center gap-2 px-3 py-1 rounded-full bg-linear-to-br from-zinc-900 to-zinc-800 text-white shadow-md cursor-pointer transform transition-transform duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-300">
               <TrendingUp className="w-4 h-4 text-amber-300" />
               <span className="text-sm font-medium">{odds}</span>
             </div>

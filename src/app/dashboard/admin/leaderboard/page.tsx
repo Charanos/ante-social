@@ -245,7 +245,7 @@ export default function LeaderboardPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center shrink-0">
                             <User className="w-5 h-5 text-neutral-600" />
                           </div>
                           <div>

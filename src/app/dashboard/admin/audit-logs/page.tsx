@@ -299,7 +299,7 @@ export default function AuditLogsPage() {
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                     <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                      <User className="w-4 h-4 text-neutral-600 flex-shrink-0" />
+                      <User className="w-4 h-4 text-neutral-600 shrink-0" />
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-neutral-600 font-medium">User ID</p>
                         <p className="text-xs font-mono text-neutral-900 truncate">{log.userId}</p>
@@ -308,7 +308,7 @@ export default function AuditLogsPage() {
 
                     {log.wallet && (
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <Wallet className="w-4 h-4 text-neutral-600 flex-shrink-0" />
+                        <Wallet className="w-4 h-4 text-neutral-600 shrink-0" />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs text-neutral-600 font-medium">Wallet</p>
                           <p className="text-xs font-mono text-neutral-900 truncate">{log.wallet}</p>
@@ -318,7 +318,7 @@ export default function AuditLogsPage() {
 
                     {log.amount && (
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green-50 border border-green-100">
-                        <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                        <div className="w-4 h-4 flex items-center justify-center shrink-0">
                           <span className="text-green-600 font-medium text-xs">$</span>
                         </div>
                         <div className="min-w-0 flex-1">
@@ -333,11 +333,11 @@ export default function AuditLogsPage() {
                   <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4 mb-4">
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
-                        <span className="text-xs text-neutral-600 font-medium w-20 flex-shrink-0 pt-0.5">Previous:</span>
+                        <span className="text-xs text-neutral-600 font-medium w-20 shrink-0 pt-0.5">Previous:</span>
                         <span className="text-xs font-mono text-neutral-700 break-all">{log.previousHash}</span>
                       </div>
                       <div className="flex items-start gap-3">
-                        <span className="text-xs text-neutral-600 font-medium w-20 flex-shrink-0 pt-0.5">Current:</span>
+                        <span className="text-xs text-neutral-600 font-medium w-20 shrink-0 pt-0.5">Current:</span>
                         <span className="text-xs font-mono text-neutral-700 break-all">{log.currentHash}</span>
                       </div>
                     </div>

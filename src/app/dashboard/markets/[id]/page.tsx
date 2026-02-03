@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import {
   Users,
@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { mockUser } from "@/lib/mockData";
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { useToast } from "@/components/ui/toast-notification";
 
 const getMockMarket = (id: string) => ({
   id,
@@ -73,22 +75,51 @@ export default function MarketDetailPage() {
 
   useEffect(() => {
     if (!marketId) return;
+    // Keep loading slightly longer to show off the logo
     setTimeout(() => {
       setMarket(getMockMarket(marketId));
       setLoading(false);
-    }, 600);
+    }, 1200);
   }, [marketId]);
+
+  const router = useRouter();
+  const toast = useToast();
 
   const handlePlaceBet = async () => {
     if (!market || !selectedOption || !stakeAmount) return;
 
     setIsSubmitting(true);
+    const newBetId = `bet-${Date.now()}`;
+    const selectedOptText = market.options.find((o: any) => o.id === selectedOption)?.option_text || "Unknown";
+
+    // Show loading toast
+    const toastId = toast.loading("Confirming your bet...", "Processing transaction securely");
+
+    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      setSelectedOption(null);
-      setStakeAmount("");
-    }, 1500);
+
+      // Update toast to success
+      toast.removeToast(toastId);
+      toast.success("Bet Placed Successfully!", "Good luck! Redirecting to your ticket...");
+
+      const params = new URLSearchParams({
+        marketId: market.id,
+        amount: stakeAmount,
+        outcome: selectedOptText,
+        title: market.title,
+        status: "active",
+        date: new Date().toISOString(),
+        new: "true"
+      });
+
+      // Redirect to the bet slip page with params
+      setTimeout(() => {
+        router.push(`/dashboard/markets/my-bets/${newBetId}?${params.toString()}`);
+      }, 1000);
+    }, 2000);
   };
+
 
   const getTimeRemaining = () => {
     if (!market) return "";
@@ -100,11 +131,7 @@ export default function MarketDetailPage() {
   };
 
   if (loading || !market) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-black/10 border-t-black rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingLogo fullScreen size="lg" />;
   }
 
   const totalVotes = market.options.reduce((acc: number, opt: any) => acc + opt.votes, 0);

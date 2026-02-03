@@ -213,7 +213,7 @@ export default function UserManagementPage() {
                         className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all group"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-600 flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-600 shrink-0">
                             <User className="w-5 h-5" />
                           </div>
                           <div>

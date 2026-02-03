@@ -10,7 +10,8 @@
 
 **Authentication:** Bearer Token (JWT)
 
-**Rate Limiting:** 
+**Rate Limiting:**
+
 - Standard users: 100 requests/minute
 - High rollers: 200 requests/minute
 - Admin: 500 requests/minute
@@ -24,9 +25,11 @@
 ## Authentication Endpoints
 
 ### POST /auth/register
+
 Register a new user account.
 
 **Request Body:**
+
 ```json
 {
   "username": "string (3-20 chars, alphanumeric + underscore)",
@@ -39,6 +42,7 @@ Register a new user account.
 ```
 
 **Response (201):**
+
 ```json
 {
   "user_id": "objectId",
@@ -55,6 +59,7 @@ Register a new user account.
 ```
 
 **Errors:**
+
 - `400` - Validation failed
 - `409` - Username or email already exists
 - `422` - User under 18 years old
@@ -62,9 +67,11 @@ Register a new user account.
 ---
 
 ### POST /auth/login
+
 Authenticate existing user.
 
 **Request Body:**
+
 ```json
 {
   "email": "string",
@@ -75,6 +82,7 @@ Authenticate existing user.
 ```
 
 **Response (200):**
+
 ```json
 {
   "user_id": "objectId",
@@ -92,6 +100,7 @@ Authenticate existing user.
 ```
 
 **Response (206 - 2FA Required):**
+
 ```json
 {
   "requires_totp": true,
@@ -100,6 +109,7 @@ Authenticate existing user.
 ```
 
 **Errors:**
+
 - `401` - Invalid credentials
 - `403` - Account suspended/frozen
 - `428` - 2FA code required
@@ -108,14 +118,17 @@ Authenticate existing user.
 ---
 
 ### POST /auth/logout
+
 Invalidate current session token.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Logged out successfully"
@@ -125,14 +138,17 @@ Authorization: Bearer {token}
 ---
 
 ### POST /auth/refresh
+
 Refresh authentication token.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200):**
+
 ```json
 {
   "token": "new_jwt_token",
@@ -143,14 +159,17 @@ Authorization: Bearer {token}
 ---
 
 ### POST /auth/2fa/setup
+
 Enable 2FA for user account.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200):**
+
 ```json
 {
   "secret": "JBSWY3DPEHPK3PXP",
@@ -174,9 +193,11 @@ Authorization: Bearer {token}
 ---
 
 ### POST /auth/2fa/verify
+
 Verify and activate 2FA.
 
 **Request Body:**
+
 ```json
 {
   "totp_code": "123456"
@@ -184,6 +205,7 @@ Verify and activate 2FA.
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "2FA enabled successfully",
@@ -192,14 +214,17 @@ Verify and activate 2FA.
 ```
 
 **Errors:**
+
 - `422` - Invalid code
 
 ---
 
 ### POST /auth/2fa/disable
+
 Disable 2FA for user account.
 
 **Request Body:**
+
 ```json
 {
   "password": "string",
@@ -208,6 +233,7 @@ Disable 2FA for user account.
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "2FA disabled successfully",
@@ -220,14 +246,17 @@ Disable 2FA for user account.
 ## User Management Endpoints
 
 ### GET /users/profile
+
 Get current user profile.
 
 **Headers:**
+
 ```
 Authorization: Bearer {token}
 ```
 
 **Response (200):**
+
 ```json
 {
   "user_id": "objectId",
@@ -247,20 +276,20 @@ Authorization: Bearer {token}
   },
   "daily_limits": {
     "currency": "KSH",
-    "deposit_limit": 66225.00,
-    "withdrawal_limit": 33112.50,
-    "deposit_used_today": 15925.00,
+    "deposit_limit": 66225.0,
+    "withdrawal_limit": 33112.5,
+    "deposit_used_today": 15925.0,
     "withdrawal_used_today": 0,
     "resets_at": "timestamp"
   },
   "wallet_balances": {
     "USD": {
       "available": 1250.75,
-      "pending": 200.00
+      "pending": 200.0
     },
     "KSH": {
-      "available": 165432.50,
-      "pending": 26490.00
+      "available": 165432.5,
+      "pending": 26490.0
     }
   },
   "total_bets_placed": 42,
@@ -272,9 +301,11 @@ Authorization: Bearer {token}
 ---
 
 ### PATCH /users/profile
+
 Update user profile (limited fields).
 
 **Request Body:**
+
 ```json
 {
   "username": "string (optional)",
@@ -293,6 +324,7 @@ Update user profile (limited fields).
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Profile updated successfully",
@@ -301,20 +333,24 @@ Update user profile (limited fields).
 ```
 
 **Errors:**
+
 - `400` - Validation failed
 - `409` - Username already taken
 
 ---
 
 ### GET /users/activity
+
 Get user activity history.
 
 **Query Parameters:**
+
 - `limit` (int, default: 20, max: 100)
 - `offset` (int, default: 0)
 - `type` (string, optional: "bet_placed" | "bet_won" | "bet_lost" | "deposit" | "withdrawal")
 
 **Response (200):**
+
 ```json
 {
   "activities": [
@@ -322,7 +358,7 @@ Get user activity history.
       "activity_id": "uuid",
       "type": "bet_placed",
       "description": "Placed $50 on Poll-Style market",
-      "amount": 50.00,
+      "amount": 50.0,
       "market_id": "uuid",
       "timestamp": "timestamp"
     }
@@ -340,19 +376,21 @@ Get user activity history.
 ## Wallet Endpoints
 
 ### GET /wallet/balance
+
 Get current wallet balance.
 
 **Response (200):**
+
 ```json
 {
   "balances": {
     "USD": {
       "available": 1250.75,
-      "pending": 200.00
+      "pending": 200.0
     },
     "KSH": {
-      "available": 165432.50,
-      "pending": 26490.00
+      "available": 165432.5,
+      "pending": 26490.0
     }
   },
   "exchange_rate": {
@@ -365,22 +403,25 @@ Get current wallet balance.
 ---
 
 ### POST /wallet/deposit
+
 Initiate a deposit.
 
 **Request Body:**
+
 ```json
 {
-  "amount": 100.00,
+  "amount": 100.0,
   "currency": "USD|KSH",
   "payment_method": "mpesa|crypto"
 }
 ```
 
 **Response (200) - M-Pesa:**
+
 ```json
 {
   "transaction_id": "objectId",
-  "amount": 13245.00,
+  "amount": 13245.0,
   "currency": "KSH",
   "status": "pending",
   "payment_instructions": {
@@ -401,10 +442,11 @@ Initiate a deposit.
 ```
 
 **Response (200) - Crypto:**
+
 ```json
 {
   "transaction_id": "objectId",
-  "amount": 100.00,
+  "amount": 100.0,
   "currency": "USD",
   "status": "pending",
   "payment_instructions": {
@@ -421,6 +463,7 @@ Initiate a deposit.
 ```
 
 **Errors:**
+
 - `400` - Invalid amount
 - `403` - Daily limit exceeded
 - `429` - Too many deposit attempts
@@ -428,12 +471,14 @@ Initiate a deposit.
 ---
 
 ### POST /wallet/withdraw
+
 Request a withdrawal.
 
 **Request Body:**
+
 ```json
 {
-  "amount": 100.00,
+  "amount": 100.0,
   "withdrawal_method": "mpesa|bank_transfer",
   "destination": {
     "mpesa_number": "+254700000000"
@@ -442,16 +487,18 @@ Request a withdrawal.
 ```
 
 **Response (200):**
+
 ```json
 {
   "transaction_id": "uuid",
-  "amount": 100.00,
+  "amount": 100.0,
   "status": "pending",
   "estimated_completion": "timestamp (24-48 hours)"
 }
 ```
 
 **Errors:**
+
 - `400` - Insufficient balance
 - `403` - Daily limit exceeded
 - `422` - Pending bets must settle first
@@ -459,21 +506,24 @@ Request a withdrawal.
 ---
 
 ### GET /wallet/transactions
+
 Get transaction history.
 
 **Query Parameters:**
+
 - `limit` (int, default: 20)
 - `offset` (int, default: 0)
 - `type` (string: "deposit" | "withdrawal" | "bet" | "payout")
 
 **Response (200):**
+
 ```json
 {
   "transactions": [
     {
       "transaction_id": "uuid",
       "type": "deposit",
-      "amount": 100.00,
+      "amount": 100.0,
       "status": "completed",
       "timestamp": "timestamp"
     }
@@ -491,14 +541,17 @@ Get transaction history.
 ## Public Markets Endpoints
 
 ### GET /markets/public
+
 List all active public markets.
 
 **Query Parameters:**
+
 - `type` (string, optional: "poll_style" | "betrayal_game" | "reflex_reaction" | "majority_prediction")
 - `status` (string: "active" | "settling" | "settled")
 - `limit` (int, default: 20)
 
 **Response (200):**
+
 ```json
 {
   "markets": [
@@ -508,7 +561,7 @@ List all active public markets.
       "title": "Best Nairobi matatu route?",
       "description": "Vote for the most reliable route",
       "status": "active",
-      "total_pool": 2450.00,
+      "total_pool": 2450.0,
       "participant_count": 47,
       "closes_at": "timestamp",
       "created_at": "timestamp"
@@ -520,9 +573,11 @@ List all active public markets.
 ---
 
 ### GET /markets/public/:market_id
+
 Get specific public market details.
 
 **Response (200):**
+
 ```json
 {
   "market_id": "uuid",
@@ -537,14 +592,14 @@ Get specific public market details.
       "media_url": "https://cdn.antesocial.com/..."
     }
   ],
-  "total_pool": 2450.00,
-  "platform_fee": 122.50,
-  "prize_pool_after_fees": 2327.50,
+  "total_pool": 2450.0,
+  "platform_fee": 122.5,
+  "prize_pool_after_fees": 2327.5,
   "participant_count": 47,
   "participants": [
     {
       "username": "betting_king",
-      "total_stake": 50.00,
+      "total_stake": 50.0,
       "timestamp": "timestamp"
     }
   ],
@@ -558,29 +613,33 @@ Get specific public market details.
 ---
 
 ### POST /markets/public/:market_id/bet
+
 Place a bet on a public market.
 
 **Request Body:**
+
 ```json
 {
   "option_id": "uuid",
-  "stake": 50.00
+  "stake": 50.0
 }
 ```
 
 **Response (201):**
+
 ```json
 {
   "bet_id": "uuid",
   "market_id": "uuid",
   "option_id": "uuid",
-  "stake": 50.00,
+  "stake": 50.0,
   "status": "active",
   "placed_at": "timestamp"
 }
 ```
 
 **Errors:**
+
 - `400` - Invalid stake amount
 - `403` - Insufficient balance
 - `404` - Market not found or closed
@@ -589,9 +648,11 @@ Place a bet on a public market.
 ---
 
 ### GET /markets/public/:market_id/results
+
 Get settled market results (only after settlement).
 
 **Response (200):**
+
 ```json
 {
   "market_id": "uuid",
@@ -601,14 +662,14 @@ Get settled market results (only after settlement).
     "text": "Route 46",
     "vote_count": 28
   },
-  "total_pool": 2450.00,
-  "platform_fee": 122.50,
-  "prize_pool_after_fees": 2327.50,
+  "total_pool": 2450.0,
+  "platform_fee": 122.5,
+  "prize_pool_after_fees": 2327.5,
   "winners": [
     {
       "username": "betting_king",
-      "stake": 50.00,
-      "payout": 165.50
+      "stake": 50.0,
+      "payout": 165.5
     }
   ],
   "settled_at": "timestamp"
@@ -620,24 +681,34 @@ Get settled market results (only after settlement).
 ## Private Group Bets Endpoints
 
 ### POST /groups
-Create a new betting group.
+
+Create a new betting group, optionally with an initial market.
 
 **Request Body:**
+
 ```json
 {
   "name": "Friday Night Crew",
   "description": "Weekly bets with the boys",
-  "is_private": true
+  "is_public": true,
+  "initial_market": {
+    "title": "Who wins the first game?",
+    "type": "poll",
+    "buy_in": 10.0,
+    "options": ["Alex", "Jamie"]
+  }
 }
 ```
 
 **Response (201):**
+
 ```json
 {
   "group_id": "uuid",
   "name": "Friday Night Crew",
   "admin_id": "uuid",
   "invite_code": "FN-CREW-2024",
+  "initial_market_id": "uuid",
   "member_count": 1,
   "created_at": "timestamp"
 }
@@ -646,9 +717,11 @@ Create a new betting group.
 ---
 
 ### POST /groups/:group_id/join
+
 Join a group via invite code.
 
 **Request Body:**
+
 ```json
 {
   "invite_code": "FN-CREW-2024"
@@ -656,6 +729,7 @@ Join a group via invite code.
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Joined group successfully",
@@ -665,15 +739,38 @@ Join a group via invite code.
 ```
 
 **Errors:**
+
 - `404` - Invalid invite code
 - `409` - Already a member
 
----
+### Group Management
+
+#### `GET /groups/:id`
+
+Returns group details and membership.
+
+#### `POST /groups/:id/invite`
+
+Generates a unique hashed invite link for the group.
+
+- **Admin Required**
+- **Response**: `{ inviteLink: string, inviteCode: string, expires: Date }`
+
+#### `PATCH /groups/:id/rules`
+
+Updates group-specific betting rules or visibility.
+
+- **Admin Required**
+- **Payload**: `{ rules: Object, visibility: 'public' | 'private' }`
+
+### Market Creation
 
 ### GET /groups/:group_id
+
 Get group details.
 
 **Response (200):**
+
 ```json
 {
   "group_id": "uuid",
@@ -697,25 +794,24 @@ Get group details.
 ---
 
 ### POST /groups/:group_id/bets
+
 Create a new group bet.
 
 **Request Body:**
+
 ```json
 {
   "type": "winner_takes_all|odd_one_out",
   "title": "Who will arrive last to the party?",
   "description": "Annual late-arrival bet",
-  "options": [
-    {"text": "Alex"},
-    {"text": "Jamie"},
-    {"text": "Morgan"}
-  ],
-  "minimum_stake": 10.00,
+  "options": [{ "text": "Alex" }, { "text": "Jamie" }, { "text": "Morgan" }],
+  "minimum_stake": 10.0,
   "closes_at": "timestamp"
 }
 ```
 
 **Response (201):**
+
 ```json
 {
   "bet_id": "uuid",
@@ -728,29 +824,33 @@ Create a new group bet.
 ```
 
 **Errors:**
+
 - `400` - Invalid bet type or insufficient options
 - `403` - Only admin can create bets
 
 ---
 
 ### POST /groups/:group_id/bets/:bet_id/place
+
 Place a bet in a group.
 
 **Request Body:**
+
 ```json
 {
   "option_id": "uuid",
-  "stake": 25.00
+  "stake": 25.0
 }
 ```
 
 **Response (201):**
+
 ```json
 {
   "bet_entry_id": "uuid",
   "bet_id": "uuid",
   "option_id": "uuid",
-  "stake": 25.00,
+  "stake": 25.0,
   "placed_at": "timestamp"
 }
 ```
@@ -758,9 +858,11 @@ Place a bet in a group.
 ---
 
 ### POST /groups/:group_id/bets/:bet_id/declare-winner
+
 Declare winner (admin only, winner_takes_all only).
 
 **Request Body:**
+
 ```json
 {
   "winner_user_id": "uuid"
@@ -768,6 +870,7 @@ Declare winner (admin only, winner_takes_all only).
 ```
 
 **Response (200):**
+
 ```json
 {
   "bet_id": "uuid",
@@ -779,15 +882,18 @@ Declare winner (admin only, winner_takes_all only).
 ```
 
 **Errors:**
+
 - `403` - Only admin can declare winner
 - `404` - User not in bet
 
 ---
 
 ### POST /groups/:group_id/bets/:bet_id/confirm
+
 Confirm winner declaration.
 
 **Response (200):**
+
 ```json
 {
   "message": "Winner confirmed",
@@ -800,9 +906,11 @@ Confirm winner declaration.
 ---
 
 ### POST /groups/:group_id/bets/:bet_id/disagree
+
 Disagree with winner declaration.
 
 **Response (200):**
+
 ```json
 {
   "message": "Disagreement recorded, payout paused",
@@ -815,9 +923,11 @@ Disagree with winner declaration.
 ---
 
 ### GET /groups/:group_id/activity
+
 Get group activity feed.
 
 **Response (200):**
+
 ```json
 {
   "activities": [
@@ -843,9 +953,11 @@ Get group activity feed.
 ## Admin Endpoints
 
 ### PATCH /admin/users/:user_id/tier
+
 Update user tier (admin only).
 
 **Request Body:**
+
 ```json
 {
   "tier": "high_roller",
@@ -854,6 +966,7 @@ Update user tier (admin only).
 ```
 
 **Response (200):**
+
 ```json
 {
   "user_id": "uuid",
@@ -867,9 +980,11 @@ Update user tier (admin only).
 ---
 
 ### GET /admin/compliance/flags
+
 Get flagged accounts.
 
 **Response (200):**
+
 ```json
 {
   "flagged_accounts": [
@@ -888,9 +1003,11 @@ Get flagged accounts.
 ---
 
 ### POST /admin/compliance/freeze
+
 Freeze user account.
 
 **Request Body:**
+
 ```json
 {
   "user_id": "uuid",
@@ -899,6 +1016,7 @@ Freeze user account.
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Account frozen",
@@ -912,16 +1030,18 @@ Freeze user account.
 ## Webhooks
 
 ### POST {webhook_url}/bet_settled
+
 Triggered when any bet is settled.
 
 **Payload:**
+
 ```json
 {
   "event": "bet_settled",
   "bet_id": "uuid",
   "market_type": "poll_style",
-  "total_pool": 2450.00,
-  "platform_fee": 122.50,
+  "total_pool": 2450.0,
+  "platform_fee": 122.5,
   "winners_count": 28,
   "settled_at": "timestamp"
 }
@@ -930,15 +1050,17 @@ Triggered when any bet is settled.
 ---
 
 ### POST {webhook_url}/withdrawal_completed
+
 Triggered when withdrawal is processed.
 
 **Payload:**
+
 ```json
 {
   "event": "withdrawal_completed",
   "transaction_id": "uuid",
   "user_id": "uuid",
-  "amount": 100.00,
+  "amount": 100.0,
   "completed_at": "timestamp"
 }
 ```
@@ -955,14 +1077,15 @@ All error responses follow this structure:
     "code": "INSUFFICIENT_BALANCE",
     "message": "Your wallet balance is insufficient for this transaction",
     "details": {
-      "required": 100.00,
-      "available": 45.50
+      "required": 100.0,
+      "available": 45.5
     }
   }
 }
 ```
 
 **Common Error Codes:**
+
 - `VALIDATION_ERROR` - Request validation failed
 - `UNAUTHORIZED` - Invalid or missing token
 - `FORBIDDEN` - Insufficient permissions
@@ -976,4 +1099,4 @@ All error responses follow this structure:
 ---
 
 **CONFIDENTIAL PROPERTY OF ANTE SOCIAL**  
-*API Version 1.0 | Last Updated: January 2026*
+_API Version 1.0 | Last Updated: January 2026_

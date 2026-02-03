@@ -324,6 +324,18 @@ GET    /api/admin/audit
 
 ---
 
+## Security & Access Control (RBAC)
+
+The backend implements a middleware-based RBAC system:
+
+1.  **Platform Admin**: Full access to global settings, market settlements, and user management.
+2.  **Group Admin**: Access to specific group dashboards, invite generation, and creation of group-restricted markets.
+3.  **User**: General participation, betting, and profile management.
+
+### Integrity Weight Persistence
+
+When a `group_admin` resolves a market, their `integrity_weight` is adjusted based on peer-review or platform oversight. If `integrity_weight` drops below a threshold, `group_admin` privileges are automatically suspended.
+
 ## ✅ Compliance Checklist
 
 - [x] 5% platform fee enforced

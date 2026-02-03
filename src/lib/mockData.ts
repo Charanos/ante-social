@@ -6,14 +6,19 @@ export const mockUser = {
   email: "wormwood.p9@gmail.com",
   full_name: "TDewalt Mowtang",
   user_level: "novice",
-  role: "user",
+  role: "admin", // Can be 'admin', 'group_admin', or 'user'
   wallet: {
     balance: 1250.50,
     total_deposits: 500,
     total_winnings: 980.50,
     total_losses: 230
-  }
+  },
+  managed_groups: ["group1", "group2"] // Groups this user can manage if they are group_admin
 }
+
+export const marketCategories = [
+    "Sports", "Memes", "Social", "Crypto", "Gaming", "Politics", "Technology", "Entertainment"
+]
 
 export const mockLeaderboard = [
   {
@@ -47,7 +52,9 @@ export const mockGroups = [
     avatar_url: null,
     member_count: 12,
     created_at: new Date("2025-11-20"),
-    active_bets: 3
+    active_bets: 3,
+    is_public: true,
+    members: ["user123", "user456"]
   },
   {
     id: "group2",
@@ -56,7 +63,9 @@ export const mockGroups = [
     avatar_url: null,
     member_count: 8,
     created_at: new Date("2025-11-18"),
-    active_bets: 5
+    active_bets: 5,
+    is_public: false,
+    members: ["user123"]
   },
   {
     id: "group3",
@@ -65,7 +74,9 @@ export const mockGroups = [
     avatar_url: null,
     member_count: 24,
     created_at: new Date("2025-11-15"),
-    active_bets: 2
+    active_bets: 2,
+    is_public: true,
+    members: ["user789"]
   },
   {
     id: "group4",
@@ -74,7 +85,9 @@ export const mockGroups = [
     avatar_url: null,
     member_count: 15,
     created_at: new Date("2025-11-22"),
-    active_bets: 4
+    active_bets: 4,
+    is_public: false,
+    members: ["user999"]
   }
 ]
 
@@ -269,3 +282,40 @@ export const mockAchievements = {
     { title: "Motlaire Myth", description: "Participate in 100 markets. Legend status achieved.", reward: 500, category: "Prestige" }
   ]
 }
+
+export const mockMyBets = [
+  {
+    id: "bet1",
+    marketId: "market1",
+    title: "Who wins the Premier League?",
+    amount: 50,
+    status: "active",
+    potentialWin: 250,
+    type: "winner_takes_all",
+    date: "2024-03-15",
+    outcome: "Manchester City"
+  },
+  {
+    id: "bet2",
+    marketId: "market2",
+    title: "Bitcoin hits $100k by Q3",
+    amount: 100,
+    status: "won",
+    potentialWin: 180,
+    type: "binary",
+    date: "2024-01-10",
+    outcome: "Yes"
+  },
+  {
+    id: "bet3",
+    marketId: "market3",
+    title: "Will it rain on Saturday?",
+    amount: 20,
+    status: "lost",
+    potentialWin: 40,
+    type: "binary",
+    date: "2024-02-28",
+    outcome: "No"
+  }
+];
+

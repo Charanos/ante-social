@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
-import { Clock, ArrowRight, TrendingUp, Users, DollarSign, Zap, Trophy, ClipboardList, Swords, AlertCircle } from "lucide-react"
+import { Clock, ArrowRight, TrendingUp, Users, DollarSign, Activity, Trophy, ClipboardList, Swords, AlertCircle } from "lucide-react"
 
 interface MarketCardProps {
     market: {
@@ -29,7 +29,7 @@ const getTypeStyles = (type: string) => {
         case "poll":
             return { label: "Poll", color: "blue", icon: ClipboardList }
         case "reflex":
-            return { label: "Reflex", color: "amber", icon: Zap }
+            return { label: "Reflex", color: "amber", icon: Activity }
         case "ladder":
             return { label: "Ladder", color: "purple", icon: Trophy }
         case "betrayal":
@@ -52,19 +52,19 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500"
+            className="group relative flex flex-col justify-between h-full  overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] transition-all duration-500"
         >
-            <Link href={linkHref} className="block">
-                <div className="flex flex-col justify-between">
+            <Link href={linkHref} className="block h-full">
+                <div className="flex flex-col justify-between h-full  max-h-[420px]">
 
                     {/* Shine effect */}
                     <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     {/* Top border accent */}
-                    <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
+                    <div className="relative top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
 
                     {/* Image Section */}
-                    <div className="relative h-48 overflow-hidden bg-linear-to-br from-black/5 to-black/10">
+                    <div className="relative h-48 top-0 overflow-hidden bg-linear-to-br from-black/5 to-black/10">
                         <Image
                             src={market.image}
                             alt={market.title}
@@ -75,7 +75,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                         {/* Type Badge */}
                         <div className="absolute top-4 left-4 px-3 flex items-center gap-1.5 py-1.5 bg-white/90 backdrop-blur-sm rounded-full border border-black/10 shadow-sm">
                             <TypeIcon className="w-3 h-3 text-black/60" />
-                            <span className="text-[10px] font-bold text-black/70 uppercase tracking-widest">
+                            <span className="text-[10px] font-semibold text-black/70 uppercase tracking-widest">
                                 {typeInfo.label}
                             </span>
                         </div>
@@ -83,7 +83,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                         {/* Time Badge */}
                         <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-sm rounded-full">
                             <Clock className="w-3 h-3 text-white" />
-                            <span className="text-[10px] font-bold font-mono text-white tracking-wider">
+                            <span className="text-[10px] font-semibold font-mono text-white tracking-wider">
                                 {market.timeLeft}
                             </span>
                         </div>
@@ -92,7 +92,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                         <div className="absolute bottom-4 left-4 px-3 py-1 bg-green-500/40 backdrop-blur-sm rounded-full border border-green-400/50">
                             <div className="flex items-center gap-1.5">
                                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                                <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                                <span className="text-[10px] font-semibold text-white uppercase tracking-widest">
                                     {status}
                                 </span>
                             </div>
@@ -115,23 +115,23 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                             <div className="space-y-1">
                                 <div className="flex items-center gap-1 text-black/30">
                                     <DollarSign className="w-3 h-3" />
-                                    <p className="text-[10px] font-bold uppercase tracking-wider">Stake</p>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider">Stake</p>
                                 </div>
-                                <p className="text-xs font-bold font-mono text-black/80">{buyIn}</p>
+                                <p className="text-xs font-semibold font-mono text-black/80">{buyIn}</p>
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center gap-1 text-black/30">
                                     <TrendingUp className="w-3 h-3" />
-                                    <p className="text-[10px] font-bold uppercase tracking-wider">Pool</p>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider">Pool</p>
                                 </div>
-                                <p className="text-xs font-bold font-mono text-black/80">{market.pool}</p>
+                                <p className="text-xs font-semibold font-mono text-black/80">{market.pool}</p>
                             </div>
                             <div className="space-y-1">
                                 <div className="flex items-center gap-1 text-black/30">
                                     <Users className="w-3 h-3" />
-                                    <p className="text-[10px] font-bold uppercase tracking-wider">Active</p>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider">Active</p>
                                 </div>
-                                <p className="text-xs font-bold font-mono text-black/80">{participantsCount}</p>
+                                <p className="text-xs font-semibold font-mono text-black/80">{participantsCount}</p>
                             </div>
                         </div>
 

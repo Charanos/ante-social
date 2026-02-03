@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowRight, TrendingUp, Users, Zap } from "lucide-react";
+import { ArrowRight, TrendingUp, Users, Activity } from "lucide-react";
 
 // Enhanced Wave Background with smoother animations
 function WaveBackground() {
@@ -175,7 +175,7 @@ function FloatingStats() {
   const stats = [
     { icon: Users, label: "Active Players", value: "12.5K", delay: 0.2 },
     { icon: TrendingUp, label: "Total Volume", value: "KSH 8.2M", delay: 0.4 },
-    { icon: Zap, label: "Markets Live", value: "342", delay: 0.6 }
+    { icon: Activity, label: "Markets Live", value: "342", delay: 0.6 }
   ];
 
   return (

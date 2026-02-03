@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
-  Zap,
+  Activity,
   Brain,
   ShieldAlert,
   Trophy,
@@ -35,7 +35,7 @@ const gameModes = [
     title: "Reflex Reaction Test",
     subtitle: "5-Second Decision",
     description: "Predict the majority's first instinct when confronted with a situation. You have 5 seconds. Don't think, just react.",
-    icon: Zap,
+    icon: Activity,
     quote: "Fortune favors the absurd.",
     mechanics: ["5-second countdown", "Minority pays more", "2x multiplier tier"],
   },

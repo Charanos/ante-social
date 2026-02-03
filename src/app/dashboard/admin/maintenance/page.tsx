@@ -97,7 +97,7 @@ export default function DataMaintenancePage() {
             >
               <DashboardCard className={`p-6 border ${task.color === 'blue' ? 'bg-blue-50/30 border-blue-100' : task.color === 'orange' ? 'bg-orange-50/30 border-orange-100' : task.color === 'green' ? 'bg-green-50/30 border-green-100' : task.color === 'purple' ? 'bg-purple-50/30 border-purple-100' : 'bg-white border-neutral-200'}`}>
                 <div className="flex items-start gap-4 mb-6">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${getColorClasses(task.color)}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${getColorClasses(task.color)}`}>
                     <task.icon className="w-5 h-5" />
                   </div>
                   <div>
@@ -145,7 +145,7 @@ export default function DataMaintenancePage() {
                 "Review audit logs after each operation for detailed results"
               ].map((note, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-blue-700">
-                  <span className="mt-1.5 w-1 h-1 rounded-full bg-blue-400 flex-shrink-0" />
+                  <span className="mt-1.5 w-1 h-1 rounded-full bg-blue-400 shrink-0" />
                   {note}
                 </li>
               ))}

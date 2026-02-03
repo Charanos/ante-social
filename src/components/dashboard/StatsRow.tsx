@@ -1,12 +1,12 @@
 "use client";
 
-import { Target, Trophy, Zap, Medal, Percent } from "lucide-react";
+import { Target, Trophy, Activity, Medal, Percent } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const stats = [
   { label: "Total Bets", value: "3", icon: "target", color: "blue" },
   { label: "Wallet Balance", value: "$1,659", icon: "trophy", color: "amber" },
-  { label: "Today's Earnings", value: "+$0", icon: "zap", color: "green" },
+  { label: "Today's Earnings", value: "+$0", icon: "Activity", color: "green" },
   { label: "Rank", value: "#2", icon: "medal", color: "purple" },
   { label: "Win Rate", value: "0%", icon: "percent", color: "orange" },
 ];
@@ -19,8 +19,8 @@ const getIcon = (iconName: string, colorClass: string) => {
       return <Target {...iconProps} />;
     case "trophy":
       return <Trophy {...iconProps} />;
-    case "zap":
-      return <Zap {...iconProps} />;
+    case "Activity":
+      return <Activity {...iconProps} />;
     case "medal":
       return <Medal {...iconProps} />;
     case "percent":

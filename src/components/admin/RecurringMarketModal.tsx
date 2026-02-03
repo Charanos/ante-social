@@ -297,7 +297,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
 
           {/* Info Message */}
           <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <div className="text-sm text-neutral-700">
               <span className="font-medium">How it works:</span> Markets will be generated automatically based on your schedule. Each market will inherit these settings but can be edited individually before publication if needed.
             </div>
