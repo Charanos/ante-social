@@ -199,7 +199,7 @@ export default function CreateMarketPage() {
                           placeholder="10"
                           className="w-full pl-10 pr-12 py-3 rounded-lg border-2 border-neutral-200 focus:border-blue-500 focus:outline-none transition-colors font-mono"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 font-medium">MP</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 font-medium">KSh</span>
                       </div>
                     </div>
 

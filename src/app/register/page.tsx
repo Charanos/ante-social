@@ -204,7 +204,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-white text-black font-semibold py-3 tracking-wider rounded-full mt-4 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50"
+              className="w-full bg-white text-black font-semibold py-2 uppercase tracking-wider rounded-full mt-4 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50"
             >
               {isLoading ? <LoaderPinwheel className="w-5 h-5 animate-spin mx-auto" /> : "Create Account"}
             </button>

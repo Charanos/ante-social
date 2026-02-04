@@ -21,6 +21,9 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
 import { mockUser } from "@/lib/mockData";
 import { MarketCard } from "@/components/markets/MarketCard";
+import Marquee from "react-fast-marquee";
+import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
 const liveWins = [
     { id: 1, name: "CryptoKing", game: "Bitcoin Binary", amount: "12,450", currency: "KSH", avatar: "CK" },
@@ -69,8 +72,7 @@ export default function DashboardPage() {
 
     const ITEMS_PER_PAGE = 6;
 
-    // Duplicate wins for infinite loop
-    const duplicatedWins = [...liveWins, ...liveWins, ...liveWins];
+    // Live wins data from constants
 
     useEffect(() => {
         // Mock data for demo
@@ -154,7 +156,7 @@ export default function DashboardPage() {
     const currentMarkets = activeMarkets.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     return (
-        <div className="space-y-10 pb-12 pl-8 overflow-x-hidden w-full max-w-[100vw]">
+        <div className="space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw]">
             <DashboardHeader user={user} />
 
             {/* Hero Section */}
@@ -229,39 +231,35 @@ export default function DashboardPage() {
                 </div>
             </motion.div>
 
-            {/* Live Wins Feed - Infinite Loop */}
-            <div className="space-y-8 my-18">
-                <div className="flex items-center gap-2 px-2">
-                    <ScanEye className="w-4 h-4 text-amber-500" />
-                    <span className="text-sm font-semibold text-black/60 uppercase tracking-widest">
-                        Live Wins
-                    </span>
-                </div>
+            <SectionHeading
+                title="Live Wins"
+                icon={<ScanEye className="w-4 h-4 text-orange-500" />}
+                className="mb-8"
+            />
 
-                <div className="relative w-full overflow-hidden bg-white/30 backdrop-blur-sm border border-black/5 rounded-2xl py-4">
-                    <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+            <div className="relative w-full overflow-hidden bg-white/30 backdrop-blur-sm border border-black/5 rounded-2xl py-4">
+                <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
 
-                    <motion.div
-                        className="flex"
-                        animate={{
-                            x: [0, -liveWins.length * 256],
-                        }}
-                        transition={{
-                            x: {
-                                repeat: Infinity,
-                                repeatType: "loop",
-                                duration: 30,
-                                ease: "linear",
-                            },
-                        }}
-                    >
-                        {duplicatedWins.map((win, index) => (
-                            <LiveWinCard key={`${win.id}-${index}`} win={win} />
-                        ))}
-                    </motion.div>
-                </div>
+                <Marquee
+                    gradient={false}
+                    speed={40}
+                    pauseOnHover={true}
+                    autoFill={true}
+                >
+                    {liveWins.map((win, index) => (
+                        <LiveWinCard key={`${win.id}-${index}`} win={win} />
+                    ))}
+                </Marquee>
             </div>
+
+            <LeaderboardSection />
+
+            <SectionHeading
+                title="Active Markets"
+                icon={<TrendingUp className="w-4 h-4 text-orange-500" />}
+                className="mb-8"
+            />
 
             {/* Markets Section */}
             <div className="space-y-6">
@@ -287,7 +285,7 @@ export default function DashboardPage() {
 
                     <motion.button
                         onClick={() => setIsReadMeOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-sm border border-black/5 rounded-full hover:bg-white/60 hover:border-black/10 transition-all text-sm font-semibold text-black/70"
+                        className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-white/40 backdrop-blur-sm border border-black/5 rounded-full hover:bg-white/60 hover:border-black/10 transition-all text-sm font-semibold text-black/70"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                     >
@@ -354,9 +352,9 @@ export default function DashboardPage() {
                         >
                             <button
                                 onClick={() => setIsReadMeOpen(false)}
-                                className="absolute top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors"
+                                className="absolute cursor-pointer top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-5 h-5 text-black" />
                             </button>
 
                             <div className="space-y-6">

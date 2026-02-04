@@ -374,7 +374,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 100, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 1, duration: 1, type: "spring", stiffness: 100 }}
-        className="relative mt-20 w-full max-w-6xl"
+        className="relative mt-20 w-full max-w-7xl"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{ perspective: 2000 }}

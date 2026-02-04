@@ -1,138 +1,265 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { Search, Users, Trophy, Filter, ArrowUpRight } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Search, Users, TrendingUp, Filter, ArrowRight, ChevronDown, X, Sparkles, Shield } from "lucide-react"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { cn } from "@/lib/utils"
+import { mockUser, mockGroups } from "@/lib/mockData"
+import { getJoinedGroups } from "@/lib/membership"
+import { SectionHeading } from "@/components/ui/SectionHeading"
+import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
+import { GroupCard } from "@/components/groups/GroupCard"
+import { LoadingLogo } from "@/components/ui/LoadingLogo"
+import { Skeleton } from "@/components/ui/Skeleton"
+import { useToast } from "@/components/ui/toast-notification"
+import { useEffect } from "react"
 
-const featuredGroups = [
-    {
-        id: 1,
-        name: "Premier League Fanatics",
-        members: 1240,
-        activeBets: 15,
-        category: "Sports",
-        image: "bg-linear-to-br from-blue-600 to-indigo-700"
-    },
-    {
-        id: 2,
-        name: "Crypto Whales KE",
-        members: 850,
-        activeBets: 32,
-        category: "Finance",
-        image: "bg-linear-to-br from-orange-400 to-red-500"
-    },
-    {
-        id: 3,
-        name: "Nairobi Tech Community",
-        members: 2100,
-        activeBets: 8,
-        category: "Social",
-        image: "bg-linear-to-br from-emerald-500 to-teal-600"
-    }
+const allGroups = mockGroups;
+
+const categories = [
+    { name: "All", count: allGroups.length },
+    { name: "Sports", count: allGroups.filter(g => g.category === "Sports").length },
+    { name: "Finance", count: allGroups.filter(g => g.category === "Finance").length },
+    { name: "Tech", count: allGroups.filter(g => g.category === "Tech").length },
+    { name: "Entertainment", count: allGroups.filter(g => g.category === "Entertainment").length },
+    { name: "Politics", count: allGroups.filter(g => g.category === "Politics").length },
+    { name: "Gaming", count: allGroups.filter(g => g.category === "Gaming").length },
+    { name: "Social", count: allGroups.filter(g => g.category === "Social").length }
+]
+
+const sortOptions = [
+    { value: "trending", label: "Trending" },
+    { value: "members", label: "Most Members" },
+    { value: "active", label: "Most Active" },
+    { value: "newest", label: "Newest" }
 ]
 
 export default function DiscoverGroupsPage() {
     const [searchTerm, setSearchTerm] = useState("")
+    const [selectedCategory, setSelectedCategory] = useState("All")
+    const [sortBy, setSortBy] = useState("trending")
+    const [showSortMenu, setShowSortMenu] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const [isFiltering, setIsFiltering] = useState(false)
+    const [joinedGroupIds, setJoinedGroupIds] = useState<string[]>([])
+    const toast = useToast()
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 1200)
+        setJoinedGroupIds(getJoinedGroups())
+        return () => clearTimeout(timer)
+    }, [])
+
+    useEffect(() => {
+        setIsFiltering(true)
+        const timer = setTimeout(() => setIsFiltering(false), 600)
+        return () => clearTimeout(timer)
+    }, [searchTerm, selectedCategory, sortBy])
+
+    const filteredAndSortedGroups = useMemo(() => {
+        let filtered = allGroups.filter(group => {
+            const matchesSearch = group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                group.description.toLowerCase().includes(searchTerm.toLowerCase())
+            const matchesCategory = selectedCategory === "All" || group.category === selectedCategory
+            return matchesSearch && matchesCategory
+        })
+
+        // Sort
+        switch (sortBy) {
+            case "trending":
+                filtered.sort((a, b) => {
+                    const aTrending = (a as any).trending || false
+                    const bTrending = (b as any).trending || false
+                    if (aTrending && !bTrending) return -1
+                    if (!aTrending && bTrending) return 1
+
+                    const aGrowth = parseInt((a as any).growth?.replace(/[^0-9-]/g, '') || "0")
+                    const bGrowth = parseInt((b as any).growth?.replace(/[^0-9-]/g, '') || "0")
+                    return bGrowth - aGrowth
+                })
+                break
+            case "members":
+                filtered.sort((a, b) => (b.member_count || 0) - (a.member_count || 0))
+                break
+            case "active":
+                filtered.sort((a, b) => (b.active_bets || 0) - (a.active_bets || 0))
+                break
+            case "newest":
+                filtered.sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }))
+                break
+        }
+
+        return filtered
+    }, [searchTerm, selectedCategory, sortBy])
+
+    const trendingGroups = allGroups.filter(g => g.trending).slice(0, 3)
+
+    if (isLoading) {
+        return <LoadingLogo fullScreen size="lg" />
+    }
 
     return (
-        <div className="space-y-8 pb-20">
+        <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full">
             <DashboardHeader
-                user={{ username: "Explorer" }}
-                subtitle="Find your tribe and start betting"
+                user={mockUser}
+                subtitle="Discover communities and join the conversation"
             />
 
-            {/* Search & Filter */}
-            <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Search for groups..."
-                        className="w-full rounded-2xl bg-white border border-gray-200 pl-12 pr-4 py-4 md:py-5 outline-none focus:ring-4 focus:ring-gray-100 transition-all font-medium text-lg placeholder:text-gray-400 shadow-sm"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <button className="px-6 py-4 rounded-2xl bg-white border border-gray-200 font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 shadow-sm transition-all">
-                    <Filter className="w-5 h-5" />
-                    Filters
-                </button>
-            </div>
-
-            {/* Featured Section */}
-            <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-yellow-500" />
-                    Trending Groups
-                </h2>
-
-                <div className="grid md:grid-cols-3 gap-6">
-                    {featuredGroups.map((group) => (
-                        <motion.div
-                            key={group.id}
-                            whileHover={{ y: -5 }}
-                            className="group relative overflow-hidden rounded-4xl bg-white border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300"
-                        >
-                            <div className={cn("h-32 w-full relative", group.image)}>
-                                <div className="absolute inset-0 bg-black/10" />
-                                <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full text-xs font-semibold text-white uppercase tracking-wider">
-                                    {group.category}
-                                </div>
-                            </div>
-
-                            <div className="p-6 relative">
-                                <div className="-mt-12 mb-4 h-16 w-16 rounded-2xl bg-white p-1 shadow-lg">
-                                    <div className={cn("w-full h-full rounded-xl flex items-center justify-center text-white font-semibold text-xl", group.image)}>
-                                        {group.name.charAt(0)}
-                                    </div>
-                                </div>
-
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2 leading-tight group-hover:text-blue-600 transition-colors">
-                                    {group.name}
-                                </h3>
-
-                                <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
-                                    <div className="flex items-center gap-1.5">
-                                        <Users className="w-4 h-4" />
-                                        {group.members.toLocaleString()}
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <Trophy className="w-4 h-4" />
-                                        {group.activeBets} Active Bets
-                                    </div>
-                                </div>
-
-                                <Link
-                                    href={`/dashboard/groups/${group.id}`}
-                                    className="flex items-center justify-center w-full py-3.5 rounded-xl bg-gray-50 font-semibold text-gray-900 group-hover:bg-black group-hover:text-white transition-all"
-                                >
-                                    View Group
-                                    <ArrowUpRight className="w-4 h-4 ml-2" />
-                                </Link>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Categories Grid */}
-            <section>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Browse Categories</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {["Sports", "Politics", "Entertainment", "Crypto", "Tech", "Music", "Gaming", "Misc"].map((cat) => (
+            <SearchFilterBar
+                searchQuery={searchTerm}
+                onSearchChange={setSearchTerm}
+                placeholder="Search groups by name or description..."
+                tabs={categories.map(c => ({ id: c.name, label: c.name }))}
+                activeTab={selectedCategory}
+                onTabChange={setSelectedCategory}
+                rightElement={
+                    <div className="relative">
                         <button
-                            key={cat}
-                            className="p-6 rounded-2xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all text-left group"
+                            onClick={() => setShowSortMenu(!showSortMenu)}
+                            className="px-4 py-2 rounded-xl bg-neutral-100/70 hover:bg-neutral-100 focus:bg-white text-sm font-semibold text-black/70 flex items-center gap-3 transition-all cursor-pointer min-w-[140px] justify-between"
                         >
-                            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{cat}</h3>
-                            <p className="text-xs text-gray-400 mt-1 font-medium group-hover:text-gray-500">240+ Groups</p>
+                            <div className="flex items-center gap-2">
+                                <Filter className="w-3.5 h-3.5" />
+                                <span className="text-xs">{sortOptions.find(o => o.value === sortBy)?.label}</span>
+                            </div>
+                            <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", showSortMenu && "rotate-180")} />
                         </button>
-                    ))}
+
+                        <AnimatePresence>
+                            {showSortMenu && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute top-full mt-2 right-0 w-full bg-white border border-black/10 rounded-xl shadow-xl overflow-hidden z-50 min-w-[160px]"
+                                >
+                                    {sortOptions.map((option) => (
+                                        <button
+                                            key={option.value}
+                                            onClick={() => {
+                                                setSortBy(option.value)
+                                                setShowSortMenu(false)
+                                            }}
+                                            className={cn(
+                                                "w-full px-4 py-3 text-left text-sm font-medium transition-colors cursor-pointer",
+                                                sortBy === option.value
+                                                    ? "bg-black/5 text-black/90"
+                                                    : "text-black/60 hover:bg-black/5"
+                                            )}
+                                        >
+                                            {option.label}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                }
+            />
+
+            {/* Trending Section */}
+            {selectedCategory === "All" && !searchTerm && (
+                <div className="space-y-6">
+                    <SectionHeading
+                        title="Trending Now"
+                    />
+
+                    <div className="grid md:grid-cols-3 gap-5">
+                        {isFiltering ? (
+                            Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className="rounded-3xl border border-black/5 bg-white/40 p-5 space-y-4">
+                                    <Skeleton className="h-32 w-full rounded-2xl" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-6 w-3/4" />
+                                        <Skeleton className="h-4 w-full" />
+                                    </div>
+                                    <div className="flex justify-between pt-4 border-t border-black/5">
+                                        <Skeleton className="h-8 w-24 rounded-full" />
+                                        <Skeleton className="h-8 w-8 rounded-full" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            trendingGroups.map((group, index) => (
+                                <GroupCard
+                                    key={group.id}
+                                    group={{
+                                        ...group,
+                                        members: group.member_count || 0,
+                                        activeBets: group.active_bets || 0,
+                                        isPublic: group.is_public ?? true,
+                                        category: group.category || "Community"
+                                    }}
+                                    featured={true}
+                                    index={index}
+                                    isJoined={joinedGroupIds.includes(group.id.toString())}
+                                />
+                            ))
+                        )}
+                    </div>
                 </div>
-            </section>
+            )}
+
+            {/* All Groups Grid */}
+            <div className="space-y-6">
+                <SectionHeading
+                    title={
+                        searchTerm
+                            ? `Search Results for "${searchTerm}"`
+                            : selectedCategory === "All"
+                                ? `${sortOptions.find(o => o.value === sortBy)?.label} Community Groups`
+                                : `${selectedCategory} Groups (${sortOptions.find(o => o.value === sortBy)?.label})`
+                    }
+                    icon={<Users className="w-4 h-4 text-black/40" />}
+                />
+
+                {filteredAndSortedGroups.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-4">
+                            <Search className="w-8 h-8 text-black/20" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-black/60 mb-2">No groups found</h3>
+                        <p className="text-sm text-black/40 max-w-sm">
+                            Try adjusting your search or filter criteria
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {isFiltering ? (
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="rounded-3xl border border-black/5 bg-white/40 p-5 space-y-4">
+                                    <Skeleton className="h-28 w-full rounded-2xl" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-5 w-3/4" />
+                                        <Skeleton className="h-4 w-full" />
+                                    </div>
+                                    <div className="flex justify-between pt-4 border-t border-black/5">
+                                        <Skeleton className="h-8 w-24 rounded-full" />
+                                        <Skeleton className="h-8 w-8 rounded-full" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            filteredAndSortedGroups.map((group, index) => (
+                                <GroupCard
+                                    key={group.id}
+                                    group={{
+                                        ...group,
+                                        members: group.member_count || 0,
+                                        activeBets: group.active_bets || 0,
+                                        isPublic: group.is_public ?? true,
+                                        category: group.category || "Community"
+                                    }}
+                                    index={index}
+                                    isJoined={joinedGroupIds.includes(group.id.toString())}
+                                />
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

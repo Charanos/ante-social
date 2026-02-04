@@ -11,7 +11,7 @@ export function DashboardCard({ children, className, gradient = true }: Dashboar
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-xl p-6 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/90",
+        "relative overflow-hidden w-full rounded-2xl bg-white/80 backdrop-blur-xl p-6 text-neutral-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:bg-white/90",
         className
       )}
     >

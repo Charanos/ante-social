@@ -12,6 +12,8 @@ import { MarketCard } from "@/components/markets/MarketCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useEffect } from "react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 
 // Mock markets data with Kenyan context
 const mockMarkets = [
@@ -187,60 +189,22 @@ export default function MarketsPage() {
           </Card>
         </motion.div>
 
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Available Markets</h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
+        <SectionHeading title="Available Markets" />
 
-        {/* Revamped Search & Filter Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="sticky top-4 z-30"
-        >
-          <div className="flex flex-col md:flex-row gap-3 p-2 bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl ring-1 ring-black/5 mb-18">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
-              <input
-                type="text"
-                placeholder="Search markets, tags, or pools..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-neutral-100/70 hover:bg-neutral-100 focus:bg-white text-sm font-medium text-neutral-900 rounded-xl border-none outline-none ring-1 ring-transparent focus:ring-black/5 transition-all placeholder:text-neutral-600"
-              />
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-1 md:py-0 px-1">
-              {["all", "poll", "betrayal", "reflex", "ladder"].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setFilterType(type)}
-                  className={`
-                                relative px-4 py-2 rounded-xl text-sm cursor-pointer font-medium transition-all whitespace-nowrap select-none
-                                ${filterType === type
-                      ? "text-neutral-200 bg-black shadow-sm ring-1 ring-black/5"
-                      : "text-neutral-600 hover:text-neutral-700 hover:bg-neutral-100/50"
-                    }
-                            `}
-                >
-                  {type === 'all' ? 'All Markets' : type.charAt(0).toUpperCase() + type.slice(1)}
-                  {filterType === type && (
-                    <motion.div
-                      layoutId="activeFilter"
-                      className="absolute inset-0 rounded-xl bg-white shadow-sm ring-1 ring-black/5 -z-10"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+        <SearchFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          placeholder="Search markets, tags, or pools..."
+          tabs={[
+            { id: "all", label: "All Markets" },
+            { id: "poll", label: "Poll" },
+            { id: "betrayal", label: "Betrayal" },
+            { id: "reflex", label: "Reflex" },
+            { id: "ladder", label: "Ladder" }
+          ]}
+          activeTab={filterType}
+          onTabChange={setFilterType}
+        />
 
         {/* Markets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

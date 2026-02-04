@@ -44,6 +44,89 @@ export const mockLeaderboard = [
   }
 ]
 
+export const leaderboardData = [
+    {
+        rank: 1,
+        username: "CryptoKing",
+        avatar: "CK",
+        totalWinnings: 2847650,
+        winRate: 78,
+        activeBets: 156,
+        trend: "up",
+        badge: "legend"
+    },
+    {
+        rank: 2,
+        username: "BetMaster",
+        avatar: "BM",
+        totalWinnings: 2345100,
+        winRate: 72,
+        activeBets: 189,
+        trend: "up",
+        badge: "master"
+    },
+    {
+        rank: 3,
+        username: "LuckyStrike",
+        avatar: "LS",
+        totalWinnings: 1998750,
+        winRate: 69,
+        activeBets: 134,
+        trend: "same",
+        badge: "expert"
+    },
+    {
+        rank: 4,
+        username: "VibeCheck",
+        avatar: "VC",
+        totalWinnings: 1765400,
+        winRate: 65,
+        activeBets: 142,
+        trend: "up",
+        badge: "expert"
+    },
+    {
+        rank: 5,
+        username: "RiskTaker",
+        avatar: "RT",
+        totalWinnings: 1523900,
+        winRate: 61,
+        activeBets: 167,
+        trend: "down",
+        badge: "pro"
+    },
+    {
+        rank: 6,
+        username: "MoonBoy",
+        avatar: "MB",
+        totalWinnings: 1398200,
+        winRate: 58,
+        activeBets: 121,
+        trend: "up",
+        badge: "pro"
+    },
+    {
+        rank: 7,
+        username: "SmartMoney",
+        avatar: "SM",
+        totalWinnings: 1234560,
+        winRate: 55,
+        activeBets: 98,
+        trend: "same",
+        badge: "advanced"
+    },
+    {
+        rank: 8,
+        username: "QuickWin",
+        avatar: "QW",
+        totalWinnings: 1089450,
+        winRate: 52,
+        activeBets: 87,
+        trend: "up",
+        badge: "advanced"
+    }
+]
+
 export const mockGroups = [
   {
     id: "group1",
@@ -51,10 +134,16 @@ export const mockGroups = [
     description: "Betting enthusiasts who live for the weekend action",
     avatar_url: null,
     member_count: 12,
-    created_at: new Date("2025-11-20"),
+    created_at: "2025-11-20",
     active_bets: 3,
     is_public: true,
-    members: ["user123", "user456"]
+    isPublic: true,
+    creator_id: "user456",
+    members: ["user123", "user456"],
+    activeBets: [],
+    activityFeed: [],
+    category: "Sports",
+    image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop"
   },
   {
     id: "group2",
@@ -62,10 +151,15 @@ export const mockGroups = [
     description: "For those who play big and win bigger",
     avatar_url: null,
     member_count: 8,
-    created_at: new Date("2025-11-18"),
+    created_at: "2025-11-18",
     active_bets: 5,
     is_public: false,
-    members: ["user123"]
+    isPublic: false,
+    creator_id: "user123",
+    members: ["user123"],
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&auto=format&fit=crop"
   },
   {
     id: "group3",
@@ -73,10 +167,16 @@ export const mockGroups = [
     description: "Betting on internet culture and viral moments",
     avatar_url: null,
     member_count: 24,
-    created_at: new Date("2025-11-15"),
+    created_at: "2025-11-15",
     active_bets: 2,
     is_public: true,
-    members: ["user789"]
+    isPublic: true,
+    creator_id: "user789",
+    members: ["user789"],
+    activeBets: [],
+    activityFeed: [],
+    category: "Social",
+    image: "https://images.unsplash.com/photo-1531297461136-82ae96c51365?w=800&auto=format&fit=crop"
   },
   {
     id: "group4",
@@ -84,10 +184,144 @@ export const mockGroups = [
     description: "Strategic players analyzing every bet",
     avatar_url: null,
     member_count: 15,
-    created_at: new Date("2025-11-22"),
+    created_at: "2025-11-22",
     active_bets: 4,
     is_public: false,
-    members: ["user999"]
+    isPublic: false,
+    creator_id: "user999",
+    members: ["user999"],
+    activeBets: [],
+    activityFeed: [],
+    category: "Strategy",
+    image: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "1",
+    name: "Premier League Fanatics",
+    description: "Discuss matches, predict outcomes, and bet on your favorite teams. Weekly analysis and live match betting.",
+    member_count: 1240,
+    active_bets: 15,
+    category: "Sports",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_001",
+    trending: true,
+    growth: "+12%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "2",
+    name: "Crypto Whales KE",
+    description: "For serious crypto investors. Market predictions, portfolio discussions, and high-stakes trading bets.",
+    member_count: 850,
+    active_bets: 32,
+    category: "Finance",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_002",
+    trending: true,
+    growth: "+28%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "3",
+    name: "Nairobi Tech Community",
+    description: "Tech enthusiasts betting on startup success, product launches, and industry trends in Kenya's tech scene.",
+    member_count: 2100,
+    active_bets: 8,
+    category: "Tech",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_003",
+    trending: true,
+    growth: "+8%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "4",
+    name: "Music Charts KE",
+    description: "Predict which songs will dominate the charts. Weekly music releases and artist collaborations.",
+    member_count: 645,
+    active_bets: 12,
+    category: "Entertainment",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_004",
+    trending: false,
+    growth: "+5%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "5",
+    name: "Political Pulse",
+    description: "Policy debates, election predictions, and political event betting. Informed and civil discussions only.",
+    member_count: 1890,
+    active_bets: 24,
+    category: "Politics",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_001",
+    trending: false,
+    growth: "+15%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1541872703-74c59636a2fd?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "6",
+    name: "Gaming Arena",
+    description: "Esports tournaments, game releases, and competitive gaming predictions. All platforms welcome.",
+    member_count: 1320,
+    active_bets: 19,
+    category: "Gaming",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_002",
+    trending: false,
+    growth: "+10%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "7",
+    name: "Nairobi Nightlife",
+    description: "Best venues, event predictions, and weekend plans. For those who know where the vibe is.",
+    member_count: 890,
+    active_bets: 6,
+    category: "Social",
+    is_public: true,
+    isPublic: true,
+    creator_id: "user_003",
+    trending: false,
+    growth: "+3%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop"
+  },
+  {
+    id: "8",
+    name: "Elite Traders Circle",
+    description: "Private group for verified high-volume traders. Exclusive market analysis and insider predictions.",
+    member_count: 234,
+    active_bets: 18,
+    category: "Finance",
+    is_public: false,
+    isPublic: false,
+    creator_id: "user_004",
+    trending: false,
+    growth: "+6%",
+    activeBets: [],
+    activityFeed: [],
+    image: "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&auto=format&fit=crop"
   }
 ]
 

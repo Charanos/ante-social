@@ -1,9 +1,11 @@
-'use client';
+'use client'
 
 import { motion } from "framer-motion";
 import { Quote, Star } from "lucide-react";
+import Marquee from "react-fast-marquee";
 
 const testimonials = [
+  // ... existing testimonials ...
   {
     text: "Finally, a betting platform that feels like a game, not a scam. The Betrayal Game is absolute chaos in the best way possible.",
     author: "Alex K.",
@@ -57,13 +59,13 @@ const testimonials = [
 function TestimonialCard({ testimonial, index }: any) {
   return (
     <div className="w-[380px] shrink-0 px-3">
-      <div className="relative h-full p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
+      <div className="relative h-full min-h-[400px] justify-between p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
 
         {/* Subtle shine effect on hover */}
         <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
 
         {/* Top border accent */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-linear-to-r from-transparent via-black/20 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
 
         <div className="relative z-10 flex flex-col h-full">
           {/* Quote Icon */}
@@ -76,7 +78,7 @@ function TestimonialCard({ testimonial, index }: any) {
 
           {/* Author Info */}
           <div className="pt-6 border-t border-black/5 mt-auto">
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm flex items-center justify-center border border-black/10 font-semibold text-black/70">
                 {testimonial.initial}
               </div>
@@ -91,7 +93,7 @@ function TestimonialCard({ testimonial, index }: any) {
             </div>
 
             {/* Stats Pills */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 justify-start">
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-full">
                 <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
                   Wins
@@ -117,14 +119,12 @@ function TestimonialCard({ testimonial, index }: any) {
 }
 
 export function Testimonials() {
-  // Duplicate testimonials for seamless infinite loop
-  const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
 
   return (
     <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-white via-neutral-50/30 to-white overflow-hidden">
 
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-black/[0.02] via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--tw-gradient-stops))] from-black/2 via-transparent to-transparent pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto">
 
@@ -158,28 +158,20 @@ export function Testimonials() {
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
 
           {/* Scrolling Track */}
-          <motion.div
-            className="flex"
-            animate={{
-              x: [0, -testimonials.length * 404], // 380px card width + 24px gap
-            }}
-            transition={{
-              x: {
-                repeat: Infinity,
-                repeatType: "loop",
-                duration: 40,
-                ease: "linear",
-              },
-            }}
+          <Marquee
+            gradient={false}
+            speed={40}
+            pauseOnHover={true}
+            autoFill={true}
           >
-            {duplicatedTestimonials.map((testimonial, index) => (
+            {testimonials.map((testimonial, index) => (
               <TestimonialCard
                 key={`${testimonial.author}-${index}`}
                 testimonial={testimonial}
                 index={index}
               />
             ))}
-          </motion.div>
+          </Marquee>
         </div>
 
         {/* Social Proof Stats */}

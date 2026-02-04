@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { Skeleton } from "@/components/ui/Skeleton"
 import { useEffect } from "react"
+import { SectionHeading } from "@/components/ui/SectionHeading"
+import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
 
 export default function MyBetsPage() {
     const [filter, setFilter] = useState("all")
@@ -43,7 +45,7 @@ export default function MyBetsPage() {
 
     return (
         <div className="min-h-screen pb-20">
-            <div className="max-w-full mx-auto pl-8 pb-8 space-y-8">
+            <div className="max-w-full mx-auto pl-0 md:pl-8 pb-8 space-y-8">
                 <DashboardHeader
                     user={mockUser}
                     subtitle="Track your active wagers and betting history"
@@ -107,58 +109,21 @@ export default function MyBetsPage() {
                     </Card>
                 </motion.div>
 
-                {/* Visual Separator */}
-                <div className="flex items-center gap-4 my-18">
-                    <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-                    <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Active & History</h2>
-                    <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-                </div>
+                <SectionHeading title="Active & History" />
 
-                {/* Filter & Search */}
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="sticky top-4 z-30 mb-8"
-                >
-                    <div className="flex flex-col md:flex-row gap-3 p-2 bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl ring-1 ring-black/5">
-                        {/* Search Input */}
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
-                            <input
-                                type="text"
-                                placeholder="Search your bets..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 bg-neutral-100/70 hover:bg-neutral-100 focus:bg-white text-sm font-medium text-neutral-900 rounded-xl border-none outline-none ring-1 ring-transparent focus:ring-black/5 transition-all placeholder:text-neutral-600"
-                            />
-                        </div>
-
-                        <div className="flex gap-1 overflow-x-auto no-scrollbar py-1 md:py-0 px-1">
-                            {["all", "active", "won", "lost"].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setFilter(tab)}
-                                    className={cn(
-                                        "relative px-4 cursor-pointer py-2 rounded-xl text-sm font-medium transition-all capitalize whitespace-nowrap select-none",
-                                        filter === tab
-                                            ? "text-neutral-200 bg-black shadow-sm ring-1 ring-black/5"
-                                            : "text-neutral-600 hover:text-neutral-700 hover:bg-neutral-100/50"
-                                    )}
-                                >
-                                    {tab}
-                                    {filter === tab && (
-                                        <motion.div
-                                            layoutId="activeFilter"
-                                            className="absolute inset-0 rounded-xl bg-white shadow-sm ring-1 ring-black/5 -z-10"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </motion.div>
+                <SearchFilterBar
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    placeholder="Search your bets..."
+                    tabs={[
+                        { id: "all", label: "all" },
+                        { id: "active", label: "active" },
+                        { id: "won", label: "won" },
+                        { id: "lost", label: "lost" }
+                    ]}
+                    activeTab={filter}
+                    onTabChange={setFilter}
+                />
 
                 {/* Bets List */}
                 <div className="grid gap-4">
