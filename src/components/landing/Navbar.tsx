@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { IconPhoto } from '@tabler/icons-react';
 
 export function Navbar() {
   const { scrollY } = useScroll();

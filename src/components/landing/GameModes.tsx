@@ -1,14 +1,8 @@
-'use client';
+"use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Users,
-  Activity,
-  Brain,
-  ShieldAlert,
-  Trophy,
-  ArrowRight
-} from "lucide-react";
+import { IconActivity, IconAlertCircle, IconArrowRight, IconAward, IconLayersOff, IconLayoutGrid, IconUsers } from '@tabler/icons-react';
+
 import { useState } from "react";
 
 const gameModes = [
@@ -16,8 +10,9 @@ const gameModes = [
     id: "poll",
     title: "Poll-Style Betting",
     subtitle: "Majority Rules",
-    description: "The classic prediction market. Option with the most votes wins. Winners split the prize pool proportionally by their stake amount.",
-    icon: Users,
+    description:
+      "The classic prediction market. Option with the most votes wins. Winners split the prize pool proportionally by their stake amount.",
+    icon: IconUsers,
     quote: "The wisdom of the crowd... or the folly?",
     mechanics: ["Most votes wins", "Pro-rata payouts", "Integrity weighting"],
   },
@@ -25,35 +20,51 @@ const gameModes = [
     id: "betrayal",
     title: "The Betrayal Game",
     subtitle: "Trust or Betray",
-    description: "Choose to Cooperate for a small guaranteed win, or Betray for a chance at the jackpot. But if everyone betrays, everyone loses.",
-    icon: ShieldAlert,
+    description:
+      "Choose to Cooperate for a small guaranteed win, or Betray for a chance at the jackpot. But if everyone betrays, everyone loses.",
+    icon: IconAlertCircle,
     quote: "Trust is a currency. Spend it wisely.",
-    mechanics: ["All cooperate = small win", "Betrayers win big", "All betray = zero"],
+    mechanics: [
+      "All cooperate = small win",
+      "Betrayers win big",
+      "All betray = zero",
+    ],
   },
   {
     id: "reflex",
     title: "Reflex Reaction Test",
     subtitle: "5-Second Decision",
-    description: "Predict the majority's first instinct when confronted with a situation. You have 5 seconds. Don't think, just react.",
-    icon: Activity,
+    description:
+      "Predict the majority's first instinct when confronted with a situation. You have 5 seconds. Don't think, just react.",
+    icon: IconActivity,
     quote: "Fortune favors the absurd.",
-    mechanics: ["5-second countdown", "Minority pays more", "2x multiplier tier"],
+    mechanics: [
+      "5-second countdown",
+      "Minority pays more",
+      "2x multiplier tier",
+    ],
   },
   {
     id: "majority",
     title: "Majority Prediction Ladder",
     subtitle: "Rank & Predict",
-    description: "Rank items based on what you think the majority will choose. Guess the correct chain to win. Perfect consensus prediction.",
-    icon: Brain,
+    description:
+      "Rank items based on what you think the majority will choose. Guess the correct chain to win. Perfect consensus prediction.",
+    icon: IconLayersOff,
     quote: "You joined the parade, not the rebellion.",
-    mechanics: ["Drag to rank", "Match majority order", "Split if multiple winners"],
+    mechanics: [
+      "Drag to rank",
+      "Match majority order",
+      "Split if multiple winners",
+    ],
   },
   {
     id: "private",
     title: "Private Group Bets",
     subtitle: "Your Circle, Your Rules",
-    description: "Create exclusive markets with friends. Winner Takes All or Odd One Out. Peer confirmation system ensures fairness.",
-    icon: Trophy,
+    description:
+      "Create exclusive markets with friends. Winner Takes All or Odd One Out. Peer confirmation system ensures fairness.",
+    icon: IconAward,
     quote: "Keep your friends close, and your bets closer.",
     mechanics: ["Winner Takes All", "Odd One Out", "Group confirmation"],
   },
@@ -65,12 +76,10 @@ export function GameModes() {
 
   return (
     <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-neutral-50/50 via-white to-neutral-50/50 overflow-hidden">
-
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,var(--tw-gradient-stops))] from-black/2 via-transparent to-transparent pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto">
-
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,14 +92,14 @@ export function GameModes() {
             Choose Your Arena
           </h2>
           <p className="text-base md:text-lg text-black/60 font-medium max-w-2xl mx-auto leading-relaxed">
-            Five unique betting formats. Each one a different way to outsmart the crowd.
+            Five unique betting formats. Each one a different way to outsmart
+            the crowd.
           </p>
         </motion.div>
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-
-          {/* Left: Navigation Menu */}
+          {/* Left: Navigation IconMenu */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             {gameModes.map((mode, index) => (
               <motion.button
@@ -100,37 +109,59 @@ export function GameModes() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className={`group relative cursor-pointer flex items-center gap-4 p-5 md:p-6 rounded-2xl text-left transition-all duration-300 ${activeMode === index
-                  ? "bg-white/60 backdrop-blur-xl border border-black/10 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12)]"
-                  : "bg-white/30 backdrop-blur-sm border border-black/5 hover:bg-white/50 hover:border-black/8 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
-                  }`}
+                className={`group relative cursor-pointer flex items-center gap-4 p-5 md:p-6 rounded-2xl text-left transition-all duration-300 ${
+                  activeMode === index
+                    ? "bg-white/60 backdrop-blur-xl border border-black/10 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12)]"
+                    : "bg-white/30 backdrop-blur-sm border border-black/5 hover:bg-white/50 hover:border-black/8 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
+                }`}
               >
                 {/* Icon */}
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${activeMode === index
-                  ? "bg-black/8 border border-black/10"
-                  : "bg-black/5 border border-black/5 group-hover:bg-black/8"
-                  }`}>
-                  <mode.icon className={`w-6 h-6 transition-colors ${activeMode === index ? "text-black/80" : "text-black/40 group-hover:text-black/60"
-                    }`} />
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                    activeMode === index
+                      ? "bg-black/8 border border-black/10"
+                      : "bg-black/5 border border-black/5 group-hover:bg-black/8"
+                  }`}
+                >
+                  <mode.icon
+                    className={`w-6 h-6 transition-colors ${
+                      activeMode === index
+                        ? "text-black/80"
+                        : "text-black/40 group-hover:text-black/60"
+                    }`}
+                  />
                 </div>
 
                 {/* Text */}
                 <div className="flex-1 min-w-0">
-                  <h3 className={`text-base md:text-lg font-semibold tracking-tight transition-colors ${activeMode === index ? "text-black/90" : "text-black/50 group-hover:text-black/70"
-                    }`}>
+                  <h3
+                    className={`text-base md:text-lg font-semibold tracking-tight transition-colors ${
+                      activeMode === index
+                        ? "text-black/90"
+                        : "text-black/50 group-hover:text-black/70"
+                    }`}
+                  >
                     {mode.title}
                   </h3>
-                  <p className={`text-xs md:text-sm font-medium mt-0.5 transition-colors ${activeMode === index ? "text-black/50" : "text-black/30 group-hover:text-black/40"
-                    }`}>
+                  <p
+                    className={`text-xs md:text-sm font-medium mt-0.5 transition-colors ${
+                      activeMode === index
+                        ? "text-black/50"
+                        : "text-black/30 group-hover:text-black/40"
+                    }`}
+                  >
                     {mode.subtitle}
                   </p>
                 </div>
 
                 {/* Arrow Indicator */}
-                <ArrowRight className={`w-5 h-5 transition-all ${activeMode === index
-                  ? "opacity-100 translate-x-0 text-black/60"
-                  : "opacity-0 -translate-x-2 text-black/30"
-                  }`} />
+                <IconArrowRight
+                  className={`w-5 h-5 transition-all ${
+                    activeMode === index
+                      ? "opacity-100 translate-x-0 text-black/60"
+                      : "opacity-0 -translate-x-2 text-black/30"
+                  }`}
+                />
               </motion.button>
             ))}
           </div>
@@ -241,7 +272,7 @@ export function GameModes() {
             whileTap={{ scale: 0.98 }}
           >
             <span className="text-lg font-normal">Explore All Game Modes</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <IconArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </motion.button>
         </motion.div>
       </div>

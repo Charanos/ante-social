@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DashboardCard } from "@/components/dashboard/DashboardCard"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
-import { Bell, Check, CheckCheck, Filter, TrendingUp, AlertCircle, DollarSign, Settings } from "lucide-react"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { IconAlertCircle, IconBell, IconCheck, IconCurrencyDollar, IconFilter, IconSettings, IconSquareCheckFilled, IconTrendingUp } from '@tabler/icons-react';
+
 
 // Mock data
 const mockNotifications = [
@@ -15,18 +16,19 @@ const mockNotifications = [
     message: "Your payment from John Doe has been processed successfully.",
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     is_read: false,
-    icon: <DollarSign className="h-4 w-4" />,
-    amount: 1250.00,
-    type: "payment"
+    icon: <IconCurrencyDollar className="h-4 w-4" />,
+    amount: 1250.0,
+    type: "payment",
   },
   {
     id: "2",
     title: "Account Alert",
-    message: "Unusual activity detected on your account. Please review your recent transactions.",
+    message:
+      "Unusual activity detected on your account. Please review your recent transactions.",
     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     is_read: false,
-    icon: <AlertCircle className="h-4 w-4" />,
-    type: "alert"
+    icon: <IconAlertCircle className="h-4 w-4" />,
+    type: "alert",
   },
   {
     id: "3",
@@ -34,8 +36,8 @@ const mockNotifications = [
     message: "Your portfolio has increased by 5.2% this week.",
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     is_read: true,
-    icon: <TrendingUp className="h-4 w-4" />,
-    type: "update"
+    icon: <IconTrendingUp className="h-4 w-4" />,
+    type: "update",
   },
   {
     id: "4",
@@ -43,62 +45,76 @@ const mockNotifications = [
     message: "Scheduled maintenance will occur tonight from 2-4 AM EST.",
     timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     is_read: true,
-    icon: <Settings className="h-4 w-4" />,
-    type: "system"
-  }
-]
+    icon: <IconSettings className="h-4 w-4" />,
+    type: "system",
+  },
+];
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(mockNotifications)
-  const [filter, setFilter] = useState("all")
-  const [selectedNotification, setSelectedNotification] = useState<typeof mockNotifications[0] | null>(null)
+  const [notifications, setNotifications] = useState(mockNotifications);
+  const [filter, setFilter] = useState("all");
+  const [selectedNotification, setSelectedNotification] = useState<
+    (typeof mockNotifications)[0] | null
+  >(null);
 
   const markAsRead = (id: string) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: true } : n))
-  }
+    setNotifications(
+      notifications.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+    );
+  };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, is_read: true })))
-  }
+    setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+  };
 
   const deleteNotification = (id: string) => {
-    setNotifications(notifications.filter(n => n.id !== id))
-  }
+    setNotifications(notifications.filter((n) => n.id !== id));
+  };
 
-  const unreadCount = notifications.filter(n => !n.is_read).length
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  const filteredNotifications = filter === "all"
-    ? notifications
-    : notifications.filter(n => n.type === filter)
+  const filteredNotifications =
+    filter === "all"
+      ? notifications
+      : notifications.filter((n) => n.type === filter);
 
   const getTimeAgo = (timestamp: string) => {
-    const now = Date.now()
-    const time = new Date(timestamp).getTime()
-    const diff = now - time
+    const now = Date.now();
+    const time = new Date(timestamp).getTime();
+    const diff = now - time;
 
-    const minutes = Math.floor(diff / 60000)
-    const hours = Math.floor(diff / 3600000)
-    const days = Math.floor(diff / 86400000)
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
 
-    if (minutes < 60) return `${minutes}m ago`
-    if (hours < 24) return `${hours}h ago`
-    return `${days}d ago`
-  }
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case "payment": return "bg-emerald-50 text-emerald-600 border-emerald-100"
-      case "alert": return "bg-amber-50 text-amber-600 border-amber-100"
-      case "update": return "bg-gray-50 text-gray-600 border-gray-100"
-      case "system": return "bg-slate-50 text-slate-600 border-slate-100"
-      default: return "bg-gray-50 text-gray-600 border-gray-100"
+      case "payment":
+        return "bg-emerald-50 text-emerald-600 border-emerald-100";
+      case "alert":
+        return "bg-amber-50 text-amber-600 border-amber-100";
+      case "update":
+        return "bg-gray-50 text-gray-600 border-gray-100";
+      case "system":
+        return "bg-slate-50 text-slate-600 border-slate-100";
+      default:
+        return "bg-gray-50 text-gray-600 border-gray-100";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <DashboardHeader
-        subtitle={unreadCount > 0 ? `${unreadCount} new notifications waiting for you` : "You're all caught up!"}
+        subtitle={
+          unreadCount > 0
+            ? `${unreadCount} new notifications waiting for you`
+            : "You're all caught up!"
+        }
       />
 
       {unreadCount > 0 && (
@@ -109,13 +125,13 @@ export default function NotificationsPage() {
             onClick={markAllAsRead}
             className="group flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-gray-900 px-4 text-white shadow-sm transition-all hover:bg-black"
           >
-            <CheckCheck className="h-3.5 w-3.5" />
+            <IconSquareCheckFilled className="h-3.5 w-3.5" />
             <span className="font-medium text-xs">Mark all read</span>
           </motion.button>
         </div>
       )}
 
-      {/* Filter Tabs */}
+      {/* IconFilter Tabs */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -128,10 +144,11 @@ export default function NotificationsPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setFilter(filterType)}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all whitespace-nowrap ${filter === filterType
-              ? "bg-gray-900 text-white shadow-md shadow-gray-900/20"
-              : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
-              }`}
+            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all whitespace-nowrap ${
+              filter === filterType
+                ? "bg-gray-900 text-white shadow-md shadow-gray-900/20"
+                : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
+            }`}
           >
             {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
           </motion.button>
@@ -157,10 +174,12 @@ export default function NotificationsPage() {
                   <div className="relative mb-6">
                     <div className="absolute inset-0 animate-pulse rounded-full bg-gray-100 blur-2xl opacity-50" />
                     <div className="relative rounded-full bg-linear-to-br from-gray-50 to-gray-100 p-8 border border-gray-200">
-                      <Bell className="h-12 w-12 text-gray-300" />
+                      <IconBell className="h-12 w-12 text-gray-300" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No notifications
+                  </h3>
                   <p className="text-gray-500 max-w-sm">
                     {filter !== "all"
                       ? `No ${filter} notifications at the moment`
@@ -176,13 +195,14 @@ export default function NotificationsPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     transition={{ delay: index * 0.03 }}
-                    className={`group relative flex items-start gap-5 px-6 py-6 transition-all ${!notification.is_read
-                      ? 'bg-linear-to-r from-gray-50/50 to-transparent hover:from-gray-50'
-                      : 'hover:bg-gray-50/50'
-                      }`}
+                    className={`group relative flex items-start gap-5 px-6 py-6 transition-all ${
+                      !notification.is_read
+                        ? "bg-linear-to-r from-gray-50/50 to-transparent hover:from-gray-50"
+                        : "hover:bg-gray-50/50"
+                    }`}
                     onClick={() => {
-                      markAsRead(notification.id)
-                      setSelectedNotification(notification)
+                      markAsRead(notification.id);
+                      setSelectedNotification(notification);
                     }}
                   >
                     {/* Unread Indicator Bar */}
@@ -191,10 +211,13 @@ export default function NotificationsPage() {
                     )}
 
                     {/* Icon */}
-                    <div className={`relative shrink-0 rounded-xl p-3.5 transition-all border ${!notification.is_read
-                      ? getTypeColor(notification.type) + ' shadow-sm'
-                      : 'bg-white border-gray-200 group-hover:shadow-md group-hover:border-gray-300'
-                      }`}>
+                    <div
+                      className={`relative shrink-0 rounded-xl p-3.5 transition-all border ${
+                        !notification.is_read
+                          ? getTypeColor(notification.type) + " shadow-sm"
+                          : "bg-white border-gray-200 group-hover:shadow-md group-hover:border-gray-300"
+                      }`}
+                    >
                       {notification.icon}
                       {!notification.is_read && (
                         <div className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-gray-500 border-2 border-white" />
@@ -206,10 +229,13 @@ export default function NotificationsPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0 cursor-pointer">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className={`text-base ${!notification.is_read
-                              ? 'font-medium text-gray-900'
-                              : 'font-medium text-gray-700'
-                              }`}>
+                            <h3
+                              className={`text-base ${
+                                !notification.is_read
+                                  ? "font-medium text-gray-900"
+                                  : "font-medium text-gray-700"
+                              }`}
+                            >
                               {notification.title}
                             </h3>
                             {!notification.is_read && (
@@ -233,8 +259,8 @@ export default function NotificationsPage() {
                           </span>
                           <button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              deleteNotification(notification.id)
+                              e.stopPropagation();
+                              deleteNotification(notification.id);
                             }}
                             className="cursor-pointer opacity-0 group-hover:opacity-100 text-xs text-gray-400 hover:text-red-600 transition-all"
                           >
@@ -244,13 +270,13 @@ export default function NotificationsPage() {
                       </div>
 
                       {/* Amount Badge */}
-                      {'amount' in notification && notification.amount && (
+                      {"amount" in notification && notification.amount && (
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5"
                         >
-                          <DollarSign className="h-3.5 w-3.5 text-emerald-600" />
+                          <IconCurrencyDollar className="h-3.5 w-3.5 text-emerald-600" />
                           <span className="text-sm font-medium text-emerald-700 font-mono">
                             {notification.amount.toFixed(2)}
                           </span>
@@ -264,12 +290,12 @@ export default function NotificationsPage() {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={(e) => {
-                          e.stopPropagation()
-                          markAsRead(notification.id)
+                          e.stopPropagation();
+                          markAsRead(notification.id);
                         }}
                         className="cursor-pointer shrink-0 self-center rounded-full bg-white border-2 border-gray-200 p-1 transition-all hover:bg-gray-50 hover:border-gray-400"
                       >
-                        <Check className="h-3.5 w-3.5 text-gray-600" />
+                        <IconCheck className="h-3.5 w-3.5 text-gray-600" />
                       </motion.button>
                     )}
                   </motion.div>
@@ -302,8 +328,18 @@ export default function NotificationsPage() {
                 onClick={() => setSelectedNotification(null)}
                 className="cursor-pointer absolute right-4 top-4 rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors z-10"
               >
-                <svg className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-5 w-5 text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
 
@@ -313,32 +349,44 @@ export default function NotificationsPage() {
                 <div className="flex items-start gap-4 mb-6">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-2xl font-medium text-gray-900">{selectedNotification.title}</h2>
-                      <span className={`inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium uppercase border ${getTypeColor(selectedNotification.type)}`}>
+                      <h2 className="text-2xl font-medium text-gray-900">
+                        {selectedNotification.title}
+                      </h2>
+                      <span
+                        className={`inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium uppercase border ${getTypeColor(selectedNotification.type)}`}
+                      >
                         {selectedNotification.type}
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 font-mono">
-                      {getTimeAgo(selectedNotification.timestamp)} • {new Date(selectedNotification.timestamp).toLocaleString()}
+                      {getTimeAgo(selectedNotification.timestamp)} •{" "}
+                      {new Date(
+                        selectedNotification.timestamp,
+                      ).toLocaleString()}
                     </p>
                   </div>
                 </div>
 
                 {/* Amount Display (if present) */}
-                {'amount' in selectedNotification && selectedNotification.amount && (
-                  <div className="mb-6 rounded-xl bg-emerald-50 border-2 border-emerald-200 p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-emerald-900">Amount</span>
+                {"amount" in selectedNotification &&
+                  selectedNotification.amount && (
+                    <div className="mb-6 rounded-xl bg-emerald-50 border-2 border-emerald-200 p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-emerald-900">
+                          Amount
+                        </span>
+                      </div>
+                      <p className="text-3xl font-medium text-emerald-700 font-mono">
+                        ${selectedNotification.amount.toFixed(2)}
+                      </p>
                     </div>
-                    <p className="text-3xl font-medium text-emerald-700 font-mono">
-                      ${selectedNotification.amount.toFixed(2)}
-                    </p>
-                  </div>
-                )}
+                  )}
 
                 {/* Message */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2 uppercase tracking-wider">Message</h3>
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 uppercase tracking-wider">
+                    Message
+                  </h3>
                   <p className="text-base text-gray-700 leading-relaxed">
                     {selectedNotification.message}
                   </p>
@@ -372,5 +420,5 @@ export default function NotificationsPage() {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }

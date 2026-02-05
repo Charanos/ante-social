@@ -1,8 +1,17 @@
-'use client';
+"use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Twitter, Github, MessageCircle, Mail, ArrowUpRight } from "lucide-react";
+import {
+  IconArrowUpRight,
+  IconBrandGithub,
+  IconBrandTwitter,
+  IconLayoutGrid,
+  IconMail,
+  IconMessageCircle,
+  IconPhoto,
+} from "@tabler/icons-react";
+
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 
@@ -44,9 +53,12 @@ function WaveBackground() {
         ctx!.moveTo(0, 0);
 
         for (let x = 0; x <= width; x += 3) {
-          const y = this.yOffset +
-            Math.sin(x * this.frequency + time * this.speed + this.phase) * this.amplitude +
-            Math.sin(x * this.frequency * 2 + time * this.speed * 0.7) * (this.amplitude * 0.3);
+          const y =
+            this.yOffset +
+            Math.sin(x * this.frequency + time * this.speed + this.phase) *
+              this.amplitude +
+            Math.sin(x * this.frequency * 2 + time * this.speed * 0.7) *
+              (this.amplitude * 0.3);
 
           if (x === 0) {
             ctx!.moveTo(x, y);
@@ -84,7 +96,7 @@ function WaveBackground() {
       time += 0.006;
       ctx.clearRect(0, 0, width, height);
 
-      waves.forEach(wave => wave.draw(time));
+      waves.forEach((wave) => wave.draw(time));
 
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -103,8 +115,9 @@ function WaveBackground() {
       className="absolute top-0 left-0 w-full h-64 pointer-events-none"
       style={{
         zIndex: 0,
-        maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)'
+        maskImage: "linear-gradient(to bottom, black 40%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to bottom, black 40%, transparent 100%)",
       }}
     />
   );
@@ -138,32 +151,37 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
-  { icon: MessageCircle, href: "https://discord.com", label: "Discord" },
-  { icon: Github, href: "https://github.com", label: "GitHub" },
-  { icon: Mail, href: "mailto:hello@antesocial.com", label: "Email" },
+  { icon: IconBrandTwitter, href: "https://twitter.com", label: "Twitter" },
+  { icon: IconMessageCircle, href: "https://discord.com", label: "Discord" },
+  { icon: IconBrandGithub, href: "https://github.com", label: "GitHub" },
+  { icon: IconMail, href: "mailto:hello@antesocial.com", label: "Email" },
 ];
 
 export function Footer() {
   return (
     <footer className="relative py-16 md:py-20 px-4 md:px-6 bg-linear-to-b from-neutral-50/30 to-white border-t border-black/5 overflow-hidden">
-
       {/* Wave Background */}
       <WaveBackground />
 
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,var(--tw-gradient-stops))] from-black/1 via-transparent to-transparent pointer-events-none" style={{ zIndex: 1 }} />
+      <div
+        className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,var(--tw-gradient-stops))] from-black/1 via-transparent to-transparent pointer-events-none"
+        style={{ zIndex: 1 }}
+      />
 
       <div className="relative max-w-7xl mx-auto" style={{ zIndex: 2 }}>
-
         {/* Top Section - Brand & Newsletter */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 pb-16 border-b border-black/5">
-
           {/* Brand Column */}
           <div className="space-y-6">
             <Link href="/" className="inline-flex items-center gap-3 group">
               <div className="relative w-24 h-24 -mr-4 -ml-6">
-                <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
+                <Image
+                  src="/ante-logo.png"
+                  alt="Ante Social"
+                  fill
+                  className="object-contain"
+                />
               </div>
               <span className="text-2xl font-semibold tracking-tight text-black">
                 ANTE SOCIAL
@@ -171,8 +189,8 @@ export function Footer() {
             </Link>
 
             <p className="text-base text-black/60 font-medium leading-relaxed max-w-md">
-              The modern social betting platform for Kenya. M-Pesa ready, crypto enabled,
-              built for players who demand transparency and speed.
+              The modern social betting platform for Kenya. M-Pesa ready, crypto
+              enabled, built for players who demand transparency and speed.
             </p>
 
             {/* Social Links */}
@@ -215,19 +233,19 @@ export function Footer() {
                 whileTap={{ scale: 0.98 }}
               >
                 Subscribe
-                <ArrowUpRight className="w-4 h-4" />
+                <IconArrowUpRight className="w-4 h-4" />
               </motion.button>
             </div>
 
             <p className="text-xs text-black/40 font-medium">
-              By subscribing, you agree to our Privacy Policy and consent to receive updates.
+              By subscribing, you agree to our Privacy Policy and consent to
+              receive updates.
             </p>
           </div>
         </div>
 
         {/* Middle Section - Links Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-16">
-
           {/* Product Column */}
           <div>
             <h4 className="text-sm font-semibold text-black/90 uppercase tracking-wider mb-4">
@@ -308,7 +326,6 @@ export function Footer() {
         {/* Bottom Section - Copyright & Meta */}
         <div className="pt-8 border-t border-black/5">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-
             {/* Copyright */}
             <p className="text-sm text-black/50 font-medium">
               © {new Date().getFullYear()} Ante Social. All rights reserved.
@@ -321,10 +338,14 @@ export function Footer() {
               </span>
               <div className="flex items-center gap-3">
                 <div className="px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-lg">
-                  <span className="text-xs font-semibold text-black/70">M-PESA</span>
+                  <span className="text-xs font-semibold text-black/70">
+                    M-PESA
+                  </span>
                 </div>
                 <div className="px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-lg">
-                  <span className="text-xs font-semibold font-mono text-black/70">USDT</span>
+                  <span className="text-xs font-semibold font-mono text-black/70">
+                    USDT
+                  </span>
                 </div>
               </div>
             </div>
@@ -334,9 +355,9 @@ export function Footer() {
         {/* Disclaimer */}
         <div className="mt-8 p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
           <p className="text-xs text-black/60 font-medium leading-relaxed text-center">
-            Gambling can be addictive. Please play responsibly. Ante Social is licensed and regulated
-            in Kenya. Players must be 18 years or older. If you or someone you know has a gambling
-            problem, please seek help.
+            Gambling can be addictive. Please play responsibly. Ante Social is
+            licensed and regulated in Kenya. Players must be 18 years or older.
+            If you or someone you know has a gambling problem, please seek help.
           </p>
         </div>
       </div>

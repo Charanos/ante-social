@@ -1,36 +1,43 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { X, Upload, Plus, Calendar, Clock, Info } from "lucide-react"
+import { useState } from "react";
+import { IconCalendar, IconClock, IconInfoCircle, IconPlus, IconSettings, IconUpload, IconX } from '@tabler/icons-react';;
+
 
 interface RecurringMarketModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarketModalProps) {
-  const [outcomes, setOutcomes] = useState([{ id: 1, name: "" }, { id: 2, name: "" }])
-  const [tags, setTags] = useState<string[]>([])
-  const [currentTag, setCurrentTag] = useState("")
+export default function RecurringMarketModal({
+  isOpen,
+  onClose,
+}: RecurringMarketModalProps) {
+  const [outcomes, setOutcomes] = useState([
+    { id: 1, name: "" },
+    { id: 2, name: "" },
+  ]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [currentTag, setCurrentTag] = useState("");
 
   const handleAddOutcome = () => {
-    setOutcomes([...outcomes, { id: outcomes.length + 1, name: "" }])
-  }
+    setOutcomes([...outcomes, { id: outcomes.length + 1, name: "" }]);
+  };
 
   const handleRemoveOutcome = (id: number) => {
     if (outcomes.length > 2) {
-      setOutcomes(outcomes.filter(outcome => outcome.id !== id))
+      setOutcomes(outcomes.filter((outcome) => outcome.id !== id));
     }
-  }
+  };
 
   const handleAddTag = () => {
     if (currentTag && !tags.includes(currentTag)) {
-      setTags([...tags, currentTag])
-      setCurrentTag("")
+      setTags([...tags, currentTag]);
+      setCurrentTag("");
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -38,11 +45,16 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-neutral-600" />
-            <h2 className="text-lg font-medium text-neutral-900">Set Up Recurring Market</h2>
+            <IconCalendar className="w-5 h-5 text-neutral-600" />
+            <h2 className="text-lg font-medium text-neutral-900">
+              Set Up Recurring Market
+            </h2>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-neutral-100 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-neutral-600" />
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-neutral-100 rounded-lg transition-colors"
+          >
+            <IconX className="w-5 h-5 text-neutral-600" />
           </button>
         </div>
 
@@ -51,8 +63,10 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
           {/* Template Information */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-4 h-4 text-neutral-600" />
-              <h3 className="text-base font-medium text-neutral-900">Template Information</h3>
+              <IconCalendar className="w-4 h-4 text-neutral-600" />
+              <h3 className="text-base font-medium text-neutral-900">
+                Template Information
+              </h3>
             </div>
 
             <div className="space-y-8">
@@ -77,7 +91,15 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
                 <p className="text-xs text-neutral-600 mt-1.5">
-                  Use variables: <span className="font-mono bg-neutral-100 px-1 py-0.5 rounded">{"{date}"}</span> for date, <span className="font-mono bg-neutral-100 px-1 py-0.5 rounded">{"{week}"}</span> for week number
+                  Use variables:{" "}
+                  <span className="font-mono bg-neutral-100 px-1 py-0.5 rounded">
+                    {"{date}"}
+                  </span>{" "}
+                  for date,{" "}
+                  <span className="font-mono bg-neutral-100 px-1 py-0.5 rounded">
+                    {"{week}"}
+                  </span>{" "}
+                  for week number
                 </p>
               </div>
 
@@ -97,8 +119,10 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
           {/* Recurrence Schedule */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-4 h-4 text-neutral-600" />
-              <h3 className="text-base font-medium text-neutral-900">Recurrence Schedule</h3>
+              <IconClock className="w-4 h-4 text-neutral-600" />
+              <h3 className="text-base font-medium text-neutral-900">
+                Recurrence Schedule
+              </h3>
             </div>
 
             <div className="space-y-8">
@@ -137,7 +161,9 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
                 <p className="text-xs text-neutral-600 mt-1.5">
-                  Local: <span className="text-blue-600">09:00 (Africa/Nairobi)</span> | UTC: <span className="text-neutral-600">06:00</span>
+                  Local:{" "}
+                  <span className="text-blue-600">09:00 (Africa/Nairobi)</span>{" "}
+                  | UTC: <span className="text-neutral-600">06:00</span>
                 </p>
               </div>
 
@@ -151,15 +177,19 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
                 <p className="text-xs text-neutral-600 mt-1.5">
-                  Local: <span className="text-blue-600">17:00 (Africa/Nairobi)</span> | UTC: <span className="text-neutral-600">14:00</span>
+                  Local:{" "}
+                  <span className="text-blue-600">17:00 (Africa/Nairobi)</span>{" "}
+                  | UTC: <span className="text-neutral-600">14:00</span>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Market Settings */}
+          {/* Market IconSettings */}
           <div>
-            <h3 className="text-base font-medium text-neutral-900 mb-4">Market Settings</h3>
+            <h3 className="text-base font-medium text-neutral-900 mb-4">
+              Market IconSettings
+            </h3>
 
             <div className="space-y-8">
               <div className="grid md:grid-cols-2 gap-4">
@@ -205,7 +235,10 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                   id="auto-publish"
                   className="w-4 h-4 rounded border-neutral-300 text-neutral-900 focus:ring-2 focus:ring-neutral-900"
                 />
-                <label htmlFor="auto-publish" className="text-sm font-medium text-neutral-900">
+                <label
+                  htmlFor="auto-publish"
+                  className="text-sm font-medium text-neutral-900"
+                >
                   Auto-publish generated markets
                 </label>
               </div>
@@ -222,14 +255,17 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                 onClick={handleAddOutcome}
                 className="text-sm font-medium text-neutral-700 hover:text-neutral-900 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-50 transition-all"
               >
-                <Plus className="w-4 h-4" />
+                <IconPlus className="w-4 h-4" />
                 Add Option
               </button>
             </div>
 
             <div className="space-y-8">
               {outcomes.map((outcome, index) => (
-                <div key={outcome.id} className="p-4 rounded-lg border border-neutral-200 bg-neutral-50/50">
+                <div
+                  key={outcome.id}
+                  className="p-4 rounded-lg border border-neutral-200 bg-neutral-50/50"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-sm font-medium text-neutral-900">
                       Option {index + 1}
@@ -239,7 +275,7 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                         onClick={() => handleRemoveOutcome(outcome.id)}
                         className="p-1 rounded text-neutral-500 hover:text-red-500 hover:bg-red-50 transition-all"
                       >
-                        <X className="w-4 h-4" />
+                        <IconX className="w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -249,8 +285,8 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                     className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all mb-3"
                   />
                   <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-all">
-                    <Upload className="w-4 h-4" />
-                    Upload Media
+                    <IconUpload className="w-4 h-4" />
+                    IconUpload Media
                   </button>
                 </div>
               ))}
@@ -268,26 +304,31 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
                 placeholder="Add tag..."
                 value={currentTag}
                 onChange={(e) => setCurrentTag(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && (e.preventDefault(), handleAddTag())
+                }
                 className="flex-1 px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
               <button
                 onClick={handleAddTag}
                 className="px-4 py-2.5 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-700 transition-all"
               >
-                <Plus className="w-4 h-4" />
+                <IconPlus className="w-4 h-4" />
               </button>
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
-                {tags.map(tag => (
+                {tags.map((tag) => (
                   <span
                     key={tag}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-100 text-xs font-medium text-neutral-700 border border-neutral-200"
                   >
                     {tag}
-                    <button onClick={() => setTags(tags.filter(t => t !== tag))} className="hover:text-red-500 transition-colors">
-                      <X className="w-3 h-3" />
+                    <button
+                      onClick={() => setTags(tags.filter((t) => t !== tag))}
+                      className="hover:text-red-500 transition-colors"
+                    >
+                      <IconX className="w-3 h-3" />
                     </button>
                   </span>
                 ))}
@@ -297,9 +338,12 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
 
           {/* Info Message */}
           <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <IconInfoCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <div className="text-sm text-neutral-700">
-              <span className="font-medium">How it works:</span> Markets will be generated automatically based on your schedule. Each market will inherit these settings but can be edited individually before publication if needed.
+              <span className="font-medium">How it works:</span> Markets will be
+              generated automatically based on your schedule. Each market will
+              inherit these settings but can be edited individually before
+              publication if needed.
             </div>
           </div>
         </div>
@@ -318,5 +362,5 @@ export default function RecurringMarketModal({ isOpen, onClose }: RecurringMarke
         </div>
       </div>
     </div>
-  )
+  );
 }

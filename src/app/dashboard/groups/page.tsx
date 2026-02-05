@@ -5,15 +5,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import {
-  Users,
-  Plus,
-  TrendingUp,
-  Calendar,
-  Activity,
-  X,
-  Shield,
-} from "lucide-react";
+import { IconActivity, IconLoader2, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+
 import { mockGroups, mockUser } from "@/lib/mockData";
 import { getJoinedGroups, isGroupMember } from "@/lib/membership";
 import { useRouter } from "next/navigation";
@@ -23,7 +16,7 @@ import { GroupCard } from "@/components/groups/GroupCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
-import { LoaderPinwheel } from "lucide-react";
+
 
 export default function GroupsPage() {
   const router = useRouter();
@@ -92,9 +85,9 @@ export default function GroupsPage() {
           disabled={isCreating}
         >
           {isCreating ? (
-            <LoaderPinwheel className="h-4 w-4 animate-spin" />
+            <IconLoader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Plus className="h-4 w-4" />
+            <IconPlus className="h-4 w-4" />
           )}
           <span className="font-semibold text-sm">
             {isCreating ? "Preparing..." : "Create Group"}
@@ -122,7 +115,7 @@ export default function GroupsPage() {
                 </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <Users className="h-6 w-6 text-blue-600" />
+                <IconUsers className="h-6 w-6 text-blue-600" />
               </div>
             </div>
           </CardContent>
@@ -144,7 +137,7 @@ export default function GroupsPage() {
                 </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+                <IconTrendingUp className="h-6 w-6 text-green-600" />
               </div>
             </div>
           </CardContent>
@@ -166,7 +159,7 @@ export default function GroupsPage() {
                 </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <Activity className="h-6 w-6 text-purple-600" />
+                <IconActivity className="h-6 w-6 text-purple-600" />
               </div>
             </div>
           </CardContent>
@@ -175,7 +168,7 @@ export default function GroupsPage() {
 
       <SectionHeading
         title="Your Groups"
-        icon={<Users className="h-4 w-4 text-purple-500" />}
+        icon={<IconUsers className="h-4 w-4 text-purple-500" />}
       />
 
       {/* Groups Grid */}

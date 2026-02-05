@@ -1,19 +1,11 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import {
-  Users,
-  Clock,
-  TrendingUp,
-  CheckCircle2,
-  Info,
-  ArrowRight,
-  ScanEye,
-  Shield
-} from "lucide-react";
+import { IconActivity, IconArrowRight, IconCircleCheckFilled, IconClock, IconEye, IconLayoutGrid, IconPhoto, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+
 import Image from "next/image";
 import { mockUser } from "@/lib/mockData";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
@@ -22,9 +14,11 @@ import { useToast } from "@/components/ui/toast-notification";
 const getMockMarket = (id: string) => ({
   id,
   title: "Best Nairobi Matatu Route",
-  description: "Vote for the most reliable, comfortable, and iconic matatu route in Nairobi. Considerations include music quality, graffiti art, speed (safely!), conductor vibes, and overall passenger experience.",
+  description:
+    "Vote for the most reliable, comfortable, and iconic matatu route in Nairobi. Considerations include music quality, graffiti art, speed (safely!), conductor vibes, and overall passenger experience.",
   category: "Poll",
-  image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&auto=format&fit=crop",
+  image:
+    "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&auto=format&fit=crop",
   buy_in_amount: 500,
   total_pool: 145600,
   participant_count: 42,
@@ -35,33 +29,53 @@ const getMockMarket = (id: string) => ({
       id: "opt1",
       option_text: "Route 111 (Ngong Road)",
       votes: 35,
-      image: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop",
     },
     {
       id: "opt2",
       option_text: "Route 125/126 (Rongai)",
       votes: 45,
-      image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
     },
     {
       id: "opt3",
       option_text: "Route 23 (Westlands)",
       votes: 28,
-      image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop"
+      image:
+        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop",
     },
     {
       id: "opt4",
       option_text: "Route 58 (Buruburu)",
       votes: 18,
-      image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop"
-    }
+      image:
+        "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop",
+    },
   ],
   participants: [
-    { username: "@matatu_king", total_stake: 5000, timestamp: new Date(Date.now() - 7200000) },
-    { username: "@nai_guy", total_stake: 1500, timestamp: new Date(Date.now() - 3600000) },
-    { username: "@city_hopper", total_stake: 1000, timestamp: new Date(Date.now() - 1800000) },
-    { username: "@route_master", total_stake: 2500, timestamp: new Date(Date.now() - 900000) }
-  ]
+    {
+      username: "@matatu_king",
+      total_stake: 5000,
+      timestamp: new Date(Date.now() - 7200000),
+    },
+    {
+      username: "@nai_guy",
+      total_stake: 1500,
+      timestamp: new Date(Date.now() - 3600000),
+    },
+    {
+      username: "@city_hopper",
+      total_stake: 1000,
+      timestamp: new Date(Date.now() - 1800000),
+    },
+    {
+      username: "@route_master",
+      total_stake: 2500,
+      timestamp: new Date(Date.now() - 900000),
+    },
+  ],
 });
 
 export default function MarketDetailPage() {
@@ -90,10 +104,15 @@ export default function MarketDetailPage() {
 
     setIsSubmitting(true);
     const newBetId = `bet-${Date.now()}`;
-    const selectedOptText = market.options.find((o: any) => o.id === selectedOption)?.option_text || "Unknown";
+    const selectedOptText =
+      market.options.find((o: any) => o.id === selectedOption)?.option_text ||
+      "Unknown";
 
     // Show loading toast
-    const toastId = toast.loading("Confirming your bet...", "Processing transaction securely");
+    const toastId = toast.loading(
+      "Confirming your bet...",
+      "Processing transaction securely",
+    );
 
     // Simulate API call
     setTimeout(() => {
@@ -101,7 +120,10 @@ export default function MarketDetailPage() {
 
       // Update toast to success
       toast.removeToast(toastId);
-      toast.success("Bet Placed Successfully!", "Good luck! Redirecting to your ticket...");
+      toast.success(
+        "Bet Placed Successfully!",
+        "Good luck! Redirecting to your ticket...",
+      );
 
       const params = new URLSearchParams({
         marketId: market.id,
@@ -110,16 +132,17 @@ export default function MarketDetailPage() {
         title: market.title,
         status: "active",
         date: new Date().toISOString(),
-        new: "true"
+        new: "true",
       });
 
       // Redirect to the bet slip page with params
       setTimeout(() => {
-        router.push(`/dashboard/markets/my-bets/${newBetId}?${params.toString()}`);
+        router.push(
+          `/dashboard/markets/my-bets/${newBetId}?${params.toString()}`,
+        );
       }, 1000);
     }, 2000);
   };
-
 
   const getTimeRemaining = () => {
     if (!market) return "";
@@ -134,23 +157,22 @@ export default function MarketDetailPage() {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
-  const totalVotes = market.options.reduce((acc: number, opt: any) => acc + opt.votes, 0);
+  const totalVotes = market.options.reduce(
+    (acc: number, opt: any) => acc + opt.votes,
+    0,
+  );
   const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
-
         {/* Dashboard Header */}
         <DashboardHeader user={mockUser} />
 
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
-
             {/* Hero Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -163,8 +185,7 @@ export default function MarketDetailPage() {
 
               {/* Hero Image */}
               <div className="relative h-64 md:h-80 overflow-hidden">
-                <Image
-                  src={market.image}
+                <Image src={market.image}
                   alt={market.title}
                   fill
                   className="object-cover"
@@ -202,35 +223,47 @@ export default function MarketDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Pool</span>
+                      <IconTrendingUp className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Pool
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {market.total_pool.toLocaleString()}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">KSH</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      KSH
+                    </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <div className="flex items-center gap-2 mb-2">
-                      <Users className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Players</span>
+                      <IconUsers className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Players
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {market.participant_count}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">Active</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      Active
+                    </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Closes In</span>
+                      <IconClock className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Closes In
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {getTimeRemaining()}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">Remaining</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      Remaining
+                    </p>
                   </div>
                 </div>
               </div>
@@ -239,7 +272,9 @@ export default function MarketDetailPage() {
             {/* Visual Separator */}
             <div className="flex items-center gap-4 my-18">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Select Your Choice</h2>
+              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                Select Your Choice
+              </h2>
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             </div>
 
@@ -248,7 +283,8 @@ export default function MarketDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {market.options.map((option: any, index: number) => {
                   const isSelected = selectedOption === option.id;
-                  const votePercentage = Math.round((option.votes / totalVotes) * 100) || 0;
+                  const votePercentage =
+                    Math.round((option.votes / totalVotes) * 100) || 0;
 
                   return (
                     <motion.div
@@ -257,15 +293,15 @@ export default function MarketDetailPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 + index * 0.05 }}
                       onClick={() => setSelectedOption(option.id)}
-                      className={`group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 ${isSelected
-                        ? "bg-white/60 backdrop-blur-xl border-2 border-black/20 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)]"
-                        : "bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 hover:border-black/10 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]"
-                        }`}
+                      className={`group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 ${
+                        isSelected
+                          ? "bg-white/60 backdrop-blur-xl border-2 border-black/20 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)]"
+                          : "bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 hover:border-black/10 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]"
+                      }`}
                     >
                       {/* Image */}
                       <div className="relative h-32 overflow-hidden">
-                        <Image
-                          src={option.image}
+                        <Image src={option.image}
                           alt={option.option_text}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -274,7 +310,7 @@ export default function MarketDetailPage() {
 
                         {isSelected && (
                           <div className="absolute top-3 right-3 p-1.5 bg-black rounded-full">
-                            <CheckCircle2 className="w-4 h-4 text-white" />
+                            <IconCircleCheckFilled className="w-4 h-4 text-white" />
                           </div>
                         )}
                       </div>
@@ -296,15 +332,24 @@ export default function MarketDetailPage() {
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${votePercentage}%` }}
-                              transition={{ duration: 1, ease: "easeOut", delay: 0.3 + index * 0.05 }}
-                              className={`h-full rounded-full ${isSelected ? "bg-black/80" : "bg-black/40"
-                                }`}
+                              transition={{
+                                duration: 1,
+                                ease: "easeOut",
+                                delay: 0.3 + index * 0.05,
+                              }}
+                              className={`h-full rounded-full ${
+                                isSelected ? "bg-black/80" : "bg-black/40"
+                              }`}
                             />
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-xs text-black/40 font-medium">{option.votes} votes</span>
+                            <span className="text-xs text-black/40 font-medium">
+                              {option.votes} votes
+                            </span>
                             {isSelected && (
-                              <span className="text-xs text-black/60 font-semibold">Selected</span>
+                              <span className="text-xs text-black/60 font-semibold">
+                                Selected
+                              </span>
                             )}
                           </div>
                         </div>
@@ -318,8 +363,10 @@ export default function MarketDetailPage() {
             {/* Recent Activity */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <ScanEye className="w-5 h-5 text-black/40" />
-                <h3 className="text-lg font-semibold text-black/90">Recent Activity</h3>
+                <IconEye className="w-5 h-5 text-black/40" />
+                <h3 className="text-lg font-semibold text-black/90">
+                  Recent Activity
+                </h3>
               </div>
 
               <div className="space-y-3">
@@ -336,8 +383,12 @@ export default function MarketDetailPage() {
                         {participant.username.substring(1, 3).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-black/90">{participant.username}</p>
-                        <p className="text-xs text-black/50 font-medium">Placed bet</p>
+                        <p className="text-sm font-semibold text-black/90">
+                          {participant.username}
+                        </p>
+                        <p className="text-xs text-black/50 font-medium">
+                          Placed bet
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -345,7 +396,10 @@ export default function MarketDetailPage() {
                         {participant.total_stake.toLocaleString()} KSH
                       </p>
                       <p className="text-xs text-black/40 font-medium">
-                        {new Date(participant.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(participant.timestamp).toLocaleTimeString(
+                          [],
+                          { hour: "2-digit", minute: "2-digit" },
+                        )}
                       </p>
                     </div>
                   </motion.div>
@@ -357,7 +411,6 @@ export default function MarketDetailPage() {
           {/* Sidebar */}
           <div className="lg:col-span-4">
             <div className="sticky top-6 space-y-6">
-
               {/* Bet Placement Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -367,13 +420,16 @@ export default function MarketDetailPage() {
               >
                 {/* Header */}
                 <div className="p-6 bg-black">
-                  <h3 className="text-xl font-semibold text-white mb-1">Place Your Bet</h3>
-                  <p className="text-sm text-white/60 font-medium">Join the pool and win</p>
+                  <h3 className="text-xl font-semibold text-white mb-1">
+                    Place Your Bet
+                  </h3>
+                  <p className="text-sm text-white/60 font-medium">
+                    Join the pool and win
+                  </p>
                 </div>
 
                 {/* Content */}
                 <div className="p-6 space-y-6">
-
                   {/* Selected Option */}
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-2">
@@ -383,19 +439,27 @@ export default function MarketDetailPage() {
                       {selectedOption ? (
                         <>
                           <span className="text-base font-semibold text-black/90">
-                            {market.options.find((o: any) => o.id === selectedOption)?.option_text}
+                            {
+                              market.options.find(
+                                (o: any) => o.id === selectedOption,
+                              )?.option_text
+                            }
                           </span>
-                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          <IconCircleCheckFilled className="w-4 h-4 text-green-600" />
                         </>
                       ) : (
-                        <span className="text-base text-black/40 italic">No option selected</span>
+                        <span className="text-base text-black/40 italic">
+                          No option selected
+                        </span>
                       )}
                     </div>
                   </div>
 
                   {/* Stake Input */}
                   <div className="space-y-3">
-                    <label className="text-sm font-semibold text-black/70">Your Stake</label>
+                    <label className="text-sm font-semibold text-black/70">
+                      Your Stake
+                    </label>
                     <div className="relative">
                       <input
                         type="number"
@@ -410,7 +474,9 @@ export default function MarketDetailPage() {
                       </span>
                     </div>
                     <div className="flex justify-between text-xs px-1">
-                      <span className="text-black/40 font-medium">Minimum buy-in</span>
+                      <span className="text-black/40 font-medium">
+                        Minimum buy-in
+                      </span>
                       <span className="font-mono font-semibold text-black/70">
                         {market.buy_in_amount.toLocaleString()} KSH
                       </span>
@@ -420,13 +486,17 @@ export default function MarketDetailPage() {
                   {/* Summary */}
                   <div className="pt-6 border-t border-black/5 space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-black/60 font-medium">Platform Fee (5%)</span>
+                      <span className="text-black/60 font-medium">
+                        Platform Fee (5%)
+                      </span>
                       <span className="font-mono font-semibold text-black/80">
                         {platformFee.toLocaleString()} KSH
                       </span>
                     </div>
                     <div className="flex justify-between text-base">
-                      <span className="text-black/90 font-semibold">Total Amount</span>
+                      <span className="text-black/90 font-semibold">
+                        Total Amount
+                      </span>
                       <span className="font-mono font-semibold text-black/90">
                         {totalAmount.toLocaleString()} KSH
                       </span>
@@ -437,12 +507,21 @@ export default function MarketDetailPage() {
                   <motion.button
                     onClick={handlePlaceBet}
                     disabled={isSubmitting || !selectedOption || !stakeAmount}
-                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${isSubmitting || !selectedOption || !stakeAmount
-                      ? "bg-black/10 text-black/30 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
-                      }`}
-                    whileHover={!isSubmitting && selectedOption && stakeAmount ? { scale: 1.02 } : {}}
-                    whileTap={!isSubmitting && selectedOption && stakeAmount ? { scale: 0.98 } : {}}
+                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
+                      isSubmitting || !selectedOption || !stakeAmount
+                        ? "bg-black/10 text-black/30 cursor-not-allowed"
+                        : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
+                    }`}
+                    whileHover={
+                      !isSubmitting && selectedOption && stakeAmount
+                        ? { scale: 1.02 }
+                        : {}
+                    }
+                    whileTap={
+                      !isSubmitting && selectedOption && stakeAmount
+                        ? { scale: 0.98 }
+                        : {}
+                    }
                   >
                     {isSubmitting ? (
                       <>
@@ -452,7 +531,7 @@ export default function MarketDetailPage() {
                     ) : (
                       <>
                         Confirm Bet
-                        <ArrowRight className="w-5 h-5" />
+                        <IconArrowRight className="w-5 h-5" />
                       </>
                     )}
                   </motion.button>
@@ -467,11 +546,15 @@ export default function MarketDetailPage() {
                 className="p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5"
               >
                 <div className="flex gap-3">
-                  <Shield className="w-5 h-5 text-black/60 shrink-0" />
+                  <IconShield className="w-5 h-5 text-black/60 shrink-0" />
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-black/90">How it works</p>
+                    <p className="text-sm font-semibold text-black/90">
+                      How it works
+                    </p>
                     <p className="text-xs text-black/60 font-medium leading-relaxed">
-                      Winners split the prize pool proportionally based on their stake. All payouts are processed instantly when the market closes.
+                      Winners split the prize pool proportionally based on their
+                      stake. All payouts are processed instantly when the market
+                      closes.
                     </p>
                   </div>
                 </div>

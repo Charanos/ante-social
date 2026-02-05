@@ -1,38 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { IconPhoto } from "@tabler/icons-react";
 import {
-  Home,
-  Wallet,
-  User,
-  Bell,
-  Users,
-  Menu,
-  X,
-  LogOut,
-  Settings,
-  Shield,
-  TrendingUp
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { signOut } from 'next-auth/react';
+  IoNotificationsOutline,
+  IoCloseOutline,
+  IoHomeOutline,
+  IoLogOutOutline,
+  IoMenuOutline,
+  IoPeopleOutline,
+  IoPersonOutline,
+  IoSettingsOutline,
+  IoShieldOutline,
+  IoTrendingUpOutline,
+  IoWalletOutline,
+} from "react-icons/io5";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const mainNavItems = [
-  { title: 'Home', url: '/dashboard', icon: Home },
-  { title: 'Markets', url: "/dashboard/markets", icon: TrendingUp },
-  { title: 'Groups', url: '/dashboard/groups', icon: Users },
-  { title: 'Wallet', url: '/dashboard/wallet', icon: Wallet },
+  { title: "Home", url: "/dashboard", icon: IoHomeOutline },
+  { title: "Markets", url: "/dashboard/markets", icon: IoTrendingUpOutline },
+  { title: "Groups", url: "/dashboard/groups", icon: IoPeopleOutline },
+  { title: "Wallet", url: "/dashboard/wallet", icon: IoWalletOutline },
 ];
 
 const secondaryNavItems = [
-  { title: 'Profile', url: '/dashboard/profile', icon: User },
-  { title: 'Notifications', url: '/dashboard/notifications', icon: Bell },
-  { title: 'Settings', url: '/settings', icon: Settings },
-  { title: 'Admin', url: '/dashboard/admin', icon: Shield },
+  { title: "Profile", url: "/dashboard/profile", icon: IoPersonOutline },
+  {
+    title: "Notifications",
+    url: "/dashboard/notifications",
+    icon: IoNotificationsOutline,
+  },
+  { title: "Settings", url: "/settings", icon: IoSettingsOutline },
+  { title: "Admin", url: "/dashboard/admin", icon: IoShieldOutline },
 ];
 
 export function MobileNav({ user }: { user: any }) {
@@ -53,28 +59,35 @@ export function MobileNav({ user }: { user: any }) {
                     onClick={() => setIsMenuOpen(false)}
                     className={cn(
                       "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300",
-                      isActive ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-gray-600"
+                      isActive
+                        ? "text-blue-600 bg-blue-50"
+                        : "text-gray-400 hover:text-gray-600",
                     )}
                   >
-                    <item.icon className={cn("w-6 h-6", isActive && "fill-current")} strokeWidth={isActive ? 2.5 : 2} />
+                    <item.icon
+                      className={cn("w-6 h-6", isActive && "fill-current")}
+                      strokeWidth={isActive ? 2.5 : 2}
+                    />
                   </Link>
                 </li>
               );
             })}
 
-            {/* More Menu Toggle */}
+            {/* More IconMenu Toggle */}
             <li>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={cn(
                   "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300",
-                  isMenuOpen ? "text-blue-600 bg-blue-50" : "text-gray-400 hover:text-gray-600"
+                  isMenuOpen
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-400 hover:text-gray-600",
                 )}
               >
                 {isMenuOpen ? (
-                  <X className="w-6 h-6" strokeWidth={2.5} />
+                  <IoCloseOutline className="w-6 h-6" strokeWidth={2.5} />
                 ) : (
-                  <Menu className="w-6 h-6" strokeWidth={2} />
+                  <IoMenuOutline className="w-6 h-6" strokeWidth={2} />
                 )}
               </button>
             </li>
@@ -82,7 +95,7 @@ export function MobileNav({ user }: { user: any }) {
         </div>
       </nav>
 
-      {/* Full Screen Menu Overlay */}
+      {/* Full Screen IconMenu Overlay */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -93,34 +106,49 @@ export function MobileNav({ user }: { user: any }) {
           >
             <div className="flex flex-col items-center mb-10">
               <div className="relative w-16 h-16 mb-4">
-                <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
+                <Image
+                  src="/ante-logo.png"
+                  alt="Ante Social"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-900">Ante Social</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Ante Social
+              </h2>
               <p className="text-gray-500">Bet with your friends.</p>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">Menu</h3>
-              {secondaryNavItems.filter(item => item.title !== "Admin" || user?.role === "admin").map((item) => (
-                <Link
-                  key={item.title}
-                  href={item.url}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all"
-                >
-                  <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                    <item.icon className="w-5 h-5" />
-                  </div>
-                  <span className="font-medium text-lg text-gray-900">{item.title}</span>
-                </Link>
-              ))}
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">
+                IconMenu
+              </h3>
+              {secondaryNavItems
+                .filter(
+                  (item) => item.title !== "Admin" || user?.role === "admin",
+                )
+                .map((item) => (
+                  <Link
+                    key={item.title}
+                    href={item.url}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all"
+                  >
+                    <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <span className="font-medium text-lg text-gray-900">
+                      {item.title}
+                    </span>
+                  </Link>
+                ))}
 
               <button
-                onClick={() => signOut({ callbackUrl: '/' })}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 border border-transparent hover:border-red-100 transition-all mt-4 text-red-600"
               >
                 <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                  <LogOut className="w-5 h-5" />
+                  <IoLogOutOutline className="w-5 h-5" />
                 </div>
                 <span className="font-medium text-lg">Sign Out</span>
               </button>

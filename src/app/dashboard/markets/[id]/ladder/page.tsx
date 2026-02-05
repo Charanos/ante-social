@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { useParams } from "next/navigation"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { useParams } from "next/navigation";
+;
 import {
   DndContext,
   closestCenter,
@@ -10,26 +11,27 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
-} from "@dnd-kit/core"
+  DragEndEvent,
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  useSortable
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { Users, Clock, TrendingUp, GripVertical, CheckCircle2, Shield, ArrowRight, ScanEye, Mic, Headphones, Music, Music2, Guitar } from "lucide-react"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
-import { useToast } from "@/hooks/useToast"
-import { mockUser } from "@/lib/mockData"
-import Image from "next/image"
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { useToast } from "@/hooks/useToast";
+import { mockUser } from "@/lib/mockData";
+import Image from "next/image";
+import { IconActivity, IconArrowRight, IconClock, IconEye, IconGripVertical, IconInfoCircle, IconLayoutGrid, IconMicrophone, IconMusic, IconPhoto, IconPlayerPlay, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
 interface RankItem {
-  id: string
-  text: string
-  icon: any
+  id: string;
+  text: string;
+  icon: any;
 }
 
 // Sortable Item Component
@@ -40,14 +42,14 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
     setNodeRef,
     transform,
     transition,
-    isDragging
-  } = useSortable({ id: item.id })
+    isDragging,
+  } = useSortable({ id: item.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1
-  }
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   return (
     <div
@@ -55,7 +57,7 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
       style={style}
       className={`
         flex items-center gap-4 p-4 rounded-xl border-2 bg-white/60 backdrop-blur-sm transition-all
-        ${isDragging ? 'border-black/30 shadow-2xl z-50' : 'border-black/10 hover:border-black/20 shadow-sm hover:shadow-md'}
+        ${isDragging ? "border-black/30 shadow-2xl z-50" : "border-black/10 hover:border-black/20 shadow-sm hover:shadow-md"}
       `}
     >
       <div
@@ -63,7 +65,7 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
         {...listeners}
         className="shrink-0 cursor-grab active:cursor-grabbing p-2 hover:bg-black/5 rounded-lg transition-colors"
       >
-        <GripVertical className="w-5 h-5 text-black/40" />
+        <IconGripVertical className="w-5 h-5 text-black/40" />
       </div>
 
       <div className="flex items-center justify-center w-10 h-10 rounded-full bg-black text-white font-medium font-mono">
@@ -77,15 +79,17 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
         <span className="font-medium text-black/90">{item.text}</span>
       </div>
     </div>
-  )
+  );
 }
 
 // Mock ladder market data
 const getMockLadderMarket = (id: string) => ({
   id,
   title: "Top Kenyan Musician 2024",
-  description: "Rank the top 5 Kenyan musicians based on what the crowd thinks. Match the majority consensus to win!",
-  image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200&auto=format&fit=crop",
+  description:
+    "Rank the top 5 Kenyan musicians based on what the crowd thinks. Match the majority consensus to win!",
+  image:
+    "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200&auto=format&fit=crop",
   category: "Ladder",
   market_type: "ladder",
   buy_in_amount: 1000,
@@ -94,87 +98,103 @@ const getMockLadderMarket = (id: string) => ({
   status: "active",
   close_date: new Date(Date.now() + 97200000), // 1d 3h
   items: [
-    { id: "item1", text: "Sauti Sol", icon: Mic },
-    { id: "item2", text: "Nyashinski", icon: Headphones },
-    { id: "item3", text: "Khaligraph Jones", icon: Music },
-    { id: "item4", text: "Nadia Mukami", icon: Music2 },
-    { id: "item5", text: "Otile Brown", icon: Guitar }
+    { id: "item1", text: "Sauti Sol", icon: IconMicrophone },
+    { id: "item2", text: "Nyashinski", icon: IconMusic },
+    { id: "item3", text: "Khaligraph Jones", icon: IconMusic },
+    { id: "item4", text: "Nadia Mukami", icon: IconMusic },
+    { id: "item5", text: "Otile Brown", icon: IconMusic },
   ],
   participants: [
-    { username: "@music_fan", total_stake: 2500, timestamp: new Date(Date.now() - 21600000) },
-    { username: "@kenyan_vibes", total_stake: 5000, timestamp: new Date(Date.now() - 14400000) },
-    { username: "@gengetone_king", total_stake: 1500, timestamp: new Date(Date.now() - 7200000) },
-    { username: "@afrobeat_lover", total_stake: 3000, timestamp: new Date(Date.now() - 3600000) }
-  ]
-})
+    {
+      username: "@music_fan",
+      total_stake: 2500,
+      timestamp: new Date(Date.now() - 21600000),
+    },
+    {
+      username: "@kenyan_vibes",
+      total_stake: 5000,
+      timestamp: new Date(Date.now() - 14400000),
+    },
+    {
+      username: "@gengetone_king",
+      total_stake: 1500,
+      timestamp: new Date(Date.now() - 7200000),
+    },
+    {
+      username: "@afrobeat_lover",
+      total_stake: 3000,
+      timestamp: new Date(Date.now() - 3600000),
+    },
+  ],
+});
 
 export default function LadderMarketPage() {
-  const params = useParams()
-  const toast = useToast()
-  const marketId = params.id as string
+  const params = useParams();
+  const toast = useToast();
+  const marketId = params.id as string;
 
-  const market = getMockLadderMarket(marketId)
+  const market = getMockLadderMarket(marketId);
 
-  const [rankedItems, setRankedItems] = useState<RankItem[]>(market.items)
-  const [stakeAmount, setStakeAmount] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [rankedItems, setRankedItems] = useState<RankItem[]>(market.items);
+  const [stakeAmount, setStakeAmount] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
-  )
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+    const { active, over } = event;
 
     if (over && active.id !== over.id) {
       setRankedItems((items) => {
-        const oldIndex = items.findIndex(item => item.id === active.id)
-        const newIndex = items.findIndex(item => item.id === over.id)
-        return arrayMove(items, oldIndex, newIndex)
-      })
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
     }
-  }
+  };
 
   const handleSubmitRanking = async () => {
     if (!stakeAmount || parseFloat(stakeAmount) < market.buy_in_amount) {
-      toast.error("Invalid Stake", `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`)
-      return
+      toast.error(
+        "Invalid Stake",
+        `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`,
+      );
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     setTimeout(() => {
-      const chain = rankedItems.map(item => item.text).join(" → ")
-      toast.success("Ranking Submitted!", `Your ranking has been saved`)
-      setIsSubmitting(false)
-    }, 1000)
-  }
+      const chain = rankedItems.map((item) => item.text).join(" → ");
+      toast.success("Ranking Submitted!", `Your ranking has been saved`);
+      setIsSubmitting(false);
+    }, 1000);
+  };
 
   const getTimeRemaining = () => {
-    const diff = market.close_date.getTime() - Date.now()
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    return `${days}d ${hours}h`
-  }
+    const diff = market.close_date.getTime() - Date.now();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return `${days}d ${hours}h`;
+  };
 
-  const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0
-  const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0
+  const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
+  const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
-
         {/* Dashboard Header */}
         <DashboardHeader user={mockUser} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
-
             {/* Hero Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -186,8 +206,7 @@ export default function LadderMarketPage() {
 
               {/* Hero Image */}
               <div className="relative h-64 md:h-80 overflow-hidden">
-                <Image
-                  src={market.image}
+                <Image src={market.image}
                   alt={market.title}
                   fill
                   className="object-cover"
@@ -225,35 +244,47 @@ export default function LadderMarketPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Pool</span>
+                      <IconTrendingUp className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Pool
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {market.total_pool.toLocaleString()}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">KSH</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      KSH
+                    </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <div className="flex items-center gap-2 mb-2">
-                      <Users className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Players</span>
+                      <IconUsers className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Players
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {market.participant_count}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">Active</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      Active
+                    </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Closes In</span>
+                      <IconClock className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Closes In
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {getTimeRemaining()}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">Remaining</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      Remaining
+                    </p>
                   </div>
                 </div>
               </div>
@@ -268,12 +299,17 @@ export default function LadderMarketPage() {
             >
               <div className="flex items-start gap-4">
                 <div className="shrink-0 w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <GripVertical className="w-6 h-6 text-purple-600" />
+                  <IconGripVertical className="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-purple-900/80 uppercase tracking-wider mb-2">How to Play</h3>
+                  <h3 className="text-sm font-semibold text-purple-900/80 uppercase tracking-wider mb-2">
+                    How to Play
+                  </h3>
                   <p className="text-base font-medium text-purple-900 leading-relaxed">
-                    Drag items to rank them from <strong>#1 (best)</strong> to <strong>#5 (last)</strong>. Your goal is to match what the <strong>majority</strong> will choose. Winners split the prize pool!
+                    Drag items to rank them from <strong>#1 (best)</strong> to{" "}
+                    <strong>#5 (last)</strong>. Your goal is to match what the{" "}
+                    <strong>majority</strong> will choose. Winners split the
+                    prize pool!
                   </p>
                 </div>
               </div>
@@ -282,7 +318,9 @@ export default function LadderMarketPage() {
             {/* Visual Separator */}
             <div className="flex items-center gap-4 my-18">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Drag to Rank</h2>
+              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                Drag to Rank
+              </h2>
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             </div>
 
@@ -299,7 +337,7 @@ export default function LadderMarketPage() {
                 onDragEnd={handleDragEnd}
               >
                 <SortableContext
-                  items={rankedItems.map(item => item.id)}
+                  items={rankedItems.map((item) => item.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-3">
@@ -314,8 +352,10 @@ export default function LadderMarketPage() {
             {/* Recent Activity */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <ScanEye className="w-5 h-5 text-black/40" />
-                <h3 className="text-lg font-semibold text-black/90">Recent Activity</h3>
+                <IconEye className="w-5 h-5 text-black/40" />
+                <h3 className="text-lg font-semibold text-black/90">
+                  Recent Activity
+                </h3>
               </div>
 
               <div className="space-y-3">
@@ -332,8 +372,12 @@ export default function LadderMarketPage() {
                         {participant.username.substring(1, 3).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-black/90">{participant.username}</p>
-                        <p className="text-xs text-black/50 font-medium">Submitted ranking</p>
+                        <p className="text-sm font-semibold text-black/90">
+                          {participant.username}
+                        </p>
+                        <p className="text-xs text-black/50 font-medium">
+                          Submitted ranking
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -341,7 +385,10 @@ export default function LadderMarketPage() {
                         {participant.total_stake.toLocaleString()} KSH
                       </p>
                       <p className="text-xs text-black/40 font-medium">
-                        {new Date(participant.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(participant.timestamp).toLocaleTimeString(
+                          [],
+                          { hour: "2-digit", minute: "2-digit" },
+                        )}
                       </p>
                     </div>
                   </motion.div>
@@ -353,7 +400,6 @@ export default function LadderMarketPage() {
           {/* Sidebar */}
           <div className="lg:col-span-4">
             <div className="sticky top-6 space-y-6">
-
               {/* Bet Placement Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -363,13 +409,16 @@ export default function LadderMarketPage() {
               >
                 {/* Header */}
                 <div className="p-6 bg-black">
-                  <h3 className="text-xl font-semibold text-white mb-1">Place Your Bet</h3>
-                  <p className="text-sm text-white/60 font-medium">Submit your ranking</p>
+                  <h3 className="text-xl font-semibold text-white mb-1">
+                    Place Your Bet
+                  </h3>
+                  <p className="text-sm text-white/60 font-medium">
+                    Submit your ranking
+                  </p>
                 </div>
 
                 {/* Content */}
                 <div className="p-6 space-y-6">
-
                   {/* Chain Preview */}
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-3">
@@ -377,7 +426,10 @@ export default function LadderMarketPage() {
                     </span>
                     <div className="space-y-2">
                       {rankedItems.map((item, index) => (
-                        <div key={item.id} className="flex items-center gap-2 text-sm">
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-2 text-sm"
+                        >
                           <span className="w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center font-mono shrink-0">
                             {index + 1}
                           </span>
@@ -392,7 +444,9 @@ export default function LadderMarketPage() {
 
                   {/* Stake Input */}
                   <div className="space-y-3">
-                    <label className="text-sm font-semibold text-black/70">Your Stake</label>
+                    <label className="text-sm font-semibold text-black/70">
+                      Your Stake
+                    </label>
                     <div className="relative">
                       <input
                         type="number"
@@ -407,7 +461,9 @@ export default function LadderMarketPage() {
                       </span>
                     </div>
                     <div className="flex justify-between text-xs px-1">
-                      <span className="text-black/40 font-medium">Minimum buy-in</span>
+                      <span className="text-black/40 font-medium">
+                        Minimum buy-in
+                      </span>
                       <span className="font-mono font-semibold text-black/70">
                         {market.buy_in_amount.toLocaleString()} KSH
                       </span>
@@ -417,13 +473,17 @@ export default function LadderMarketPage() {
                   {/* Summary */}
                   <div className="pt-6 border-t border-black/5 space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-black/60 font-medium">Platform Fee (5%)</span>
+                      <span className="text-black/60 font-medium">
+                        Platform Fee (5%)
+                      </span>
                       <span className="font-mono font-semibold text-black/80">
                         {platformFee.toLocaleString()} KSH
                       </span>
                     </div>
                     <div className="flex justify-between text-base">
-                      <span className="text-black/90 font-semibold">Total Amount</span>
+                      <span className="text-black/90 font-semibold">
+                        Total Amount
+                      </span>
                       <span className="font-mono font-semibold text-black/90">
                         {totalAmount.toLocaleString()} KSH
                       </span>
@@ -434,12 +494,17 @@ export default function LadderMarketPage() {
                   <motion.button
                     onClick={handleSubmitRanking}
                     disabled={isSubmitting || !stakeAmount}
-                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${isSubmitting || !stakeAmount
-                      ? "bg-black/10 text-black/30 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
-                      }`}
-                    whileHover={!isSubmitting && stakeAmount ? { scale: 1.02 } : {}}
-                    whileTap={!isSubmitting && stakeAmount ? { scale: 0.98 } : {}}
+                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
+                      isSubmitting || !stakeAmount
+                        ? "bg-black/10 text-black/30 cursor-not-allowed"
+                        : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
+                    }`}
+                    whileHover={
+                      !isSubmitting && stakeAmount ? { scale: 1.02 } : {}
+                    }
+                    whileTap={
+                      !isSubmitting && stakeAmount ? { scale: 0.98 } : {}
+                    }
                   >
                     {isSubmitting ? (
                       <>
@@ -449,7 +514,7 @@ export default function LadderMarketPage() {
                     ) : (
                       <>
                         Submit Ranking
-                        <ArrowRight className="w-5 h-5" />
+                        <IconArrowRight className="w-5 h-5" />
                       </>
                     )}
                   </motion.button>
@@ -464,11 +529,15 @@ export default function LadderMarketPage() {
                 className="p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5"
               >
                 <div className="flex gap-3">
-                  <Shield className="w-5 h-5 text-black/60 shrink-0" />
+                  <IconShield className="w-5 h-5 text-black/60 shrink-0" />
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-black/90">How it works</p>
+                    <p className="text-sm font-semibold text-black/90">
+                      How it works
+                    </p>
                     <p className="text-xs text-black/60 font-medium leading-relaxed">
-                      Winners are those whose ranking matches the majority's consensus exactly. Prize pool split proportionally based on stakes.
+                      Winners are those whose ranking matches the majority's
+                      consensus exactly. Prize pool split proportionally based
+                      on stakes.
                     </p>
                   </div>
                 </div>
@@ -478,5 +547,5 @@ export default function LadderMarketPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

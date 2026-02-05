@@ -1,7 +1,8 @@
-'use client'
+"use client";
 
 import { motion } from "framer-motion";
-import { Quote, Star } from "lucide-react";
+import { IconInfoCircle, IconMessageShare, IconStar } from '@tabler/icons-react';
+
 import Marquee from "react-fast-marquee";
 
 const testimonials = [
@@ -60,7 +61,6 @@ function TestimonialCard({ testimonial, index }: any) {
   return (
     <div className="w-[380px] shrink-0 px-3">
       <div className="relative h-full min-h-[400px] justify-between p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
-
         {/* Subtle shine effect on hover */}
         <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
 
@@ -69,7 +69,7 @@ function TestimonialCard({ testimonial, index }: any) {
 
         <div className="relative z-10 flex flex-col h-full">
           {/* Quote Icon */}
-          <Quote className="w-8 h-8 text-black/10 mb-6" />
+          <IconMessageShare className="w-8 h-8 text-black/10 mb-6" />
 
           {/* Testimonial Text */}
           <p className="text-base md:text-lg text-black/70 font-medium leading-relaxed mb-6 flex-1">
@@ -119,15 +119,12 @@ function TestimonialCard({ testimonial, index }: any) {
 }
 
 export function Testimonials() {
-
   return (
     <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-white via-neutral-50/30 to-white overflow-hidden">
-
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,var(--tw-gradient-stops))] from-black/2 via-transparent to-transparent pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto">
-
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -137,7 +134,7 @@ export function Testimonials() {
           className="mb-16 md:mb-20 text-center space-y-4"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-black/5 rounded-full shadow-sm mb-4">
-            <Star className="w-4 h-4 text-black/60" />
+            <IconStar className="w-4 h-4 text-black/60" />
             <span className="text-sm font-semibold text-black/70">
               Trusted by Players
             </span>
@@ -147,7 +144,8 @@ export function Testimonials() {
             What Players Are Saying
           </h2>
           <p className="text-base md:text-lg text-black/60 font-medium max-w-2xl mx-auto leading-relaxed">
-            Join thousands of Kenyan bettors who've found their new home on Ante Social.
+            Join thousands of Kenyan bettors who've found their new home on Ante
+            Social.
           </p>
         </motion.div>
 

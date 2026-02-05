@@ -1,24 +1,11 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Trophy,
-  Lock,
-  Activity,
-  Gift,
-  Star,
-  Medal,
-  Clock,
-  Users,
-  DollarSign,
-  Target,
-  Check,
-  X,
-  ArrowRight
-} from "lucide-react";
+
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { mockUser } from "@/lib/mockData";
+import { IconActivity, IconArrowRight, IconAward, IconCheck, IconClock, IconCurrencyDollar, IconGift, IconStar, IconTarget, IconUsers, IconX } from '@tabler/icons-react';;
 
 const mockAchievements = {
   stats: {
@@ -26,7 +13,7 @@ const mockAchievements = {
     unlocked: 12,
     total: 28,
     earned: 3800,
-    streak: 7
+    streak: 7,
   },
   dailyBonus: [
     { day: 1, reward: 100, claimed: false },
@@ -38,34 +25,105 @@ const mockAchievements = {
     { day: 7, reward: 1000, claimed: false },
   ],
   inProgress: [
-    { title: "Win 10 Markets", description: "Win 10 different betting markets", progress: 60, reward: 500 },
-    { title: "7-Day Streak", description: "Login for 7 consecutive days", progress: 85, reward: 300 },
+    {
+      title: "Win 10 Markets",
+      description: "Win 10 different betting markets",
+      progress: 60,
+      reward: 500,
+    },
+    {
+      title: "7-Day Streak",
+      description: "Login for 7 consecutive days",
+      progress: 85,
+      reward: 300,
+    },
   ],
   unlocked: [
-    { title: "First Win", description: "Won your first market", category: "Beginner", reward: 100, date: "2 days ago" },
-    { title: "Early Bird", description: "Placed bet within first hour", category: "Time Based", reward: 150, date: "1 week ago" },
-    { title: "Lucky Day", description: "Won 3 markets in one day", category: "Performance", reward: 200, date: "3 days ago" },
-    { title: "High Roller", description: "Reached High Roller tier", category: "Prestige", reward: 500, date: "1 month ago" },
+    {
+      title: "First Win",
+      description: "Won your first market",
+      category: "Beginner",
+      reward: 100,
+      date: "2 days ago",
+    },
+    {
+      title: "Early Bird",
+      description: "Placed bet within first hour",
+      category: "Time Based",
+      reward: 150,
+      date: "1 week ago",
+    },
+    {
+      title: "Lucky Day",
+      description: "Won 3 markets in one day",
+      category: "Performance",
+      reward: 200,
+      date: "3 days ago",
+    },
+    {
+      title: "High Roller",
+      description: "Reached High Roller tier",
+      category: "Prestige",
+      reward: 500,
+      date: "1 month ago",
+    },
   ],
   locked: [
-    { title: "10-Win Streak", description: "Win 10 markets in a row", category: "Performance", reward: 1000 },
-    { title: "Big Spender", description: "Deposit over 100,000 KSH", category: "Risk", reward: 750 },
-    { title: "Social Butterfly", description: "Refer 5 friends", category: "Social", reward: 500 },
-    { title: "Perfect Week", description: "Win every bet for 7 days", category: "Performance", reward: 2000 },
-    { title: "Market Master", description: "Win 50 different markets", category: "Prestige", reward: 1500 },
-    { title: "Night Owl", description: "Place bet after midnight", category: "Time Based", reward: 100 },
-  ]
+    {
+      title: "10-Win Streak",
+      description: "Win 10 markets in a row",
+      category: "Performance",
+      reward: 1000,
+    },
+    {
+      title: "Big Spender",
+      description: "Deposit over 100,000 KSH",
+      category: "Risk",
+      reward: 750,
+    },
+    {
+      title: "Social Butterfly",
+      description: "Refer 5 friends",
+      category: "Social",
+      reward: 500,
+    },
+    {
+      title: "Perfect Week",
+      description: "Win every bet for 7 days",
+      category: "Performance",
+      reward: 2000,
+    },
+    {
+      title: "Market Master",
+      description: "Win 50 different markets",
+      category: "Prestige",
+      reward: 1500,
+    },
+    {
+      title: "Night Owl",
+      description: "Place bet after midnight",
+      category: "Time Based",
+      reward: 100,
+    },
+  ],
 };
 
 const getCategoryIcon = (category: string) => {
   switch (category.toLowerCase()) {
-    case 'beginner': return <Star className="w-4 h-4" />;
-    case 'time based': return <Clock className="w-4 h-4" />;
-    case 'performance': return <Trophy className="w-4 h-4" />;
-    case 'prestige': return <Medal className="w-4 h-4" />;
-    case 'risk': return <Activity className="w-4 h-4" />;
-    case 'social': return <Users className="w-4 h-4" />;
-    default: return <Target className="w-4 h-4" />;
+    case "beginner":
+      return <IconStar className="w-4 h-4" />;
+    case "time based":
+      return <IconClock className="w-4 h-4" />;
+    case "performance":
+      return <IconAward className="w-4 h-4" />;
+    case "prestige":
+      return <IconAward className="w-4 h-4" />;
+    case "risk":
+      return <IconActivity className="w-4 h-4" />;
+    case "social":
+      return <IconUsers className="w-4 h-4" />;
+    default:
+      return <IconTarget className="w-4 h-4" />;
   }
 };
 
@@ -81,7 +139,6 @@ export default function AchievementsPage() {
 
   return (
     <div className="space-y-8 pb-16">
-
       {/* Header */}
       <DashboardHeader
         user={mockUser}
@@ -91,7 +148,9 @@ export default function AchievementsPage() {
       {/* Visual Separator */}
       <div className="flex items-center gap-4 my-18">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Overview</h2>
+        <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+          Overview
+        </h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
@@ -108,11 +167,15 @@ export default function AchievementsPage() {
           <div className="p-6 relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-900/60">Cash Earned</p>
-                <p className="mt-2 text-3xl font-medium font-mono text-green-900">{mockAchievements.stats.balance} KSH</p>
+                <p className="text-sm font-medium text-green-900/60">
+                  Cash Earned
+                </p>
+                <p className="mt-2 text-3xl font-medium font-mono text-green-900">
+                  {mockAchievements.stats.balance} KSH
+                </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <DollarSign className="h-6 w-6 text-green-600" />
+                <IconCurrencyDollar className="h-6 w-6 text-green-600" />
               </div>
             </div>
           </div>
@@ -129,11 +192,16 @@ export default function AchievementsPage() {
           <div className="p-6 relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-amber-900/60">Unlocked</p>
-                <p className="mt-2 text-3xl font-medium font-mono text-amber-900">{mockAchievements.stats.unlocked}/{mockAchievements.stats.total}</p>
+                <p className="text-sm font-medium text-amber-900/60">
+                  Unlocked
+                </p>
+                <p className="mt-2 text-3xl font-medium font-mono text-amber-900">
+                  {mockAchievements.stats.unlocked}/
+                  {mockAchievements.stats.total}
+                </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <Trophy className="h-6 w-6 text-amber-600" />
+                <IconAward className="h-6 w-6 text-amber-600" />
               </div>
             </div>
           </div>
@@ -150,11 +218,15 @@ export default function AchievementsPage() {
           <div className="p-6 relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-900/60">Total Rewards</p>
-                <p className="mt-2 text-3xl font-medium font-mono text-blue-900">{mockAchievements.stats.earned} KSH</p>
+                <p className="text-sm font-medium text-blue-900/60">
+                  Total Rewards
+                </p>
+                <p className="mt-2 text-3xl font-medium font-mono text-blue-900">
+                  {mockAchievements.stats.earned} KSH
+                </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <Gift className="h-6 w-6 text-blue-600" />
+                <IconGift className="h-6 w-6 text-blue-600" />
               </div>
             </div>
           </div>
@@ -171,11 +243,15 @@ export default function AchievementsPage() {
           <div className="p-6 relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-900/60">Day Streak</p>
-                <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{mockAchievements.stats.streak}</p>
+                <p className="text-sm font-medium text-purple-900/60">
+                  Day Streak
+                </p>
+                <p className="mt-2 text-3xl font-medium font-mono text-purple-900">
+                  {mockAchievements.stats.streak}
+                </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <Activity className="h-6 w-6 text-purple-600" />
+                <IconActivity className="h-6 w-6 text-purple-600" />
               </div>
             </div>
           </div>
@@ -201,15 +277,20 @@ export default function AchievementsPage() {
                 transition={{ delay: 0.35 + index * 0.05 }}
                 className="flex flex-col items-center gap-2"
               >
-                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all ${day.claimed
-                  ? "bg-amber-100 border-amber-200 text-amber-700"
-                  : day.day === 1
-                    ? "bg-amber-500 border-amber-500 text-white shadow-lg scale-110"
-                    : "bg-white/40 backdrop-blur-sm border-black/10 text-black/40"
-                  }`}>
-                  {day.claimed ? <Check className="w-4 h-4" /> : day.day}
+                <div
+                  className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all ${
+                    day.claimed
+                      ? "bg-amber-100 border-amber-200 text-amber-700"
+                      : day.day === 1
+                        ? "bg-amber-500 border-amber-500 text-white shadow-lg scale-110"
+                        : "bg-white/40 backdrop-blur-sm border-black/10 text-black/40"
+                  }`}
+                >
+                  {day.claimed ? <IconCheck className="w-4 h-4" /> : day.day}
                 </div>
-                <span className={`text-xs font-mono font-semibold ${day.claimed || day.day === 1 ? "text-amber-600" : "text-black/40"}`}>
+                <span
+                  className={`text-xs font-mono font-semibold ${day.claimed || day.day === 1 ? "text-amber-600" : "text-black/40"}`}
+                >
                   {day.reward} KSH
                 </span>
               </motion.div>
@@ -222,7 +303,7 @@ export default function AchievementsPage() {
             whileTap={{ scale: 0.98 }}
             className="w-full md:w-auto bg-linear-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold px-8 py-2 rounded-xl shadow-lg flex items-center justify-center gap-2 cursor-pointer"
           >
-            <Gift className="w-5 h-5" />
+            <IconGift className="w-5 h-5" />
             Claim Daily Bonus
           </motion.button>
         </div>
@@ -233,7 +314,9 @@ export default function AchievementsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">In Progress</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+            In Progress
+          </h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -251,10 +334,16 @@ export default function AchievementsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-black/90 text-base">{item.title}</h4>
-                    <p className="text-sm text-black/60 font-medium mt-1">{item.description}</p>
+                    <h4 className="font-semibold text-black/90 text-base">
+                      {item.title}
+                    </h4>
+                    <p className="text-sm text-black/60 font-medium mt-1">
+                      {item.description}
+                    </p>
                   </div>
-                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">+{item.reward} KSH</span>
+                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">
+                    +{item.reward} KSH
+                  </span>
                 </div>
 
                 <div className="space-y-2">
@@ -262,11 +351,17 @@ export default function AchievementsPage() {
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${item.progress}%` }}
-                      transition={{ duration: 1, ease: "easeOut", delay: 0.5 + index * 0.05 }}
+                      transition={{
+                        duration: 1,
+                        ease: "easeOut",
+                        delay: 0.5 + index * 0.05,
+                      }}
                       className="h-full bg-black/80 rounded-full"
                     />
                   </div>
-                  <div className="text-xs font-mono font-semibold text-black/50">{item.progress}%</div>
+                  <div className="text-xs font-mono font-semibold text-black/50">
+                    {item.progress}%
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -279,7 +374,9 @@ export default function AchievementsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Unlocked</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+            Unlocked
+          </h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -297,14 +394,24 @@ export default function AchievementsPage() {
                   {getCategoryIcon(item.category)}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-black/90 text-base">{item.title}</h4>
-                  <p className="text-xs text-black/60 font-medium mt-1">{item.description}</p>
+                  <h4 className="font-semibold text-black/90 text-base">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs text-black/60 font-medium mt-1">
+                    {item.description}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">+{item.reward} KSH</span>
-                  <span className="text-xs font-semibold text-black/50">{item.category}</span>
+                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">
+                    +{item.reward} KSH
+                  </span>
+                  <span className="text-xs font-semibold text-black/50">
+                    {item.category}
+                  </span>
                 </div>
-                <span className="text-xs text-black/40 font-medium">Unlocked {item.date}</span>
+                <span className="text-xs text-black/40 font-medium">
+                  Unlocked {item.date}
+                </span>
               </div>
             </motion.div>
           ))}
@@ -316,7 +423,9 @@ export default function AchievementsPage() {
         {/* Visual Separator */}
         <div className="flex items-center gap-4 my-18">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Locked</h2>
+          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+            Locked
+          </h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
@@ -334,12 +443,20 @@ export default function AchievementsPage() {
                   {getCategoryIcon(item.category)}
                 </div>
                 <div className="mb-4">
-                  <h4 className="font-semibold text-black/60 text-base">{item.title}</h4>
-                  <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">{item.description}</p>
+                  <h4 className="font-semibold text-black/60 text-base">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">
+                    {item.description}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">+{item.reward} KSH</span>
-                  <span className="text-xs font-semibold text-black/30">{item.category}</span>
+                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">
+                    +{item.reward} KSH
+                  </span>
+                  <span className="text-xs font-semibold text-black/30">
+                    {item.category}
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -368,7 +485,7 @@ export default function AchievementsPage() {
                 onClick={() => setShowBonusModal(false)}
                 className="absolute top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5 text-black/60" />
+                <IconX className="w-5 h-5 text-black/60" />
               </button>
 
               <div className="text-center space-y-6">
@@ -378,18 +495,22 @@ export default function AchievementsPage() {
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                   className="w-20 h-20 mx-auto rounded-full bg-linear-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg"
                 >
-                  <Gift className="w-10 h-10 text-white" />
+                  <IconGift className="w-10 h-10 text-white" />
                 </motion.div>
 
                 <div>
-                  <h3 className="text-2xl font-semibold text-black/90 mb-2">Daily Bonus</h3>
+                  <h3 className="text-2xl font-semibold text-black/90 mb-2">
+                    Daily Bonus
+                  </h3>
                   <p className="text-base text-black/60 font-medium">
                     Claim your reward for today
                   </p>
                 </div>
 
                 <div className="p-6 rounded-2xl bg-linear-to-br from-amber-50 to-yellow-50 border border-amber-200">
-                  <p className="text-sm font-semibold text-amber-900/60 mb-2">Today's Reward</p>
+                  <p className="text-sm font-semibold text-amber-900/60 mb-2">
+                    Today's Reward
+                  </p>
                   <p className="text-4xl font-semibold font-mono text-amber-900">
                     100 <span className="text-2xl">KSH</span>
                   </p>
@@ -402,7 +523,7 @@ export default function AchievementsPage() {
                   className="w-full bg-black text-white font-semibold py-2 rounded-xl shadow-lg hover:bg-black/90 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Claim Reward
-                  <ArrowRight className="w-5 h-5" />
+                  <IconArrowRight className="w-5 h-5" />
                 </motion.button>
 
                 <p className="text-xs text-black/40 font-medium">

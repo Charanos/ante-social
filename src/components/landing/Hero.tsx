@@ -1,8 +1,15 @@
-'use client'
+"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowRight, TrendingUp, Users, Activity } from "lucide-react";
+import {
+  IconActivity,
+  IconArrowRight,
+  IconPhoto,
+  IconTrendingUp,
+  IconUsers,
+} from "@tabler/icons-react";
 
 // Enhanced Wave Background with smoother animations
 function WaveBackground() {
@@ -43,9 +50,12 @@ function WaveBackground() {
         ctx!.moveTo(0, height);
 
         for (let x = 0; x <= width; x += 3) {
-          const y = this.yOffset +
-            Math.sin(x * this.frequency + time * this.speed + this.phase) * this.amplitude +
-            Math.sin(x * this.frequency * 2 + time * this.speed * 0.7) * (this.amplitude * 0.3);
+          const y =
+            this.yOffset +
+            Math.sin(x * this.frequency + time * this.speed + this.phase) *
+              this.amplitude +
+            Math.sin(x * this.frequency * 2 + time * this.speed * 0.7) *
+              (this.amplitude * 0.3);
 
           if (x === 0) {
             ctx!.moveTo(x, y);
@@ -99,8 +109,12 @@ function WaveBackground() {
         ctx!.beginPath();
         ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         const gradient = ctx!.createRadialGradient(
-          this.x, this.y, 0,
-          this.x, this.y, this.size * 2
+          this.x,
+          this.y,
+          0,
+          this.x,
+          this.y,
+          this.size * 2,
         );
         gradient.addColorStop(0, `rgba(0, 0, 0, ${this.alpha})`);
         gradient.addColorStop(1, `rgba(0, 0, 0, 0)`);
@@ -138,10 +152,10 @@ function WaveBackground() {
       ctx.clearRect(0, 0, width, height);
 
       // Draw waves
-      waves.forEach(wave => wave.draw(time));
+      waves.forEach((wave) => wave.draw(time));
 
       // Draw particles
-      particles.forEach(particle => {
+      particles.forEach((particle) => {
         particle.update(time);
         particle.draw();
       });
@@ -163,8 +177,9 @@ function WaveBackground() {
       className="absolute inset-0 w-full h-full pointer-events-none"
       style={{
         zIndex: 0,
-        maskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)',
-        WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 90%)'
+        maskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+        WebkitMaskImage:
+          "linear-gradient(to bottom, black 40%, transparent 90%)",
       }}
     />
   );
@@ -173,9 +188,14 @@ function WaveBackground() {
 // Floating stats component
 function FloatingStats() {
   const stats = [
-    { icon: Users, label: "Active Players", value: "12.5K", delay: 0.2 },
-    { icon: TrendingUp, label: "Total Volume", value: "KSH 8.2M", delay: 0.4 },
-    { icon: Activity, label: "Markets Live", value: "342", delay: 0.6 }
+    { icon: IconUsers, label: "Active Players", value: "12.5K", delay: 0.2 },
+    {
+      icon: IconTrendingUp,
+      label: "Total Volume",
+      value: "KSH 8.2M",
+      delay: 0.4,
+    },
+    { icon: IconActivity, label: "Markets Live", value: "342", delay: 0.6 },
   ];
 
   return (
@@ -185,14 +205,22 @@ function FloatingStats() {
           key={stat.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: stat.delay, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{
+            delay: stat.delay,
+            duration: 0.6,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
           whileHover={{ scale: 1.05, y: -2 }}
           className="flex items-center gap-3 px-4 md:px-6 py-3 bg-white/80 backdrop-blur-sm border border-black/5 rounded-full shadow-sm hover:shadow-md transition-shadow"
         >
           <stat.icon className="w-4 h-4 text-black/60" />
           <div className="flex flex-col items-start">
-            <span className="text-xs text-black/50 font-medium">{stat.label}</span>
-            <span className="font-mono text-sm md:text-base font-semibold text-black">{stat.value}</span>
+            <span className="text-xs text-black/50 font-medium">
+              {stat.label}
+            </span>
+            <span className="font-mono text-sm md:text-base font-semibold text-black">
+              {stat.value}
+            </span>
           </div>
         </motion.div>
       ))}
@@ -206,8 +234,14 @@ export function Hero() {
   const mouseY = useMotionValue(0);
 
   const springConfig = { stiffness: 150, damping: 30 };
-  const rotateX = useSpring(useTransform(mouseY, [-300, 300], [5, -5]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-5, 5]), springConfig);
+  const rotateX = useSpring(
+    useTransform(mouseY, [-300, 300], [5, -5]),
+    springConfig,
+  );
+  const rotateY = useSpring(
+    useTransform(mouseX, [-300, 300], [-5, 5]),
+    springConfig,
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -232,8 +266,14 @@ export function Hero() {
       <WaveBackground />
 
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-50/40 via-white to-white" style={{ zIndex: -10 }} />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-black/5 blur-[120px] rounded-full pointer-events-none" style={{ zIndex: -5 }} />
+      <div
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-neutral-50/40 via-white to-white"
+        style={{ zIndex: -10 }}
+      />
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-black/5 blur-[120px] rounded-full pointer-events-none"
+        style={{ zIndex: -5 }}
+      />
 
       {/* Ambient floating orbs */}
       <motion.div
@@ -246,7 +286,7 @@ export function Hero() {
         transition={{
           duration: 8,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
         style={{ zIndex: -5 }}
       />
@@ -261,7 +301,7 @@ export function Hero() {
           duration: 10,
           repeat: Infinity,
           ease: "easeInOut",
-          delay: 1
+          delay: 1,
         }}
         style={{ zIndex: -5 }}
       />
@@ -273,15 +313,17 @@ export function Hero() {
         transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="relative max-w-5xl mx-auto space-y-8 pt-16 z-10"
       >
-
         <motion.h1
           className="text-5xl md:text-8xl font-medium tracking-tight text-black leading-[1.1]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
         >
-          The only social betting{" "}
-          <br className="hidden md:block" />
+          The only social betting <br className="hidden md:block" />
           <span className="relative inline-block">
             platform you need
             <motion.span
@@ -323,7 +365,7 @@ export function Hero() {
               transition={{ duration: 0.6 }}
             />
             <span className="relative z-10">Get Started for Free</span>
-            <ArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
+            <IconArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
           </motion.button>
 
           <motion.button
@@ -367,8 +409,6 @@ export function Hero() {
       </motion.div> */}
       </motion.div>
 
-
-
       {/* Enhanced Dashboard Mockup */}
       <motion.div
         initial={{ opacity: 0, y: 100, scale: 0.95 }}
@@ -384,25 +424,23 @@ export function Hero() {
           style={{
             rotateX: mounted ? rotateX : 0,
             rotateY: mounted ? rotateY : 0,
-            transformStyle: "preserve-3d"
+            transformStyle: "preserve-3d",
           }}
           whileHover={{ scale: 1.01 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
           {/* Dashboard Preview */}
-          <div className="relative bg-linear-to-br from-neutral-50 to-white p-8 md:p-12">
-            {/* Mockup placeholder - replace with actual dashboard image */}
-            <div className="aspect-video bg-linear-to-br from-neutral-100 to-neutral-50 rounded-xl border border-black/5 flex items-center justify-center overflow-hidden">
-              <div className="text-center space-y-8 p-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-full text-sm font-mono">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                  </span>
-                  Dashboard Preview
-                </div>
-                <p className="text-neutral-600 font-medium">Your betting command center</p>
-              </div>
+          <div className="relative bg-linear-to-br from-neutral-50 to-white p-4 md:p-6">
+            <div className="relative aspect-video rounded-xl border border-black/5 overflow-hidden shadow-2xl">
+              <Image
+                src="/dashboard-mockup.png"
+                alt="Dashboard Preview"
+                fill
+                className="object-cover object-top"
+                priority
+              />
+              {/* Optional: Add a subtle overlay for depth */}
+              <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
 
@@ -422,8 +460,9 @@ export function Hero() {
         <motion.div
           className="absolute -bottom-20 left-0 right-0 h-32 opacity-30 blur-2xl"
           style={{
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)",
-            transform: "scaleY(-1)"
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)",
+            transform: "scaleY(-1)",
           }}
         />
 
@@ -432,30 +471,28 @@ export function Hero() {
           className="absolute -top-4 -right-4 w-24 h-24 bg-black/5 rounded-full blur-2xl"
           animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3]
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 4,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
         <motion.div
           className="absolute -bottom-6 -left-6 w-32 h-32 bg-black/5 rounded-full blur-2xl"
           animate={{
             scale: [1, 1.3, 1],
-            opacity: [0.2, 0.4, 0.2]
+            opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
             duration: 5,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 1
+            delay: 1,
           }}
         />
       </motion.div>
-
-
     </section>
   );
 }

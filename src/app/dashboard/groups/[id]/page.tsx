@@ -3,45 +3,39 @@
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  TrendingUp,
-  Settings,
-  UserPlus,
-  MoreVertical,
-  Shield,
-  Bell,
-  BellOff,
-  LogOut,
-  CheckCircle2,
-  AlertCircle,
-  Sparkles,
-  Crown,
-  ArrowRight,
-  ScanEye,
-  Plus,
-  Save,
-  X,
-  DollarSign,
-  Brain,
-  ShieldAlert,
-  Users,
-  Activity,
-  Trophy,
-  Calendar,
-  Clock,
-  LoaderPinwheel,
-  ArrowLeft,
-  Share2,
-  UserMinus,
-  UserCog,
-  Award,
-  Medal,
-  Zap,
-  Target,
-  ChevronDown,
-  Edit3,
-  Info,
-  TrendingDown,
-} from "lucide-react";
+  IconActivity,
+  IconAlertCircle,
+  IconArrowRight,
+  IconAward,
+  IconBell,
+  IconCalendar,
+  IconCheck,
+  IconCircleCheckFilled,
+  IconClock,
+  IconCopy,
+  IconCrown,
+  IconCurrencyDollar,
+  IconDeviceFloppy,
+  IconDots,
+  IconEdit,
+  IconEye,
+  IconInfoCircle,
+  IconLoader2,
+  IconLogout,
+  IconPhoto,
+  IconSettings,
+  IconShare2,
+  IconShield,
+  IconStar,
+  IconTrendingDown,
+  IconTrendingUp,
+  IconTrophy,
+  IconUser,
+  IconUserMinus,
+  IconUserPlus,
+  IconUsers,
+  IconX,
+} from "@tabler/icons-react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -53,6 +47,7 @@ import { mockUser, mockMyBets } from "@/lib/mockData";
 import { isGroupMember, joinGroup, leaveGroup } from "@/lib/membership";
 import Link from "next/link";
 import Image from "next/image";
+import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 
 // Types
 interface GroupMember {
@@ -220,15 +215,15 @@ const mockGroupDetails: UnifiedGroup = {
 
 const ActivityIcon = ({ type }: { type: string }) => {
   const icons = {
-    bet_settled: <CheckCircle2 className="w-4 h-4 text-green-600" />,
-    bet_created: <Sparkles className="w-4 h-4 text-blue-600" />,
-    member_joined: <UserPlus className="w-4 h-4 text-purple-600" />,
-    bet_participated: <TrendingUp className="w-4 h-4 text-orange-600" />,
-    bet_disputed: <AlertCircle className="w-4 h-4 text-red-600" />,
+    bet_settled: <IconCircleCheckFilled className="w-4 h-4 text-green-600" />,
+    bet_created: <IconStar className="w-4 h-4 text-blue-600" />,
+    member_joined: <IconUserPlus className="w-4 h-4 text-purple-600" />,
+    bet_participated: <IconTrendingUp className="w-4 h-4 text-orange-600" />,
+    bet_disputed: <IconAlertCircle className="w-4 h-4 text-red-600" />,
   };
   return (
     icons[type as keyof typeof icons] || (
-      <Activity className="w-4 h-4 text-black/40" />
+      <IconActivity className="w-4 h-4 text-black/40" />
     )
   );
 };
@@ -287,7 +282,7 @@ const PlaceBetSlip = ({
           className="h-full rounded-3xl bg-linear-to-br from-green-500 to-green-600 text-white shadow-2xl flex flex-col items-center justify-center text-center space-y-6 p-10"
         >
           <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <CheckCircle2 className="w-14 h-14" />
+            <IconCircleCheckFilled className="w-14 h-14" />
           </div>
           <div>
             <h3 className="text-2xl font-semibold mb-2">Bet Confirmed!</h3>
@@ -313,7 +308,7 @@ const PlaceBetSlip = ({
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10">
-                  <ScanEye className="w-5 h-5" />
+                  <IconEye className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="text-[10px] font-semibold text-white/50 uppercase tracking-widest">
@@ -353,11 +348,11 @@ const PlaceBetSlip = ({
                       consensus
                     </p>
                   </div>
-                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+                  <IconCircleCheckFilled className="w-6 h-6 text-green-600" />
                 </div>
               ) : (
                 <p className="text-base text-black/40 italic flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
+                  <IconAlertCircle className="w-4 h-4" />
                   No option selected
                 </p>
               )}
@@ -391,7 +386,7 @@ const PlaceBetSlip = ({
               </div>
               {stakeAmount && parseFloat(stakeAmount) < 50 && (
                 <p className="text-xs text-red-600 flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5" />
+                  <IconAlertCircle className="w-3.5 h-3.5" />
                   Minimum stake is 50 KSH
                 </p>
               )}
@@ -435,12 +430,12 @@ const PlaceBetSlip = ({
             >
               {isSubmittingBet ? (
                 <>
-                  <LoaderPinwheel className="w-5 h-5 animate-spin" />
+                  <IconLoader2 className="w-5 h-5 animate-spin" />
                   Processing...
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-5 h-5" />
+                  <IconCircleCheckFilled className="w-5 h-5" />
                   Confirm & Place Bet
                 </>
               )}
@@ -449,7 +444,7 @@ const PlaceBetSlip = ({
             {/* Info */}
             <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
               <div className="flex gap-3">
-                <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <IconInfoCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-blue-900">
                     How it works
@@ -509,7 +504,11 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
   };
 
   const StatusIcon =
-    bet.status === "won" ? Trophy : bet.status === "lost" ? X : Clock;
+    bet.status === "won"
+      ? IconTrophy
+      : bet.status === "lost"
+        ? IconX
+        : IconClock;
 
   return (
     <motion.div
@@ -539,7 +538,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
             onClick={onClose}
             className="p-2 hover:bg-white/10 rounded-full transition-colors"
           >
-            <X className="w-4 h-4 text-white/70" />
+            <IconX className="w-4 h-4 text-white/70" />
           </button>
         </div>
         <div className="relative z-10">
@@ -563,7 +562,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
               {bet.outcome || bet.details || "Selection"}
             </p>
             <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
-              <TrendingDown className="w-5 h-5 text-black/40" />
+              <IconTrendingDown className="w-5 h-5 text-black/40" />
             </div>
           </div>
         </div>
@@ -582,8 +581,8 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                 onClick={() => setIsEditing(true)}
                 className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
               >
-                <Edit3 className="w-3 h-3" />
-                Edit
+                <IconEdit className="w-3 h-3" />
+                IconEdit
               </button>
             )}
           </div>
@@ -609,10 +608,10 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                   className="py-3 bg-black text-white rounded-xl font-semibold text-sm hover:bg-neutral-900 transition-all flex items-center justify-center gap-2"
                 >
                   {isSaving ? (
-                    <LoaderPinwheel className="w-4 h-4 animate-spin" />
+                    <IconLoader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      <Save className="w-4 h-4" />
+                      <IconDeviceFloppy className="w-4 h-4" />
                       Save
                     </>
                   )}
@@ -648,14 +647,14 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
           </p>
         </div>
 
-        {/* Edit Time Warning */}
+        {/* IconEdit Time Warning */}
         {canEdit && (
           <div className="py-2 px-4 rounded-xl bg-amber-50 border border-amber-200">
             <div className="flex gap-3">
-              <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <IconClock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-amber-900">
-                  Edit Window Active
+                  IconEdit Window Active
                 </p>
                 <p className="text-xs text-amber-700 leading-relaxed">
                   You have {timeRemaining} minute
@@ -844,7 +843,7 @@ export default function GroupPage() {
       try {
         await navigator.share({
           title: `Join ${group.name} on Ante Social`,
-          text: `Check out this group: ${group.description}`,
+          text: `IconCheck out this group: ${group.description}`,
           url: url,
         });
         toast.success("Shared Successfully", "Invitation sent!");
@@ -866,7 +865,7 @@ export default function GroupPage() {
           setShowMemberActions(null);
           toast.success(
             "Member Removed",
-            "User has been removed from the group",
+            "IconUser has been removed from the group",
           );
         } catch (error) {
           toast.error("Error", "Failed to remove member");
@@ -884,7 +883,7 @@ export default function GroupPage() {
       setTimeout(() => {
         try {
           setShowMemberActions(null);
-          toast.success("Member Promoted", "User is now a group admin");
+          toast.success("Member Promoted", "IconUser is now a group admin");
         } catch (error) {
           toast.error("Error", "Failed to promote member");
         } finally {
@@ -901,7 +900,7 @@ export default function GroupPage() {
       setTimeout(() => {
         try {
           setShowMemberActions(null);
-          toast.success("Member Demoted", "User is now a regular member");
+          toast.success("Member Demoted", "IconUser is now a regular member");
         } catch (error) {
           toast.error("Error", "Failed to demote member");
         } finally {
@@ -941,7 +940,7 @@ export default function GroupPage() {
       />
 
       {/* Group Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl">
+          <div className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl">
         {group.image && (
           <div className="absolute inset-0">
             <Image
@@ -965,7 +964,7 @@ export default function GroupPage() {
                       {group.name}
                     </h1>
                     {!group.isPublic && (
-                      <Shield className="w-5 h-5 text-white/50" />
+                      <IconShield className="w-5 h-5 text-white/50" />
                     )}
                   </div>
                   <p className="text-base text-white/70 font-normal max-w-2xl my-3 leading-relaxed">
@@ -978,7 +977,7 @@ export default function GroupPage() {
                     {group.category}
                   </span>
                   <span className="text-sm text-white/50 font-normal flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
+                    <IconCalendar className="w-3.5 h-3.5" />
                     Created{" "}
                     {group.created_at
                       ? new Date(group.created_at).toLocaleDateString()
@@ -986,7 +985,7 @@ export default function GroupPage() {
                   </span>
                   {isMember && (
                     <span className="text-sm text-green-400 font-normal flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <IconCircleCheckFilled className="w-3.5 h-3.5" />
                       Member
                     </span>
                   )}
@@ -994,7 +993,7 @@ export default function GroupPage() {
                     onClick={handleInvite}
                     className="text-sm text-orange-500/80 hover:text-orange-500 font-normal flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <Share2 className="w-3.5 h-3.5" />
+                    <IconShare2 className="w-3.5 h-3.5" />
                     Invite
                   </button>
                 </div>
@@ -1014,9 +1013,9 @@ export default function GroupPage() {
                     className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold uppercase tracking-wider text-[10px] hover:bg-neutral-100 transition-all shadow-lg cursor-pointer flex items-center gap-2 disabled:opacity-70"
                   >
                     {isJoining ? (
-                      <LoaderPinwheel className="w-3 h-3 animate-spin" />
+                      <IconLoader2 className="w-3 h-3 animate-spin" />
                     ) : (
-                      <UserPlus className="w-3 h-3" />
+                      <IconUserPlus className="w-3 h-3" />
                     )}
                     {isJoining ? "Joining..." : "Join Group"}
                   </motion.button>
@@ -1028,7 +1027,7 @@ export default function GroupPage() {
                   onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                   className="p-2.5 hover:bg-white/10 rounded-xl transition-colors cursor-pointer backdrop-blur-sm border border-white/10"
                 >
-                  <MoreVertical className="w-5 h-5 text-white/80" />
+                  <IconDots className="w-5 h-5 text-white/80" />
                 </button>
 
                 <AnimatePresence>
@@ -1045,11 +1044,11 @@ export default function GroupPage() {
                         className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer disabled:opacity-50"
                       >
                         {isActionLoading ? (
-                          <LoaderPinwheel className="w-4 h-4 animate-spin" />
+                          <IconLoader2 className="w-4 h-4 animate-spin" />
                         ) : isNotificationsOn ? (
-                          <BellOff className="w-4 h-4" />
+                          <IconBell className="w-4 h-4" />
                         ) : (
-                          <Bell className="w-4 h-4" />
+                          <IconBell className="w-4 h-4" />
                         )}
                         {isActionLoading
                           ? "Updating..."
@@ -1061,8 +1060,8 @@ export default function GroupPage() {
                       {(isPlatformAdmin || isGroupAdmin) && (
                         <Link href={`/dashboard/groups/${groupId}/settings`}>
                           <button className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5">
-                            <Settings className="w-4 h-4" />
-                            Group Settings
+                            <IconSettings className="w-4 h-4" />
+                            Group IconSettings
                           </button>
                         </Link>
                       )}
@@ -1073,9 +1072,9 @@ export default function GroupPage() {
                         className="w-full px-4 py-3 text-left text-sm font-normal text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5 disabled:opacity-50"
                       >
                         {isActionLoading ? (
-                          <LoaderPinwheel className="w-4 h-4 animate-spin" />
+                          <IconLoader2 className="w-4 h-4 animate-spin" />
                         ) : (
-                          <LogOut className="w-4 h-4" />
+                          <IconLogout className="w-4 h-4" />
                         )}
                         {isActionLoading ? "Leaving..." : "Leave Group"}
                       </button>
@@ -1121,13 +1120,13 @@ export default function GroupPage() {
           <div className="flex items-center justify-between">
             <SectionHeading
               title="Featured Market"
-              icon={<TrendingUp className="w-4 h-4 text-green-500" />}
+              icon={<IconTrendingUp className="w-4 h-4 text-green-500" />}
             />
             <Link
               href={`/dashboard/markets`}
               className="text-sm font-medium text-black/40 hover:text-black/60 transition-colors flex items-center gap-1 cursor-pointer"
             >
-              Browse All <ArrowRight className="w-4 h-4" />
+              Browse All <IconArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -1143,13 +1142,13 @@ export default function GroupPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <div className="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
                           <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-widest flex items-center gap-1.5">
-                            <Activity className="w-3 h-3" />
+                            <IconActivity className="w-3 h-3" />
                             Active Market
                           </span>
                         </div>
                         <div className="px-2.5 py-1 rounded-full bg-black/5 border border-black/10">
                           <span className="text-[10px] font-semibold text-black/40 uppercase tracking-widest flex items-center gap-1.5">
-                            <Clock className="w-3 h-3" />
+                            <IconClock className="w-3 h-3" />
                             {group.activeBets && group.activeBets[0]
                               ? timeUntil(group.activeBets[0].endsAt)
                               : "2h 15m"}{" "}
@@ -1158,7 +1157,7 @@ export default function GroupPage() {
                         </div>
                         <div className="px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
                           <span className="text-[10px] font-semibold text-green-700 uppercase tracking-widest flex items-center gap-1.5">
-                            <DollarSign className="w-3 h-3" />
+                            <IconCurrencyDollar className="w-3 h-3" />
                             Min: 50 KSH
                           </span>
                         </div>
@@ -1224,7 +1223,7 @@ export default function GroupPage() {
                               : "bg-white border-black/5 hover:border-black/10 hover:shadow-md",
                           )}
                         >
-                          <div className="relative h-24 -mx-6 -mt-6 mb-4 overflow-hidden">
+                            <div className="relative h-24 -mx-6 -mt-6 mb-4 overflow-hidden">
                             <Image
                               src={option.image}
                               alt={option.text}
@@ -1234,7 +1233,7 @@ export default function GroupPage() {
                             <div className="absolute inset-0 bg-black/40 transition-opacity group-hover:bg-black/30" />
                             {isSelected && (
                               <div className="absolute top-3 right-3 bg-blue-500 rounded-full p-1 z-10">
-                                <CheckCircle2 className="w-3 h-3 text-white" />
+                                <IconCircleCheckFilled className="w-3 h-3 text-white" />
                               </div>
                             )}
                           </div>
@@ -1312,91 +1311,23 @@ export default function GroupPage() {
 
       {/* Leaderboard Section */}
       {isMember && leaderboard.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          <SectionHeading
-            title="Group Leaderboard"
-            icon={<Trophy className="w-4 h-4 text-amber-500" />}
-          />
-
-          <div className="relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-sm border border-black/5 shadow-lg">
-            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-amber-500/50 to-transparent" />
-
-            <div className="divide-y divide-black/5">
-              {leaderboard.map((member, index) => {
-                const RankIcon =
-                  index === 0
-                    ? Crown
-                    : index === 1
-                      ? Medal
-                      : index === 2
-                        ? Award
-                        : Trophy;
-                const rankColor =
-                  index === 0
-                    ? "text-amber-500"
-                    : index === 1
-                      ? "text-slate-400"
-                      : index === 2
-                        ? "text-orange-500"
-                        : "text-black/40";
-
-                return (
-                  <motion.div
-                    key={member.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="p-5 hover:bg-white/40 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-3">
-                        <RankIcon className={cn("w-5 h-5", rankColor)} />
-                        <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-base font-semibold text-black/70 group-hover:scale-110 transition-transform">
-                          {member.avatar}
-                        </div>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-base font-medium text-black/90 truncate">
-                            {member.username}
-                          </h4>
-                          {member.role === "admin" && (
-                            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-[10px] font-medium text-orange-700 uppercase tracking-wider">
-                              <Crown className="w-3 h-3" />
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs mt-1">
-                          <span className="text-black/50 font-normal">
-                            {member.totalBets} bets
-                          </span>
-                          <span className="text-black/20">•</span>
-                          <span className="text-green-600 font-medium">
-                            {member.winRate}% win rate
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="text-right">
-                        <p className="text-sm font-semibold font-mono text-black/90">
-                          {(member.totalWinnings / 1000).toFixed(0)}K
-                        </p>
-                        <p className="text-[10px] text-black/40 font-medium">
-                          KSH
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
+        <LeaderboardSection
+          title="Group Leaderboard"
+          icon={<IconAward className="w-4 h-4 text-amber-500" />}
+          data={leaderboard.map((member, index) => ({
+            rank: index + 1,
+            username: member.username,
+            avatar: (
+              <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-black/70">
+                {member.avatar}
+              </div>
+            ),
+            totalWinnings: member.totalWinnings,
+            winRate: member.winRate,
+            activeBets: member.totalBets,
+            trend: "same",
+          }))}
+        />
       )}
 
       <SectionHeading title="Group Activity" />
@@ -1404,17 +1335,22 @@ export default function GroupPage() {
       {/* Tabs */}
       <div className="flex items-center gap-6 border-b border-black/5">
         {[
-          { id: "feed", label: "Activity Feed", icon: Activity, count: null },
+          {
+            id: "feed",
+            label: "Activity Feed",
+            icon: IconActivity,
+            count: null,
+          },
           {
             id: "bets",
             label: "Active Bets",
-            icon: Trophy,
+            icon: IconAward,
             count: mockMyBets.length,
           },
           {
             id: "members",
             label: "Members",
-            icon: Users,
+            icon: IconUsers,
             count: group.member_count,
           },
         ].map((tab) => (
@@ -1563,7 +1499,7 @@ export default function GroupPage() {
                     className="p-8 rounded-3xl bg-linear-to-br from-neutral-50 to-white border border-black/5 text-center space-y-4"
                   >
                     <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto">
-                      <Activity className="w-8 h-8 text-black/20" />
+                      <IconActivity className="w-8 h-8 text-black/20" />
                     </div>
                     <div>
                       <p className="font-medium text-black/60 mb-2">
@@ -1612,11 +1548,11 @@ export default function GroupPage() {
                       )}
                     >
                       {bet.status === "won" ? (
-                        <CheckCircle2 className="w-5 h-5" />
+                        <IconCircleCheckFilled className="w-5 h-5" />
                       ) : bet.status === "lost" ? (
-                        <X className="w-5 h-5" />
+                        <IconX className="w-5 h-5" />
                       ) : (
-                        <TrendingUp className="w-5 h-5" />
+                        <IconTrendingUp className="w-5 h-5" />
                       )}
                     </div>
                     <div>
@@ -1673,7 +1609,7 @@ export default function GroupPage() {
                     className="p-8 rounded-3xl bg-linear-to-br from-neutral-50 to-white border border-black/5 text-center space-y-4"
                   >
                     <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto">
-                      <Trophy className="w-8 h-8 text-black/20" />
+                      <IconAward className="w-8 h-8 text-black/20" />
                     </div>
                     <div>
                       <p className="font-medium text-black/60 mb-2">
@@ -1719,7 +1655,7 @@ export default function GroupPage() {
                       typeof memberItem === "string"
                         ? ({
                             id: memberItem,
-                            username: `User ${memberItem}`,
+                            username: `IconUser ${memberItem}`,
                             avatar: "U",
                             role: "member",
                             joined: group.created_at,
@@ -1751,7 +1687,7 @@ export default function GroupPage() {
                                 </h4>
                                 {member.role === "admin" && (
                                   <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-[10px] font-medium text-orange-700 uppercase tracking-wider">
-                                    <Crown className="w-3 h-3" />
+                                    <IconCrown className="w-3 h-3" />
                                     Admin
                                   </span>
                                 )}
@@ -1785,7 +1721,7 @@ export default function GroupPage() {
                                   }
                                   className="p-2  hover:bg-black/5 rounded-lg transition-colors cursor-pointer"
                                 >
-                                  <MoreVertical className="w-4 h-4 text-black/40" />
+                                  <IconDots className="w-4 h-4 text-black/40" />
                                 </button>
 
                                 <AnimatePresence>
@@ -1804,7 +1740,7 @@ export default function GroupPage() {
                                           disabled={isActionLoading}
                                           className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer"
                                         >
-                                          <UserCog className="w-4 h-4" />
+                                          <IconSettings className="w-4 h-4" />
                                           Promote to Admin
                                         </button>
                                       ) : (
@@ -1815,7 +1751,7 @@ export default function GroupPage() {
                                           disabled={isActionLoading}
                                           className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer"
                                         >
-                                          <UserMinus className="w-4 h-4" />
+                                          <IconUserMinus className="w-4 h-4" />
                                           Remove Admin
                                         </button>
                                       )}
@@ -1826,7 +1762,7 @@ export default function GroupPage() {
                                         disabled={isActionLoading}
                                         className="w-full px-4 py-3 text-left text-sm font-normal text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5"
                                       >
-                                        <UserMinus className="w-4 h-4" />
+                                        <IconUserMinus className="w-4 h-4" />
                                         Remove from Group
                                       </button>
                                     </motion.div>

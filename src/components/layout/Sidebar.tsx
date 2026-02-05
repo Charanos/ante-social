@@ -3,21 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home,
-  Wallet,
-  Users,
-  User,
-  Bell,
-  LogOut,
-  Shield,
-  ChevronLeft,
-  ChevronRight,
-  TrendingUp,
-  Settings,
-  HelpCircle,
-  FileText,
-  ChevronDown,
-} from "lucide-react";
+  IconChevronDown,
+  IconLogout,
+  IconPhoto,
+  IconSettings,
+} from "@tabler/icons-react";
+import {
+  IoNotificationsOutline,
+  IoChevronBackOutline,
+  IoChevronForwardOutline,
+  IoHomeOutline,
+  IoPeopleOutline,
+  IoPersonOutline,
+  IoShieldOutline,
+  IoTrendingUpOutline,
+  IoWalletOutline,
+} from "react-icons/io5";
+
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -33,11 +35,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { title: "Home", url: "/dashboard", icon: Home },
+  { title: "Home", url: "/dashboard", icon: IoHomeOutline },
   {
     title: "Markets",
     url: "/dashboard/markets",
-    icon: TrendingUp,
+    icon: IoTrendingUpOutline,
     children: [
       { title: "All Markets", url: "/dashboard/markets" },
       { title: "My Bets", url: "/dashboard/markets/my-bets" },
@@ -47,17 +49,21 @@ const navItems: NavItem[] = [
   {
     title: "Groups",
     url: "/dashboard/groups",
-    icon: Users,
+    icon: IoPeopleOutline,
     children: [
       { title: "My Groups", url: "/dashboard/groups" },
       { title: "Discover", url: "/dashboard/groups/discover" },
       { title: "Create Group", url: "/dashboard/groups/create" },
     ],
   },
-  { title: "Wallet", url: "/dashboard/wallet", icon: Wallet },
-  { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
-  { title: "Profile", url: "/dashboard/profile", icon: User },
-  { title: "Admin", url: "/dashboard/admin", icon: Shield },
+  { title: "Wallet", url: "/dashboard/wallet", icon: IoWalletOutline },
+  {
+    title: "Notifications",
+    url: "/dashboard/notifications",
+    icon: IoNotificationsOutline,
+  },
+  { title: "Profile", url: "/dashboard/profile", icon: IoPersonOutline },
+  { title: "Admin", url: "/dashboard/admin", icon: IoShieldOutline },
 ];
 
 interface SidebarProps {
@@ -105,9 +111,9 @@ export function Sidebar({
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {collapsed ? (
-          <ChevronRight className="h-3 w-3" />
+          <IoChevronForwardOutline className="h-3 w-3" />
         ) : (
-          <ChevronLeft className="h-3 w-3" />
+          <IoChevronBackOutline className="h-3 w-3" />
         )}
       </button>
 
@@ -207,7 +213,7 @@ export function Sidebar({
                           >
                             {item.title}
                           </span>
-                          <ChevronDown
+                          <IconChevronDown
                             className={cn(
                               "h-4 w-4 text-gray-400 transition-transform duration-200",
                               isExpanded ? "rotate-180" : "",
@@ -268,7 +274,7 @@ export function Sidebar({
 
                     {/* Tooltip for collapsed mode */}
                     {collapsed && (
-                      <div className="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all z-50 shadow-xl translate-x-[-10px] group-hover:translate-x-0">
+                      <div className="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all z-50 shadow-xl -translate-x-2.5 group-hover:translate-x-0">
                         {item.title}
                         {isNotifications &&
                           unreadCount > 0 &&
@@ -330,7 +336,7 @@ export function Sidebar({
             )}
             title={collapsed ? "Settings" : undefined}
           >
-            <Settings className="h-5 w-5" />
+            <IconSettings className="h-5 w-5" />
             {!collapsed && (
               <span className="ml-3 text-sm font-medium">Settings</span>
             )}
@@ -345,7 +351,7 @@ export function Sidebar({
             )}
             title={collapsed ? "Sign Out" : undefined}
           >
-            <LogOut className="h-5 w-5 transition-colors group-hover:text-red-600" />
+            <IconLogout className="h-5 w-5 transition-colors group-hover:text-red-600" />
             {!collapsed && (
               <span className="ml-3 text-sm font-medium">Sign Out</span>
             )}

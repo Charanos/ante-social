@@ -1,22 +1,43 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { useParams } from "next/navigation"
-import { Users, Clock, TrendingUp, CheckCircle2, Shield, ArrowRight, Activity, ScanEye, LogOut, BellOff, HelpCircle, EyeOff, PartyPopper } from "lucide-react"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
-import { useToast } from "@/hooks/useToast"
-import { mockUser } from "@/lib/mockData"
-import Image from "next/image"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useParams } from "next/navigation";
+import {
+  IconActivity,
+  IconArrowRight,
+  IconBell,
+  IconChevronRight,
+  IconCircleCheckFilled,
+  IconClock,
+  IconEye,
+  IconEyeOff,
+  IconHelpCircle,
+  IconLayoutGrid,
+  IconLogout,
+  IconMoodSmile,
+  IconPhoto,
+  IconShield,
+  IconTrendingUp,
+  IconUsers,
+} from "@tabler/icons-react";
+
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { useToast } from "@/hooks/useToast";
+import { mockUser } from "@/lib/mockData";
+import Image from "next/image";
 
 // Mock reflex market data
 const getMockReflexMarket = (id: string) => ({
   id,
   title: "First Reaction: Group Chat Dilemma",
-  description: "When suddenly added to a new group chat, what will the majority do in the first 5 seconds? Predict the crowd's instinct!",
-  image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop",
+  description:
+    "When suddenly added to a new group chat, what will the majority do in the first 5 seconds? Predict the crowd's instinct!",
+  image:
+    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop",
   category: "Reflex",
-  scenario: "You're suddenly added to a group chat with 50 unknown people. What's your FIRST reaction?",
+  scenario:
+    "You're suddenly added to a group chat with 50 unknown people. What's your FIRST reaction?",
   market_type: "reflex",
   buy_in_amount: 500,
   total_pool: 98750,
@@ -24,79 +45,134 @@ const getMockReflexMarket = (id: string) => ({
   status: "active",
   close_date: new Date(Date.now() + 2700000), // 45 min
   options: [
-    { id: "opt1", option_text: "Leave immediately", icon: LogOut, votes: 45, percentage: 29 },
-    { id: "opt2", option_text: "Mute notifications", icon: BellOff, votes: 52, percentage: 33 },
-    { id: "opt3", option_text: "Ask \"who's this?\"", icon: HelpCircle, votes: 38, percentage: 24 },
-    { id: "opt4", option_text: "Pretend not seeing it", icon: EyeOff, votes: 15, percentage: 10 },
-    { id: "opt5", option_text: "Participate for fun", icon: PartyPopper, votes: 6, percentage: 4 }
+    {
+      id: "opt1",
+      option_text: "Leave immediately",
+      icon: IconLogout,
+      votes: 45,
+      percentage: 29,
+    },
+    {
+      id: "opt2",
+      option_text: "Mute notifications",
+      icon: IconBell,
+      votes: 52,
+      percentage: 33,
+    },
+    {
+      id: "opt3",
+      option_text: 'Ask "who\'s this?"',
+      icon: IconHelpCircle,
+      votes: 38,
+      percentage: 24,
+    },
+    {
+      id: "opt4",
+      option_text: "Pretend not seeing it",
+      icon: IconEyeOff,
+      votes: 15,
+      percentage: 10,
+    },
+    {
+      id: "opt5",
+      option_text: "Participate for fun",
+      icon: IconMoodSmile,
+      votes: 6,
+      percentage: 4,
+    },
   ],
   participants: [
-    { username: "@quick_exit", total_stake: 1000, timestamp: new Date(Date.now() - 1200000) },
-    { username: "@social_master", total_stake: 2500, timestamp: new Date(Date.now() - 900000) },
-    { username: "@mute_gang", total_stake: 1500, timestamp: new Date(Date.now() - 600000) },
-    { username: "@shy_one", total_stake: 500, timestamp: new Date(Date.now() - 300000) }
-  ]
-})
+    {
+      username: "@quick_exit",
+      total_stake: 1000,
+      timestamp: new Date(Date.now() - 1200000),
+    },
+    {
+      username: "@social_master",
+      total_stake: 2500,
+      timestamp: new Date(Date.now() - 900000),
+    },
+    {
+      username: "@mute_gang",
+      total_stake: 1500,
+      timestamp: new Date(Date.now() - 600000),
+    },
+    {
+      username: "@shy_one",
+      total_stake: 500,
+      timestamp: new Date(Date.now() - 300000),
+    },
+  ],
+});
 
 export default function ReflexMarketPage() {
-  const params = useParams()
-  const toast = useToast()
-  const marketId = params.id as string
+  const params = useParams();
+  const toast = useToast();
+  const marketId = params.id as string;
 
-  const market = getMockReflexMarket(marketId)
+  const market = getMockReflexMarket(marketId);
 
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
-  const [stakeAmount, setStakeAmount] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [countdown, setCountdown] = useState(5)
-  const [isCountingDown, setIsCountingDown] = useState(false)
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [stakeAmount, setStakeAmount] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  const [isCountingDown, setIsCountingDown] = useState(false);
 
   useEffect(() => {
     if (isCountingDown && countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
     } else if (countdown === 0) {
-      setIsCountingDown(false)
-      setCountdown(5)
+      setIsCountingDown(false);
+      setCountdown(5);
     }
-  }, [countdown, isCountingDown])
+  }, [countdown, isCountingDown]);
 
   const handlePlaceBet = () => {
-    if (!selectedOption || !stakeAmount || parseFloat(stakeAmount) < market.buy_in_amount) {
-      toast.error("Invalid Bet", `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`)
-      return
+    if (
+      !selectedOption ||
+      !stakeAmount ||
+      parseFloat(stakeAmount) < market.buy_in_amount
+    ) {
+      toast.error(
+        "Invalid Bet",
+        `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`,
+      );
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     setTimeout(() => {
-      const selectedOptionText = market.options.find((o: any) => o.id === selectedOption)?.option_text
-      toast.success("Prediction Locked!", `You predicted "${selectedOptionText}"`)
-      setIsSubmitting(false)
-    }, 1000)
-  }
+      const selectedOptionText = market.options.find(
+        (o: any) => o.id === selectedOption,
+      )?.option_text;
+      toast.success(
+        "Prediction Locked!",
+        `You predicted "${selectedOptionText}"`,
+      );
+      setIsSubmitting(false);
+    }, 1000);
+  };
 
   const getTimeRemaining = () => {
-    const diff = market.close_date.getTime() - Date.now()
-    const minutes = Math.floor(diff / (1000 * 60))
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-    return `${minutes}m ${seconds}s`
-  }
+    const diff = market.close_date.getTime() - Date.now();
+    const minutes = Math.floor(diff / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return `${minutes}m ${seconds}s`;
+  };
 
-  const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0
-  const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0
+  const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
+  const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
-
         {/* Dashboard Header */}
         <DashboardHeader user={mockUser} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
-
             {/* Hero Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -147,35 +223,47 @@ export default function ReflexMarketPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Pool</span>
+                      <IconTrendingUp className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Pool
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {market.total_pool.toLocaleString()}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">KSH</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      KSH
+                    </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <div className="flex items-center gap-2 mb-2">
-                      <Users className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Players</span>
+                      <IconUsers className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Players
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {market.participant_count}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">Active</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      Active
+                    </p>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">Closes In</span>
+                      <IconClock className="w-4 h-4 text-black/40" />
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                        Closes In
+                      </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
                       {getTimeRemaining()}
                     </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">Remaining</p>
+                    <p className="text-xs font-medium text-black/40 mt-1">
+                      Remaining
+                    </p>
                   </div>
                 </div>
               </div>
@@ -190,15 +278,17 @@ export default function ReflexMarketPage() {
             >
               <div className="flex items-start gap-4">
                 <div className="shrink-0 w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <Activity className="w-6 h-6 text-amber-600" />
+                  <IconActivity className="w-6 h-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-amber-900/80 uppercase tracking-wider mb-2">The Scenario</h3>
+                  <h3 className="text-sm font-semibold text-amber-900/80 uppercase tracking-wider mb-2">
+                    The Scenario
+                  </h3>
                   <p className="text-lg font-medium text-amber-900 leading-relaxed">
                     {market.scenario}
                   </p>
                   <p className="text-sm text-amber-700 mt-3 font-medium flex items-center gap-2">
-                    <Activity className="w-4 h-4" />
+                    <IconActivity className="w-4 h-4" />
                     You have 5 seconds to decide. What will the majority choose?
                   </p>
                 </div>
@@ -208,14 +298,16 @@ export default function ReflexMarketPage() {
             {/* Visual Separator */}
             <div className="flex items-center gap-4 my-18">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Quick Reactions</h2>
+              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                Quick Reactions
+              </h2>
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
             </div>
 
             {/* Options */}
             <div className="space-y-4 my-18">
               {market.options.map((option: any, index: number) => {
-                const isSelected = selectedOption === option.id
+                const isSelected = selectedOption === option.id;
 
                 return (
                   <motion.div
@@ -224,10 +316,11 @@ export default function ReflexMarketPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 + index * 0.05 }}
                     onClick={() => setSelectedOption(option.id)}
-                    className={`group relative p-5 rounded-2xl cursor-pointer transition-all duration-300 ${isSelected
-                      ? "bg-white/60 backdrop-blur-xl border-2 border-black/20 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)]"
-                      : "bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 hover:border-black/10 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]"
-                      }`}
+                    className={`group relative p-5 rounded-2xl cursor-pointer transition-all duration-300 ${
+                      isSelected
+                        ? "bg-white/60 backdrop-blur-xl border-2 border-black/20 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)]"
+                        : "bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 hover:border-black/10 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       <div className="shrink-0 w-12 h-12 rounded-xl bg-black/5 flex items-center justify-center">
@@ -243,7 +336,7 @@ export default function ReflexMarketPage() {
                               {option.percentage}%
                             </span>
                             {isSelected && (
-                              <CheckCircle2 className="w-5 h-5 text-black" />
+                              <IconCircleCheckFilled className="w-5 h-5 text-black" />
                             )}
                           </div>
                         </div>
@@ -254,25 +347,34 @@ export default function ReflexMarketPage() {
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${option.percentage}%` }}
-                              transition={{ duration: 1, ease: "easeOut", delay: 0.3 + index * 0.05 }}
-                              className={`h-full rounded-full ${isSelected ? 'bg-black/80' : 'bg-black/40'
-                                }`}
+                              transition={{
+                                duration: 1,
+                                ease: "easeOut",
+                                delay: 0.3 + index * 0.05,
+                              }}
+                              className={`h-full rounded-full ${
+                                isSelected ? "bg-black/80" : "bg-black/40"
+                              }`}
                             />
                           </div>
-                          <span className="text-xs text-black/40 font-medium">{option.votes} predictions</span>
+                          <span className="text-xs text-black/40 font-medium">
+                            {option.votes} predictions
+                          </span>
                         </div>
                       </div>
                     </div>
                   </motion.div>
-                )
+                );
               })}
             </div>
 
             {/* Recent Activity */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <ScanEye className="w-5 h-5 text-black/40" />
-                <h3 className="text-lg font-semibold text-black/90">Recent Activity</h3>
+                <IconEye className="w-5 h-5 text-black/40" />
+                <h3 className="text-lg font-semibold text-black/90">
+                  Recent Activity
+                </h3>
               </div>
 
               <div className="space-y-3">
@@ -289,8 +391,12 @@ export default function ReflexMarketPage() {
                         {participant.username.substring(1, 3).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-black/90">{participant.username}</p>
-                        <p className="text-xs text-black/50 font-medium">Made prediction</p>
+                        <p className="text-sm font-semibold text-black/90">
+                          {participant.username}
+                        </p>
+                        <p className="text-xs text-black/50 font-medium">
+                          Made prediction
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -298,7 +404,10 @@ export default function ReflexMarketPage() {
                         {participant.total_stake.toLocaleString()} KSH
                       </p>
                       <p className="text-xs text-black/40 font-medium">
-                        {new Date(participant.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(participant.timestamp).toLocaleTimeString(
+                          [],
+                          { hour: "2-digit", minute: "2-digit" },
+                        )}
                       </p>
                     </div>
                   </motion.div>
@@ -310,7 +419,6 @@ export default function ReflexMarketPage() {
           {/* Sidebar */}
           <div className="lg:col-span-4">
             <div className="sticky top-6 space-y-6">
-
               {/* Bet Placement Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -320,13 +428,16 @@ export default function ReflexMarketPage() {
               >
                 {/* Header */}
                 <div className="p-6 bg-black">
-                  <h3 className="text-xl font-semibold text-white mb-1">Place Your Bet</h3>
-                  <p className="text-sm text-white/60 font-medium">Predict the crowd's reflex</p>
+                  <h3 className="text-xl font-semibold text-white mb-1">
+                    Place Your Bet
+                  </h3>
+                  <p className="text-sm text-white/60 font-medium">
+                    Predict the crowd's reflex
+                  </p>
                 </div>
 
                 {/* Content */}
                 <div className="p-6 space-y-6">
-
                   {/* Selected Option */}
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-2">
@@ -336,19 +447,27 @@ export default function ReflexMarketPage() {
                       {selectedOption ? (
                         <>
                           <span className="text-base font-semibold text-black/90">
-                            {market.options.find((o: any) => o.id === selectedOption)?.option_text}
+                            {
+                              market.options.find(
+                                (o: any) => o.id === selectedOption,
+                              )?.option_text
+                            }
                           </span>
-                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                          <IconCircleCheckFilled className="w-4 h-4 text-green-600" />
                         </>
                       ) : (
-                        <span className="text-base text-black/40 italic">No option selected</span>
+                        <span className="text-base text-black/40 italic">
+                          No option selected
+                        </span>
                       )}
                     </div>
                   </div>
 
                   {/* Stake Input */}
                   <div className="space-y-3">
-                    <label className="text-sm font-semibold text-black/70">Your Stake</label>
+                    <label className="text-sm font-semibold text-black/70">
+                      Your Stake
+                    </label>
                     <div className="relative">
                       <input
                         type="number"
@@ -363,7 +482,9 @@ export default function ReflexMarketPage() {
                       </span>
                     </div>
                     <div className="flex justify-between text-xs px-1">
-                      <span className="text-black/40 font-medium">Minimum buy-in</span>
+                      <span className="text-black/40 font-medium">
+                        Minimum buy-in
+                      </span>
                       <span className="font-mono font-semibold text-black/70">
                         {market.buy_in_amount.toLocaleString()} KSH
                       </span>
@@ -373,13 +494,17 @@ export default function ReflexMarketPage() {
                   {/* Summary */}
                   <div className="pt-6 border-t border-black/5 space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-black/60 font-medium">Platform Fee (5%)</span>
+                      <span className="text-black/60 font-medium">
+                        Platform Fee (5%)
+                      </span>
                       <span className="font-mono font-semibold text-black/80">
                         {platformFee.toLocaleString()} KSH
                       </span>
                     </div>
                     <div className="flex justify-between text-base">
-                      <span className="text-black/90 font-semibold">Total Amount</span>
+                      <span className="text-black/90 font-semibold">
+                        Total Amount
+                      </span>
                       <span className="font-mono font-semibold text-black/90">
                         {totalAmount.toLocaleString()} KSH
                       </span>
@@ -390,12 +515,21 @@ export default function ReflexMarketPage() {
                   <motion.button
                     onClick={handlePlaceBet}
                     disabled={isSubmitting || !selectedOption || !stakeAmount}
-                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${isSubmitting || !selectedOption || !stakeAmount
-                      ? "bg-black/10 text-black/30 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
-                      }`}
-                    whileHover={!isSubmitting && selectedOption && stakeAmount ? { scale: 1.02 } : {}}
-                    whileTap={!isSubmitting && selectedOption && stakeAmount ? { scale: 0.98 } : {}}
+                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
+                      isSubmitting || !selectedOption || !stakeAmount
+                        ? "bg-black/10 text-black/30 cursor-not-allowed"
+                        : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
+                    }`}
+                    whileHover={
+                      !isSubmitting && selectedOption && stakeAmount
+                        ? { scale: 1.02 }
+                        : {}
+                    }
+                    whileTap={
+                      !isSubmitting && selectedOption && stakeAmount
+                        ? { scale: 0.98 }
+                        : {}
+                    }
                   >
                     {isSubmitting ? (
                       <>
@@ -405,7 +539,7 @@ export default function ReflexMarketPage() {
                     ) : (
                       <>
                         Confirm Bet
-                        <ArrowRight className="w-5 h-5" />
+                        <IconArrowRight className="w-5 h-5" />
                       </>
                     )}
                   </motion.button>
@@ -420,11 +554,15 @@ export default function ReflexMarketPage() {
                 className="p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5"
               >
                 <div className="flex gap-3">
-                  <Shield className="w-5 h-5 text-black/60 shrink-0" />
+                  <IconShield className="w-5 h-5 text-black/60 shrink-0" />
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-black/90">How it works</p>
+                    <p className="text-sm font-semibold text-black/90">
+                      How it works
+                    </p>
                     <p className="text-xs text-black/60 font-medium leading-relaxed">
-                      Winners split the prize pool proportionally based on their stake. All payouts are processed instantly when the market closes.
+                      Winners split the prize pool proportionally based on their
+                      stake. All payouts are processed instantly when the market
+                      closes.
                     </p>
                   </div>
                 </div>
@@ -434,5 +572,5 @@ export default function ReflexMarketPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

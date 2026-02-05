@@ -1,7 +1,8 @@
 "use client";
 
-import { Clock } from "lucide-react";
+
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { IconClock, IconPhoto } from '@tabler/icons-react';;;
 
 interface VibeMarketCardProps {
   title: string;
@@ -20,17 +21,13 @@ export function VibeMarketCard({
   pool,
   bets,
   timeLeft,
-  tag
+  tag,
 }: VibeMarketCardProps) {
   return (
     <DashboardCard className="max-w-md w-full p-0 border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-300">
       {/* Image Section */}
       <div className="relative h-56 w-full bg-neutral-100">
-        <img
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover"
-        />
+        <img src={image} alt={title} className="h-full w-full object-cover" />
         <div className="absolute top-4 left-4 px-3 py-1 bg-black/70 rounded-full shadow-sm backdrop-blur-sm">
           <span className="text-xs font-medium text-white">{tag}</span>
         </div>
@@ -50,7 +47,7 @@ export function VibeMarketCard({
 
         {/* Time Left */}
         <div className="flex items-center gap-2 text-neutral-600 text-sm font-medium mb-4">
-          <Clock className="w-4 h-4" />
+          <IconClock className="w-4 h-4" />
           <span>Closes in {timeLeft}</span>
         </div>
 
@@ -61,7 +58,9 @@ export function VibeMarketCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-black font-medium font-mono">{pool}</span>
-            <span className="text-neutral-500 text-sm font-medium">{bets} bets</span>
+            <span className="text-neutral-500 text-sm font-medium">
+              {bets} bets
+            </span>
           </div>
 
           <button className="bg-black text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors cursor-pointer">

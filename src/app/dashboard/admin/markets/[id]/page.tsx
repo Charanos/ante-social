@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { ArrowLeft, Users, DollarSign, Calendar, Clock, TrendingUp, Award, Flag, Edit, Share2, BarChart3, Image as ImageIcon } from "lucide-react"
-import { useRouter } from "next/navigation"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
-import Link from "next/link"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { IconAward, IconCalendar, IconChartBar, IconClock, IconCurrencyDollar, IconEdit, IconLayoutGrid, IconShare2, IconTrendingUp, IconUsers } from '@tabler/icons-react';;
+
+import { useRouter } from "next/navigation";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import Link from "next/link";
 
 export default function ViewMarketPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   const marketData = {
     id: 1,
     title: "What's your vibe right now?",
-    description: "Pick the one that matches your brain's current state. Trust your gut — your mood might just make you money today.",
+    description:
+      "Pick the one that matches your brain's current state. Trust your gut — your mood might just make you money today.",
     status: "active",
     totalPool: 20,
     participants: 1,
@@ -25,45 +27,61 @@ export default function ViewMarketPage() {
     createdDate: "Nov 28, 2025",
     tags: ["memes", "mood", "wager", "bet"],
     outcomes: [
-      { id: 1, name: "Barely holding it together", bets: 0, amount: 0, percentage: 0 },
+      {
+        id: 1,
+        name: "Barely holding it together",
+        bets: 0,
+        amount: 0,
+        percentage: 0,
+      },
       { id: 2, name: "Not bad actually", bets: 1, amount: 20, percentage: 100 },
-      { id: 3, name: "I thrive off of chaos", bets: 0, amount: 0, percentage: 0 },
-      { id: 4, name: "Does it matter anymore?", bets: 0, amount: 0, percentage: 0 },
-      { id: 5, name: "I'm fine...", bets: 0, amount: 0, percentage: 0 }
-    ]
-  }
+      {
+        id: 3,
+        name: "I thrive off of chaos",
+        bets: 0,
+        amount: 0,
+        percentage: 0,
+      },
+      {
+        id: 4,
+        name: "Does it matter anymore?",
+        bets: 0,
+        amount: 0,
+        percentage: 0,
+      },
+      { id: 5, name: "I'm fine...", bets: 0, amount: 0, percentage: 0 },
+    ],
+  };
 
   const getStatusStyles = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-50 text-green-700 border-green-200"
+        return "bg-green-50 text-green-700 border-green-200";
       case "cancelled":
-        return "bg-red-50 text-red-700 border-red-200"
+        return "bg-red-50 text-red-700 border-red-200";
       case "closed":
-        return "bg-neutral-100 text-neutral-700 border-neutral-200"
+        return "bg-neutral-100 text-neutral-700 border-neutral-200";
       default:
-        return "bg-neutral-100 text-neutral-700 border-neutral-200"
+        return "bg-neutral-100 text-neutral-700 border-neutral-200";
     }
-  }
+  };
 
   return (
     <div className="min-h-screen pb-8">
       <div className="max-w-full mx-auto px-6">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader
-          subtitle="View market information and betting activity"
-        />
+        <DashboardHeader subtitle="View market information and betting activity" />
 
         <div className="flex items-center justify-end gap-2 -mt-16 mb-8 relative z-10 px-2">
           <Link href={`/dashboard/admin/markets/${marketData.id}/edit`}>
             <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
-              <Edit className="w-4 h-4" />
-              Edit Market
+              <IconEdit className="w-4 h-4" />
+              IconEdit Market
             </button>
           </Link>
           <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">
-            <Share2 className="w-4 h-4" />
+            <IconShare2 className="w-4 h-4" />
             Share
           </button>
         </div>
@@ -77,8 +95,12 @@ export default function ViewMarketPage() {
         >
           <div className="flex items-start justify-between mb-6">
             <div className="flex-1">
-              <h2 className="text-2xl font-medium text-neutral-900 mb-3">{marketData.title}</h2>
-              <p className="text-neutral-600 leading-relaxed mb-4">{marketData.description}</p>
+              <h2 className="text-2xl font-medium text-neutral-900 mb-3">
+                {marketData.title}
+              </h2>
+              <p className="text-neutral-600 leading-relaxed mb-4">
+                {marketData.description}
+              </p>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
@@ -92,7 +114,9 @@ export default function ViewMarketPage() {
                 ))}
               </div>
             </div>
-            <span className={`px-4 py-2 text-sm font-medium rounded-full border ${getStatusStyles(marketData.status)}`}>
+            <span
+              className={`px-4 py-2 text-sm font-medium rounded-full border ${getStatusStyles(marketData.status)}`}
+            >
               {marketData.status.toUpperCase()}
             </span>
           </div>
@@ -101,33 +125,50 @@ export default function ViewMarketPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-neutral-100">
             <div className="p-4 rounded-lg bg-green-50/50 border border-green-100">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-4 h-4 text-green-600" />
-                <span className="text-xs font-medium text-green-700">Total Pool</span>
+                <IconCurrencyDollar className="w-4 h-4 text-green-600" />
+                <span className="text-xs font-medium text-green-700">
+                  Total Pool
+                </span>
               </div>
-              <p className="text-2xl font-medium text-green-900">${marketData.totalPool.toFixed(2)}</p>
+              <p className="text-2xl font-medium text-green-900">
+                ${marketData.totalPool.toFixed(2)}
+              </p>
             </div>
 
             <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-100">
               <div className="flex items-center gap-2 mb-2">
-                <Users className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-medium text-blue-700">Participants</span>
+                <IconUsers className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-medium text-blue-700">
+                  Participants
+                </span>
               </div>
-              <p className="text-2xl font-medium text-blue-900">{marketData.participants}</p>
-              <p className="text-xs text-blue-600 mt-1">Min: {marketData.minParticipants} / Max: {marketData.maxParticipants}</p>
+              <p className="text-2xl font-medium text-blue-900">
+                {marketData.participants}
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Min: {marketData.minParticipants} / Max:{" "}
+                {marketData.maxParticipants}
+              </p>
             </div>
 
             <div className="p-4 rounded-lg bg-purple-50/50 border border-purple-100">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-purple-600" />
-                <span className="text-xs font-medium text-purple-700">Buy-in</span>
+                <IconTrendingUp className="w-4 h-4 text-purple-600" />
+                <span className="text-xs font-medium text-purple-700">
+                  Buy-in
+                </span>
               </div>
-              <p className="text-2xl font-medium text-purple-900">{marketData.buyIn} MP</p>
+              <p className="text-2xl font-medium text-purple-900">
+                {marketData.buyIn} MP
+              </p>
             </div>
 
             <div className="p-4 rounded-lg bg-orange-50/50 border border-orange-100">
               <div className="flex items-center gap-2 mb-2">
-                <Award className="w-4 h-4 text-orange-600" />
-                <span className="text-xs font-medium text-orange-700">Status</span>
+                <IconAward className="w-4 h-4 text-orange-600" />
+                <span className="text-xs font-medium text-orange-700">
+                  Status
+                </span>
               </div>
               <p className="text-lg font-medium text-orange-900">Pending</p>
             </div>
@@ -141,37 +182,47 @@ export default function ViewMarketPage() {
           transition={{ delay: 0.2 }}
           className="bg-white rounded-xl border border-neutral-200 p-8 mb-6"
         >
-          <h3 className="text-lg font-medium text-neutral-900 mb-6">Timeline</h3>
+          <h3 className="text-lg font-medium text-neutral-900 mb-6">
+            Timeline
+          </h3>
 
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <div className="p-2 rounded-lg bg-neutral-100">
-                <Calendar className="w-5 h-5 text-neutral-600" />
+                <IconCalendar className="w-5 h-5 text-neutral-600" />
               </div>
               <div>
                 <p className="text-sm font-medium text-neutral-900">Created</p>
-                <p className="text-sm text-neutral-600">{marketData.createdDate}</p>
+                <p className="text-sm text-neutral-600">
+                  {marketData.createdDate}
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="p-2 rounded-lg bg-red-100">
-                <Clock className="w-5 h-5 text-red-600" />
+                <IconClock className="w-5 h-5 text-red-600" />
               </div>
               <div>
                 <p className="text-sm font-medium text-neutral-900">Closes</p>
-                <p className="text-sm text-neutral-600">{marketData.closeDate}</p>
+                <p className="text-sm text-neutral-600">
+                  {marketData.closeDate}
+                </p>
                 <p className="text-xs text-red-600 mt-0.5">in 7 hours</p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <div className="p-2 rounded-lg bg-blue-100">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+                <IconChartBar className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-neutral-900">Settlement</p>
-                <p className="text-sm text-neutral-600">{marketData.settlementDate}</p>
+                <p className="text-sm font-medium text-neutral-900">
+                  Settlement
+                </p>
+                <p className="text-sm text-neutral-600">
+                  {marketData.settlementDate}
+                </p>
                 <p className="text-xs text-blue-600 mt-0.5">in 8 hours</p>
               </div>
             </div>
@@ -187,7 +238,9 @@ export default function ViewMarketPage() {
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-medium text-neutral-900">Outcomes</h3>
-            <span className="text-sm text-neutral-600">{marketData.outcomes.length} options</span>
+            <span className="text-sm text-neutral-600">
+              {marketData.outcomes.length} options
+            </span>
           </div>
 
           <div className="space-y-8">
@@ -197,11 +250,16 @@ export default function ViewMarketPage() {
                 className="p-6 rounded-lg border border-neutral-200 bg-neutral-50/30 hover:bg-neutral-50 transition-all"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-base font-medium text-neutral-900">{outcome.name}</h4>
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${outcome.percentage > 0
-                    ? 'bg-green-100 text-green-700 border border-green-200'
-                    : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
-                    }`}>
+                  <h4 className="text-base font-medium text-neutral-900">
+                    {outcome.name}
+                  </h4>
+                  <span
+                    className={`px-3 py-1 text-xs font-medium rounded-full ${
+                      outcome.percentage > 0
+                        ? "bg-green-100 text-green-700 border border-green-200"
+                        : "bg-neutral-100 text-neutral-600 border border-neutral-200"
+                    }`}
+                  >
                     {outcome.percentage}%
                   </span>
                 </div>
@@ -217,10 +275,16 @@ export default function ViewMarketPage() {
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-4">
                     <span className="text-neutral-600">
-                      <span className="font-medium text-neutral-900">{outcome.bets}</span> bet(s)
+                      <span className="font-medium text-neutral-900">
+                        {outcome.bets}
+                      </span>{" "}
+                      bet(s)
                     </span>
                     <span className="text-neutral-600">
-                      <span className="font-medium text-neutral-900">${outcome.amount.toFixed(2)}</span> staked
+                      <span className="font-medium text-neutral-900">
+                        ${outcome.amount.toFixed(2)}
+                      </span>{" "}
+                      staked
                     </span>
                   </div>
                 </div>
@@ -230,5 +294,5 @@ export default function ViewMarketPage() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

@@ -5,49 +5,46 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import {
-  Settings,
-  Shield,
-  Users,
-  Globe,
-  Lock,
-  Save,
-  Trash2,
-  ChevronLeft,
-  Image as ImageIcon,
-  CheckCircle2,
-  Gavel,
-  Upload,
-  X,
-  AlertCircle,
-  DollarSign,
-  TrendingUp,
-  Edit3,
-  Check,
-  RefreshCw,
-  Bell,
-  Eye,
-  EyeOff,
-  Copy,
-  ExternalLink,
-  Trophy,
-  LoaderPinwheel,
-  Search,
-} from "lucide-react";
+  IconActivity,
+  IconAlertCircle,
+  IconAward,
+  IconBolt,
+  IconCheck,
+  IconCircleCheckFilled,
+  IconClipboard,
+  IconClock,
+  IconCopy,
+  IconCurrencyDollar,
+  IconDeviceFloppy,
+  IconDots,
+  IconEdit,
+  IconEye,
+  IconExternalLink,
+  IconFilter,
+  IconGavel,
+  IconGlobe,
+  IconLayoutGrid,
+  IconLoader2,
+  IconLock,
+  IconPhoto,
+  IconSearch,
+  IconSettings,
+  IconShield,
+  IconTrash,
+  IconTrendingUp,
+  IconUpload,
+  IconUsers,
+  IconX,
+} from "@tabler/icons-react";
+
 import { cn } from "@/lib/utils";
 import { mockGroups, mockUser } from "@/lib/mockData";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
-import {
-  ClipboardList,
-  Activity as ActivityIcon,
-  Swords,
-  Timer,
-  Calendar,
-} from "lucide-react";
 
-// Settings Sections
+// IconSettings Sections
 type SettingsSection = "general" | "privacy" | "roles" | "markets";
 
 export default function GroupSettingsPage() {
@@ -121,25 +118,25 @@ export default function GroupSettingsPage() {
     {
       id: "general",
       label: "General",
-      icon: Settings,
+      icon: IconSettings,
       description: "Basic group information",
     },
     {
       id: "privacy",
       label: "Privacy",
-      icon: Lock,
+      icon: IconLock,
       description: "Access control settings",
     },
     {
       id: "roles",
       label: "Permissions",
-      icon: Shield,
+      icon: IconShield,
       description: "Member capabilities",
     },
     {
       id: "markets",
       label: "Markets",
-      icon: TrendingUp,
+      icon: IconTrendingUp,
       description: "Manage betting markets",
     },
   ];
@@ -202,15 +199,15 @@ export default function GroupSettingsPage() {
   const getTypeStyles = (type: string) => {
     switch (type.toLowerCase()) {
       case "poll":
-        return { label: "Poll", color: "blue", icon: ClipboardList };
+        return { label: "Poll", color: "blue", icon: IconClipboard };
       case "reflex":
-        return { label: "Reflex", color: "amber", icon: ActivityIcon };
+        return { label: "Reflex", color: "amber", icon: IconActivity };
       case "ladder":
-        return { label: "Ladder", color: "purple", icon: Trophy };
+        return { label: "Ladder", color: "purple", icon: IconAward };
       case "betrayal":
-        return { label: "Betrayal", color: "red", icon: Swords };
+        return { label: "Betrayal", color: "red", icon: IconBolt };
       default:
-        return { label: "Market", color: "gray", icon: AlertCircle };
+        return { label: "Market", color: "gray", icon: IconAlertCircle };
     }
   };
 
@@ -241,7 +238,7 @@ export default function GroupSettingsPage() {
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Users className="h-6 w-6 text-blue-600" />
+                  <IconUsers className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -260,7 +257,7 @@ export default function GroupSettingsPage() {
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Shield className="h-6 w-6 text-green-600" />
+                  <IconShield className="h-6 w-6 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -279,19 +276,17 @@ export default function GroupSettingsPage() {
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Globe className="h-6 w-6 text-amber-600" />
+                  <IconGlobe className="h-6 w-6 text-amber-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Local Settings Search Bar */}
-        {/* Local Settings Search Bar */}
         <SearchFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="Search within settings..."
+          placeholder="IconSearch within settings..."
           tabs={[{ id: "all", label: "All Settings" }]}
           activeTab="all"
           onTabChange={() => {}}
@@ -313,7 +308,7 @@ export default function GroupSettingsPage() {
                     setActiveSection(section.id as SettingsSection)
                   }
                   className={cn(
-                    "w-full text-left p-5 rounded-2xl cursor-pointer transition-all flex items-start gap-4 group relative",
+                    "w-full text-left px-5 py-3 rounded-2xl cursor-pointer transition-all flex items-start gap-4 group relative",
                     activeSection === section.id
                       ? "bg-white text-black shadow-lg ring-2 ring-black/5"
                       : "text-black/50 hover:bg-white/80 hover:text-black/80 hover:shadow-md",
@@ -321,7 +316,7 @@ export default function GroupSettingsPage() {
                 >
                   <div
                     className={cn(
-                      "p-3 rounded-xl transition-all shrink-0",
+                      "p-2 rounded-xl transition-all shrink-0",
                       activeSection === section.id
                         ? "bg-black text-white shadow-md"
                         : "bg-black/5 text-black/40 group-hover:bg-black/10",
@@ -351,7 +346,7 @@ export default function GroupSettingsPage() {
                     className="w-full text-left p-5 rounded-2xl hover:bg-red-50 text-red-600 transition-all flex items-center gap-4 group border-2 border-transparent hover:border-red-200"
                   >
                     <div className="p-3 bg-red-100 rounded-xl group-hover:bg-red-200 transition-colors">
-                      <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                      <IconTrash className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     </div>
                     <div>
                       <p className="font-medium text-sm">Delete Group</p>
@@ -406,15 +401,14 @@ export default function GroupSettingsPage() {
                               <Image
                                 src={group.image}
                                 alt={group.name}
-                                fill
                                 className="object-cover"
                               />
                             ) : (
-                              <Users className="w-16 h-16 text-black/20" />
+                              <IconUsers className="w-16 h-16 text-black/20" />
                             )}
                             {canEdit && (
                               <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-2">
-                                <ImageIcon className="w-10 h-10 text-white" />
+                                <IconPhoto className="w-10 h-10 text-white" />
                                 <p className="text-xs font-medium text-white uppercase tracking-wider">
                                   Change
                                 </p>
@@ -424,7 +418,7 @@ export default function GroupSettingsPage() {
                           <div className="space-y-4 flex-1">
                             <div className="space-y-2 p-4 bg-blue-50 border border-blue-100 rounded-xl">
                               <p className="text-xs font-medium text-blue-900 uppercase tracking-wider flex items-center gap-2">
-                                <AlertCircle className="w-3.5 h-3.5" />
+                                <IconAlertCircle className="w-3.5 h-3.5" />
                                 Image Guidelines
                               </p>
                               <ul className="text-xs text-blue-700 space-y-1 ml-5 list-disc">
@@ -439,12 +433,12 @@ export default function GroupSettingsPage() {
                                   onClick={handleImageUpload}
                                   className="px-6 py-2 bg-black hover:bg-black/90 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-black/20 hover:shadow-xl active:scale-95"
                                 >
-                                  <Upload className="w-4 h-4" />
-                                  Upload New
+                                  <IconUpload className="w-4 h-4" />
+                                  IconUpload New
                                 </button>
                                 {group.image && (
                                   <button className="px-6 py-2 hover:bg-red-50 text-red-600 border-2 border-red-200 rounded-xl text-sm font-medium transition-all hover:border-red-300 active:scale-95">
-                                    <X className="w-4 h-4 inline mr-1.5" />
+                                    <IconX className="w-4 h-4 inline mr-1.5" />
                                     Remove
                                   </button>
                                 )}
@@ -474,11 +468,11 @@ export default function GroupSettingsPage() {
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             disabled={!canEdit}
-                            className="w-full px-5 py-4 bg-white border-2 border-black/20 rounded-xl focus:outline-none focus:border-black focus:ring-4 focus:ring-black/5 disabled:opacity-50 disabled:bg-black/2 font-medium text-black/90 transition-all shadow-sm hover:border-black/30"
+                            className="w-full px-5 py-3 bg-white border-2 border-black/20 rounded-xl focus:outline-none focus:border-black focus:ring-4 focus:ring-black/5 disabled:opacity-50 disabled:bg-black/2 font-medium text-black/90 transition-all shadow-sm hover:border-black/30"
                             placeholder="Enter group name"
                           />
                           <p className="text-xs text-black/40 flex items-center gap-1.5">
-                            <AlertCircle className="w-3.5 h-3.5" />
+                            <IconAlertCircle className="w-3.5 h-3.5" />
                             This is how your group appears across the platform
                           </p>
                         </div>
@@ -487,18 +481,18 @@ export default function GroupSettingsPage() {
                             Group Handle
                           </label>
                           <div className="flex">
-                            <span className="px-5 py-4 bg-black/5 border-2 border-black/20 border-r-0 rounded-l-xl text-black/60 text-sm flex items-center font-mono font-medium shadow-sm">
+                            <span className="px-5 py-2 bg-black/5 border-2 border-black/20 border-r-0 rounded-l-xl text-black/60 text-sm flex items-center font-mono font-medium shadow-sm">
                               @
                             </span>
                             <input
                               type="text"
                               defaultValue={id}
                               disabled={!canEdit}
-                              className="flex-1 px-5 py-4 bg-white border-2 border-black/20 border-l-0 rounded-r-xl focus:outline-none focus:border-black focus:ring-4 focus:ring-black/5 disabled:opacity-50 disabled:bg-black/2 font-medium font-mono text-black/90 transition-all shadow-sm hover:border-black/30"
+                              className="flex-1 px-5 py-3 bg-white border-2 border-black/20 border-l-0 rounded-r-xl focus:outline-none focus:border-black focus:ring-4 focus:ring-black/5 disabled:opacity-50 disabled:bg-black/2 font-medium font-mono text-black/90 transition-all shadow-sm hover:border-black/30"
                             />
                           </div>
                           <p className="text-xs text-black/40 flex items-center gap-1.5">
-                            <Lock className="w-3.5 h-3.5" />
+                            <IconLock className="w-3.5 h-3.5" />
                             Handle cannot be changed once created
                           </p>
                         </div>
@@ -564,7 +558,7 @@ export default function GroupSettingsPage() {
                       {/* Group URL Preview */}
                       <div className="p-5 rounded-xl bg-linear-to-br from-purple-50 to-pink-50 border border-purple-100">
                         <p className="text-xs font-medium text-purple-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <IconExternalLink className="w-3.5 h-3.5" />
                           Group URL Preview
                         </p>
                         <div className="flex items-center gap-3">
@@ -572,7 +566,7 @@ export default function GroupSettingsPage() {
                             ante.social/groups/{id}
                           </code>
                           <button className="p-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all active:scale-95">
-                            <Copy className="w-4 h-4" />
+                            <IconCopy className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -593,17 +587,17 @@ export default function GroupSettingsPage() {
 
                     <div className="space-y-6">
                       {/* Visibility Toggle */}
-                      <div className="p-7 rounded-2xl border-2 border-black/10 bg-linear-to-br from-blue-50/50 to-transparent hover:border-blue-200 transition-all shadow-sm">
+                      <div className="p-4 rounded-2xl border-2 border-black/10 bg-linear-to-br from-blue-50/50 to-transparent hover:border-blue-200 transition-all shadow-sm">
                         <div className="flex items-start justify-between gap-6">
                           <div className="flex gap-5">
                             <div className="p-4 bg-blue-500 rounded-xl shadow-lg h-fit">
                               {isPublic ? (
-                                <Globe className="w-6 h-6 text-white" />
+                                <IconGlobe className="w-4 h-4 text-white" />
                               ) : (
-                                <Lock className="w-6 h-6 text-white" />
+                                <IconLock className="w-4 h-4 text-white" />
                               )}
                             </div>
-                            <div className="space-y-2.5">
+                            <div className="space-y-1">
                               <h3 className="font-medium text-lg text-black/90">
                                 {isPublic ? "Public Group" : "Private Group"}
                               </h3>
@@ -632,16 +626,16 @@ export default function GroupSettingsPage() {
                         </div>
                       </div>
 
-                      {/* Join Settings */}
+                      {/* Join IconSettings */}
                       <div className="space-y-5">
                         <h3 className="font-medium text-sm text-black/60 uppercase tracking-widest flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          Membership Settings
+                          <IconUsers className="w-4 h-4" />
+                          Membership IconSettings
                         </h3>
                         <div className="space-y-3">
                           <label className="flex items-start gap-4 p-5 rounded-xl hover:bg-black/2 cursor-pointer transition-all group border-2 border-transparent hover:border-black/10">
                             <div className="w-6 h-6 rounded-lg border-2 border-black/30 flex items-center justify-center text-white bg-black shrink-0 mt-0.5 group-hover:scale-110 transition-transform shadow-sm">
-                              <CheckCircle2 className="w-4 h-4" />
+                              <IconCircleCheckFilled className="w-4 h-4" />
                             </div>
                             <div className="space-y-1.5 flex-1">
                               <span className="text-sm font-medium text-black/90">
@@ -683,7 +677,7 @@ export default function GroupSettingsPage() {
                       {/* Content Visibility */}
                       <div className="space-y-5">
                         <h3 className="font-medium text-sm text-black/60 uppercase tracking-widest flex items-center gap-2">
-                          <Eye className="w-4 h-4" />
+                          <IconEye className="w-4 h-4" />
                           Content Visibility
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -691,7 +685,7 @@ export default function GroupSettingsPage() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-black/5 rounded-lg">
-                                  <TrendingUp className="w-4 h-4 text-black/60" />
+                                  <IconTrendingUp className="w-4 h-4 text-black/60" />
                                 </div>
                                 <span className="text-sm font-medium text-black/90">
                                   Markets
@@ -709,7 +703,7 @@ export default function GroupSettingsPage() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-black/5 rounded-lg">
-                                  <Users className="w-4 h-4 text-black/60" />
+                                  <IconUsers className="w-4 h-4 text-black/60" />
                                 </div>
                                 <span className="text-sm font-medium text-black/90">
                                   Member List
@@ -742,7 +736,7 @@ export default function GroupSettingsPage() {
 
                     <div className="space-y-6">
                       <h3 className="font-medium text-sm text-black/60 uppercase tracking-widest flex items-center gap-2">
-                        <Shield className="w-4 h-4" />
+                        <IconShield className="w-4 h-4" />
                         Member Capabilities
                       </h3>
                       <div className="divide-y divide-black/5 border-2 border-black/10 rounded-2xl overflow-hidden shadow-sm">
@@ -751,28 +745,28 @@ export default function GroupSettingsPage() {
                             id: "create_markets",
                             title: "Create Markets",
                             desc: "Allow members to propose new betting markets for the group",
-                            icon: TrendingUp,
+                            icon: IconTrendingUp,
                             default: true,
                           },
                           {
                             id: "post_comment",
                             title: "Post & Comment",
                             desc: "Share messages and interact in the activity feed",
-                            icon: Users,
+                            icon: IconUsers,
                             default: true,
                           },
                           {
                             id: "invite_members",
                             title: "Invite Members",
                             desc: "Generate and share invitation links with others",
-                            icon: Users,
+                            icon: IconUsers,
                             default: true,
                           },
                           {
                             id: "moderate_content",
                             title: "Moderate Content",
-                            desc: "Flag inappropriate posts and comments for review",
-                            icon: Gavel,
+                            desc: "IconFlag inappropriate posts and comments for review",
+                            icon: IconGavel,
                             default: false,
                           },
                         ].map((perm, i) => (
@@ -816,7 +810,7 @@ export default function GroupSettingsPage() {
                               </p>
                             </div>
                             <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                              <Trophy className="h-6 w-6 text-green-600" />
+                              <IconAward className="h-6 w-6 text-green-600" />
                             </div>
                           </div>
                         </CardContent>
@@ -843,19 +837,19 @@ export default function GroupSettingsPage() {
                               </p>
                             </div>
                             <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                              <DollarSign className="h-6 w-6 text-purple-600" />
+                              <IconCurrencyDollar className="h-6 w-6 text-purple-600" />
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     </div>
 
-                    {/* Market Specific Search & Filter */}
+                    {/* Market Specific IconSearch & IconFilter */}
                     <div className="space-y-6">
                       <SearchFilterBar
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
-                        placeholder="Search for a specific market..."
+                        placeholder="IconSearch for a specific market..."
                         tabs={[
                           { id: "all", label: "All Markets" },
                           { id: "active", label: "Active" },
@@ -887,7 +881,6 @@ export default function GroupSettingsPage() {
                                   <Image
                                     src={market.image}
                                     alt={market.title}
-                                    fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
                                   <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full border border-black/10 shadow-sm flex items-center gap-1.5">
@@ -897,7 +890,7 @@ export default function GroupSettingsPage() {
                                     </span>
                                   </div>
                                   <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/80 backdrop-blur-sm rounded-full flex items-center gap-1.5">
-                                    <Timer className="w-3 h-3 text-white" />
+                                    <IconClock className="w-3 h-3 text-white" />
                                     <span className="text-[10px] font-medium text-white font-mono">
                                       {market.timeLeft}
                                     </span>
@@ -935,11 +928,11 @@ export default function GroupSettingsPage() {
 
                                   <div className="flex items-center gap-4 text-xs font-medium text-black/60 pt-3 border-t border-black/5">
                                     <div className="flex items-center gap-1.5">
-                                      <DollarSign className="w-3.5 h-3.5 text-black/40" />
+                                      <IconCurrencyDollar className="w-3.5 h-3.5 text-black/40" />
                                       {market.pool}
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                      <Users className="w-3.5 h-3.5 text-black/40" />
+                                      <IconUsers className="w-3.5 h-3.5 text-black/40" />
                                       {market.participants}
                                     </div>
                                   </div>
@@ -986,14 +979,13 @@ export default function GroupSettingsPage() {
                 <Image
                   src={selectedMarket.image}
                   alt={selectedMarket.title}
-                  fill
                   className="object-cover opacity-60"
                 />
                 <button
                   onClick={() => setSelectedMarket(null)}
                   className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-all"
                 >
-                  <X className="w-5 h-5" />
+                  <IconX className="w-5 h-5" />
                 </button>
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="flex items-center gap-2 mb-2">
@@ -1059,11 +1051,11 @@ export default function GroupSettingsPage() {
                           </label>
                           <div className="flex gap-3">
                             <button className="flex-1 py-2.5 px-4 bg-white border border-black/10 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2">
-                              <Edit3 className="w-4 h-4" />
-                              Edit Details
+                              <IconEdit className="w-4 h-4" />
+                              IconEdit Details
                             </button>
                             <button className="flex-1 py-2.5 px-4 bg-white border border-black/10 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors flex items-center justify-center gap-2">
-                              <X className="w-4 h-4" />
+                              <IconX className="w-4 h-4" />
                               Cancel Market
                             </button>
                           </div>
@@ -1075,7 +1067,7 @@ export default function GroupSettingsPage() {
                     {selectedMarket.status === "pending_confirmation" && (
                       <div className="space-y-4">
                         <p className="text-sm font-semibold text-black/80 flex items-center gap-2">
-                          <Gavel className="w-4 h-4" />
+                          <IconGavel className="w-4 h-4" />
                           Determine Winner
                         </p>
                         <div className="grid grid-cols-1 gap-2">
@@ -1105,7 +1097,7 @@ export default function GroupSettingsPage() {
                                 {option}
                               </span>
                               {selectedMarket.correctOption === option && (
-                                <CheckCircle2 className="w-4 h-4 text-black" />
+                                <IconCircleCheckFilled className="w-4 h-4 text-black" />
                               )}
                             </button>
                           ))}
@@ -1126,7 +1118,7 @@ export default function GroupSettingsPage() {
                           }}
                           className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Check className="w-4 h-4" />
+                          <IconCheck className="w-4 h-4" />
                           Confirm Result
                         </button>
                       </div>
@@ -1137,7 +1129,7 @@ export default function GroupSettingsPage() {
                       <div className="p-4 rounded-xl bg-green-50 border border-green-200">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-green-100 rounded-full">
-                            <Trophy className="w-5 h-5 text-green-700" />
+                            <IconAward className="w-5 h-5 text-green-700" />
                           </div>
                           <div>
                             <p className="text-xs font-semibold text-green-800 uppercase tracking-wider">
@@ -1177,7 +1169,7 @@ export default function GroupSettingsPage() {
             >
               <div className="text-center space-y-6">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                  <AlertCircle className="w-8 h-8 text-red-600" />
+                  <IconAlertCircle className="w-8 h-8 text-red-600" />
                 </div>
                 <div className="space-y-3">
                   <h3 className="text-2xl font-medium text-black/90">
@@ -1217,10 +1209,12 @@ export default function GroupSettingsPage() {
             <div className="max-w-3xl mx-auto bg-black text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between pointer-events-auto">
               <div className="flex items-center gap-3 px-2">
                 <div className="p-2 rounded-full bg-white/10">
-                  <AlertCircle className="w-5 h-5" />
+                  <IconAlertCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">Unsaved Changes</p>
+                  <p className="font-medium uppercase tracking-wide text-sm">
+                    Unsaved Changes
+                  </p>
                   <p className="text-xs text-white/60">
                     You have modified group settings
                   </p>
@@ -1240,7 +1234,7 @@ export default function GroupSettingsPage() {
                 >
                   {isSaving ? (
                     <>
-                      <LoaderPinwheel className="w-4 h-4 animate-spin" />
+                      <IconLoader2 className="w-4 h-4 animate-spin" />
                       Saving...
                     </>
                   ) : (

@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Users, Clock, Search, ArrowRight, Activity, Trophy, Filter } from "lucide-react";
+import { IconLayoutGrid, IconPhoto, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
@@ -21,74 +22,81 @@ const mockMarkets = [
     id: "1",
     title: "Best Nairobi Matatu Route",
     description: "Vote for the most reliable and comfortable matatu route",
-    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
     type: "poll",
     buyIn: "500 KSH",
     pool: "145,600 KSH",
     participants: 42,
     timeLeft: "2h 15m",
-    status: "active"
+    status: "active",
   },
   {
     id: "2",
     title: "Trust or Betray: Social Experiment",
-    description: "Cooperate for small win or betray for jackpot - choose wisely",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
+    description:
+      "Cooperate for small win or betray for jackpot - choose wisely",
+    image:
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
     type: "betrayal",
     buyIn: "1,000 KSH",
     pool: "66,250 KSH",
     participants: 50,
     timeLeft: "4h 30m",
-    status: "active"
+    status: "active",
   },
   {
     id: "3",
     title: "First Reaction: Group Chat Added",
     description: "5 seconds to predict the crowd's instinct - pure reflex",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
     type: "reflex",
     buyIn: "750 KSH",
     pool: "33,125 KSH",
     participants: 50,
     timeLeft: "45m",
-    status: "active"
+    status: "active",
   },
   {
     id: "4",
     title: "Rank These Nairobi Inconveniences",
     description: "Order items by what you think the majority will choose",
-    image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
     type: "ladder",
     buyIn: "500 KSH",
     pool: "46,375 KSH",
     participants: 70,
     timeLeft: "6h 20m",
-    status: "active"
+    status: "active",
   },
   {
     id: "5",
     title: "Who Wins the Derby?",
     description: "AFC Leopards vs Gor Mahia - predict Kenya's biggest rivalry",
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
     type: "poll",
     buyIn: "1,200 KSH",
     pool: "98,750 KSH",
     participants: 93,
     timeLeft: "1d 3h",
-    status: "active"
+    status: "active",
   },
   {
     id: "6",
     title: "Top Kenyan Musician 2024",
     description: "Rank the top 5 based on majority consensus",
-    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
     type: "ladder",
     buyIn: "600 KSH",
     pool: "52,100 KSH",
     participants: 78,
     timeLeft: "8h 45m",
-    status: "active"
-  }
+    status: "active",
+  },
 ];
 
 const getTypeStyles = (type: string) => {
@@ -104,9 +112,7 @@ const getTypeStyles = (type: string) => {
     default:
       return { label: type };
   }
-}
-  ;
-
+};
 export default function MarketsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -125,14 +131,19 @@ export default function MarketsPage() {
     return () => clearTimeout(timer);
   }, [searchQuery, filterType]);
 
-  const totalParticipants = mockMarkets.reduce((sum, m) => sum + m.participants, 0);
+  const totalParticipants = mockMarkets.reduce(
+    (sum, m) => sum + m.participants,
+    0,
+  );
   const totalPool = mockMarkets.reduce((sum, m) => {
-    const poolValue = parseFloat(m.pool.replace(/[^0-9.]/g, ''));
+    const poolValue = parseFloat(m.pool.replace(/[^0-9.]/g, ""));
     return sum + poolValue;
   }, 0);
 
-  const filteredMarkets = mockMarkets.filter(market => {
-    const matchesSearch = market.title.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredMarkets = mockMarkets.filter((market) => {
+    const matchesSearch = market.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchesFilter = filterType === "all" || market.type === filterType;
     return matchesSearch && matchesFilter;
   });
@@ -144,8 +155,10 @@ export default function MarketsPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto md:pl-8 pl-0 pb-8 space-y-2">
-        <DashboardHeader user={mockUser} subtitle="Explore active betting markets and join the action" />
-
+        <DashboardHeader
+          user={mockUser}
+          subtitle="Explore active betting markets and join the action"
+        />
 
         {/* Stats Cards */}
         <motion.div
@@ -160,11 +173,15 @@ export default function MarketsPage() {
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-900/60">Active Markets</p>
-                  <p className="mt-2 text-3xl font-medium numeric text-blue-900">{mockMarkets.length}</p>
+                  <p className="text-sm font-medium text-blue-900/60">
+                    Active Markets
+                  </p>
+                  <p className="mt-2 text-3xl font-medium numeric text-blue-900">
+                    {mockMarkets.length}
+                  </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <TrendingUp className="h-6 w-6 text-blue-600" />
+                  <IconTrendingUp className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -176,13 +193,15 @@ export default function MarketsPage() {
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-900/60">Total Participants</p>
+                  <p className="text-sm font-medium text-purple-900/60">
+                    Total Participants
+                  </p>
                   <p className="mt-2 text-3xl font-medium numeric text-purple-900">
                     {totalParticipants}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <Users className="h-6 w-6 text-purple-600" />
+                  <IconUsers className="h-6 w-6 text-purple-600" />
                 </div>
               </div>
             </CardContent>
@@ -194,13 +213,13 @@ export default function MarketsPage() {
         <SearchFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="Search markets, tags, or pools..."
+          placeholder="IconSearch markets, tags, or pools..."
           tabs={[
             { id: "all", label: "All Markets" },
             { id: "poll", label: "Poll" },
             { id: "betrayal", label: "Betrayal" },
             { id: "reflex", label: "Reflex" },
-            { id: "ladder", label: "Ladder" }
+            { id: "ladder", label: "Ladder" },
           ]}
           activeTab={filterType}
           onTabChange={setFilterType}
@@ -210,7 +229,10 @@ export default function MarketsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {isFiltering ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-3xl border border-neutral-100 bg-white p-4 space-y-4">
+              <div
+                key={i}
+                className="rounded-3xl border border-neutral-100 bg-white p-4 space-y-4"
+              >
                 <Skeleton className="h-48 w-full rounded-2xl" />
                 <div className="space-y-2">
                   <Skeleton className="h-6 w-3/4" />
@@ -228,8 +250,12 @@ export default function MarketsPage() {
             ))
           ) : (
             <div className="col-span-full flex flex-col items-center justify-center py-16">
-              <p className="text-lg font-semibold text-black/40 mb-2">No markets found</p>
-              <p className="text-sm text-black/30 font-medium">Try adjusting your search or filters</p>
+              <p className="text-lg font-semibold text-black/40 mb-2">
+                No markets found
+              </p>
+              <p className="text-sm text-black/30 font-medium">
+                Try adjusting your search or filters
+              </p>
             </div>
           )}
         </div>
