@@ -250,7 +250,7 @@ export default function LadderMarketPage() {
                   <h2 className="text-2xl md:text-3xl font-semibold text-black/90 tracking-tight mb-3">
                     {market.title}
                   </h2>
-                  <p className="text-base text-black/60 font-medium leading-relaxed">
+                  <p className="text-base text-black/80 font-medium leading-relaxed">
                     {market.description}
                   </p>
                 </div>
@@ -488,7 +488,7 @@ export default function LadderMarketPage() {
                   {/* Summary */}
                   <div className="pt-6 border-t border-black/5 space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-black/60 font-medium">
+                      <span className="text-black/80 font-medium">
                         Platform Fee (5%)
                       </span>
                       <span className="font-mono font-semibold text-black/80">
@@ -544,12 +544,12 @@ export default function LadderMarketPage() {
                 className="p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5"
               >
                 <div className="flex gap-3">
-                  <IconShield className="w-5 h-5 text-black/60 shrink-0" />
+                  <IconShield className="w-5 h-5 text-black/80 shrink-0" />
                   <div className="space-y-2">
                     <p className="text-sm font-semibold text-black/90">
                       How it works
                     </p>
-                    <p className="text-xs text-black/60 font-medium leading-relaxed">
+                    <p className="text-xs text-black/80 font-medium leading-relaxed">
                       Winners are those whose ranking matches the majority's
                       consensus exactly. Prize pool split proportionally based
                       on stakes.

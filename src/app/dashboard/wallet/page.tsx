@@ -226,7 +226,7 @@ export default function WalletPage() {
         </div>
       </motion.div>
 
-      <SectionHeading title="Performance Analytics" />
+      <SectionHeading title="Performance Analytics" className="my-16 md:my-18" />
 
       {/* Performance Cards */}
       <div className="grid gap-6 md:grid-cols-3">
@@ -316,7 +316,8 @@ export default function WalletPage() {
       <div className="space-y-6">
         <div className="relative">
           <SectionHeading
-            title="Transaction IconHistory"
+            title="Transaction History"
+            className="my-16 md:my-18"
             icon={<IconHistory className="w-4 h-4 text-blue-500" />}
           />
           <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
@@ -339,7 +340,7 @@ export default function WalletPage() {
                 "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all cursor-pointer",
                 selectedFilter === type.value
                   ? "bg-black text-white shadow-md"
-                  : "bg-white/60 text-black/60 hover:bg-white hover:text-black/80 border border-black/5",
+                  : "bg-white/60 text-black/80 hover:bg-white hover:text-black/80 border border-black/5",
               )}
             >
               {type.label}
@@ -375,7 +376,7 @@ export default function WalletPage() {
               <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-4">
                 <IconHistory className="w-8 h-8 text-black/20" />
               </div>
-              <h3 className="text-lg font-medium text-black/60 mb-2">
+              <h3 className="text-lg font-medium text-black/80 mb-2">
                 No transactions found
               </h3>
               <p className="text-sm text-black/40">

@@ -39,7 +39,7 @@ const RankBadge = ({ rank }: { rank: number }) => {
   }
   return (
     <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/60 backdrop-blur-sm border border-black/5">
-      <span className="text-sm font-semibold font-mono text-black/60">
+      <span className="text-sm font-semibold font-mono text-black/80">
         #{rank}
       </span>
     </div>
@@ -130,7 +130,7 @@ export default function LeaderboardSection({
             <h3 className="font-semibold text-xs md:text-sm text-black/90 mb-1 text-center truncate w-full">
               {displayData[1].username}
             </h3>
-            <p className="text-[10px] md:text-xs font-mono font-semibold text-black/60">
+            <p className="text-[10px] md:text-xs font-mono font-semibold text-black/80">
               {(displayData[1].totalWinnings / 1000).toFixed(0)}K KSH
             </p>
             <p className="hidden md:block text-[10px] text-black/40 font-semibold mt-1">
@@ -186,7 +186,7 @@ export default function LeaderboardSection({
             <h3 className="font-semibold text-xs md:text-sm text-black/90 mb-1 text-center truncate w-full">
               {displayData[2].username}
             </h3>
-            <p className="text-[10px] md:text-xs font-mono font-semibold text-black/60">
+            <p className="text-[10px] md:text-xs font-mono font-semibold text-black/80">
               {(displayData[2].totalWinnings / 1000).toFixed(0)}K KSH
             </p>
             <p className="hidden md:block text-[10px] text-black/40 font-semibold mt-1">

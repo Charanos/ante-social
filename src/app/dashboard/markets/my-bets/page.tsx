@@ -6,7 +6,10 @@ import { motion } from "framer-motion";
 import {
   IconArrowRight,
   IconAward,
-  IconLoader2,
+  IconLoader3,
+  IconShieldCheck,
+  IconShieldDollar,
+  IconShieldX,
   IconTrendingUp,
 } from "@tabler/icons-react";
 
@@ -139,12 +142,12 @@ export default function MyBetsPage() {
           </Card>
         </motion.div>
 
-        <SectionHeading title="Active & IconHistory" />
+        <SectionHeading title="Active & History" className="my-16 md:my-18" />
 
         <SearchFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="IconSearch your bets..."
+          placeholder="Search your bets..."
           tabs={[
             { id: "all", label: "all" },
             { id: "active", label: "active" },
@@ -178,13 +181,13 @@ export default function MyBetsPage() {
                       )}
                     >
                       {bet.status === "active" && (
-                        <IconLoader2 className="w-6 h-6" />
+                        <IconShieldDollar className="w-6 h-6" />
                       )}
                       {bet.status === "won" && (
-                        <IconLoader2 className="w-6 h-6" />
+                        <IconShieldCheck className="w-6 h-6" />
                       )}
                       {bet.status === "lost" && (
-                        <IconLoader2 className="w-6 h-6" />
+                        <IconShieldX className="w-6 h-6" />
                       )}
                     </div>
 

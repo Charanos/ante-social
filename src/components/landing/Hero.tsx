@@ -213,7 +213,7 @@ function FloatingStats() {
           whileHover={{ scale: 1.05, y: -2 }}
           className="flex items-center gap-3 px-4 md:px-6 py-3 bg-white/80 backdrop-blur-sm border border-black/5 rounded-full shadow-sm hover:shadow-md transition-shadow"
         >
-          <stat.icon className="w-4 h-4 text-black/60" />
+          <stat.icon className="w-4 h-4 text-black/80" />
           <div className="flex flex-col items-start">
             <span className="text-xs text-black/50 font-medium">
               {stat.label}
@@ -314,7 +314,7 @@ export function Hero() {
         className="relative max-w-5xl mx-auto space-y-8 pt-16 z-10"
       >
         <motion.h1
-          className="text-3xl md:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
+          className="text-3xl md:text-6xl lg:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{

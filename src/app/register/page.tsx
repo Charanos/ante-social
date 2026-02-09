@@ -8,11 +8,11 @@ import {
   IconArrowRight,
   IconEye,
   IconEyeOff,
-  IconLoader2,
+  IconLoader3,
   IconPhoto,
 } from "@tabler/icons-react";
 
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/components/ui/toast-notification";
 import Image from "next/image";
 
 export default function RegisterPage() {
@@ -58,7 +58,7 @@ export default function RegisterPage() {
       {/* LEFT SIDE: Brand (White) */}
       <div className="relative bg-white text-black flex flex-col justify-between p-12 lg:p-20 z-10 order-last lg:order-first">
         <div>
-          <div className="relative w-24 h-24 md:w-36 md:h-36 mb-2">
+          <div className="relative w-24 h-24 md:w-36 md:h-36 mb-2 -ml-6">
             <Image
               src="/ante-logo.png"
               alt="Ante Logo"
@@ -258,7 +258,7 @@ export default function RegisterPage() {
               className="w-full bg-white text-black font-semibold py-2 uppercase tracking-wider rounded-full mt-4 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
-                <IconLoader2 className="w-5 h-5 animate-spin mx-auto" />
+                <IconLoader3 className="w-5 h-5 animate-spin mx-auto" />
               ) : (
                 "Create Account"
               )}

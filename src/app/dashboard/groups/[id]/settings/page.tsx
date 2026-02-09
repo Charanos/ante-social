@@ -24,7 +24,7 @@ import {
   IconGavel,
   IconGlobe,
   IconLayoutGrid,
-  IconLoader2,
+  IconLoader3,
   IconLock,
   IconPhoto,
   IconSearch,
@@ -286,7 +286,7 @@ export default function GroupSettingsPage() {
         <SearchFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="IconSearch within settings..."
+          placeholder="Search within settings..."
           tabs={[{ id: "all", label: "All Settings" }]}
           activeTab="all"
           onTabChange={() => {}}
@@ -377,7 +377,7 @@ export default function GroupSettingsPage() {
                       <h2 className="text-3xl font-medium flex items-center gap-3 text-black/90">
                         General Information
                       </h2>
-                      <p className="text-black/60 text-sm mt-3 leading-relaxed">
+                      <p className="text-black/80 text-sm mt-3 leading-relaxed">
                         Customize your group's basic details and appearance.
                       </p>
                     </div>
@@ -434,7 +434,7 @@ export default function GroupSettingsPage() {
                                   className="px-6 py-2 bg-black hover:bg-black/90 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-black/20 hover:shadow-xl active:scale-95"
                                 >
                                   <IconUpload className="w-4 h-4" />
-                                  IconUpload New
+                                  Upload New
                                 </button>
                                 {group.image && (
                                   <button className="px-6 py-2 hover:bg-red-50 text-red-600 border-2 border-red-200 rounded-xl text-sm font-medium transition-all hover:border-red-300 active:scale-95">
@@ -481,7 +481,7 @@ export default function GroupSettingsPage() {
                             Group Handle
                           </label>
                           <div className="flex">
-                            <span className="px-5 py-2 bg-black/5 border-2 border-black/20 border-r-0 rounded-l-xl text-black/60 text-sm flex items-center font-mono font-medium shadow-sm">
+                            <span className="px-5 py-2 bg-black/5 border-2 border-black/20 border-r-0 rounded-l-xl text-black/80 text-sm flex items-center font-mono font-medium shadow-sm">
                               @
                             </span>
                             <input
@@ -580,7 +580,7 @@ export default function GroupSettingsPage() {
                       <h2 className="text-3xl font-medium flex items-center gap-3 text-black/90">
                         Privacy & Access
                       </h2>
-                      <p className="text-black/60 text-sm mt-3 leading-relaxed">
+                      <p className="text-black/80 text-sm mt-3 leading-relaxed">
                         Control who can discover and join your group.
                       </p>
                     </div>
@@ -601,7 +601,7 @@ export default function GroupSettingsPage() {
                               <h3 className="font-medium text-lg text-black/90">
                                 {isPublic ? "Public Group" : "Private Group"}
                               </h3>
-                              <p className="text-sm text-black/60 leading-relaxed max-w-md">
+                              <p className="text-sm text-black/80 leading-relaxed max-w-md">
                                 {isPublic
                                   ? "Anyone can search for and view this group. Markets and activities are visible to all users."
                                   : "Only members can view this group. Hidden from public search and discovery."}
@@ -628,9 +628,9 @@ export default function GroupSettingsPage() {
 
                       {/* Join IconSettings */}
                       <div className="space-y-5">
-                        <h3 className="font-medium text-sm text-black/60 uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="font-medium text-sm text-black/80 uppercase tracking-widest flex items-center gap-2">
                           <IconUsers className="w-4 h-4" />
-                          Membership IconSettings
+                          Membership Settings
                         </h3>
                         <div className="space-y-3">
                           <label className="flex items-start gap-4 p-5 rounded-xl hover:bg-black/2 cursor-pointer transition-all group border-2 border-transparent hover:border-black/10">
@@ -676,7 +676,7 @@ export default function GroupSettingsPage() {
 
                       {/* Content Visibility */}
                       <div className="space-y-5">
-                        <h3 className="font-medium text-sm text-black/60 uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="font-medium text-sm text-black/80 uppercase tracking-widest flex items-center gap-2">
                           <IconEye className="w-4 h-4" />
                           Content Visibility
                         </h3>
@@ -685,7 +685,7 @@ export default function GroupSettingsPage() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-black/5 rounded-lg">
-                                  <IconTrendingUp className="w-4 h-4 text-black/60" />
+                                  <IconTrendingUp className="w-4 h-4 text-black/80" />
                                 </div>
                                 <span className="text-sm font-medium text-black/90">
                                   Markets
@@ -703,7 +703,7 @@ export default function GroupSettingsPage() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-black/5 rounded-lg">
-                                  <IconUsers className="w-4 h-4 text-black/60" />
+                                  <IconUsers className="w-4 h-4 text-black/80" />
                                 </div>
                                 <span className="text-sm font-medium text-black/90">
                                   Member List
@@ -729,13 +729,13 @@ export default function GroupSettingsPage() {
                       <h2 className="text-3xl font-medium flex items-center gap-3 text-black/90">
                         Roles & Permissions
                       </h2>
-                      <p className="text-black/60 text-sm mt-3 leading-relaxed">
+                      <p className="text-black/80 text-sm mt-3 leading-relaxed">
                         Control what members can do in your group.
                       </p>
                     </div>
 
                     <div className="space-y-6">
-                      <h3 className="font-medium text-sm text-black/60 uppercase tracking-widest flex items-center gap-2">
+                      <h3 className="font-medium text-sm text-black/80 uppercase tracking-widest flex items-center gap-2">
                         <IconShield className="w-4 h-4" />
                         Member Capabilities
                       </h3>
@@ -765,7 +765,7 @@ export default function GroupSettingsPage() {
                           {
                             id: "moderate_content",
                             title: "Moderate Content",
-                            desc: "IconFlag inappropriate posts and comments for review",
+                            desc: "Flag inappropriate posts and comments for review",
                             icon: IconGavel,
                             default: false,
                           },
@@ -787,7 +787,7 @@ export default function GroupSettingsPage() {
                       <h2 className="text-3xl font-medium flex items-center gap-3 text-black/90">
                         Market Management
                       </h2>
-                      <p className="text-black/60 text-sm mt-3 leading-relaxed">
+                      <p className="text-black/80 text-sm mt-3 leading-relaxed">
                         Control and settle betting markets in your group.
                       </p>
                     </div>
@@ -849,7 +849,7 @@ export default function GroupSettingsPage() {
                       <SearchFilterBar
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
-                        placeholder="IconSearch for a specific market..."
+                        placeholder="Search for a specific market..."
                         tabs={[
                           { id: "all", label: "All Markets" },
                           { id: "active", label: "Active" },
@@ -884,7 +884,7 @@ export default function GroupSettingsPage() {
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                   />
                                   <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full border border-black/10 shadow-sm flex items-center gap-1.5">
-                                    <TypeIcon className="w-3 h-3 text-black/60" />
+                                    <TypeIcon className="w-3 h-3 text-black/80" />
                                     <span className="text-[10px] font-semibold text-black/70 uppercase tracking-widest">
                                       {typeInfo.label}
                                     </span>
@@ -917,7 +917,7 @@ export default function GroupSettingsPage() {
                                           "pending_confirmation" &&
                                           "bg-orange-100 text-orange-700",
                                         market.status === "settled" &&
-                                          "bg-black/5 text-black/60",
+                                          "bg-black/5 text-black/80",
                                       )}
                                     >
                                       {market.status === "pending_confirmation"
@@ -926,7 +926,7 @@ export default function GroupSettingsPage() {
                                     </span>
                                   </div>
 
-                                  <div className="flex items-center gap-4 text-xs font-medium text-black/60 pt-3 border-t border-black/5">
+                                  <div className="flex items-center gap-4 text-xs font-medium text-black/80 pt-3 border-t border-black/5">
                                     <div className="flex items-center gap-1.5">
                                       <IconCurrencyDollar className="w-3.5 h-3.5 text-black/40" />
                                       {market.pool}
@@ -1175,7 +1175,7 @@ export default function GroupSettingsPage() {
                   <h3 className="text-2xl font-medium text-black/90">
                     Delete Group?
                   </h3>
-                  <p className="text-black/60 leading-relaxed">
+                  <p className="text-black/80 leading-relaxed">
                     This action cannot be undone. All markets, member data, and
                     activity will be permanently removed.
                   </p>
@@ -1234,7 +1234,7 @@ export default function GroupSettingsPage() {
                 >
                   {isSaving ? (
                     <>
-                      <IconLoader2 className="w-4 h-4 animate-spin" />
+                      <IconLoader3 className="w-4 h-4 animate-spin" />
                       Saving...
                     </>
                   ) : (

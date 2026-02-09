@@ -8,12 +8,12 @@ import {
   IconCode,
   IconEye,
   IconEyeOff,
-  IconLoader2,
+  IconLoader3,
   IconPhoto,
 } from "@tabler/icons-react";
 
 import { signIn } from "next-auth/react";
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/components/ui/toast-notification";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -66,7 +66,7 @@ export default function LoginPage() {
       {/* LEFT SIDE: Brand (White) */}
       <div className="relative bg-white text-black flex flex-col justify-between p-12 lg:p-20 z-10">
         <div>
-          <div className="relative w-24 h-24 md:w-36 md:h-36 mb-2">
+          <div className="relative w-24 h-24 md:w-36 md:h-36 mb-2 -ml-6">
             <Image
               src="/ante-logo.png"
               alt="Ante Logo"
@@ -185,7 +185,7 @@ export default function LoginPage() {
                   className="w-full bg-white text-black font-semibold py-2 uppercase tracking-wider rounded-full mt-8 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? (
-                    <IconLoader2 className="w-5 h-5 animate-spin mx-auto" />
+                    <IconLoader3 className="w-5 h-5 animate-spin mx-auto" />
                   ) : (
                     "Sign In"
                   )}
@@ -202,7 +202,7 @@ export default function LoginPage() {
               >
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">
-                    Authentication IconCode
+                    Authentication Code
                   </label>
                   <input
                     type="text"
@@ -231,7 +231,7 @@ export default function LoginPage() {
                     className="w-full bg-white text-black font-medium py-3 rounded-full hover:bg-orange-500 hover:text-white transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isLoading ? (
-                      <IconLoader2 className="w-5 h-5 animate-spin mx-auto" />
+                      <IconLoader3 className="w-5 h-5 animate-spin mx-auto" />
                     ) : (
                       "Verify"
                     )}

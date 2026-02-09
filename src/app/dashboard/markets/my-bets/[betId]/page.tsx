@@ -150,7 +150,7 @@ export default function BetSlipPage() {
           className="bg-white rounded-2xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl border border-black/5"
         >
           <div className="bg-black/5 p-6 rounded-2xl w-fit mx-auto">
-            <IoAlertCircleOutline className="w-12 h-12 text-black/60" />
+            <IoAlertCircleOutline className="w-12 h-12 text-black/80" />
           </div>
           <div className="space-y-2">
             <p className="text-2xl font-semibold text-black">
@@ -320,7 +320,7 @@ export default function BetSlipPage() {
               {isMarketOpen && !isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-xs font-semibold text-black hover:text-black/60 transition-colors cursor-pointer"
+                  className="text-xs font-semibold text-black hover:text-black/80 transition-colors cursor-pointer"
                 >
                   EDIT
                 </button>
@@ -353,7 +353,7 @@ export default function BetSlipPage() {
                       setIsEditing(false);
                       setNewAmount(bet.amount);
                     }}
-                    className="py-3 bg-gray-100 text-black/60 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+                    className="py-3 bg-gray-100 text-black/80 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -376,7 +376,7 @@ export default function BetSlipPage() {
                 <span className="text-sm font-medium text-black/40">
                   Potential Profit
                 </span>
-                <span className="font-semibold text-black/60 font-mono tracking-tight">
+                <span className="font-semibold text-black/80 font-mono tracking-tight">
                   +$
                   {potentialProfit.toLocaleString(undefined, {
                     maximumFractionDigits: 2,

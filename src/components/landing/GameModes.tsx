@@ -91,7 +91,7 @@ export function GameModes() {
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
             Choose Your Arena
           </h2>
-          <p className="text-base md:text-lg text-black/60 font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
             Five unique betting formats. Each one a different way to outsmart
             the crowd.
           </p>
@@ -127,7 +127,7 @@ export function GameModes() {
                     className={`w-6 h-6 transition-colors ${
                       activeMode === index
                         ? "text-black/80"
-                        : "text-black/40 group-hover:text-black/60"
+                        : "text-black/40 group-hover:text-black/80"
                     }`}
                   />
                 </div>
@@ -158,7 +158,7 @@ export function GameModes() {
                 <IconArrowRight
                   className={`w-5 h-5 transition-all ${
                     activeMode === index
-                      ? "opacity-100 translate-x-0 text-black/60"
+                      ? "opacity-100 translate-x-0 text-black/80"
                       : "opacity-0 -translate-x-2 text-black/30"
                   }`}
                 />
@@ -210,7 +210,7 @@ export function GameModes() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.25 }}
-                      className="text-base md:text-lg text-black/60 font-medium leading-relaxed"
+                      className="text-base md:text-lg text-black/80 font-medium leading-relaxed"
                     >
                       {currentMode.description}
                     </motion.p>
@@ -229,7 +229,7 @@ export function GameModes() {
                         className="flex items-center gap-2 px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-full"
                       >
                         <div className="w-1 h-1 rounded-full bg-black/30" />
-                        <span className="text-xs font-medium text-black/60 uppercase tracking-wide">
+                        <span className="text-xs font-medium text-black/80 uppercase tracking-wide">
                           {mechanic}
                         </span>
                       </div>

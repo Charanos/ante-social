@@ -121,7 +121,7 @@ export function MobileNav({ user }: { user: any }) {
 
             <div className="space-y-2">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-2">
-                IconMenu
+                Menu
               </h3>
               {secondaryNavItems
                 .filter(

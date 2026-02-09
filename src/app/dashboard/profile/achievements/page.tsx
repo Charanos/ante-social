@@ -1,12 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  IconActivity,
+  IconArrowRight,
+  IconAward,
+  IconCheck,
+  IconClock,
+  IconCurrencyDollar,
+  IconGift,
+  IconStar,
+  IconTarget,
+  IconUsers,
+  IconX,
+  IconLoader3,
+} from "@tabler/icons-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { mockUser } from "@/lib/mockData";
-import { IconActivity, IconArrowRight, IconAward, IconCheck, IconClock, IconCurrencyDollar, IconGift, IconStar, IconTarget, IconUsers, IconX } from '@tabler/icons-react';;
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { useToast } from "@/components/ui/toast-notification";
+import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
+// --- Mock Data ---
 const mockAchievements = {
   stats: {
     balance: 2450,
@@ -30,12 +48,14 @@ const mockAchievements = {
       description: "Win 10 different betting markets",
       progress: 60,
       reward: 500,
+      category: "Performance",
     },
     {
       title: "7-Day Streak",
       description: "Login for 7 consecutive days",
       progress: 85,
       reward: 300,
+      category: "Consistency",
     },
   ],
   unlocked: [
@@ -122,23 +142,72 @@ const getCategoryIcon = (category: string) => {
       return <IconActivity className="w-4 h-4" />;
     case "social":
       return <IconUsers className="w-4 h-4" />;
+    case "consistency":
+      return <IconTarget className="w-4 h-4" />;
     default:
       return <IconTarget className="w-4 h-4" />;
   }
 };
 
 export default function AchievementsPage() {
+  const toast = useToast();
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [showBonusModal, setShowBonusModal] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("All");
+
+  // Simulate Page Load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClaimBonus = () => {
-    // Handle claim logic here
+    setIsClaiming(true);
     setTimeout(() => {
+      setIsClaiming(false);
       setShowBonusModal(false);
+      toast.success(
+        "Daily Bonus Claimed!",
+        "You've received 100 KSH. Come back tomorrow for more!"
+      );
     }, 1500);
   };
 
+  // Filter Logic
+  const filterItems = (items: any[]) => {
+    return items.filter((item) => {
+      const matchesSearch =
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesTab =
+        activeTab === "All" ||
+        item.category?.toLowerCase() === activeTab.toLowerCase();
+      return matchesSearch && matchesTab;
+    });
+  };
+
+  const filteredInProgress = filterItems(mockAchievements.inProgress);
+  const filteredUnlocked = filterItems(mockAchievements.unlocked);
+  const filteredLocked = filterItems(mockAchievements.locked);
+
+  const tabs = [
+    { id: "All", label: "All" },
+    { id: "Performance", label: "Performance" },
+    { id: "Time Based", label: "Time Based" },
+    { id: "Prestige", label: "Prestige" },
+    { id: "Social", label: "Social" },
+  ];
+
+  if (isPageLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-18 pl-6 pb-16">
       {/* Header */}
       <DashboardHeader
         user={mockUser}
@@ -146,7 +215,7 @@ export default function AchievementsPage() {
       />
 
       {/* Visual Separator */}
-      <div className="flex items-center gap-4 my-18">
+      <div className="flex items-center gap-4 my-8">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
           Overview
@@ -258,12 +327,12 @@ export default function AchievementsPage() {
         </motion.div>
       </div>
 
-      {/* Daily Bonus */}
-      <motion.div
+      {/* Daily Bonus Section */}
+      {/* <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="relative overflow-hidden my-18 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] p-6 md:p-8"
+        className="relative overflow-hidden my-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] p-6 md:p-8"
       >
         <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
 
@@ -282,14 +351,18 @@ export default function AchievementsPage() {
                     day.claimed
                       ? "bg-amber-100 border-amber-200 text-amber-700"
                       : day.day === 1
-                        ? "bg-amber-500 border-amber-500 text-white shadow-lg scale-110"
-                        : "bg-white/40 backdrop-blur-sm border-black/10 text-black/40"
+                      ? "bg-amber-500 border-amber-500 text-white shadow-lg scale-110"
+                      : "bg-white/40 backdrop-blur-sm border-black/10 text-black/40"
                   }`}
                 >
                   {day.claimed ? <IconCheck className="w-4 h-4" /> : day.day}
                 </div>
                 <span
-                  className={`text-xs font-mono font-semibold ${day.claimed || day.day === 1 ? "text-amber-600" : "text-black/40"}`}
+                  className={`text-xs font-mono font-semibold ${
+                    day.claimed || day.day === 1
+                      ? "text-amber-600"
+                      : "text-black/40"
+                  }`}
                 >
                   {day.reward} KSH
                 </span>
@@ -307,162 +380,176 @@ export default function AchievementsPage() {
             Claim Daily Bonus
           </motion.button>
         </div>
-      </motion.div>
+      </motion.div> */}
+
+      {/* Search & Filter */}
+      <SearchFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        tabs={tabs}
+        placeholder="Search achievements..."
+      />
 
       {/* In Progress */}
-      <div className="space-y-6">
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-            In Progress
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
+      {filteredInProgress.length > 0 && (
+        <div className="space-y-6">
+          <SectionHeading title="In Progress" className="my-16 md:my-18" />
+
+          <div className="grid gap-4">
+            {filteredInProgress.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 + index * 0.05 }}
+                className="relative overflow-hidden p-6 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:bg-white/60 hover:border-black/10 transition-all cursor-pointer"
+              >
+                <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-black/90 text-base">
+                        {item.title}
+                      </h4>
+                      <p className="text-sm text-black/80 font-medium mt-1">
+                        {item.description}
+                      </p>
+                    </div>
+                    <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">
+                      +{item.reward} KSH
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${item.progress}%` }}
+                        transition={{
+                          duration: 1,
+                          ease: "easeOut",
+                          delay: 0.5 + index * 0.05,
+                        }}
+                        className="h-full bg-black/80 rounded-full"
+                      />
+                    </div>
+                    <div className="text-xs font-mono font-semibold text-black/50">
+                      {item.progress}%
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
+      )}
 
-        <div className="grid gap-4">
-          {mockAchievements.inProgress.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 + index * 0.05 }}
-              className="relative overflow-hidden p-6 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:bg-white/60 hover:border-black/10 transition-all cursor-pointer"
-            >
-              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
+      {/* Unlocked */}
+      {filteredUnlocked.length > 0 && (
+        <div className="space-y-6">
+          <SectionHeading title="Unlocked" className="my-16 md:my-18" />
 
-              <div className="space-y-4">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
+          <div className="grid md:grid-cols-2 gap-4">
+            {filteredUnlocked.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.05 }}
+                className="relative overflow-hidden p-6 rounded-3xl bg-linear-to-br from-amber-50/50 to-white/40 backdrop-blur-xl border border-amber-200/50 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] cursor-pointer"
+              >
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                    {getCategoryIcon(item.category)}
+                  </div>
+                  <div>
                     <h4 className="font-semibold text-black/90 text-base">
                       {item.title}
                     </h4>
-                    <p className="text-sm text-black/60 font-medium mt-1">
+                    <p className="text-xs text-black/80 font-medium mt-1">
                       {item.description}
                     </p>
                   </div>
-                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">
-                    +{item.reward} KSH
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${item.progress}%` }}
-                      transition={{
-                        duration: 1,
-                        ease: "easeOut",
-                        delay: 0.5 + index * 0.05,
-                      }}
-                      className="h-full bg-black/80 rounded-full"
-                    />
+                  <div className="flex items-center gap-2">
+                    <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">
+                      +{item.reward} KSH
+                    </span>
+                    <span className="text-xs font-semibold text-black/50">
+                      {item.category}
+                    </span>
                   </div>
-                  <div className="text-xs font-mono font-semibold text-black/50">
-                    {item.progress}%
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Unlocked */}
-      <div className="space-y-6">
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-            Unlocked
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          {mockAchievements.unlocked.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.05 }}
-              className="relative overflow-hidden p-6 rounded-3xl bg-linear-to-br from-amber-50/50 to-white/40 backdrop-blur-xl border border-amber-200/50 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] cursor-pointer"
-            >
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                  {getCategoryIcon(item.category)}
-                </div>
-                <div>
-                  <h4 className="font-semibold text-black/90 text-base">
-                    {item.title}
-                  </h4>
-                  <p className="text-xs text-black/60 font-medium mt-1">
-                    {item.description}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">
-                    +{item.reward} KSH
-                  </span>
-                  <span className="text-xs font-semibold text-black/50">
-                    {item.category}
+                  <span className="text-xs text-black/40 font-medium">
+                    Unlocked {item.date}
                   </span>
                 </div>
-                <span className="text-xs text-black/40 font-medium">
-                  Unlocked {item.date}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Locked */}
-      <div className="space-y-6">
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-            Locked
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
+      {filteredLocked.length > 0 && (
+        <div className="space-y-6">
+          <SectionHeading title="Locked" className="my-16 md:my-18" />
 
-        <div className="grid md:grid-cols-3 gap-4">
-          {mockAchievements.locked.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55 + index * 0.05 }}
-              className="relative overflow-hidden p-6 rounded-3xl bg-white/20 backdrop-blur-sm border border-black/5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.05)] hover:bg-white/40 transition-all cursor-pointer"
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center text-black/30 mb-4">
-                  {getCategoryIcon(item.category)}
+          <div className="grid md:grid-cols-3 gap-4">
+            {filteredLocked.map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55 + index * 0.05 }}
+                className="relative overflow-hidden p-6 rounded-3xl bg-white/20 backdrop-blur-sm border border-black/5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.05)] hover:bg-white/40 transition-all cursor-pointer"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center text-black/30 mb-4">
+                    {getCategoryIcon(item.category)}
+                  </div>
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-black/80 text-base">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">
+                      +{item.reward} KSH
+                    </span>
+                    <span className="text-xs font-semibold text-black/30">
+                      {item.category}
+                    </span>
+                  </div>
                 </div>
-                <div className="mb-4">
-                  <h4 className="font-semibold text-black/60 text-base">
-                    {item.title}
-                  </h4>
-                  <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">
-                    {item.description}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">
-                    +{item.reward} KSH
-                  </span>
-                  <span className="text-xs font-semibold text-black/30">
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Fallback for Empty Search */}
+      {filteredInProgress.length === 0 &&
+        filteredUnlocked.length === 0 &&
+        filteredLocked.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center">
+              <IconAward className="w-8 h-8 text-neutral-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-neutral-900">
+                No achievements found
+              </h3>
+              <p className="text-sm text-neutral-500 mt-1">
+                Try adjusting your search or filter
+              </p>
+            </div>
+          </div>
+        )}
 
       {/* Bonus Claim Modal */}
       <AnimatePresence>
@@ -485,7 +572,7 @@ export default function AchievementsPage() {
                 onClick={() => setShowBonusModal(false)}
                 className="absolute top-6 right-6 p-2 hover:bg-black/5 rounded-full transition-colors cursor-pointer"
               >
-                <IconX className="w-5 h-5 text-black/60" />
+                <IconX className="w-5 h-5 text-black/80" />
               </button>
 
               <div className="text-center space-y-6">
@@ -502,7 +589,7 @@ export default function AchievementsPage() {
                   <h3 className="text-2xl font-semibold text-black/90 mb-2">
                     Daily Bonus
                   </h3>
-                  <p className="text-base text-black/60 font-medium">
+                  <p className="text-base text-black/80 font-medium">
                     Claim your reward for today
                   </p>
                 </div>
@@ -518,12 +605,22 @@ export default function AchievementsPage() {
 
                 <motion.button
                   onClick={handleClaimBonus}
+                  disabled={isClaiming}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-black text-white font-semibold py-2 rounded-xl shadow-lg hover:bg-black/90 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full bg-black text-white font-semibold py-3 rounded-xl shadow-lg hover:bg-black/90 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Claim Reward
-                  <IconArrowRight className="w-5 h-5" />
+                  {isClaiming ? (
+                    <>
+                      <IconLoader3 className="w-5 h-5 animate-spin" />
+                      Claiming...
+                    </>
+                  ) : (
+                    <>
+                      Claim Reward
+                      <IconArrowRight className="w-5 h-5" />
+                    </>
+                  )}
                 </motion.button>
 
                 <p className="text-xs text-black/40 font-medium">

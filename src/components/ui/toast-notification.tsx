@@ -12,7 +12,7 @@ import {
   ReactNode,
 } from "react";
 import { cn } from "@/lib/utils";
-import { IconLoader2 } from '@tabler/icons-react';
+import { IconLoader3 } from '@tabler/icons-react';
 import { IoAlertCircleOutline, IoCheckmarkCircleOutline, IoCloseCircleOutline, IoCloseOutline, IoInformationCircleOutline } from 'react-icons/io5';
 
 export type ToastTypeEnum =
@@ -153,7 +153,7 @@ function ToastItem({
       case "info":
         return <IoInformationCircleOutline className="h-5 w-5 text-blue-600" />;
       case "loading":
-        return <IconLoader2 className="h-5 w-5 text-neutral-600 animate-spin" />;
+        return <IconLoader3 className="h-5 w-5 text-neutral-600 animate-spin" />;
     }
   };
 

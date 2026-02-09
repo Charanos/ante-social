@@ -28,7 +28,7 @@ import {
   IconBrandApple,
   IconTrash,
   IconAlertTriangle,
-  IconLoader2,
+  IconLoader3,
 } from "@tabler/icons-react";
 
 type SettingsSection =
@@ -356,7 +356,7 @@ export default function SettingsPage() {
                                       ease: "linear",
                                     }}
                                   >
-                                    <IconLoader2 className="w-3 h-3" />
+                                    <IconLoader3 className="w-3 h-3" />
                                   </motion.div>
                                   Uploading...
                                 </>
@@ -380,6 +380,7 @@ export default function SettingsPage() {
 
                     <SectionHeading
                       title="Personal Details"
+                      className="my-16 md:my-18"
                       icon={<IconUser className="w-4 h-4 text-neutral-500" />}
                     />
 
@@ -390,11 +391,11 @@ export default function SettingsPage() {
                         transition={{ delay: 0.15 }}
                         className="space-y-2"
                       >
-                        <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                        <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                           Username
                         </label>
                         <div className="relative">
-                          <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60" />
+                          <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/80" />
                           <input
                             type="text"
                             value={username}
@@ -410,11 +411,11 @@ export default function SettingsPage() {
                         transition={{ delay: 0.2 }}
                         className="space-y-2"
                       >
-                        <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                        <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                           Email
                         </label>
                         <div className="relative">
-                          <IconMail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60" />
+                          <IconMail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/80" />
                           <input
                             type="email"
                             value={email}
@@ -430,11 +431,11 @@ export default function SettingsPage() {
                         transition={{ delay: 0.25 }}
                         className="space-y-2"
                       >
-                        <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                        <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                           Phone
                         </label>
                         <div className="relative">
-                          <IconPhone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60" />
+                          <IconPhone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/80" />
                           <input
                             type="tel"
                             value={phone}
@@ -450,11 +451,11 @@ export default function SettingsPage() {
                         transition={{ delay: 0.3 }}
                         className="space-y-2"
                       >
-                        <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                        <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                           Location
                         </label>
                         <div className="relative">
-                          <IconMapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60" />
+                          <IconMapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/80" />
                           <input
                             type="text"
                             value={location}
@@ -471,7 +472,7 @@ export default function SettingsPage() {
                       transition={{ delay: 0.35 }}
                       className="space-y-2"
                     >
-                      <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                      <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                         Bio
                       </label>
                       <textarea
@@ -489,6 +490,7 @@ export default function SettingsPage() {
                   <div className="space-y-12">
                     <SectionHeading
                       title="Password Management"
+                      className="my-16 md:my-18"
                       icon={<IconLock className="w-4 h-4 text-neutral-500" />}
                     />
 
@@ -504,7 +506,7 @@ export default function SettingsPage() {
 
                       <div className="space-y-3">
                         <div className="space-y-4 my-3">
-                          <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                          <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                             Current Password
                           </label>
                           <input
@@ -518,7 +520,7 @@ export default function SettingsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div className="space-y-4 my-3">
-                            <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                            <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                               New Password
                             </label>
                             <input
@@ -531,7 +533,7 @@ export default function SettingsPage() {
                           </div>
 
                           <div className="space-y-4 my-3">
-                            <label className="text-xs font-semibold text-black/60 uppercase tracking-wider">
+                            <label className="text-xs font-semibold text-black/80 uppercase tracking-wider">
                               Confirm Password
                             </label>
                             <input
@@ -563,7 +565,7 @@ export default function SettingsPage() {
                                   ease: "linear",
                                 }}
                               >
-                                <IconLoader2 className="w-4 h-4" />
+                                <IconLoader3 className="w-4 h-4" />
                               </motion.div>
                               Updating...
                             </>
@@ -576,6 +578,7 @@ export default function SettingsPage() {
 
                     <SectionHeading
                       title="Account Security"
+                      className="my-16 md:my-18"
                       icon={<IconShield className="w-4 h-4 text-neutral-500" />}
                     />
 
@@ -623,7 +626,7 @@ export default function SettingsPage() {
                                   ease: "linear",
                                 }}
                               >
-                                <IconLoader2 className="w-3 h-3 text-black" />
+                                <IconLoader3 className="w-3 h-3 text-black" />
                               </motion.div>
                             )}
                           </motion.div>
@@ -695,6 +698,7 @@ export default function SettingsPage() {
                   <div className="space-y-12">
                     <SectionHeading
                       title="Notification Channels"
+                      className="my-16 md:my-18"
                       icon={<IconBell className="w-4 h-4 text-neutral-500" />}
                     />
 
@@ -707,7 +711,7 @@ export default function SettingsPage() {
                       <div className="space-y-3">
                         <div className="flex items-center justify-between p-3 rounded-lg bg-white border border-black/5 hover:border-black/10 transition-all">
                           <div className="flex items-center gap-3">
-                            <IconMail className="w-4 h-4 text-black/60" />
+                            <IconMail className="w-4 h-4 text-black/80" />
                             <div>
                               <p className="text-sm font-semibold text-black/90">
                                 Email Notifications
@@ -743,7 +747,7 @@ export default function SettingsPage() {
 
                         <div className="flex items-center justify-between p-3 rounded-lg bg-white border border-black/5 hover:border-black/10 transition-all">
                           <div className="flex items-center gap-3">
-                            <IconBell className="w-4 h-4 text-black/60" />
+                            <IconBell className="w-4 h-4 text-black/80" />
                             <div>
                               <p className="text-sm font-semibold text-black/90">
                                 Push Notifications
@@ -781,6 +785,7 @@ export default function SettingsPage() {
 
                     <SectionHeading
                       title="Notification Types"
+                      className="my-16 md:my-18"
                       icon={<IconUser className="w-4 h-4 text-neutral-500" />}
                     />
 
@@ -853,6 +858,7 @@ export default function SettingsPage() {
                   <div className="space-y-12">
                     <SectionHeading
                       title="Profile Visibility"
+                      className="my-16 md:my-18"
                       icon={<IconShield className="w-4 h-4 text-neutral-500" />}
                     />
 
@@ -910,6 +916,7 @@ export default function SettingsPage() {
                       icon={
                         <IconCreditCard className="w-4 h-4 text-neutral-500" />
                       }
+                      className="my-16 md:my-18"
                     />
 
                     <motion.div
@@ -926,7 +933,7 @@ export default function SettingsPage() {
                         <span className="text-sm font-semibold text-black/90">
                           Download My Data
                         </span>
-                        <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60" />
+                        <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80" />
                       </motion.button>
 
                       <motion.button
@@ -937,7 +944,7 @@ export default function SettingsPage() {
                         <span className="text-sm font-semibold text-black/90">
                           Privacy Policy
                         </span>
-                        <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60" />
+                        <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80" />
                       </motion.button>
 
                       <motion.button
@@ -948,7 +955,7 @@ export default function SettingsPage() {
                         <span className="text-sm font-semibold text-black/90">
                           Terms of Service
                         </span>
-                        <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60" />
+                        <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80" />
                       </motion.button>
                     </motion.div>
                   </div>
@@ -962,6 +969,7 @@ export default function SettingsPage() {
                       icon={
                         <IconCreditCard className="w-4 h-4 text-neutral-500" />
                       }
+                      className="my-16 md:my-18"
                     />
 
                     <motion.div
@@ -1010,6 +1018,7 @@ export default function SettingsPage() {
                       icon={
                         <IconCreditCard className="w-4 h-4 text-neutral-500" />
                       }
+                      className="my-16 md:my-18"
                     />
 
                     <motion.div
@@ -1030,7 +1039,7 @@ export default function SettingsPage() {
                         <span className="text-sm font-semibold text-black/90">
                           View All Transactions
                         </span>
-                        <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60" />
+                        <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80" />
                       </motion.button>
                     </motion.div>
 
@@ -1039,6 +1048,7 @@ export default function SettingsPage() {
                       icon={
                         <IconAlertTriangle className="w-4 h-4 text-red-500" />
                       }
+                      className="my-16 md:my-18"
                     />
 
                     <motion.div
@@ -1116,7 +1126,7 @@ export default function SettingsPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-sm text-black/60"
+                    className="text-sm text-black/80"
                   >
                     This action cannot be undone. All your data, bets, and
                     groups will be permanently deleted.
@@ -1154,7 +1164,7 @@ export default function SettingsPage() {
                             ease: "linear",
                           }}
                         >
-                          <IconLoader2 className="w-4 h-4" />
+                          <IconLoader3 className="w-4 h-4" />
                         </motion.div>
                         Deleting...
                       </>
@@ -1234,7 +1244,7 @@ export default function SettingsPage() {
                           ease: "linear",
                         }}
                       >
-                        <IconLoader2 className="w-4 h-4" />
+                        <IconLoader3 className="w-4 h-4" />
                       </motion.div>
                       Saving...
                     </>

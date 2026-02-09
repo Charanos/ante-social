@@ -160,7 +160,7 @@ export default function BetrayalMarketPage() {
                   <h2 className="text-2xl md:text-3xl font-semibold text-black/90 tracking-tight mb-3">
                     {market.title}
                   </h2>
-                  <p className="text-base text-black/60 font-medium leading-relaxed">
+                  <p className="text-base text-black/80 font-medium leading-relaxed">
                     {market.description}
                   </p>
                 </div>
@@ -251,10 +251,10 @@ export default function BetrayalMarketPage() {
                   <h3 className="text-2xl font-semibold text-black/90">
                     COOPERATE
                   </h3>
-                  <p className="text-sm text-black/60 font-medium">
+                  <p className="text-sm text-black/80 font-medium">
                     Play it safe. Share the reward.
                   </p>
-                  <div className="space-y-2 text-left">
+                  <div className="space-y-2 text-center">
                     <p className="text-xs text-green-700 font-medium">
                       ✓ Guaranteed small win if others cooperate
                     </p>
@@ -295,10 +295,10 @@ export default function BetrayalMarketPage() {
                   <h3 className="text-2xl font-semibold text-black/90">
                     BETRAY
                   </h3>
-                  <p className="text-sm text-black/60 font-medium">
+                  <p className="text-sm text-black/80 font-medium">
                     Risk it all. Take the prize.
                   </p>
-                  <div className="space-y-2 text-left">
+                  <div className="space-y-2 text-center">
                     <p className="text-xs text-green-700 font-medium">
                       ✓ Win big if minority betrays
                     </p>
@@ -385,7 +385,7 @@ export default function BetrayalMarketPage() {
             <div className="text-center">
               <button
                 onClick={() => setShowOutcomes(!showOutcomes)}
-                className="px-6 py-2 text-sm text-black/60 hover:text-black/90 font-medium cursor-pointer transition-colors underline"
+                className="px-6 py-2 text-sm text-black/80 hover:text-black/90 font-medium cursor-pointer transition-colors underline"
               >
                 {showOutcomes ? "Hide" : "Show"} Possible Outcomes
               </button>
@@ -525,7 +525,7 @@ export default function BetrayalMarketPage() {
                   {/* Summary */}
                   <div className="pt-6 border-t border-black/5 space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-black/60 font-medium">
+                      <span className="text-black/80 font-medium">
                         Platform Fee (5%)
                       </span>
                       <span className="font-mono font-semibold text-black/80">
@@ -585,12 +585,12 @@ export default function BetrayalMarketPage() {
                 className="p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5"
               >
                 <div className="flex gap-3">
-                  <IconShield className="w-5 h-5 text-black/60 shrink-0" />
+                  <IconShield className="w-5 h-5 text-black/80 shrink-0" />
                   <div className="space-y-2">
                     <p className="text-sm font-semibold text-black/90">
                       Your Choice is Secret
                     </p>
-                    <p className="text-xs text-black/60 font-medium leading-relaxed">
+                    <p className="text-xs text-black/80 font-medium leading-relaxed">
                       No one knows what you picked until the market settles.
                       Results revealed simultaneously to all participants.
                     </p>

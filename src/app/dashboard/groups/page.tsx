@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { IconActivity, IconLoader2, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import { IconActivity, IconLoader3, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
 import { mockGroups, mockUser } from "@/lib/mockData";
 import { getJoinedGroups, isGroupMember } from "@/lib/membership";
@@ -85,7 +85,7 @@ export default function GroupsPage() {
           disabled={isCreating}
         >
           {isCreating ? (
-            <IconLoader2 className="h-4 w-4 animate-spin" />
+            <IconLoader3 className="h-4 w-4 animate-spin" />
           ) : (
             <IconPlus className="h-4 w-4" />
           )}
@@ -168,6 +168,7 @@ export default function GroupsPage() {
 
       <SectionHeading
         title="Your Groups"
+        className="my-16 md:my-18"
         icon={<IconUsers className="h-4 w-4 text-purple-500" />}
       />
 

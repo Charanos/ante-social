@@ -134,7 +134,7 @@ export function Testimonials() {
           className="mb-16 md:mb-20 text-center space-y-4"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-black/5 rounded-full shadow-sm mb-4">
-            <IconStar className="w-4 h-4 text-black/60" />
+            <IconStar className="w-4 h-4 text-black/80" />
             <span className="text-sm font-semibold text-black/70">
               Trusted by Players
             </span>
@@ -143,7 +143,7 @@ export function Testimonials() {
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
             What Players Are Saying
           </h2>
-          <p className="text-base md:text-lg text-black/60 font-medium max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
             Join thousands of Kenyan bettors who've found their new home on Ante
             Social.
           </p>

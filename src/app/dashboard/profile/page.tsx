@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -19,7 +19,7 @@ import {
   IconShield,
   IconTrendingUp,
   IconUser,
-  IconLoader2,
+  IconLoader3,
   IconCamera,
   IconPhone,
   IconMapPin,
@@ -271,16 +271,13 @@ export default function ProfilePage() {
                   <h1 className="text-3xl md:text-4xl font-medium text-white">
                     Your Achievements
                   </h1>
-                  <p className="text-base text-white/70 font-normal max-w-2xl my-3 leading-relaxed">
+                  <p className="text-base text-white/70 font-normal max-w-7xl my-3 leading-relaxed">
                     Track your progress, earn badges, and unlock exclusive
                     rewards as you master the art of prediction
                   </p>
                 </div>
 
                 <div className="flex items-center gap-8 flex-wrap w-full">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-xs font-medium text-white/90 uppercase tracking-wider">
-                    Level 7
-                  </span>
                   <span className="text-sm text-white/50 font-normal flex items-center gap-1.5">
                     <IconTrendingUp className="w-3.5 h-3.5" />
                     12 Badges Earned
@@ -295,7 +292,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/10">
+          <div className="grid text-center md:grid-cols-3 grid-cols-1 gap-6 pt-6 border-t border-white/10">
             <div className="space-y-1">
               <p className="text-sm font-medium text-white/80">Total Badges</p>
               <p className="text-2xl font-normal text-white font-mono">12</p>
@@ -373,8 +370,8 @@ export default function ProfilePage() {
         {/* Left Column - Profile Info */}
         <div className="lg:col-span-2 space-y-12">
           {/* Personal Information */}
-          <div className="space-y-12 mt-10">
-            <SectionHeading title="Edit Profile Information" />
+          <div className="space-y-12">
+            <SectionHeading title="Edit Profile Information" className="mt-12" />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -407,7 +404,7 @@ export default function ProfilePage() {
                             ease: "linear",
                           }}
                         >
-                          <IconLoader2 className="h-4 w-4" />
+                          <IconLoader3 className="h-4 w-4" />
                         </motion.div>
                       ) : (
                         <IconCamera className="h-4 w-4" />
@@ -433,75 +430,75 @@ export default function ProfilePage() {
                 {/* Editable Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Full Name
                     </label>
                     <div className="relative">
-                      <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60 pointer-events-none" />
+                      <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/90 pointer-events-none" />
                       <input
                         type="text"
                         value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setFullName(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Username
                     </label>
                     <div className="relative">
-                      <IconHash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60 pointer-events-none" />
+                      <IconHash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/90 pointer-events-none" />
                       <input
                         type="text"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setUsername(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Email
                     </label>
                     <div className="relative">
-                      <IconMail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60 pointer-events-none" />
+                      <IconMail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/90 pointer-events-none" />
                       <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setEmail(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Phone
                     </label>
                     <div className="relative">
-                      <IconPhone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60 pointer-events-none" />
+                      <IconPhone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/90 pointer-events-none" />
                       <input
                         type="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setPhone(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
                   </div>
 
                   <div className="md:col-span-2 space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Location
                     </label>
                     <div className="relative">
-                      <IconMapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60 pointer-events-none" />
+                      <IconMapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/90 pointer-events-none" />
                       <input
                         type="text"
                         value={location}
-                        onChange={(e) => setLocation(e.target.value)}
+                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setLocation(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
@@ -509,12 +506,12 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                  <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                     Bio
                   </label>
                   <textarea
                     value={bio}
-                    onChange={(e) => setBio(e.target.value)}
+                    onChange={(e: { target: { value: SetStateAction<string>; }; }) => setBio(e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all resize-none cursor-pointer"
                   />
@@ -527,7 +524,8 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <SectionHeading
               title="Preferences"
-              icon={<IconSettings className="h-5 w-5 text-black/60" />}
+              className="my-16 md:my-18"
+              icon={<IconSettings className="h-5 w-5 text-black/80" />}
             />
 
             <motion.div
@@ -542,11 +540,11 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Timezone */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Timezone
                     </label>
                     <div className="relative">
-                      <IconGlobe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/60 pointer-events-none" />
+                      <IconGlobe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/80 pointer-events-none" />
                       <select
                         value={timezone}
                         onChange={(e) => setTimezone(e.target.value)}
@@ -570,11 +568,11 @@ export default function ProfilePage() {
 
                   {/* Language */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                    <label className="text-xs font-medium text-black/80 uppercase tracking-wider">
                       Language
                     </label>
                     <div className="relative">
-                      <IconLanguage className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/60 pointer-events-none" />
+                      <IconLanguage className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/80 pointer-events-none" />
                       <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
@@ -615,7 +613,7 @@ export default function ProfilePage() {
                           <IconMail
                             className={cn(
                               "h-4 w-4",
-                              emailNotif ? "text-black/70" : "text-black/60",
+                              emailNotif ? "text-black/70" : "text-black/80",
                             )}
                           />
                         </div>
@@ -656,7 +654,7 @@ export default function ProfilePage() {
                           <IconBell
                             className={cn(
                               "h-4 w-4",
-                              pushNotif ? "text-black/70" : "text-black/60",
+                              pushNotif ? "text-black/70" : "text-black/80",
                             )}
                           />
                         </div>
@@ -691,7 +689,7 @@ export default function ProfilePage() {
         {/* Right Column - Status & Quick Links */}
         <div className="lg:col-span-1 space-y-6">
           {/* Status & Limits */}
-          <div className="space-y-6 mt-10">
+          <div className="space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -699,7 +697,7 @@ export default function ProfilePage() {
               className="relative overflow-hidden "
             >
               <div className="space-y-6">
-                <SectionHeading title="Account Status" />
+                <SectionHeading title="Account Status" className="my-12" />
 
                 {/* Tier Badge */}
                 <div className="relative overflow-hidden p-4 rounded-2xl bg-linear-to-br from-amber-50 to-orange-50 border border-amber-100">
@@ -737,10 +735,10 @@ export default function ProfilePage() {
                 <div className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-black/5">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-black/5">
-                      <IconHash className="h-4 w-4 text-black/60" />
+                      <IconHash className="h-4 w-4 text-black/80" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-xs font-medium text-black/60 uppercase tracking-wider">
+                      <p className="text-xs font-medium text-black/80 uppercase tracking-wider">
                         User ID
                       </p>
                       <p className="text-sm font-mono font-medium text-black/90">
@@ -799,7 +797,7 @@ export default function ProfilePage() {
 
           {/* Quick Links */}
           <div className="space-y-4 mt-10">
-            <SectionHeading title="Quick Links" />
+            <SectionHeading title="Quick Links" className="my-16 md:my-18" />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -818,7 +816,7 @@ export default function ProfilePage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-black/5 group-hover:bg-black/10 transition-colors">
-                        <IconSettings className="w-4 h-4 text-black/60" />
+                        <IconSettings className="w-4 h-4 text-black/80" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-black/90">
@@ -829,7 +827,7 @@ export default function ProfilePage() {
                         </p>
                       </div>
                     </div>
-                    <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60 transition-colors" />
+                    <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80 transition-colors" />
                   </motion.div>
                 </Link>
 
@@ -841,7 +839,7 @@ export default function ProfilePage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-black/5 group-hover:bg-black/10 transition-colors">
-                        <IconCreditCard className="w-4 h-4 text-black/60" />
+                        <IconCreditCard className="w-4 h-4 text-black/80" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-black/90">
@@ -850,7 +848,7 @@ export default function ProfilePage() {
                         <p className="text-xs text-black/50">Manage funds</p>
                       </div>
                     </div>
-                    <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60 transition-colors" />
+                    <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80 transition-colors" />
                   </motion.div>
                 </Link>
 
@@ -862,7 +860,7 @@ export default function ProfilePage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-black/5 group-hover:bg-black/10 transition-colors">
-                        <IconAward className="w-4 h-4 text-black/60" />
+                        <IconAward className="w-4 h-4 text-black/80" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-black/90">
@@ -871,7 +869,7 @@ export default function ProfilePage() {
                         <p className="text-xs text-black/50">View badges</p>
                       </div>
                     </div>
-                    <IconChevronRight className="w-4 h-4 text-black/60 group-hover:text-black/60 transition-colors" />
+                    <IconChevronRight className="w-4 h-4 text-black/80 group-hover:text-black/80 transition-colors" />
                   </motion.div>
                 </Link>
               </div>
@@ -925,7 +923,7 @@ export default function ProfilePage() {
                           ease: "linear",
                         }}
                       >
-                        <IconLoader2 className="w-4 h-4" />
+                        <IconLoader3 className="w-4 h-4" />
                       </motion.div>
                       Saving...
                     </>

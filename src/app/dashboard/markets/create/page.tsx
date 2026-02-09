@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconActivity, IconAlertTriangle, IconAward, IconCalendar, IconCurrencyDollar, IconDeviceFloppy, IconLayersOff, IconLoader2, IconPlus, IconUsers, IconX } from '@tabler/icons-react';;
+import { IconActivity, IconAlertTriangle, IconAward, IconCalendar, IconCurrencyDollar, IconDeviceFloppy, IconLayersOff, IconLoader3, IconPlus, IconUsers, IconX } from '@tabler/icons-react';;
 
 import { useRouter } from "next/navigation";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -600,7 +600,7 @@ export default function CreateMarketPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <IconLoader2 className="w-5 h-5 animate-spin" />
+                      <IconLoader3 className="w-5 h-5 animate-spin" />
                       Creating...
                     </>
                   ) : (

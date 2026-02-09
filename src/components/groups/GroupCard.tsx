@@ -194,7 +194,7 @@ export function GroupCard({
                   </span>
                 </div>
               ) : (
-                <IconArrowRight className="w-4 h-4 text-black/30 group-hover:text-black/60 group-hover:translate-x-1 transition-all" />
+                <IconArrowRight className="w-4 h-4 text-black/30 group-hover:text-black/80 group-hover:translate-x-1 transition-all" />
               )}
             </div>
           </div>

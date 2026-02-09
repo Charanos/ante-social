@@ -9,10 +9,12 @@ import {
   IconCircleCheckFilled,
   IconEye,
   IconHelpCircle,
-  IconLoader2,
+  IconLoader3,
   IconPhoto,
   IconTrendingUp,
   IconX,
+  Icon,
+  IconEyeDollar,
 } from "@tabler/icons-react";
 
 import Image from "next/image";
@@ -297,8 +299,8 @@ export default function DashboardPage() {
 
       <SectionHeading
         title="Live Wins"
-        icon={<IconEye className="w-4 h-4 text-orange-500" />}
-        className="my-20"
+        className="my-16 md:my-18"
+        icon={<IconEyeDollar className="w-4 h-4 text-orange-500" />}
       />
 
       <div className="relative w-full overflow-hidden bg-white/30 backdrop-blur-sm border border-black/5 rounded-2xl py-4">
@@ -321,8 +323,8 @@ export default function DashboardPage() {
 
       <SectionHeading
         title="Active Markets"
+        className="my-16 md:my-18"
         icon={<IconTrendingUp className="w-4 h-4 text-orange-500" />}
-        className="mb-8"
       />
 
       {/* Markets Section */}
@@ -339,7 +341,7 @@ export default function DashboardPage() {
                 className={`pb-3 text-sm cursor-pointer font-semibold transition-all relative ${
                   activeTab === tab
                     ? "text-black/90"
-                    : "text-black/40 hover:text-black/60"
+                    : "text-black/40 hover:text-black/80"
                 }`}
               >
                 {tab}
@@ -365,7 +367,7 @@ export default function DashboardPage() {
 
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
-            <IconLoader2 className="w-8 h-8 animate-spin text-black/40" />
+            <IconLoader3 className="w-8 h-8 animate-spin text-black/40" />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -417,7 +419,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: { stopPropagation: () => any; }) => e.stopPropagation()}
               className="relative w-full max-w-lg bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden p-8 border border-black/5"
             >
               <button
@@ -432,7 +434,7 @@ export default function DashboardPage() {
                   <h3 className="text-2xl font-semibold text-black/90 mb-2">
                     How to Play
                   </h3>
-                  <p className="text-base text-black/60 font-medium">
+                  <p className="text-base text-black/80 font-medium">
                     Welcome to Ante Social. Simple rules, strategic gameplay.
                   </p>
                 </div>
@@ -476,7 +478,7 @@ export default function DashboardPage() {
                       <p className="text-sm font-semibold text-black/90 mb-1">
                         Pro Tip
                       </p>
-                      <p className="text-xs text-black/60 font-medium leading-relaxed">
+                      <p className="text-xs text-black/80 font-medium leading-relaxed">
                         Smaller groups often mean higher payouts. Be contrarian,
                         think different, win big.
                       </p>

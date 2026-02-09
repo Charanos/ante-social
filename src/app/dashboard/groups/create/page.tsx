@@ -13,7 +13,7 @@ import { mockUser } from "@/lib/mockData";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import { IconActivity, IconAward, IconChevronLeft, IconChevronRight, IconCoffee, IconGlobe, IconLayersOff, IconLoader2, IconLock, IconPalette, IconPlus, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';;
+import { IconActivity, IconAward, IconChevronLeft, IconChevronRight, IconCoffee, IconGlobe, IconLayersOff, IconLoader3, IconLock, IconPalette, IconPlus, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';;
 
 const steps = [
   { id: 1, title: "Category" },
@@ -790,7 +790,7 @@ export default function CreateGroupPage() {
                 >
                   {isCreating ? (
                     <>
-                      <IconLoader2 className="w-5 h-5 animate-spin" />
+                      <IconLoader3 className="w-5 h-5 animate-spin" />
                       Launching...
                     </>
                   ) : (

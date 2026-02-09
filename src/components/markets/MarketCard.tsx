@@ -90,7 +90,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
 
             {/* Type Badge */}
             <div className="absolute top-4 left-4 px-3 flex items-center gap-1.5 py-1.5 bg-white/90 backdrop-blur-sm rounded-full border border-black/10 shadow-sm">
-              <TypeIcon className="w-3 h-3 text-black/60" />
+              <TypeIcon className="w-3 h-3 text-black/80" />
               <span className="text-[10px] font-semibold text-black/70 uppercase tracking-widest">
                 {typeInfo.label}
               </span>
@@ -121,7 +121,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
               <h3 className="text-lg font-semibold text-black/90 tracking-tight mb-2 line-clamp-1 group-hover:text-black transition-colors">
                 {market.title}
               </h3>
-              <p className="text-sm text-black/60 font-medium line-clamp-2 leading-relaxed">
+              <p className="text-sm text-black/80 font-medium line-clamp-2 leading-relaxed">
                 {market.description}
               </p>
             </div>

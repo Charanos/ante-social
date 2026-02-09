@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  IconChevronDown,
   IconLogout,
   IconPhoto,
   IconSettings,
@@ -25,7 +24,12 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { mockNotifications } from "@/lib/mockData";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface NavItem {
   title: string;
@@ -79,23 +83,17 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [defaultValue, setDefaultValue] = useState<string | undefined>(undefined);
 
   // Auto-expand the section if the current path is within it
   useEffect(() => {
     const activeItem = navItems.find((item) =>
       item.children?.some((child) => pathname === child.url),
     );
-    if (activeItem && !expandedItems.includes(activeItem.title)) {
-      setExpandedItems((prev) => [...prev, activeItem.title]);
+    if (activeItem) {
+      setDefaultValue(activeItem.title);
     }
   }, [pathname]);
-
-  const toggleExpand = (title: string) => {
-    setExpandedItems((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
-    );
-  };
 
   return (
     <aside
@@ -156,7 +154,13 @@ export function Sidebar({
           )}
         </div>
 
-        <ul className="space-y-1.5 flex-1">
+        <Accordion
+          type="single"
+          collapsible
+          value={defaultValue}
+          onValueChange={setDefaultValue}
+          className="space-y-1.5 flex-1"
+        >
           {navItems
             .filter(
               (item) =>
@@ -171,160 +175,174 @@ export function Sidebar({
               const unreadCount = isNotifications
                 ? mockNotifications.filter((n) => !n.is_read).length
                 : 0;
-              const isExpanded = expandedItems.includes(item.title);
               const hasChildren =
                 item.children && item.children.length > 0 && !collapsed;
 
-              return (
-                <li key={item.title}>
-                  <div
-                    className={cn(
-                      "relative group flex items-center rounded-xl transition-all duration-200 cursor-pointer overflow-hidden",
-                      isActive && !hasChildren
-                        ? "bg-linear-to-r from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/20"
-                        : "text-gray-500 hover:bg-gray-400/10 hover:shadow-sm hover:text-gray-900",
-                      collapsed ? "justify-center px-2 py-3" : "py-2.5 px-3",
-                    )}
-                    onClick={() =>
-                      hasChildren ? toggleExpand(item.title) : null
-                    }
-                  >
-                    {/* Main Link Content */}
-                    {hasChildren ? (
-                      // If it has children and is NOT collapsed, it behaves as a toggle
-                      <div className="flex w-full items-center">
+              // If collapsed and has children, render as clickable link
+              if (collapsed && item.children && item.children.length > 0) {
+                return (
+                  <li key={item.title} className="list-none">
+                    <Link
+                      href={item.url}
+                      className={cn(
+                        "relative group flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer overflow-hidden px-2 py-3",
+                        isActive
+                          ? "bg-linear-to-r from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/20"
+                          : "text-gray-500 hover:bg-gray-400/10 hover:shadow-sm hover:text-gray-900",
+                      )}
+                      title={item.title}
+                    >
+                      <item.icon
+                        className={cn(
+                          "h-5 w-5 transition-colors duration-200",
+                          isActive
+                            ? "text-white"
+                            : "text-gray-400 group-hover:text-gray-600",
+                        )}
+                      />
+                      {/* Tooltip for collapsed mode */}
+                      <div className="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all z-50 shadow-xl -translate-x-2.5 group-hover:translate-x-0">
+                        {item.title}
+                      </div>
+                    </Link>
+                  </li>
+                );
+              }
+
+              // If no children, render as regular link
+              if (!hasChildren) {
+                return (
+                  <li key={item.title} className="list-none">
+                    <Link
+                      href={item.url}
+                      className={cn(
+                        "relative group flex items-center rounded-xl transition-all duration-200 cursor-pointer overflow-hidden",
+                        isActive
+                          ? "bg-linear-to-r from-gray-900 to-gray-800 text-white shadow-lg shadow-gray-900/20"
+                          : "text-gray-500 hover:bg-gray-400/10 hover:shadow-sm hover:text-gray-900",
+                        collapsed ? "justify-center px-2 py-3" : "py-2.5 px-3",
+                      )}
+                      title={collapsed ? item.title : undefined}
+                    >
+                      <div className="relative shrink-0">
                         <item.icon
                           className={cn(
-                            "h-5 w-5 transition-colors duration-200 shrink-0",
+                            "h-5 w-5 transition-colors duration-200",
                             isActive
-                              ? "text-gray-900"
+                              ? "text-white"
                               : "text-gray-400 group-hover:text-gray-600",
                           )}
                         />
+                        {isNotifications && unreadCount > 0 && (
+                          <span
+                            className={cn(
+                              "absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 ring-2 ring-white",
+                            )}
+                          />
+                        )}
+                      </div>
 
+                      {!collapsed && (
                         <div className="flex flex-1 items-center justify-between ml-3 overflow-hidden">
                           <span
                             className={cn(
                               "text-sm font-medium tracking-wide transition-opacity duration-200 truncate",
                               isActive
-                                ? "text-gray-900"
+                                ? "text-white"
                                 : "text-gray-600 group-hover:text-gray-900",
                             )}
                           >
                             {item.title}
                           </span>
-                          <IconChevronDown
-                            className={cn(
-                              "h-4 w-4 text-gray-400 transition-transform duration-200",
-                              isExpanded ? "rotate-180" : "",
-                            )}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      // Standard Link
-                      <Link
-                        href={item.url}
-                        className={cn(
-                          "flex w-full items-center",
-                          collapsed && "justify-center",
-                        )}
-                        title={collapsed ? item.title : undefined}
-                      >
-                        <div className="relative shrink-0">
-                          <item.icon
-                            className={cn(
-                              "h-5 w-5 transition-colors duration-200",
-                              isActive && !hasChildren
-                                ? "text-white"
-                                : "text-gray-400 group-hover:text-gray-600",
-                              isActive && hasChildren ? "text-gray-900" : "",
-                            )}
-                          />
                           {isNotifications && unreadCount > 0 && (
-                            <span
-                              className={cn(
-                                "absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 ring-2 ring-white",
-                              )}
-                            />
+                            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+                              {unreadCount}
+                            </span>
                           )}
                         </div>
+                      )}
 
-                        {!collapsed && (
-                          <div className="flex flex-1 items-center justify-between ml-3 overflow-hidden">
-                            <span
-                              className={cn(
-                                "text-sm font-medium tracking-wide transition-opacity duration-200 truncate",
-                                isActive && !hasChildren
-                                  ? "text-white"
-                                  : "text-gray-600 group-hover:text-gray-900",
-                              )}
-                            >
-                              {item.title}
-                            </span>
-                            {isNotifications && unreadCount > 0 && (
-                              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
-                                {unreadCount}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </Link>
-                    )}
+                      {/* Tooltip for collapsed mode */}
+                      {collapsed && (
+                        <div className="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all z-50 shadow-xl -translate-x-2.5 group-hover:translate-x-0">
+                          {item.title}
+                          {isNotifications &&
+                            unreadCount > 0 &&
+                            ` (${unreadCount})`}
+                        </div>
+                      )}
+                    </Link>
+                  </li>
+                );
+              }
 
-                    {/* Tooltip for collapsed mode */}
-                    {collapsed && (
-                      <div className="absolute left-full ml-4 px-3 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap transition-all z-50 shadow-xl -translate-x-2.5 group-hover:translate-x-0">
-                        {item.title}
-                        {isNotifications &&
-                          unreadCount > 0 &&
-                          ` (${unreadCount})`}
-                      </div>
+              // Has children and not collapsed - render with accordion
+              return (
+                <AccordionItem
+                  key={item.title}
+                  value={item.title}
+                  className="border-none"
+                >
+                  <AccordionTrigger
+                    className={cn(
+                      "relative group flex items-center rounded-xl transition-all duration-200 hover:no-underline py-2.5 px-3",
+                      isActive
+                        ? "text-gray-900"
+                        : "text-gray-500 hover:bg-gray-400/10 hover:shadow-sm hover:text-gray-900"
                     )}
-                  </div>
-
-                  {/* Nested Items Accordion */}
-                  <AnimatePresence>
-                    {hasChildren && isExpanded && !collapsed && (
-                      <motion.ul
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeInOut" }}
-                        className="overflow-hidden ml-9 mt-1 space-y-1 border-l-2 border-gray-100 pl-2"
-                      >
-                        {item.children
-                          ?.filter((child) => {
-                            if (child.title === "Create Market") {
-                              return (session?.user as any)?.role === "admin";
-                            }
-                            return true;
-                          })
-                          .map((child) => {
-                            const isChildActive = pathname === child.url;
-                            return (
-                              <li key={child.url}>
-                                <Link
-                                  href={child.url}
-                                  className={cn(
-                                    "block px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150",
-                                    isChildActive
-                                      ? "bg-gray-100 text-gray-900"
-                                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
-                                  )}
-                                >
-                                  {child.title}
-                                </Link>
-                              </li>
-                            );
-                          })}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </li>
+                  >
+                    <item.icon
+                      className={cn(
+                        "h-5 w-5 transition-colors duration-200 shrink-0 mr-3",
+                        isActive
+                          ? "text-gray-900"
+                          : "text-gray-400 group-hover:text-gray-600",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "text-sm font-medium tracking-wide transition-opacity duration-200 truncate flex-1 text-left",
+                        isActive
+                          ? "text-gray-900"
+                          : "text-gray-600 group-hover:text-gray-900",
+                      )}
+                    >
+                      {item.title}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-1 pt-1">
+                    <ul className="ml-9 space-y-1 border-l-2 cursor-pointer border-gray-100 pl-2">
+                      {item.children
+                        ?.filter((child) => {
+                          if (child.title === "Create Market") {
+                            return (session?.user as any)?.role === "admin";
+                          }
+                          return true;
+                        })
+                        .map((child) => {
+                          const isChildActive = pathname === child.url;
+                          return (
+                            <li key={child.url}>
+                              <Link
+                                href={child.url}
+                                className={cn(
+                                  "block px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150",
+                                  isChildActive
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
+                                )}
+                              >
+                                {child.title}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
               );
             })}
-        </ul>
+        </Accordion>
 
         {/* Bottom Controls */}
         <div className="mt-auto pt-6 border-t border-gray-100">

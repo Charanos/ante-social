@@ -208,12 +208,12 @@ export default function MarketsPage() {
           </Card>
         </motion.div>
 
-        <SectionHeading title="Available Markets" />
+        <SectionHeading title="Available Markets" className="my-16 md:my-18" />
 
         <SearchFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          placeholder="IconSearch markets, tags, or pools..."
+          placeholder="Search markets, tags, or pools..."
           tabs={[
             { id: "all", label: "All Markets" },
             { id: "poll", label: "Poll" },

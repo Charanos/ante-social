@@ -126,7 +126,7 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
             <h3 className="text-xl md:text-2xl font-medium text-black/90 tracking-tight group-hover:text-black transition-colors">
               {feature.title}
             </h3>
-            <p className="text-black/60 text-sm md:text-base leading-relaxed font-medium">
+            <p className="text-black/80 text-sm md:text-base leading-relaxed font-medium">
               {feature.description}
             </p>
           </div>
@@ -194,7 +194,7 @@ export function FeatureGrid() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-black/60 font-medium leading-relaxed"
+            className="text-lg text-black/80 font-medium leading-relaxed"
           >
             Powerful tools designed for the Kenyan market. M-Pesa ready, crypto
             enabled, socially driven.

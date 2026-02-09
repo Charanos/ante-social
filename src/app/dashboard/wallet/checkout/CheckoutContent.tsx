@@ -13,7 +13,7 @@ import {
   IconShield,
   IconInfoCircle,
   IconWallet,
-  IconLoader2,
+  IconLoader3,
 } from "@tabler/icons-react";
 
 import { cn } from "@/lib/utils";
@@ -207,7 +207,7 @@ export default function CheckoutContent() {
             </div>
 
             {/* Payment Method Cards */}
-            <div className="space-y-4">
+            <div className="space-y-4 my-12">
               <h3 className="text-[10px] font-bold text-black/40 uppercase tracking-[0.2em] mb-4">
                 Select Payment Method
               </h3>
@@ -263,7 +263,7 @@ export default function CheckoutContent() {
                           "font-bold text-sm tracking-tight",
                           method === "mpesa"
                             ? "text-green-900"
-                            : "text-black/60",
+                            : "text-black/80",
                         )}
                       >
                         M-Pesa
@@ -324,7 +324,7 @@ export default function CheckoutContent() {
                       <p
                         className={cn(
                           "font-bold text-sm tracking-tight",
-                          method === "usdt" ? "text-cyan-900" : "text-black/60",
+                          method === "usdt" ? "text-cyan-900" : "text-black/80",
                         )}
                       >
                         USDT
@@ -340,7 +340,7 @@ export default function CheckoutContent() {
 
             {/* Amount Input */}
             <div>
-              <SectionHeading title="Enter Amount" />
+              <SectionHeading title="Enter Amount" className="my-16 md:my-18" />
 
               <div className="space-y-2">
                 <div className="relative">
@@ -372,7 +372,7 @@ export default function CheckoutContent() {
                         "py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer",
                         amount === amt.toString()
                           ? "bg-black text-white"
-                          : "bg-white border border-black/5 text-black/60 hover:bg-black/5",
+                          : "bg-white border border-black/5 text-black/80 hover:bg-black/5",
                       )}
                     >
                       ${amt}
@@ -384,7 +384,7 @@ export default function CheckoutContent() {
 
             {/* Payment Details Section */}
             <div>
-              <SectionHeading title="Payment Details" />
+              <SectionHeading title="Payment Details" className="my-16 md:my-18" />
 
               <div className="space-y-4">
                 {method === "mpesa" ? (
@@ -561,26 +561,26 @@ export default function CheckoutContent() {
 
                 <div className="space-y-3 py-4 border-y border-black/5">
                   <div className="flex justify-between text-sm">
-                    <span className="text-black/60">Amount</span>
+                    <span className="text-black/80">Amount</span>
                     <span className="font-mono font-semibold text-black">
                       {amount ? `$${amount}` : "$0.00"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-black/60">Method</span>
+                    <span className="text-black/80">Method</span>
                     <span className="font-medium text-black">
                       {method === "mpesa" ? "M-Pesa" : "USDT (TRC20)"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-black/60">Type</span>
+                    <span className="text-black/80">Type</span>
                     <span className="font-medium text-black capitalize">
                       {mode}
                     </span>
                   </div>
                   {method === "mpesa" && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-black/60">Processing</span>
+                      <span className="text-black/80">Processing</span>
                       <span className="font-medium text-green-600">
                         Instant
                       </span>
@@ -612,7 +612,7 @@ export default function CheckoutContent() {
               >
                 {isProcessing ? (
                   <>
-                    <IconLoader2 className="w-5 h-5 animate-spin" />
+                    <IconLoader3 className="w-5 h-5 animate-spin" />
                     Processing Request
                   </>
                 ) : (

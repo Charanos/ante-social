@@ -146,7 +146,7 @@ export default function DiscoverGroupsPage() {
       <SearchFilterBar
         searchQuery={searchTerm}
         onSearchChange={setSearchTerm}
-        placeholder="IconSearch groups by name or description..."
+        placeholder="Search groups by name or description..."
         tabs={categories.map((c) => ({ id: c.name, label: c.name }))}
         activeTab={selectedCategory}
         onTabChange={setSelectedCategory}
@@ -189,7 +189,7 @@ export default function DiscoverGroupsPage() {
                         "w-full px-4 py-3 text-left text-sm font-medium transition-colors cursor-pointer",
                         sortBy === option.value
                           ? "bg-black/5 text-black/90"
-                          : "text-black/60 hover:bg-black/5",
+                          : "text-black/80 hover:bg-black/5",
                       )}
                     >
                       {option.label}
@@ -205,7 +205,7 @@ export default function DiscoverGroupsPage() {
       {/* Trending Section */}
       {selectedCategory === "All" && !searchTerm && (
         <div className="space-y-6">
-          <SectionHeading title="Trending Now" />
+          <SectionHeading title="Trending Now" className="my-16 md:my-18" />
 
           <div className="grid md:grid-cols-3 gap-5">
             {isFiltering
@@ -249,12 +249,13 @@ export default function DiscoverGroupsPage() {
         <SectionHeading
           title={
             searchTerm
-              ? `IconSearch Results for "${searchTerm}"`
+              ? `Search Results for "${searchTerm}"`
               : selectedCategory === "All"
                 ? `${sortOptions.find((o) => o.value === sortBy)?.label} Community Groups`
                 : `${selectedCategory} Groups (${sortOptions.find((o) => o.value === sortBy)?.label})`
           }
           icon={<IoPeopleOutline className="w-4 h-4 text-black/40" />}
+          className="my-16 md:my-18"
         />
 
         {filteredAndSortedGroups.length === 0 ? (
@@ -262,7 +263,7 @@ export default function DiscoverGroupsPage() {
             <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-4">
               <IoSearchOutline className="w-8 h-8 text-black/20" />
             </div>
-            <h3 className="text-lg font-semibold text-black/60 mb-2">
+            <h3 className="text-lg font-semibold text-black/80 mb-2">
               No groups found
             </h3>
             <p className="text-sm text-black/40 max-w-sm">

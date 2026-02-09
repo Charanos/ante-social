@@ -20,7 +20,7 @@ import {
   IconEdit,
   IconEye,
   IconInfoCircle,
-  IconLoader2,
+  IconLoader3,
   IconLogout,
   IconPhoto,
   IconSettings,
@@ -41,7 +41,7 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
 import { mockUser, mockMyBets } from "@/lib/mockData";
 import { isGroupMember, joinGroup, leaveGroup } from "@/lib/membership";
@@ -364,7 +364,7 @@ const PlaceBetSlip = ({
             {/* Stake Input */}
             <div className="space-y-3">
               <div className="flex items-center justify-between my-4">
-                <label className="text-xs font-semibold text-black/60 uppercase tracking-widest">
+                <label className="text-xs font-semibold text-black/80 uppercase tracking-widest">
                   Stake Amount (KSH)
                 </label>
                 <span className="text-xs font-semibold text-black/30">
@@ -378,7 +378,7 @@ const PlaceBetSlip = ({
                 <input
                   type="number"
                   value={stakeAmount}
-                  onChange={(e) => setStakeAmount(e.target.value)}
+                  onChange={(e: { target: { value: SetStateAction<string>; }; }) => setStakeAmount(e.target.value)}
                   placeholder="50"
                   min="50"
                   className="w-full pl-16 pr-1 py-2 bg-neutral-50 border-2 border-black/10 rounded-xl font-mono font-semibold text-lg text-black focus:border-black focus:bg-white focus:outline-none transition-all placeholder:text-black/20"
@@ -430,7 +430,7 @@ const PlaceBetSlip = ({
             >
               {isSubmittingBet ? (
                 <>
-                  <IconLoader2 className="w-5 h-5 animate-spin" />
+                  <IconLoader3 className="w-5 h-5 animate-spin" />
                   Processing...
                 </>
               ) : (
@@ -573,7 +573,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
         {/* Stake Section */}
         <div className="space-y-3">
           <div className="flex items-center my-3 justify-between">
-            <label className="text-xs font-semibold text-black/60 uppercase tracking-widest">
+            <label className="text-xs font-semibold text-black/80 uppercase tracking-widest">
               Stake Amount
             </label>
             {canEdit && !isEditing && (
@@ -582,7 +582,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                 className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
               >
                 <IconEdit className="w-3 h-3" />
-                IconEdit
+                Edit
               </button>
             )}
           </div>
@@ -596,7 +596,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                 <input
                   type="number"
                   value={editedAmount}
-                  onChange={(e) => setEditedAmount(e.target.value)}
+                  onChange={(e: { target: { value: any; }; }) => setEditedAmount(e.target.value)}
                   className="w-full pl-14 pr-4 py-2 bg-neutral-50 border-2 border-black/10 rounded-xl font-mono font-semibold text-xl focus:border-black focus:bg-white outline-none"
                   autoFocus
                 />
@@ -608,7 +608,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                   className="py-3 bg-black text-white rounded-xl font-semibold text-sm hover:bg-neutral-900 transition-all flex items-center justify-center gap-2"
                 >
                   {isSaving ? (
-                    <IconLoader2 className="w-4 h-4 animate-spin" />
+                    <IconLoader3 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
                       <IconDeviceFloppy className="w-4 h-4" />
@@ -654,7 +654,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
               <IconClock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-amber-900">
-                  IconEdit Window Active
+                  Edit Window Active
                 </p>
                 <p className="text-xs text-amber-700 leading-relaxed">
                   You have {timeRemaining} minute
@@ -679,7 +679,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
         {/* Market Link */}
         <Link
           href={`/dashboard/markets/${bet.marketId || bet.id}`}
-          className="block w-full py-3 rounded-xl border border-black/10 text-center text-xs font-semibold text-black/60 hover:bg-neutral-50 hover:text-black transition-all uppercase tracking-widest"
+          className="block w-full py-3 rounded-xl border border-black/10 text-center text-xs font-semibold text-black/80 hover:bg-neutral-50 hover:text-black transition-all uppercase tracking-widest"
         >
           View Market Details →
         </Link>
@@ -843,7 +843,7 @@ export default function GroupPage() {
       try {
         await navigator.share({
           title: `Join ${group.name} on Ante Social`,
-          text: `IconCheck out this group: ${group.description}`,
+          text: `Check out this group: ${group.description}`,
           url: url,
         });
         toast.success("Shared Successfully", "Invitation sent!");
@@ -865,7 +865,7 @@ export default function GroupPage() {
           setShowMemberActions(null);
           toast.success(
             "Member Removed",
-            "IconUser has been removed from the group",
+            "User has been removed from the group",
           );
         } catch (error) {
           toast.error("Error", "Failed to remove member");
@@ -883,7 +883,7 @@ export default function GroupPage() {
       setTimeout(() => {
         try {
           setShowMemberActions(null);
-          toast.success("Member Promoted", "IconUser is now a group admin");
+          toast.success("Member Promoted", "User is now a group admin");
         } catch (error) {
           toast.error("Error", "Failed to promote member");
         } finally {
@@ -900,7 +900,7 @@ export default function GroupPage() {
       setTimeout(() => {
         try {
           setShowMemberActions(null);
-          toast.success("Member Demoted", "IconUser is now a regular member");
+          toast.success("Member Demoted", "User is now a regular member");
         } catch (error) {
           toast.error("Error", "Failed to demote member");
         } finally {
@@ -1013,7 +1013,7 @@ export default function GroupPage() {
                     className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold uppercase tracking-wider text-[10px] hover:bg-neutral-100 transition-all shadow-lg cursor-pointer flex items-center gap-2 disabled:opacity-70"
                   >
                     {isJoining ? (
-                      <IconLoader2 className="w-3 h-3 animate-spin" />
+                      <IconLoader3 className="w-3 h-3 animate-spin" />
                     ) : (
                       <IconUserPlus className="w-3 h-3" />
                     )}
@@ -1044,7 +1044,7 @@ export default function GroupPage() {
                         className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer disabled:opacity-50"
                       >
                         {isActionLoading ? (
-                          <IconLoader2 className="w-4 h-4 animate-spin" />
+                          <IconLoader3 className="w-4 h-4 animate-spin" />
                         ) : isNotificationsOn ? (
                           <IconBell className="w-4 h-4" />
                         ) : (
@@ -1061,7 +1061,7 @@ export default function GroupPage() {
                         <Link href={`/dashboard/groups/${groupId}/settings`}>
                           <button className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5">
                             <IconSettings className="w-4 h-4" />
-                            Group IconSettings
+                            Group Settings
                           </button>
                         </Link>
                       )}
@@ -1072,7 +1072,7 @@ export default function GroupPage() {
                         className="w-full px-4 py-3 text-left text-sm font-normal text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5 disabled:opacity-50"
                       >
                         {isActionLoading ? (
-                          <IconLoader2 className="w-4 h-4 animate-spin" />
+                          <IconLoader3 className="w-4 h-4 animate-spin" />
                         ) : (
                           <IconLogout className="w-4 h-4" />
                         )}
@@ -1120,11 +1120,12 @@ export default function GroupPage() {
           <div className="flex items-center justify-between">
             <SectionHeading
               title="Featured Market"
+              className="my-16 md:my-18"
               icon={<IconTrendingUp className="w-4 h-4 text-green-500" />}
             />
             <Link
               href={`/dashboard/markets`}
-              className="text-sm font-medium text-black/40 hover:text-black/60 transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-sm font-medium text-black/40 hover:text-black/80 transition-colors flex items-center gap-1 cursor-pointer"
             >
               Browse All <IconArrowRight className="w-4 h-4" />
             </Link>
@@ -1330,7 +1331,7 @@ export default function GroupPage() {
         />
       )}
 
-      <SectionHeading title="Group Activity" />
+      <SectionHeading title="Group Activity" className="my-16 md:my-18" />
 
       {/* Tabs */}
       <div className="flex items-center gap-6 border-b border-black/5">
@@ -1361,7 +1362,7 @@ export default function GroupPage() {
               "pb-4 px-2 text-sm font-medium transition-all relative flex items-center gap-2 cursor-pointer",
               activeTab === tab.id
                 ? "text-black/90"
-                : "text-black/40 hover:text-black/60",
+                : "text-black/40 hover:text-black/80",
             )}
           >
             <tab.icon className="w-4 h-4" />
@@ -1456,7 +1457,7 @@ export default function GroupPage() {
                                   </span>{" "}
                                   {activity.action}
                                   {activity.details && (
-                                    <span className="text-black/60">
+                                    <span className="text-black/80">
                                       {" "}
                                       "{activity.details}"
                                     </span>
@@ -1502,7 +1503,7 @@ export default function GroupPage() {
                       <IconActivity className="w-8 h-8 text-black/20" />
                     </div>
                     <div>
-                      <p className="font-medium text-black/60 mb-2">
+                      <p className="font-medium text-black/80 mb-2">
                         Select a Bet
                       </p>
                       <p className="text-sm text-black/40 leading-relaxed">
@@ -1612,7 +1613,7 @@ export default function GroupPage() {
                       <IconAward className="w-8 h-8 text-black/20" />
                     </div>
                     <div>
-                      <p className="font-medium text-black/60 mb-2">
+                      <p className="font-medium text-black/80 mb-2">
                         Select a Bet
                       </p>
                       <p className="text-sm text-black/40 leading-relaxed">

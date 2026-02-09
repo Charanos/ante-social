@@ -306,7 +306,7 @@ export default function PrivateMarketDetailsPage() {
                         >
                           {isSubmitting
                             ? "Calculating..."
-                            : "IconLock Choice & Settle"}
+                            : "Lock Choice & Settle"}
                         </button>
                       </>
                     )}
@@ -415,7 +415,7 @@ export default function PrivateMarketDetailsPage() {
               </div>
 
               <button className="w-full mt-6 py-3 rounded-xl border border-dashed border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-50 transition-all text-sm font-medium">
-                View All IconHistory
+                View All History
               </button>
             </div>
 

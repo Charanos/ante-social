@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { IconLoader2 } from '@tabler/icons-react';
+import { IconLoader3 } from '@tabler/icons-react';
 
 
 export default function AdminLayout({
@@ -30,7 +30,7 @@ export default function AdminLayout({
   if (status === "loading") {
     return (
       <div className="flex h-[50vh] w-full items-center justify-center">
-        <IconLoader2 className="h-8 w-8 animate-spin text-neutral-500" />
+        <IconLoader3 className="h-8 w-8 animate-spin text-neutral-500" />
       </div>
     );
   }

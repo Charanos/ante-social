@@ -53,8 +53,8 @@ const mockUsers = [
 ];
 
 const tabs = [
-  { id: "lookup", label: "IconUser Lookup", icon: IconSearch },
-  { id: "levels", label: "IconUser Levels", icon: IconCrown },
+  { id: "lookup", label: "User Lookup", icon: IconSearch },
+  { id: "levels", label: "User Levels", icon: IconCrown },
   { id: "kyc", label: "KYC Review", icon: IconShield },
   { id: "aml", label: "AML & Clusters", icon: IconActivity },
 ];
@@ -87,7 +87,7 @@ export default function UserManagementPage() {
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader subtitle="IconUser lookup, tier management, KYC review, and fraud detection" />
+        <DashboardHeader subtitle="User lookup, tier management, KYC review, and fraud detection" />
 
         {/* Main Content Card */}
         <DashboardCard className="overflow-hidden p-0">

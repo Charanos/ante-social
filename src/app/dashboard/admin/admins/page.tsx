@@ -80,7 +80,7 @@ export default function AdminManagementPage() {
               <div className="relative w-64">
                 <input
                   type="text"
-                  placeholder="IconSearch admins..."
+                  placeholder="Search admins..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-2 text-sm rounded-lg border border-neutral-200 bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"

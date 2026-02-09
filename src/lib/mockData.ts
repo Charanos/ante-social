@@ -143,7 +143,7 @@ export const mockGroups = [
     activeBets: [],
     activityFeed: [],
     category: "Sports",
-    image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "group2",
@@ -159,7 +159,7 @@ export const mockGroups = [
     members: ["user123"],
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1634704784915-aacf363b021f?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "group3",
@@ -176,7 +176,7 @@ export const mockGroups = [
     activeBets: [],
     activityFeed: [],
     category: "Social",
-    image: "https://images.unsplash.com/photo-1531297461136-82ae96c51365?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "group4",
@@ -193,7 +193,7 @@ export const mockGroups = [
     activeBets: [],
     activityFeed: [],
     category: "Strategy",
-    image: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "1",
@@ -209,7 +209,7 @@ export const mockGroups = [
     growth: "+12%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "2",
@@ -225,7 +225,7 @@ export const mockGroups = [
     growth: "+28%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "3",
@@ -241,7 +241,7 @@ export const mockGroups = [
     growth: "+8%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "4",
@@ -257,7 +257,7 @@ export const mockGroups = [
     growth: "+5%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "5",
@@ -273,7 +273,7 @@ export const mockGroups = [
     growth: "+15%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1541872703-74c59636a2fd?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "6",
@@ -289,7 +289,7 @@ export const mockGroups = [
     growth: "+10%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "7",
@@ -305,7 +305,7 @@ export const mockGroups = [
     growth: "+3%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80"
   },
   {
     id: "8",
@@ -321,7 +321,7 @@ export const mockGroups = [
     growth: "+6%",
     activeBets: [],
     activityFeed: [],
-    image: "https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80"
   }
 ]
 

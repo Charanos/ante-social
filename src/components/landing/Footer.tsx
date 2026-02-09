@@ -188,7 +188,7 @@ export function Footer() {
               </span>
             </Link>
 
-            <p className="text-base text-black/60 font-medium leading-relaxed max-w-md">
+            <p className="text-base text-black/80 font-medium leading-relaxed max-w-md">
               The modern social betting platform for Kenya. M-Pesa ready, crypto
               enabled, built for players who demand transparency and speed.
             </p>
@@ -206,7 +206,7 @@ export function Footer() {
                   whileTap={{ scale: 0.95 }}
                   aria-label={social.label}
                 >
-                  <social.icon className="w-4 h-4 text-black/60" />
+                  <social.icon className="w-4 h-4 text-black/80" />
                 </motion.a>
               ))}
             </div>
@@ -217,7 +217,7 @@ export function Footer() {
             <h3 className="text-lg font-semibold text-black/90">
               Stay in the Loop
             </h3>
-            <p className="text-sm text-black/60 font-medium">
+            <p className="text-sm text-black/80 font-medium">
               Get updates on new markets, features, and exclusive promotions.
             </p>
 
@@ -256,7 +256,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-black/60 hover:text-black/90 font-medium transition-colors"
+                    className="text-sm text-black/80 hover:text-black/90 font-medium transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -275,7 +275,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-black/60 hover:text-black/90 font-medium transition-colors"
+                    className="text-sm text-black/80 hover:text-black/90 font-medium transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -294,7 +294,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-black/60 hover:text-black/90 font-medium transition-colors"
+                    className="text-sm text-black/80 hover:text-black/90 font-medium transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -313,7 +313,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-black/60 hover:text-black/90 font-medium transition-colors"
+                    className="text-sm text-black/80 hover:text-black/90 font-medium transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -354,7 +354,7 @@ export function Footer() {
 
         {/* Disclaimer */}
         <div className="mt-8 p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
-          <p className="text-xs text-black/60 font-medium leading-relaxed text-center">
+          <p className="text-xs text-black/80 font-medium leading-relaxed text-center">
             Gambling can be addictive. Please play responsibly. Ante Social is
             licensed and regulated in Kenya. Players must be 18 years or older.
             If you or someone you know has a gambling problem, please seek help.
