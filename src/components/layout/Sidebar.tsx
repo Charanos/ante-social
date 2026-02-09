@@ -329,7 +329,7 @@ export function Sidebar({
         {/* Bottom Controls */}
         <div className="mt-auto pt-6 border-t border-gray-100">
           <Link
-            href="/settings"
+            href="/dashboard/settings"
             className={cn(
               "flex items-center rounded-xl px-3 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 mb-2",
               collapsed ? "justify-center px-2" : "justify-start",

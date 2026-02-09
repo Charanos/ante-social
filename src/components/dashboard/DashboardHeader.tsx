@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { IconActivity, IconAward, IconBell, IconChevronRight, IconHome, IconPhoto } from '@tabler/icons-react';
+import {
+  IconActivity,
+  IconAward,
+  IconBell,
+  IconChevronRight,
+  IconHome,
+  IconPhoto,
+} from "@tabler/icons-react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -122,7 +129,8 @@ export default function DashboardHeader({
           {/* Avatar */}
           <div className="relative w-6 h-6 rounded-full bg-linear-to-br from-neutral-900 to-neutral-700 flex items-center justify-center text-white text-sm font-semibold overflow-hidden border-2 border-white shadow-sm">
             {user?.image ? (
-              <Image src={user.image}
+              <Image
+                src={user.image}
                 alt={user.username || "User"}
                 fill
                 className="object-cover"

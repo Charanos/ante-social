@@ -314,7 +314,7 @@ export function Hero() {
         className="relative max-w-5xl mx-auto space-y-8 pt-16 z-10"
       >
         <motion.h1
-          className="text-5xl md:text-8xl font-medium tracking-tight text-black leading-[1.1]"
+          className="text-3xl md:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
@@ -337,7 +337,7 @@ export function Hero() {
         </motion.h1>
 
         <motion.p
-          className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-600 font-medium leading-relaxed"
+          className="max-w-2xl mx-auto text-lg text-neutral-600 font-medium leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}

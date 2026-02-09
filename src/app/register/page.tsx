@@ -4,7 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { IconArrowRight, IconEye, IconEyeOff, IconLoader2, IconPhoto } from '@tabler/icons-react';
+import {
+  IconArrowRight,
+  IconEye,
+  IconEyeOff,
+  IconLoader2,
+  IconPhoto,
+} from "@tabler/icons-react";
 
 import { useToast } from "@/hooks/useToast";
 import Image from "next/image";
@@ -53,7 +59,8 @@ export default function RegisterPage() {
       <div className="relative bg-white text-black flex flex-col justify-between p-12 lg:p-20 z-10 order-last lg:order-first">
         <div>
           <div className="relative w-24 h-24 md:w-36 md:h-36 mb-2">
-            <Image src="/ante-logo.png"
+            <Image
+              src="/ante-logo.png"
               alt="Ante Logo"
               fill
               className="object-contain"

@@ -3,7 +3,23 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
-import { IconActivity, IconArrowRight, IconCircleCheckFilled, IconClock, IconEye, IconHandClick, IconInfoCircle, IconLayoutGrid, IconPhoto, IconScale, IconShield, IconSkull, IconTrendingUp, IconUsers, IconBolt } from '@tabler/icons-react';;
+import {
+  IconActivity,
+  IconArrowRight,
+  IconCircleCheckFilled,
+  IconClock,
+  IconEye,
+  IconHandClick,
+  IconInfoCircle,
+  IconLayoutGrid,
+  IconPhoto,
+  IconScale,
+  IconShield,
+  IconSkull,
+  IconTrendingUp,
+  IconUsers,
+  IconBolt,
+} from "@tabler/icons-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
@@ -114,7 +130,8 @@ export default function BetrayalMarketPage() {
 
               {/* Hero Image */}
               <div className="relative h-64 md:h-80 overflow-hidden">
-                <Image src={market.image}
+                <Image
+                  src={market.image}
                   alt={market.title}
                   fill
                   className="object-cover"
@@ -461,7 +478,8 @@ export default function BetrayalMarketPage() {
                           >
                             {selectedChoice.toUpperCase()}
                           </span>
-                          <IconCircleCheckFilled                             className={`w-4 h-4 ${
+                          <IconCircleCheckFilled
+                            className={`w-4 h-4 ${
                               selectedChoice === "cooperate"
                                 ? "text-green-600"
                                 : "text-red-600"

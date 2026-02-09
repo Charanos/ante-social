@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
-;
 import {
   DndContext,
   closestCenter,
@@ -26,7 +25,22 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
 import { mockUser } from "@/lib/mockData";
 import Image from "next/image";
-import { IconActivity, IconArrowRight, IconClock, IconEye, IconGripVertical, IconInfoCircle, IconLayoutGrid, IconMicrophone, IconMusic, IconPhoto, IconPlayerPlay, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import {
+  IconActivity,
+  IconArrowRight,
+  IconClock,
+  IconEye,
+  IconGripVertical,
+  IconInfoCircle,
+  IconLayoutGrid,
+  IconMicrophone,
+  IconMusic,
+  IconPhoto,
+  IconPlayerPlay,
+  IconShield,
+  IconTrendingUp,
+  IconUsers,
+} from "@tabler/icons-react";
 
 interface RankItem {
   id: string;
@@ -206,7 +220,8 @@ export default function LadderMarketPage() {
 
               {/* Hero Image */}
               <div className="relative h-64 md:h-80 overflow-hidden">
-                <Image src={market.image}
+                <Image
+                  src={market.image}
                   alt={market.title}
                   fill
                   className="object-cover"

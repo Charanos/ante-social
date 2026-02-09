@@ -940,7 +940,7 @@ export default function GroupPage() {
       />
 
       {/* Group Hero Section */}
-          <div className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl">
         {group.image && (
           <div className="absolute inset-0">
             <Image
@@ -1223,7 +1223,7 @@ export default function GroupPage() {
                               : "bg-white border-black/5 hover:border-black/10 hover:shadow-md",
                           )}
                         >
-                            <div className="relative h-24 -mx-6 -mt-6 mb-4 overflow-hidden">
+                          <div className="relative h-24 -mx-6 -mt-6 mb-4 overflow-hidden">
                             <Image
                               src={option.image}
                               alt={option.text}

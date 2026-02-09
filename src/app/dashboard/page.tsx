@@ -298,7 +298,7 @@ export default function DashboardPage() {
       <SectionHeading
         title="Live Wins"
         icon={<IconEye className="w-4 h-4 text-orange-500" />}
-        className="mb-8"
+        className="my-20"
       />
 
       <div className="relative w-full overflow-hidden bg-white/30 backdrop-blur-sm border border-black/5 rounded-2xl py-4">

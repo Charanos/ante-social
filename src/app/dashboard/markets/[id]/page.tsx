@@ -4,7 +4,18 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { IconActivity, IconArrowRight, IconCircleCheckFilled, IconClock, IconEye, IconLayoutGrid, IconPhoto, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import {
+  IconActivity,
+  IconArrowRight,
+  IconCircleCheckFilled,
+  IconClock,
+  IconEye,
+  IconLayoutGrid,
+  IconPhoto,
+  IconShield,
+  IconTrendingUp,
+  IconUsers,
+} from "@tabler/icons-react";
 
 import Image from "next/image";
 import { mockUser } from "@/lib/mockData";
@@ -185,7 +196,8 @@ export default function MarketDetailPage() {
 
               {/* Hero Image */}
               <div className="relative h-64 md:h-80 overflow-hidden">
-                <Image src={market.image}
+                <Image
+                  src={market.image}
                   alt={market.title}
                   fill
                   className="object-cover"
@@ -301,7 +313,8 @@ export default function MarketDetailPage() {
                     >
                       {/* Image */}
                       <div className="relative h-32 overflow-hidden">
-                        <Image src={option.image}
+                        <Image
+                          src={option.image}
                           alt={option.option_text}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"

@@ -1,8 +1,7 @@
 import { Footer } from "@/components/landing/Footer";
 import Image from "next/image";
 import Link from "next/link";
-import { IconArrowLeft, IconPhoto } from '@tabler/icons-react';
-
+import { IconArrowLeft, IconPhoto } from "@tabler/icons-react";
 
 export default async function MarketingPage({
   params,
@@ -21,7 +20,8 @@ export default async function MarketingPage({
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative w-8 h-8">
-              <Image src="/ante-logo.png"
+              <Image
+                src="/ante-logo.png"
                 alt="Ante Social"
                 fill
                 className="object-contain"
