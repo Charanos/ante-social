@@ -44,7 +44,7 @@ export function LoadingLogo({
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
         {content}
-        <p className="text-xs md:text-md font-semibold text-black/40 uppercase tracking-widest animate-pulse">
+        <p className="text-xs md:text-md font-semibold text-black/40 uppercase tracking-widest animate-pulse mt-0">
           Loading
         </p>
       </div>

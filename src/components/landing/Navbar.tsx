@@ -32,7 +32,7 @@ export function Navbar() {
           <Image src="/ante-logo.png" alt="Ante Social" fill className="object-contain" />
         </div>
         <span className="text-xl font-semibold tracking-tight text-black">
-          ANTE SOCIAL
+          Ante Social
         </span>
       </Link>
 

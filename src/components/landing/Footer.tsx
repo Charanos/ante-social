@@ -184,7 +184,7 @@ export function Footer() {
                 />
               </div>
               <span className="text-2xl font-semibold tracking-tight text-black">
-                ANTE SOCIAL
+                Ante Social
               </span>
             </Link>
 
