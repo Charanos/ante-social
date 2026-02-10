@@ -236,7 +236,7 @@ export default function DashboardPage() {
                 </span>
               </h1>
               <p className="text-neutral-500 text-base md:text-lg">
-                Your fortune favors the bold.
+                fortune favors the bold.
               </p>
             </div>
 
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <IconAward className="w-5 h-5 text-amber-400" /> Daily Bonus
+                  <IconAward className="w-5 h-5 text-amber-400" /> Achievements
                 </motion.button>
               </Link>
               <Link href="/dashboard/wallet" className="flex-1 md:flex-none">
