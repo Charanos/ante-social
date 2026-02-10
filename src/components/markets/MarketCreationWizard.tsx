@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconActivity, IconAward, IconChevronLeft, IconChevronRight, IconCurrencyDollar, IconInfoCircle, IconLayoutGrid, IconList, IconPhoto, IconPlus, IconShield, IconTarget, IconUsers, IconX } from '@tabler/icons-react';;
+import { IconAccessPoint, IconAward, IconChevronLeft, IconChevronRight, IconCurrencyDollar, IconInfoCircle, IconLayoutGrid, IconList, IconPhoto, IconPlus, IconShield, IconTarget, IconUsers, IconX } from '@tabler/icons-react';;
 
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-notification";
@@ -127,7 +127,7 @@ export function MarketCreationWizard() {
                     "cursor-pointer hover:scale-110 active:scale-95",
                 )}
               >
-                {step > s.id ? <IconActivity className="w-5 h-5" /> : s.id}
+                {step > s.id ? <IconAccessPoint className="w-5 h-5" /> : s.id}
               </div>
               <span
                 className={cn(
@@ -305,7 +305,7 @@ export function MarketCreationWizard() {
                     {
                       id: "reflex",
                       label: "Reflex",
-                      icon: IconActivity,
+                      icon: IconAccessPoint,
                       desc: "Time-sensitive prediction windows.",
                     },
                     {

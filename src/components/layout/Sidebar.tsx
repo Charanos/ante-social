@@ -3,15 +3,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  IconBasket,
+  IconBell,
+  IconHome2,
   IconLogout,
+  IconLogout2,
   IconPhoto,
   IconSettings,
+  IconSettingsCog,
+  IconShieldLock,
+  IconUserCircle,
+  IconUsersGroup,
 } from "@tabler/icons-react";
 import {
   IoNotificationsOutline,
   IoChevronBackOutline,
   IoChevronForwardOutline,
-  IoHomeOutline,
   IoPeopleOutline,
   IoPersonOutline,
   IoShieldOutline,
@@ -39,11 +46,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { title: "Home", url: "/dashboard", icon: IoHomeOutline },
+  { title: "Home", url: "/dashboard", icon: IconHome2 },
   {
     title: "Markets",
     url: "/dashboard/markets",
-    icon: IoTrendingUpOutline,
+    icon: IconBasket,
     children: [
       { title: "All Markets", url: "/dashboard/markets" },
       { title: "My Bets", url: "/dashboard/markets/my-bets" },
@@ -53,7 +60,7 @@ const navItems: NavItem[] = [
   {
     title: "Groups",
     url: "/dashboard/groups",
-    icon: IoPeopleOutline,
+    icon: IconUsersGroup,
     children: [
       { title: "My Groups", url: "/dashboard/groups" },
       { title: "Discover", url: "/dashboard/groups/discover" },
@@ -64,10 +71,10 @@ const navItems: NavItem[] = [
   {
     title: "Notifications",
     url: "/dashboard/notifications",
-    icon: IoNotificationsOutline,
+    icon: IconBell,
   },
-  { title: "Profile", url: "/dashboard/profile", icon: IoPersonOutline },
-  { title: "Admin", url: "/dashboard/admin", icon: IoShieldOutline },
+  { title: "Profile", url: "/dashboard/profile", icon: IconUserCircle },
+  { title: "Admin", url: "/dashboard/admin", icon: IconShieldLock },
 ];
 
 interface SidebarProps {
@@ -354,7 +361,7 @@ export function Sidebar({
             )}
             title={collapsed ? "Settings" : undefined}
           >
-            <IconSettings className="h-5 w-5" />
+            <IconSettingsCog className="h-5 w-5" />
             {!collapsed && (
               <span className="ml-3 text-sm font-medium">Settings</span>
             )}
@@ -369,7 +376,7 @@ export function Sidebar({
             )}
             title={collapsed ? "Sign Out" : undefined}
           >
-            <IconLogout className="h-5 w-5 transition-colors group-hover:text-red-600" />
+            <IconLogout2 className="h-5 w-5 transition-colors group-hover:text-red-600" />
             {!collapsed && (
               <span className="ml-3 text-sm font-medium">Sign Out</span>
             )}

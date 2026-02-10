@@ -2,7 +2,7 @@
 
 
 import { Card, CardContent } from "@/components/ui/card";
-import { IconActivity, IconAward, IconPercentage, IconTarget } from '@tabler/icons-react';;
+import { IconAccessPoint, IconAward, IconPercentage, IconTarget } from '@tabler/icons-react';;
 import { IoWalletOutline } from 'react-icons/io5';
 
 const stats = [
@@ -22,7 +22,7 @@ const getIcon = (iconName: string, colorClass: string) => {
     case "trophy":
       return <IconAward {...iconProps} />;
     case "Activity":
-      return <IconActivity {...iconProps} />;
+      return <IconAccessPoint {...iconProps} />;
     case "medal":
       return <IconAward {...iconProps} />;
     case "percent":

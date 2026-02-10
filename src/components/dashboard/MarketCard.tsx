@@ -131,7 +131,7 @@ export function MarketCard({
             </div>
             <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white border border-zinc-100 shadow-sm">
               <span className="text-[10px] uppercase tracking-wider text-zinc-400 mb-1">
-                IconUsers
+                Users
               </span>
               <span className="text-base font-mono font-medium text-zinc-900">
                 {participants}

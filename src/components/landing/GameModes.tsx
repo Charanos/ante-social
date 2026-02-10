@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { IconActivity, IconAlertCircle, IconArrowRight, IconAward, IconLayersOff, IconLayoutGrid, IconUsers } from '@tabler/icons-react';
+import { IconAccessPoint, IconAlertCircle, IconArrowRight, IconAward, IconLayersOff, IconLayoutGrid, IconUsers } from '@tabler/icons-react';
 
 import { useState } from "react";
 
@@ -36,7 +36,7 @@ const gameModes = [
     subtitle: "5-Second Decision",
     description:
       "Predict the majority's first instinct when confronted with a situation. You have 5 seconds. Don't think, just react.",
-    icon: IconActivity,
+    icon: IconAccessPoint,
     quote: "Fortune favors the absurd.",
     mechanics: [
       "5-second countdown",

@@ -13,7 +13,7 @@ import { mockUser } from "@/lib/mockData";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import { IconActivity, IconAward, IconChevronLeft, IconChevronRight, IconCoffee, IconGlobe, IconLayersOff, IconLoader3, IconLock, IconPalette, IconPlus, IconShield, IconTrendingUp, IconUsers } from '@tabler/icons-react';;
+import { IconAccessPoint, IconAward, IconBriefcase, IconChevronLeft, IconChevronRight, IconCoffee, IconDeviceGamepad, IconDeviceLaptop, IconFlask, IconGlobe, IconLayersOff, IconLoader3, IconLock, IconPalette, IconPlus, IconShield, IconStar, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
 const steps = [
   { id: 1, title: "Category" },
@@ -41,7 +41,7 @@ const marketTypes = [
   {
     id: "reflex",
     name: "Reflex Reaction",
-    icon: IconActivity,
+    icon: IconAccessPoint,
     description: "5-second prediction test",
     color: "amber",
   },
@@ -59,29 +59,57 @@ const groupCategories = [
     id: "sports",
     name: "Sports",
     icon: IconAward,
-    description: "For athletic competitions",
+    description: "Football, Basketball, F1 & more",
     color: "blue",
+  },
+  {
+    id: "politics",
+    name: "Politics",
+    icon: IconGlobe,
+    description: "Elections, Policy & Global Events",
+    color: "red",
   },
   {
     id: "crypto",
     name: "Crypto",
     icon: IconTrendingUp,
-    description: "Trading and market vibes",
+    description: "Prices, Adoption & Memecoins",
     color: "green",
   },
   {
-    id: "lifestyle",
-    name: "Lifestyle",
-    icon: IconCoffee,
-    description: "Daily life and casual fun",
+    id: "pop_culture",
+    name: "Pop Culture",
+    icon: IconStar,
+    description: "Celebrities, Music & Virality",
+    color: "purple",
+  },
+  {
+    id: "business",
+    name: "Business",
+    icon: IconBriefcase,
+    description: "Startups, Stocks & Economy",
     color: "amber",
+  },
+  {
+    id: "science",
+    name: "Science",
+    icon: IconFlask,
+    description: "Space, Tech & Breakthroughs",
+    color: "cyan",
+  },
+  {
+    id: "tech",
+    name: "Technology",
+    icon: IconDeviceLaptop,
+    description: "AI, Gadgets & Software",
+    color: "indigo",
   },
   {
     id: "gaming",
     name: "Gaming",
-    icon: IconPalette,
-    description: "Esports and gaming sessions",
-    color: "purple",
+    icon: IconDeviceGamepad,
+    description: "Esports, Releases & Streamers",
+    color: "violet",
   },
 ];
 
@@ -186,37 +214,37 @@ export default function CreateGroupPage() {
 
   return (
     <div className="min-h-screen pb-12 pl-0 md:pl-8">
-      <div className="max-w-full mx-auto px-6 pb-8">
+      <div className="w-full mx-auto px-0 md:px-6 pb-8">
         <DashboardHeader
           user={mockUser}
           subtitle="Start a new community and launch your first betting market"
         />
 
         {/* Progress Steps */}
-        <div className="mb-12 mt-8">
-          <div className="flex items-center justify-between relative z-10 max-w-7xl mx-auto">
+        <div className="mb-8 md:mb-12 mt-4 md:mt-8">
+          <div className="flex items-center justify-between relative z-10 max-w-7xl mx-auto px-2 md:px-0">
             {steps.map((s, i) => (
               <div
                 key={s.id}
-                className="flex flex-col items-center gap-3 relative z-10"
+                className="flex flex-col items-center gap-2 md:gap-3 relative z-10"
               >
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-500 border-2",
+                    "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold transition-all duration-500 border-2",
                     currentStep >= s.id
                       ? "bg-black border-black text-white shadow-lg shadow-black/20"
                       : "bg-white/50 backdrop-blur-sm border-neutral-200 text-neutral-400",
                   )}
                 >
                   {currentStep > s.id ? (
-                    <IconPlus className="w-5 h-5 rotate-45" />
+                    <IconPlus className="w-4 h-4 md:w-5 md:h-5 rotate-45" />
                   ) : (
                     s.id
                   )}
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-semibold uppercase tracking-widest transition-colors duration-300",
+                    "text-[10px] font-semibold uppercase tracking-widest transition-colors duration-300 hidden md:block",
                     currentStep >= s.id ? "text-black" : "text-neutral-400",
                   )}
                 >
@@ -225,10 +253,10 @@ export default function CreateGroupPage() {
               </div>
             ))}
             {/* Progress Bar Background */}
-            <div className="absolute top-5 left-0 w-full h-0.5 bg-neutral-200/50 -z-10" />
+            <div className="absolute top-4 md:top-5 left-0 w-full h-0.5 bg-neutral-200/50 -z-10" />
             {/* Active Progress Bar */}
             <div
-              className="absolute top-5 left-0 h-0.5 bg-black transition-all duration-500 -z-10"
+              className="absolute top-4 md:top-5 left-0 h-0.5 bg-black transition-all duration-500 -z-10"
               style={{
                 width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
               }}
@@ -306,7 +334,6 @@ export default function CreateGroupPage() {
                     },
                   };
                   const colors = colorMap[cat.color] || colorMap.blue;
-
                   return (
                     <motion.button
                       key={cat.id}
@@ -314,7 +341,7 @@ export default function CreateGroupPage() {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedCategory(cat.id)}
                       className={cn(
-                        "relative p-6 rounded-2xl border-2 transition-all cursor-pointer text-left overflow-hidden group",
+                        "relative p-6 rounded-2xl flex flex-col border-2 transition-all cursor-pointer text-left overflow-hidden group min-h-[160px]",
                         isSelected
                           ? `bg-linear-to-br ${colors.bg.replace(/\/50/g, "")} ${colors.activeBorder} shadow-lg scale-[1.02]`
                           : `bg-linear-to-br ${colors.bg} ${colors.border} hover:border-black/10 hover:shadow-md`,
@@ -328,7 +355,7 @@ export default function CreateGroupPage() {
                         )}
                       />
 
-                      <div className="relative z-10 flex flex-col gap-4">
+                      <div className="relative z-10 flex flex-col gap-4 h-full">
                         <div
                           className={cn(
                             "p-3 rounded-xl w-fit shadow-sm backdrop-blur-sm transition-all",
@@ -340,7 +367,7 @@ export default function CreateGroupPage() {
                         <div>
                           <h3
                             className={cn(
-                              "font-bold mb-1 transition-colors",
+                              "font-bold mb-1 transition-colors text-lg",
                               colors.title,
                             )}
                           >

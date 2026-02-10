@@ -165,23 +165,23 @@ export default function MarketsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6"
         >
           {/* Active Markets Card */}
           <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
-            <CardContent className="p-6 relative z-10">
+            <CardContent className="p-4 md:p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-900/60">
-                    Active Markets
+                    Active
                   </p>
-                  <p className="mt-2 text-3xl font-medium numeric text-blue-900">
+                  <p className="mt-2 text-2xl md:text-3xl font-medium numeric text-blue-900">
                     {mockMarkets.length}
                   </p>
                 </div>
-                <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <IconTrendingUp className="h-6 w-6 text-blue-600" />
+                <div className="rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
+                  <IconTrendingUp className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -190,18 +190,18 @@ export default function MarketsPage() {
           {/* Total Participants Card */}
           <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
-            <CardContent className="p-6 relative z-10">
+            <CardContent className="p-4 md:p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-900/60">
-                    Total Participants
+                    Participants
                   </p>
-                  <p className="mt-2 text-3xl font-medium numeric text-purple-900">
+                  <p className="mt-2 text-2xl md:text-3xl font-medium numeric text-purple-900">
                     {totalParticipants}
                   </p>
                 </div>
-                <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <IconUsers className="h-6 w-6 text-purple-600" />
+                <div className="rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
+                  <IconUsers className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
                 </div>
               </div>
             </CardContent>

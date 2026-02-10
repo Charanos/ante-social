@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconAlertTriangle,
   IconAward,
   IconCalendar,
@@ -38,7 +38,7 @@ const marketTypes = [
   {
     id: "reflex",
     name: "Reflex Reaction",
-    icon: IconActivity,
+    icon: IconAccessPoint,
     description: "5-second prediction test",
     color: "amber",
   },

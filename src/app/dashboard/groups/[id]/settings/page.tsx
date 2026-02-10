@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconAlertCircle,
   IconAward,
   IconBolt,
@@ -201,7 +201,7 @@ export default function GroupSettingsPage() {
       case "poll":
         return { label: "Poll", color: "blue", icon: IconClipboard };
       case "reflex":
-        return { label: "Reflex", color: "amber", icon: IconActivity };
+        return { label: "Reflex", color: "amber", icon: IconAccessPoint };
       case "ladder":
         return { label: "Ladder", color: "purple", icon: IconAward };
       case "betrayal":

@@ -32,28 +32,32 @@ const categories = [
     count: allGroups.filter((g) => g.category === "Sports").length,
   },
   {
-    name: "Finance",
-    count: allGroups.filter((g) => g.category === "Finance").length,
-  },
-  {
-    name: "Tech",
-    count: allGroups.filter((g) => g.category === "Tech").length,
-  },
-  {
-    name: "Entertainment",
-    count: allGroups.filter((g) => g.category === "Entertainment").length,
-  },
-  {
     name: "Politics",
     count: allGroups.filter((g) => g.category === "Politics").length,
   },
   {
-    name: "Gaming",
-    count: allGroups.filter((g) => g.category === "Gaming").length,
+    name: "Crypto",
+    count: allGroups.filter((g) => g.category === "Crypto").length,
   },
   {
-    name: "Social",
-    count: allGroups.filter((g) => g.category === "Social").length,
+    name: "Pop Culture",
+    count: allGroups.filter((g) => g.category === "Pop Culture").length,
+  },
+  {
+    name: "Business",
+    count: allGroups.filter((g) => g.category === "Business").length,
+  },
+  {
+    name: "Science",
+    count: allGroups.filter((g) => g.category === "Science").length,
+  },
+  {
+    name: "Technology",
+    count: allGroups.filter((g) => g.category === "Technology").length,
+  },
+  {
+    name: "Gaming",
+    count: allGroups.filter((g) => g.category === "Gaming").length,
   },
 ];
 

@@ -94,7 +94,7 @@ export default function LeaderboardSection({
   const displayData = data || leaderboardData;
 
   return (
-    <div className="space-y-6 my-6">
+    <div className="space-y-6 my-24 md:my-0">
       {/* Section Header */}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">

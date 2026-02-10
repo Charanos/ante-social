@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { IconActivity, IconLoader3, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import { IconAccessPoint, IconLoader3, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
 import { mockGroups, mockUser } from "@/lib/mockData";
 import { getJoinedGroups, isGroupMember } from "@/lib/membership";
@@ -159,7 +159,7 @@ export default function GroupsPage() {
                 </p>
               </div>
               <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                <IconActivity className="h-6 w-6 text-purple-600" />
+                <IconAccessPoint className="h-6 w-6 text-purple-600" />
               </div>
             </div>
           </CardContent>

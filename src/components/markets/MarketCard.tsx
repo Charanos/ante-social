@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconAlertCircle,
   IconArrowRight,
   IconAward,
@@ -42,7 +42,7 @@ const getTypeStyles = (type: string) => {
     case "poll":
       return { label: "Poll", color: "blue", icon: IconClipboard };
     case "reflex":
-      return { label: "Reflex", color: "amber", icon: IconActivity };
+      return { label: "Reflex", color: "amber", icon: IconAccessPoint };
     case "ladder":
       return { label: "Ladder", color: "purple", icon: IconAward };
     case "betrayal":
@@ -127,7 +127,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 border-y py-4 my-6 border-gray-100/50">
+            <div className="grid w-full grid-cols-3 gap-3 border-y py-4 my-6 border-gray-100/50">
               <div className="space-y-1">
                 <div className="flex items-center gap-1 text-black/30">
                   <IconCurrencyDollar className="w-3 h-3" />
@@ -150,7 +150,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                   {market.pool}
                 </p>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 flex flex-col items-center">
                 <div className="flex items-center gap-1 text-black/30">
                   <IconUsers className="w-3 h-3" />
                   <p className="text-[10px] font-semibold uppercase tracking-wider">

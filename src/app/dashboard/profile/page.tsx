@@ -239,7 +239,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-8 pb-20 pl-0 md:pl-8">
+    <div className="space-y-6 md:space-y-8 pb-12 md:pb-20 pl-0 md:pl-8">
       <DashboardHeader
         user={mockUser}
         subtitle="Manage your account and preferences"
@@ -250,7 +250,7 @@ export default function ProfilePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl"
+        className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl mx-1 md:mx-0"
       >
         {/* Background with gradient overlay */}
         <div className="absolute inset-0">
@@ -258,26 +258,26 @@ export default function ProfilePage() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 p-8 md:p-10 space-y-8">
+        <div className="relative z-10 p-6 md:p-10 space-y-6 md:space-y-8">
           <div className="flex items-start justify-between">
-            <div className="flex items-start gap-6 flex-1">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 flex-1 text-center md:text-left">
               {/* Avatar Circle */}
-              <div className="h-24 w-24 md:h-28 md:w-28 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-5xl font-semibold text-white shadow-lg shrink-0">
+              <div className="h-24 w-24 md:h-28 md:w-28 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-4xl md:text-5xl font-semibold text-white shadow-lg shrink-0">
                 {username.charAt(0).toUpperCase()}
               </div>
 
-              <div className="space-y-4 pt-2 flex-1">
+              <div className="space-y-4 pt-2 flex-1 w-full">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-medium text-white">
+                  <h1 className="text-2xl md:text-4xl font-medium text-white">
                     Your Achievements
                   </h1>
-                  <p className="text-base text-white/70 font-normal max-w-7xl my-3 leading-relaxed">
+                  <p className="text-sm md:text-base text-white/70 font-normal max-w-7xl my-3 leading-relaxed">
                     Track your progress, earn badges, and unlock exclusive
                     rewards as you master the art of prediction
                   </p>
                 </div>
 
-                <div className="flex items-center gap-8 flex-wrap w-full">
+                <div className="flex items-center justify-center md:justify-start gap-4 md:gap-8 flex-wrap w-full">
                   <span className="text-sm text-white/50 font-normal flex items-center gap-1.5">
                     <IconTrendingUp className="w-3.5 h-3.5" />
                     12 Badges Earned
@@ -292,24 +292,24 @@ export default function ProfilePage() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid text-center md:grid-cols-3 grid-cols-1 gap-6 pt-6 border-t border-white/10">
+          <div className="grid text-center grid-cols-3 gap-2 md:gap-6 pt-6 border-t border-white/10">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-white/80">Total Badges</p>
-              <p className="text-2xl font-normal text-white font-mono">12</p>
+              <p className="text-xs md:text-sm font-medium text-white/80">Total Badges</p>
+              <p className="text-xl md:text-2xl font-normal text-white font-mono">12</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-white/80">
-                Completed Achievements
+              <p className="text-xs md:text-sm font-medium text-white/80">
+                Completed
               </p>
-              <p className="text-2xl font-normal text-green-400 font-mono">
+              <p className="text-xl md:text-2xl font-normal text-green-400 font-mono">
                 28
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-medium text-white/80">
-                Current Streak
+              <p className="text-xs md:text-sm font-medium text-white/80">
+                Streak
               </p>
-              <p className="text-2xl font-normal text-orange-400 font-mono">
+              <p className="text-xl md:text-2xl font-normal text-orange-400 font-mono">
                 5 days
               </p>
             </div>
@@ -318,7 +318,7 @@ export default function ProfilePage() {
           {/* Featured Achievements Preview */}
           <div className="pt-6 border-t border-white/10">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-white/90 uppercase tracking-wider">
+              <h3 className="text-xs md:text-sm font-medium text-white/90 uppercase tracking-wider">
                 Recent Achievements
               </h3>
               <Link href="/dashboard/profile/achievements">
@@ -338,7 +338,7 @@ export default function ProfilePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + index * 0.05 }}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  className="relative overflow-hidden p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer group flex flex-col justify-between"
+                  className="relative overflow-hidden p-3 md:p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer group flex flex-col justify-between"
                 >
                   {/* Content Left Side */}
                   <div className="flex-1">
@@ -355,7 +355,7 @@ export default function ProfilePage() {
                     <span className="text-xs font-mono font-semibold text-green-400">
                       +{achievement.reward}
                     </span>
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 group-hover:border-green-400/30 transition-all">
+                    <div className="p-1.5 md:p-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 group-hover:border-green-400/30 transition-all">
                       {getAchievementIcon(achievement.icon)}
                     </div>
                   </div>

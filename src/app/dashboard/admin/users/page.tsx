@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconActivity, IconCalendar, IconCheck, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers } from '@tabler/icons-react';;
+import { IconAccessPoint, IconCalendar, IconCheck, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers } from '@tabler/icons-react';;
 
 import { useRouter } from "next/navigation";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -56,7 +56,7 @@ const tabs = [
   { id: "lookup", label: "User Lookup", icon: IconSearch },
   { id: "levels", label: "User Levels", icon: IconCrown },
   { id: "kyc", label: "KYC Review", icon: IconShield },
-  { id: "aml", label: "AML & Clusters", icon: IconActivity },
+  { id: "aml", label: "AML & Clusters", icon: IconAccessPoint },
 ];
 
 export default function UserManagementPage() {
@@ -303,7 +303,7 @@ export default function UserManagementPage() {
                     {activeTab === "kyc" ? (
                       <IconShield className="w-8 h-8 text-neutral-300" />
                     ) : (
-                      <IconActivity className="w-8 h-8 text-neutral-300" />
+                      <IconAccessPoint className="w-8 h-8 text-neutral-300" />
                     )}
                   </div>
                   <h3 className="text-lg font-medium text-neutral-900 mb-2">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { IconActivity, IconCircleCheckFilled, IconCircleX, IconClock, IconCode, IconInfoCircle, IconPlayerPlay, IconRefresh, IconTrendingUp } from '@tabler/icons-react';
+import { IconAccessPoint, IconCircleCheckFilled, IconCircleX, IconClock, IconCode, IconInfoCircle, IconPlayerPlay, IconRefresh, IconTrendingUp } from '@tabler/icons-react';
 
 import { useRouter } from "next/navigation";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -114,7 +114,7 @@ export default function CronMonitorPage() {
       case "failed":
         return <IconCircleX className="w-4 h-4" />;
       case "running":
-        return <IconActivity className="w-4 h-4 animate-pulse" />;
+        return <IconAccessPoint className="w-4 h-4 animate-pulse" />;
       default:
         return <IconClock className="w-4 h-4" />;
     }
@@ -180,7 +180,7 @@ export default function CronMonitorPage() {
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
-                  <IconActivity className="h-6 w-6 text-blue-600" />
+                  <IconAccessPoint className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>

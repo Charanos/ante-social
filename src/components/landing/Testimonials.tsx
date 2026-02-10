@@ -16,7 +16,7 @@ const testimonials = [
     initial: "A",
   },
   {
-    text: "M-Pesa integration is seamless. Deposit in 45 seconds, withdraw just as fast. The glassmorphic UI is incredibly polished.",
+    text: "M-Pesa integration is seamless. Deposit in 45 seconds, withdraw just as fast.",
     author: "Sarah M.",
     role: "Novice",
     location: "Mombasa",
@@ -32,7 +32,7 @@ const testimonials = [
     initial: "M",
   },
   {
-    text: "The Reflex Reaction Test is addictive. 5 seconds to predict the crowd's instinct - it's pure adrenaline. Love the 2x multiplier tiers.",
+    text: "The Reflex Reaction Test is addictive. 5 seconds to predict the crowd's instinct - it's pure adrenaline.",
     author: "Grace W.",
     role: "Novice",
     location: "Nakuru",
@@ -59,8 +59,8 @@ const testimonials = [
 
 function TestimonialCard({ testimonial, index }: any) {
   return (
-    <div className="w-[380px] shrink-0 px-3">
-      <div className="relative h-full min-h-[400px] justify-between p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
+    <div className="md:w-[380px] w-[280px] shrink-0 px-3">
+      <div className="relative h-full min-h-[300px] md:min-h-[400px] justify-between p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
         {/* Subtle shine effect on hover */}
         <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
 
@@ -141,7 +141,7 @@ export function Testimonials() {
           </div>
 
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
-            What Players Are Saying
+            Players Say What?
           </h2>
           <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
             Join thousands of Kenyan bettors who've found their new home on Ante

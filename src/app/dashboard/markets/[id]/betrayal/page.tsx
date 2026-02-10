@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconArrowRight,
   IconCircleCheckFilled,
   IconClock,

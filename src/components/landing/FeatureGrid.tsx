@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { IconActivity, IconArrowRight, IconCurrencyDollar, IconShield, IconTarget, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import { IconAccessPoint, IconArrowRight, IconCurrencyDollar, IconShield, IconTarget, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
 
 import type { IconType } from "react-icons";
@@ -70,7 +70,7 @@ const features: Feature[] = [
     title: "Live Updates",
     description:
       "Real-time market changes, instant notifications, live settlement.",
-    icon: IconActivity,
+    icon: IconAccessPoint,
     stats: { label: "Settlement", value: "<5min" },
     highlights: ["Real-time Updates", "Push Alerts"],
     colSpan: "md:col-span-12 lg:col-span-6",

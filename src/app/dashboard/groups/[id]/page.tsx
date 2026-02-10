@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconAlertCircle,
   IconArrowRight,
   IconAward,
@@ -35,6 +35,8 @@ import {
   IconUserPlus,
   IconUsers,
   IconX,
+  IconLock,
+  IconTarget,
 } from "@tabler/icons-react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
@@ -223,7 +225,7 @@ const ActivityIcon = ({ type }: { type: string }) => {
   };
   return (
     icons[type as keyof typeof icons] || (
-      <IconActivity className="w-4 h-4 text-black/40" />
+      <IconAccessPoint className="w-4 h-4 text-black/40" />
     )
   );
 };
@@ -235,10 +237,12 @@ const PlaceBetSlip = ({
   setSelectedOption,
   betSuccess,
   setBetSuccess,
+  onBetPlaced
 }: any) => {
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmittingBet, setIsSubmittingBet] = useState(false);
   const toast = useToast();
+  const router = useRouter();
 
   const platformFee = useMemo(() => {
     return stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
@@ -251,25 +255,52 @@ const PlaceBetSlip = ({
   const handlePlaceBet = useCallback(() => {
     if (!selectedOption || !stakeAmount || parseFloat(stakeAmount) < 50) return;
 
+    // Check balance
+    if (mockUser.wallet.balance < parseFloat(stakeAmount)) {
+      toast.error(
+        "Insufficient Balance",
+        "Please top up your wallet to place this bet."
+      );
+      setTimeout(() => {
+        router.push("/dashboard/wallet/checkout");
+      }, 1000);
+      return;
+    }
+
     setIsSubmittingBet(true);
     setTimeout(() => {
       try {
         setBetSuccess(true);
-        toast.success("Bet Placed!", "Your prediction has been recorded.");
+        toast.success("Bet Placed!", "Redirecting to your bet slip..."); // Updated message
 
-        // Reset after 3 seconds
+        // Create new bet object
+        const newBet = {
+             id: `bet_${Date.now()}`,
+             title: activeMarket?.title || "Unknown Market",
+             amount: parseFloat(stakeAmount),
+             potentialWin: parseFloat(stakeAmount) * 1.95, // Mock odds
+             status: "active",
+             outcome: selectedOption === "opt1" ? "Man United Win" : selectedOption === "opt2" ? "Draw" : "Liverpool Win",
+             date: new Date().toISOString(),
+             marketId: activeMarket?.id || "market_01"
+        };
+
+        // Redirect after short delay
         setTimeout(() => {
           setBetSuccess(false);
           setStakeAmount("");
           setSelectedOption(null);
-        }, 3000);
+          if (onBetPlaced) {
+             onBetPlaced(newBet);
+          }
+        }, 1500);
       } catch (error) {
         toast.error("Error", "Failed to place bet");
       } finally {
         setIsSubmittingBet(false);
       }
     }, 1500);
-  }, [selectedOption, stakeAmount, toast, setBetSuccess, setSelectedOption]);
+  }, [selectedOption, stakeAmount, toast, setBetSuccess, setSelectedOption, activeMarket, onBetPlaced]);
 
   return (
     <AnimatePresence mode="wait">
@@ -954,7 +985,7 @@ export default function GroupPage() {
           </div>
         )}
 
-        <div className="relative z-10 p-8 md:p-10 space-y-8">
+        <div className="relative z-10 p-5 md:p-10 space-y-6 md:space-y-8">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-6">
               <div className="space-y-3">
@@ -989,13 +1020,15 @@ export default function GroupPage() {
                       Member
                     </span>
                   )}
-                  <button
-                    onClick={handleInvite}
-                    className="text-sm text-orange-500/80 hover:text-orange-500 font-normal flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <IconShare2 className="w-3.5 h-3.5" />
-                    Invite
-                  </button>
+                  {isMember && (
+                    <button
+                      onClick={handleInvite}
+                      className="text-sm text-orange-500/80 hover:text-orange-500 font-normal flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <IconShare2 className="w-3.5 h-3.5" />
+                      Invite
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1086,7 +1119,7 @@ export default function GroupPage() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-white/10">
             <div className="space-y-1">
               <p className="text-sm font-normal text-white/50">Members</p>
               <p className="text-2xl font-medium text-white font-mono">
@@ -1143,7 +1176,7 @@ export default function GroupPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <div className="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
                           <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-widest flex items-center gap-1.5">
-                            <IconActivity className="w-3 h-3" />
+                            <IconAccessPoint className="w-3 h-3" />
                             Active Market
                           </span>
                         </div>
@@ -1299,11 +1332,18 @@ export default function GroupPage() {
             {/* Place Bet Slip Sidebar - ONLY FOR PLACING NEW BETS */}
             <div className="lg:col-span-4">
               <PlaceBetSlip
-                activeMarket={group.activeBets[0]}
+                activeMarket={group.activeBets && group.activeBets[0]}
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
                 betSuccess={betSuccess}
                 setBetSuccess={setBetSuccess}
+                onBetPlaced={(newBet: any) => {
+                  setActiveTab("bets");
+                  // Small delay to allow tab transition before showing the bet
+                  setTimeout(() => {
+                      setSelectedBetToManage(newBet);
+                  }, 100);
+                }}
               />
             </div>
           </div>
@@ -1331,455 +1371,556 @@ export default function GroupPage() {
         />
       )}
 
-      <SectionHeading title="Group Activity" className="my-16 md:my-18" />
+      {isMember ? (
+        <>
+          <SectionHeading title="Group Activity" className="my-16 md:my-18" />
 
-      {/* Tabs */}
-      <div className="flex items-center gap-6 border-b border-black/5">
-        {[
-          {
-            id: "feed",
-            label: "Activity Feed",
-            icon: IconActivity,
-            count: null,
-          },
-          {
-            id: "bets",
-            label: "Active Bets",
-            icon: IconAward,
-            count: mockMyBets.length,
-          },
-          {
-            id: "members",
-            label: "Members",
-            icon: IconUsers,
-            count: group.member_count,
-          },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => handleTabChange(tab.id)}
-            className={cn(
-              "pb-4 px-2 text-sm font-medium transition-all relative flex items-center gap-2 cursor-pointer",
-              activeTab === tab.id
-                ? "text-black/90"
-                : "text-black/40 hover:text-black/80",
-            )}
-          >
-            <tab.icon className="w-4 h-4" />
-            {tab.label}
-            {tab.count !== null && tab.count !== undefined && (
-              <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-black/5 text-black/40">
-                {tab.count}
-              </span>
-            )}
-            {activeTab === tab.id && (
+          {/* Tabs */}
+          <div className="flex items-center gap-6 border-b border-black/5">
+            {[
+              {
+                id: "feed",
+                label: "Activity Feed",
+                icon: IconAccessPoint,
+                count: null,
+              },
+              {
+                id: "bets",
+                label: "Active Bets",
+                icon: IconAward,
+                count: mockMyBets.length,
+              },
+              {
+                id: "members",
+                label: "Members",
+                icon: IconUsers,
+                count: group.member_count,
+              },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  "pb-4 px-2 text-sm font-medium transition-all relative flex items-center gap-2 cursor-pointer",
+                  activeTab === tab.id
+                    ? "text-black/90"
+                    : "text-black/40 hover:text-black/80",
+                )}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+                {tab.count !== null && tab.count !== undefined && (
+                  <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-black/5 text-black/40">
+                    {tab.count}
+                  </span>
+                )}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="activeGroupTab"
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-black rounded-full"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <AnimatePresence mode="wait">
+            {activeTab === "feed" && (
               <motion.div
-                layoutId="activeGroupTab"
-                className="absolute bottom-0 left-0 w-full h-0.5 bg-black rounded-full"
-              />
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      <AnimatePresence mode="wait">
-        {activeTab === "feed" && (
-          <motion.div
-            key="feed"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6"
-          >
-            {/* Activity List */}
-            <div className="lg:col-span-8 space-y-4">
-              {isTabLoading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="p-5 rounded-2xl bg-white/40 border border-black/5 space-y-3"
-                  >
-                    <div className="flex items-center gap-4">
-                      <Skeleton className="w-10 h-10 rounded-full" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-1/2" />
-                        <Skeleton className="h-3 w-1/4" />
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <>
-                  {group.activityFeed?.map(
-                    (activity: GroupActivity, index: number) => (
-                      <motion.div
-                        key={`${activity.id}-${index}`}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        onClick={() => {
-                          // If it's a bet-related activity, show management slip
-                          if (activity.type.includes("bet")) {
-                            setSelectedBetToManage({
-                              id: activity.id,
-                              title: activity.details || activity.action,
-                              amount: parseInt(
-                                activity.amount?.replace(/[^\d]/g, "") || "0",
-                              ),
-                              potentialWin:
-                                parseInt(
-                                  activity.amount?.replace(/[^\d]/g, "") || "0",
-                                ) * 1.95,
-                              status:
-                                activity.type === "bet_settled"
-                                  ? "settled"
-                                  : "active",
-                              outcome: activity.details || "Unknown",
-                              date: activity.timestamp,
-                              marketId: "market_001",
-                            });
-                          }
-                        }}
-                        className="p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all cursor-pointer"
+                key="feed"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+              >
+                {/* Activity List */}
+                <div className="lg:col-span-8 space-y-4">
+                  {isTabLoading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="p-5 rounded-2xl bg-white/40 border border-black/5 space-y-3"
                       >
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
-                            <ActivityIcon type={activity.type} />
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <p className="text-sm font-normal text-black/90">
-                                  <span className="font-medium">
-                                    {activity.user}
-                                  </span>{" "}
-                                  {activity.action}
-                                  {activity.details && (
-                                    <span className="text-black/80">
-                                      {" "}
-                                      "{activity.details}"
-                                    </span>
-                                  )}
-                                </p>
-                                {activity.amount && (
-                                  <p className="text-xs font-mono font-medium text-green-600 mt-1">
-                                    {activity.amount}
-                                  </p>
-                                )}
-                              </div>
-                              <span className="text-xs text-black/40 font-normal shrink-0">
-                                {timeAgo(activity.timestamp)}
-                              </span>
-                            </div>
+                        <div className="flex items-center gap-4">
+                          <Skeleton className="w-10 h-10 rounded-full" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-4 w-1/2" />
+                            <Skeleton className="h-3 w-1/4" />
                           </div>
                         </div>
-                      </motion.div>
-                    ),
-                  )}
-                  <p className="text-center text-sm text-black/30 font-normal py-4">
-                    End of activity
-                  </p>
-                </>
-              )}
-            </div>
-
-            {/* Manage Bet Slip Sidebar - ONLY SHOWS WHEN BET IS SELECTED */}
-            <div className="lg:col-span-4">
-              <AnimatePresence mode="wait">
-                {selectedBetToManage ? (
-                  <ManageBetSlip
-                    bet={selectedBetToManage}
-                    onClose={() => setSelectedBetToManage(null)}
-                  />
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-8 rounded-3xl bg-linear-to-br from-neutral-50 to-white border border-black/5 text-center space-y-4"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto">
-                      <IconActivity className="w-8 h-8 text-black/20" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-black/80 mb-2">
-                        Select a Bet
-                      </p>
-                      <p className="text-sm text-black/40 leading-relaxed">
-                        Click on any bet activity to view details and manage
-                        your stake
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === "bets" && (
-          <motion.div
-            key="bets"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6"
-          >
-            {/* Bets List */}
-            <div className="lg:col-span-8 space-y-4">
-              {mockMyBets.map((bet, index) => (
-                <motion.div
-                  key={bet.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  onClick={() => setSelectedBetToManage(bet)}
-                  className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer"
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
-                        bet.status === "won"
-                          ? "bg-green-100 text-green-600"
-                          : bet.status === "lost"
-                            ? "bg-red-100 text-red-600"
-                            : "bg-blue-100 text-blue-600",
-                      )}
-                    >
-                      {bet.status === "won" ? (
-                        <IconCircleCheckFilled className="w-5 h-5" />
-                      ) : bet.status === "lost" ? (
-                        <IconX className="w-5 h-5" />
-                      ) : (
-                        <IconTrendingUp className="w-5 h-5" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-black/90">{bet.title}</h4>
-                      <div className="flex items-center gap-3 mt-1 text-sm text-black/50 font-normal">
-                        <span>{new Date(bet.date).toLocaleDateString()}</span>
-                        <span>•</span>
-                        <span className="text-black/70">
-                          Pick: {bet.outcome}
-                        </span>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-6 md:text-right w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-black/5">
-                    <div>
-                      <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
-                        Stake
-                      </p>
-                      <p className="font-mono font-medium">{bet.amount} KSH</p>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
-                        Potential
-                      </p>
-                      <p
-                        className={cn(
-                          "font-mono font-semibold",
-                          bet.status === "won"
-                            ? "text-green-600"
-                            : "text-black/90",
-                        )}
-                      >
-                        {bet.potentialWin} KSH
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Manage Bet Slip Sidebar */}
-            <div className="lg:col-span-4">
-              <AnimatePresence mode="wait">
-                {selectedBetToManage ? (
-                  <ManageBetSlip
-                    bet={selectedBetToManage}
-                    onClose={() => setSelectedBetToManage(null)}
-                  />
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-8 rounded-3xl bg-linear-to-br from-neutral-50 to-white border border-black/5 text-center space-y-4"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto">
-                      <IconAward className="w-8 h-8 text-black/20" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-black/80 mb-2">
-                        Select a Bet
-                      </p>
-                      <p className="text-sm text-black/40 leading-relaxed">
-                        Click on any bet to view details, edit stake, or cancel
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === "members" && (
-          <motion.div
-            key="members"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-6"
-          >
-            <div className="space-y-3">
-              {isTabLoading
-                ? Array.from({ length: 4 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="p-5 rounded-2xl bg-white/40 border border-black/5 space-y-3"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Skeleton className="w-12 h-12 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-1/3" />
-                          <Skeleton className="h-3 w-1/4" />
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                : group.members?.map((memberItem, index) => {
-                    const member =
-                      typeof memberItem === "string"
-                        ? ({
-                            id: memberItem,
-                            username: `IconUser ${memberItem}`,
-                            avatar: "U",
-                            role: "member",
-                            joined: group.created_at,
-                            totalBets: 0,
-                          } as GroupMember)
-                        : (memberItem as GroupMember);
-
-                    return (
-                      <motion.div
-                        key={member.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className={cn(
-                          "p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all relative",
-                          showMemberActions === member.id ? "z-50" : "z-0",
-                        )}
-                      >
-                        <div className="flex items-center justify-between z-10">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-base font-medium text-black/70">
-                              {member.avatar}
-                            </div>
-
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="text-base font-medium text-black/90">
-                                  {member.username}
-                                </h4>
-                                {member.role === "admin" && (
-                                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-[10px] font-medium text-orange-700 uppercase tracking-wider">
-                                    <IconCrown className="w-3 h-3" />
-                                    Admin
-                                  </span>
-                                )}
+                    ))
+                  ) : (
+                    <>
+                      {group.activityFeed?.map(
+                        (activity: GroupActivity, index: number) => (
+                          <motion.div
+                            key={`${activity.id}-${index}`}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onClick={() => {
+                              // If it's a bet-related activity, show management slip
+                              if (activity.type.includes("bet")) {
+                                setSelectedBetToManage({
+                                  id: activity.id,
+                                  title: activity.details || activity.action,
+                                  amount: parseInt(
+                                    activity.amount?.replace(/[^\d]/g, "") || "0",
+                                  ),
+                                  potentialWin:
+                                    parseInt(
+                                      activity.amount?.replace(/[^\d]/g, "") || "0",
+                                    ) * 1.95,
+                                  status:
+                                    activity.type === "bet_settled"
+                                      ? "settled"
+                                      : "active",
+                                  outcome: activity.details || "Unknown",
+                                  date: activity.timestamp,
+                                  marketId: "market_001",
+                                });
+                              }
+                            }}
+                            className="p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all cursor-pointer"
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
+                                <ActivityIcon type={activity.type} />
                               </div>
-                              <p className="text-sm text-black/50 font-normal">
-                                Joined{" "}
-                                {new Date(member.joined).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
 
-                          <div className="flex items-center gap-4">
-                            <div className="text-right">
-                              <p className="text-sm font-mono font-medium text-black/90">
-                                {member.totalBets}
-                              </p>
-                              <p className="text-xs text-black/40 font-normal">
-                                Total Bets
-                              </p>
-                            </div>
-
-                            {canManageMembers && member.id !== mockUser.id && (
-                              <div className="relative">
-                                <button
-                                  onClick={() =>
-                                    setShowMemberActions(
-                                      showMemberActions === member.id
-                                        ? null
-                                        : member.id,
-                                    )
-                                  }
-                                  className="p-2  hover:bg-black/5 rounded-lg transition-colors cursor-pointer"
-                                >
-                                  <IconDots className="w-4 h-4 text-black/40" />
-                                </button>
-
-                                <AnimatePresence>
-                                  {showMemberActions === member.id && (
-                                    <motion.div
-                                      initial={{ opacity: 0, y: -10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: -10 }}
-                                      className="absolute top-full mt-2 right-0 w-48 bg-white border border-black/10 rounded-xl shadow-xl overflow-hidden z-9999"
-                                    >
-                                      {member.role === "member" ? (
-                                        <button
-                                          onClick={() =>
-                                            handlePromoteMember(member.id)
-                                          }
-                                          disabled={isActionLoading}
-                                          className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer"
-                                        >
-                                          <IconSettings className="w-4 h-4" />
-                                          Promote to Admin
-                                        </button>
-                                      ) : (
-                                        <button
-                                          onClick={() =>
-                                            handleDemoteMember(member.id)
-                                          }
-                                          disabled={isActionLoading}
-                                          className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer"
-                                        >
-                                          <IconUserMinus className="w-4 h-4" />
-                                          Remove Admin
-                                        </button>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1">
+                                    <p className="text-sm font-normal text-black/90">
+                                      <span className="font-medium">
+                                        {activity.user}
+                                      </span>{" "}
+                                      {activity.action}
+                                      {activity.details && (
+                                        <span className="text-black/80">
+                                          {" "}
+                                          "{activity.details}"
+                                        </span>
                                       )}
-                                      <button
-                                        onClick={() =>
-                                          handleRemoveMember(member.id)
-                                        }
-                                        disabled={isActionLoading}
-                                        className="w-full px-4 py-3 text-left text-sm font-normal text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5"
-                                      >
-                                        <IconUserMinus className="w-4 h-4" />
-                                        Remove from Group
-                                      </button>
-                                    </motion.div>
-                                  )}
-                                </AnimatePresence>
+                                    </p>
+                                    {activity.amount && (
+                                      <p className="text-xs font-mono font-medium text-green-600 mt-1">
+                                        {activity.amount}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-black/40 font-normal shrink-0">
+                                    {timeAgo(activity.timestamp)}
+                                  </span>
+                                </div>
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          </motion.div>
+                        ),
+                      )}
+                      <p className="text-center text-sm text-black/30 font-normal py-4">
+                        End of activity
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Manage Bet Slip Sidebar - ONLY SHOWS WHEN BET IS SELECTED */}
+                <div className="lg:col-span-4">
+                  <AnimatePresence mode="wait">
+                    {selectedBetToManage ? (
+                      <ManageBetSlip
+                        bet={selectedBetToManage}
+                        onClose={() => setSelectedBetToManage(null)}
+                      />
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="p-8 rounded-3xl bg-linear-to-br from-neutral-50 to-white border border-black/5 text-center space-y-4"
+                      >
+                        <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto">
+                          <IconAccessPoint className="w-8 h-8 text-black/20" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-black/80 mb-2">
+                            Select a Bet
+                          </p>
+                          <p className="text-sm text-black/40 leading-relaxed">
+                            Click on any bet activity to view details and manage
+                            your stake
+                          </p>
                         </div>
                       </motion.div>
-                    );
-                  })}
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "bets" && (
+              <motion.div
+                key="bets"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+              >
+                {/* Bets List */}
+                <div className="lg:col-span-8 space-y-4">
+                  {mockMyBets.map((bet, index) => (
+                    <motion.div
+                      key={bet.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => setSelectedBetToManage(bet)}
+                      className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={cn(
+                            "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
+                            bet.status === "won"
+                              ? "bg-green-100 text-green-600"
+                              : bet.status === "lost"
+                                ? "bg-red-100 text-red-600"
+                                : "bg-blue-100 text-blue-600",
+                          )}
+                        >
+                          {bet.status === "won" ? (
+                            <IconCircleCheckFilled className="w-5 h-5" />
+                          ) : bet.status === "lost" ? (
+                            <IconX className="w-5 h-5" />
+                          ) : (
+                            <IconTrendingUp className="w-5 h-5" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-black/90">{bet.title}</h4>
+                          <div className="flex items-center gap-3 mt-1 text-sm text-black/50 font-normal">
+                            <span>{new Date(bet.date).toLocaleDateString()}</span>
+                            <span>•</span>
+                            <span className="text-black/70">
+                              Pick: {bet.outcome}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-6 md:text-right w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-black/5">
+                        <div>
+                          <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
+                            Stake
+                          </p>
+                          <p className="font-mono font-medium">{bet.amount} KSH</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
+                            Potential
+                          </p>
+                          <p
+                            className={cn(
+                              "font-mono font-semibold",
+                              bet.status === "won"
+                                ? "text-green-600"
+                                : "text-black/90",
+                            )}
+                          >
+                            {bet.potentialWin} KSH
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Manage Bet Slip Sidebar */}
+                <div className="lg:col-span-4">
+                  <AnimatePresence mode="wait">
+                    {selectedBetToManage ? (
+                      <ManageBetSlip
+                        bet={selectedBetToManage}
+                        onClose={() => setSelectedBetToManage(null)}
+                      />
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="p-8 rounded-3xl bg-linear-to-br from-neutral-50 to-white border border-black/5 text-center space-y-4"
+                      >
+                        <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto">
+                          <IconAward className="w-8 h-8 text-black/20" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-black/80 mb-2">
+                            Select a Bet
+                          </p>
+                          <p className="text-sm text-black/40 leading-relaxed">
+                            Click on any bet to view details, edit stake, or cancel
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "members" && (
+              <motion.div
+                key="members"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-6"
+              >
+                <div className="space-y-3">
+                  {isTabLoading
+                    ? Array.from({ length: 4 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="p-5 rounded-2xl bg-white/40 border border-black/5 space-y-3"
+                        >
+                          <div className="flex items-center gap-4">
+                            <Skeleton className="w-12 h-12 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-1/3" />
+                              <Skeleton className="h-3 w-1/4" />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    : group.members?.map((memberItem, index) => {
+                        const member =
+                          typeof memberItem === "string"
+                            ? ({
+                                id: memberItem,
+                                username: `IconUser ${memberItem}`,
+                                avatar: "U",
+                                role: "member",
+                                joined: group.created_at,
+                                totalBets: 0,
+                              } as GroupMember)
+                            : (memberItem as GroupMember);
+
+                        return (
+                          <motion.div
+                            key={member.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className={cn(
+                              "p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all relative",
+                              showMemberActions === member.id ? "z-50" : "z-0",
+                            )}
+                          >
+                            <div className="flex items-center justify-between z-10">
+                              <div className="flex items-center gap-4 flex-1">
+                                <div className="w-12 h-12 rounded-full bg-neutral-100 flex items-center justify-center text-base font-medium text-black/70">
+                                  {member.avatar}
+                                </div>
+
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="text-base font-medium text-black/90">
+                                      {member.username}
+                                    </h4>
+                                    {member.role === "admin" && (
+                                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-[10px] font-medium text-orange-700 uppercase tracking-wider">
+                                        <IconCrown className="w-3 h-3" />
+                                        Admin
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-black/50 font-normal">
+                                    Joined{" "}
+                                    {new Date(member.joined).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                  <p className="text-sm font-mono font-medium text-black/90">
+                                    {member.totalBets}
+                                  </p>
+                                  <p className="text-xs text-black/40 font-normal">
+                                    Total Bets
+                                  </p>
+                                </div>
+
+                                {canManageMembers && member.id !== mockUser.id && (
+                                  <div className="relative">
+                                    <button
+                                      onClick={() =>
+                                        setShowMemberActions(
+                                          showMemberActions === member.id
+                                            ? null
+                                            : member.id,
+                                        )
+                                      }
+                                      className="p-2  hover:bg-black/5 rounded-lg transition-colors cursor-pointer"
+                                    >
+                                      <IconDots className="w-4 h-4 text-black/40" />
+                                    </button>
+
+                                    <AnimatePresence>
+                                      {showMemberActions === member.id && (
+                                        <motion.div
+                                          initial={{ opacity: 0, y: -10 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          exit={{ opacity: 0, y: -10 }}
+                                          className="absolute top-full mt-2 right-0 w-48 bg-white border border-black/10 rounded-xl shadow-xl overflow-hidden z-9999"
+                                        >
+                                          {member.role === "member" ? (
+                                            <button
+                                              onClick={() =>
+                                                handlePromoteMember(member.id)
+                                              }
+                                              disabled={isActionLoading}
+                                              className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer"
+                                            >
+                                              <IconSettings className="w-4 h-4" />
+                                              Promote to Admin
+                                            </button>
+                                          ) : (
+                                            <button
+                                              onClick={() =>
+                                                handleDemoteMember(member.id)
+                                              }
+                                              disabled={isActionLoading}
+                                              className="w-full px-4 py-3 text-left text-sm font-normal text-black/70 hover:bg-black/5 transition-colors flex items-center gap-3 cursor-pointer"
+                                            >
+                                              <IconUserMinus className="w-4 h-4" />
+                                              Remove Admin
+                                            </button>
+                                          )}
+                                          <button
+                                            onClick={() =>
+                                              handleRemoveMember(member.id)
+                                            }
+                                            disabled={isActionLoading}
+                                            className="w-full px-4 py-3 text-left text-sm font-normal text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3 cursor-pointer border-t border-black/5"
+                                          >
+                                            <IconUserMinus className="w-4 h-4" />
+                                            Remove from Group
+                                          </button>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-8 py-4 w-full md:px-6 md:py-12 rounded-2xl bg-black/5 backdrop-blur-md border border-black/5 shadow-lg"
+        >
+          <div className="w-full mx-auto space-y-8 flex items-center flex-col justify-between">
+            {/* Header */}
+            <div className="text-center space-y-4 py-4">
+              <h2 className="text-3xl md:text-4xl font-medium text-black tracking-tight">
+                Join to unlock full access
+              </h2>
+              <p className="text-base text-black/60 leading-relaxed max-w-xl mx-auto">
+                Become a member to participate in bets, view live activity, and compete on the leaderboard.
+              </p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+            {/* What you'll get */}
+            <div className="grid grid-cols-1 text-center place-items-center md:grid-cols-3 gap-6 pt-6">
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-medium text-black/90 mb-1">Live Activity Feed</h3>
+                  <p className="text-sm text-black/50 leading-relaxed">
+                    Track every bet, win, and update in real-time
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-medium text-black/90 mb-1">Group Leaderboard</h3>
+                  <p className="text-sm text-black/50 leading-relaxed">
+                    Compete with members and climb the rankings
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-medium text-black/90 mb-1">Exclusive Markets</h3>
+                  <p className="text-sm text-black/50 leading-relaxed">
+                    Access group-specific betting opportunities
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center justify-center gap-8 pt-6 border-t border-black/5">
+              <div className="text-center">
+                <p className="text-2xl font-semibold font-mono text-black">
+                  {group.member_count.toLocaleString()}
+                </p>
+                <p className="text-xs text-black/40 uppercase tracking-wider font-medium mt-1">
+                  Members
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold font-mono text-green-600">
+                  {group.active_bets}
+                </p>
+                <p className="text-xs text-black/40 uppercase tracking-wider font-medium mt-1">
+                  Active Bets
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-semibold font-mono text-black">
+                  93.2K
+                </p>
+                <p className="text-xs text-black/40 uppercase tracking-wider font-medium mt-1">
+                  Total Pool
+                </p>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center pt-4">
+              <button
+                onClick={handleJoinGroup}
+                disabled={isJoining}
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-black text-white font-semibold text-sm hover:bg-neutral-900 transition-all shadow-lg cursor-pointer hover:shadow-xl active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isJoining ? (
+                  <>
+                    <IconLoader3 className="w-4 h-4 animate-spin" />
+                    Joining...
+                  </>
+                ) : (
+                  <>
+                    <IconUserPlus className="w-4 h-4" />
+                    Join Group
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

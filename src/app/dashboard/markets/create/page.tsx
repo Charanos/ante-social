@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconActivity, IconAlertTriangle, IconAward, IconCalendar, IconCurrencyDollar, IconDeviceFloppy, IconLayersOff, IconLoader3, IconPlus, IconUsers, IconX } from '@tabler/icons-react';;
+import { IconAccessPoint, IconAlertTriangle, IconAward, IconCalendar, IconCurrencyDollar, IconDeviceFloppy, IconLayersOff, IconLoader3, IconPlus, IconUsers, IconX } from '@tabler/icons-react';;
 
 import { useRouter } from "next/navigation";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -30,7 +30,7 @@ const marketTypes = [
   {
     id: "reflex",
     name: "Reflex Reaction",
-    icon: IconActivity,
+    icon: IconAccessPoint,
     description: "5-second prediction test",
     color: "amber",
   },

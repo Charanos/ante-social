@@ -26,7 +26,7 @@ import { useToast } from "@/hooks/useToast";
 import { mockUser } from "@/lib/mockData";
 import Image from "next/image";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconArrowRight,
   IconClock,
   IconEye,

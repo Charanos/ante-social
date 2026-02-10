@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconArrowRight,
   IconPhoto,
   IconTrendingUp,
@@ -195,7 +195,7 @@ function FloatingStats() {
       value: "KSH 8.2M",
       delay: 0.4,
     },
-    { icon: IconActivity, label: "Markets Live", value: "342", delay: 0.6 },
+    { icon: IconAccessPoint, label: "Markets Live", value: "342", delay: 0.6 },
   ];
 
   return (
@@ -314,7 +314,7 @@ export function Hero() {
         className="relative max-w-5xl mx-auto space-y-8 pt-16 z-10"
       >
         <motion.h1
-          className="text-3xl md:text-6xl lg:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
+          className="text-5xl md:text-6xl lg:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
@@ -337,7 +337,7 @@ export function Hero() {
         </motion.h1>
 
         <motion.p
-          className="max-w-2xl mx-auto text-lg text-neutral-600 font-medium leading-relaxed"
+          className="max-w-2xl mx-auto text-md md:text-lg text-neutral-600 font-medium leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}

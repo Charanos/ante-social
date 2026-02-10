@@ -8,7 +8,7 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
 import { cn } from "@/lib/utils"
 import {
-  IconActivity,
+  IconAccessPoint,
   IconAward,
   IconCurrencyDollar,
   IconEdit,
@@ -132,11 +132,11 @@ export default function AdminPage() {
     },
     {
       category: "System Oversight",
-      icon: IconActivity,
+      icon: IconAccessPoint,
       color: "orange",
       actions: [
         { name: "Audit Logs", icon: IconFileText, href: "/dashboard/admin/audit-logs" },
-        { name: "Cron Monitor", icon: IconActivity, href: "/dashboard/admin/cron-monitor" }
+        { name: "Cron Monitor", icon: IconAccessPoint, href: "/dashboard/admin/cron-monitor" }
       ]
     },
     {

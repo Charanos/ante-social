@@ -136,7 +136,7 @@ export default function WalletPage() {
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative z-10 p-8 md:p-10 space-y-8">
+        <div className="relative z-10 p-6 md:p-10 space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ export default function WalletPage() {
                 <p className="text-sm text-white/60 font-normal">
                   Available Balance
                 </p>
-                <p className="text-4xl font-semibold font-mono">
+                <p className="text-3xl md:text-4xl font-semibold font-mono">
                   ${mockUser.wallet.balance.toFixed(2)}
                 </p>
               </div>

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconArrowRight,
   IconCircleCheckFilled,
   IconClock,
@@ -112,6 +112,18 @@ export default function MarketDetailPage() {
 
   const handlePlaceBet = async () => {
     if (!market || !selectedOption || !stakeAmount) return;
+
+    // Check balance
+    if (mockUser.wallet.balance < parseFloat(stakeAmount)) {
+      toast.error(
+        "Insufficient Balance",
+        "Please top up your wallet to place this bet."
+      );
+      setTimeout(() => {
+        router.push("/dashboard/wallet/checkout");
+      }, 1000);
+      return;
+    }
 
     setIsSubmitting(true);
     const newBetId = `bet-${Date.now()}`;

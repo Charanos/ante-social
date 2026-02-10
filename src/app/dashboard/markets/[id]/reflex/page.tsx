@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import {
-  IconActivity,
+  IconAccessPoint,
   IconArrowRight,
   IconBell,
   IconChevronRight,
@@ -278,7 +278,7 @@ export default function ReflexMarketPage() {
             >
               <div className="flex items-start gap-4">
                 <div className="shrink-0 w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <IconActivity className="w-6 h-6 text-amber-600" />
+                  <IconAccessPoint className="w-6 h-6 text-amber-600" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-amber-900/80 uppercase tracking-wider mb-2">
@@ -288,7 +288,7 @@ export default function ReflexMarketPage() {
                     {market.scenario}
                   </p>
                   <p className="text-sm text-amber-700 mt-3 font-medium flex items-center gap-2">
-                    <IconActivity className="w-4 h-4" />
+                    <IconAccessPoint className="w-4 h-4" />
                     You have 5 seconds to decide. What will the majority choose?
                   </p>
                 </div>
