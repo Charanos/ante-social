@@ -1,1019 +1,659 @@
-# Ante Social - UI/UX Design System
+# Ante Social — Design System & Principles
 
-**PROPRIETARY INFORMATION – DO NOT SHARE**
-
----
-
-## Typography System
-
-### Font Family
-
-**Primary Font: Mona Sans**
-- Used for all text, headings, body copy, and UI elements
-- Variable font with multiple weights (200-900)
-- Supports all Latin characters and special symbols
-
-**Numerals & Monospace: JetBrains Mono**
-- Used exclusively for:
-  - Currency amounts (balances, stakes, payouts)
-  - Transaction IDs
-  - Countdown timers
-  - Bet pools
-  - Date/time stamps
-  - Any numeric data display
-
-### Font Implementation
-
-```css
-/* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Mona+Sans:wght@200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
-/* Base font family */
-body {
-  font-family: 'Mona Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-}
-
-/* Numeric/monospace elements */
-.numeric,
-.currency,
-.amount,
-.timer,
-.transaction-id,
-.pool-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-variant-numeric: tabular-nums;
-}
-```
-
-### Font Scale
-
-```
-Display: 48px / 3rem (Mona Sans Bold)
-Heading 1: 36px / 2.25rem (Mona Sans Bold)
-Heading 2: 28px / 1.75rem (Mona Sans SemiBold)
-Heading 3: 24px / 1.5rem (Mona Sans SemiBold)
-Heading 4: 20px / 1.25rem (Mona Sans Medium)
-Body Large: 18px / 1.125rem (Mona Sans Regular)
-Body: 16px / 1rem (Mona Sans Regular)
-Body Small: 14px / 0.875rem (Mona Sans Regular)
-Caption: 12px / 0.75rem (Mona Sans Medium)
-Micro: 10px / 0.625rem (Mona Sans Medium)
-
-Numerals Large: 32px / 2rem (JetBrains Mono Bold)
-Numerals Medium: 24px / 1.5rem (JetBrains Mono SemiBold)
-Numerals: 16px / 1rem (JetBrains Mono Regular)
-Numerals Small: 14px / 0.875rem (JetBrains Mono Regular)
-```
+> A living reference for every page, component, and interaction across the platform.
 
 ---
 
-## Color System
+## 1. Philosophy
 
-### Light Theme
+Ante Social sits at the intersection of **social media and prediction markets**. Every design decision should communicate two things simultaneously:
 
-**Primary Colors:**
+- **Trust & Clarity** — financial products require legibility, hierarchy, and honest data presentation
+- **Energy & Community** — social products require warmth, personality, and moments of delight
+
+The aesthetic direction is **refined glass minimalism** — clean, breathable, light — but with enough personality to feel alive. Never sterile. Never corporate. Never generic.
+
+**The one thing someone should remember:** _"It felt effortless but I could always find what I needed."_
+
+---
+
+## 2. Core Aesthetic Values
+
+### 2.1 Light Over Dark
+
+The primary theme is **light mode only**. No dual-theme complexity. Backgrounds are near-white with subtle warmth. Dark elements (text, buttons, borders) use black with opacity rather than flat colours.
+
 ```
-Primary: #FF6B35 (Vibrant Orange)
-Primary Hover: #E85A2A
-Primary Active: #D14D1F
-
-Secondary: #004E89 (Deep Blue)
-Secondary Hover: #003D6D
-Secondary Active: #002C51
-
-Accent: #00D9FF (Cyan)
-Accent Hover: #00C4E6
-Accent Active: #00AFCC
-```
-
-**Neutral Colors:**
-```
-Text Primary: #1A1A1A
-Text Secondary: #4A4A4A
-Text Tertiary: #6B6B6B
-Text Disabled: #9B9B9B
-
-Background Primary: #FFFFFF
-Background Secondary: #F8F9FA
-Background Tertiary: #F0F1F3
-Background Hover: #E8E9EB
-
-Border: #D1D5DB
-Border Light: #E5E7EB
-Border Dark: #9CA3AF
+bg-white            → pure surfaces
+bg-white/40         → glass cards
+bg-white/60         → interactive elements
+bg-black/5          → subtle fills
+bg-black/10         → hover fills
+text-black/90       → primary text
+text-black/60       → secondary text
+text-black/40       → tertiary / labels
+text-black/30       → placeholders
+border-black/5      → card borders
+border-black/10     → input borders
+border-black/20     → active input borders
 ```
 
-**Semantic Colors:**
-```
-Success: #10B981
-Success Background: #D1FAE5
+### 2.2 Glass Morphism Cards
 
-Error: #EF4444
-Error Background: #FEE2E2
+Every card uses the same glass treatment:
 
-Warning: #F59E0B
-Warning Background: #FEF3C7
-
-Info: #3B82F6
-Info Background: #DBEAFE
+```tsx
+className="relative overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl
+           border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]"
 ```
 
-### Dark Theme
+Top-edge accent line (always):
 
-**Primary Colors:**
-```
-Primary: #FF7B51 (Brighter Orange for dark bg)
-Primary Hover: #FF8B65
-Primary Active: #FF9B79
-
-Secondary: #0066B8 (Brighter Blue)
-Secondary Hover: #1A7ACC
-Secondary Active: #338EE0
-
-Accent: #00E5FF (Brighter Cyan)
-Accent Hover: #1AEBFF
-Accent Active: #33F0FF
+```tsx
+<div
+  className="absolute top-0 left-0 right-0 h-px 
+                bg-gradient-to-r from-transparent via-black/20 to-transparent"
+/>
 ```
 
-**Neutral Colors:**
-```
-Text Primary: #F8F9FA
-Text Secondary: #D1D5DB
-Text Tertiary: #9CA3AF
-Text Disabled: #6B7280
+### 2.3 Gradient Separators
 
-Background Primary: #0F0F0F
-Background Secondary: #1A1A1A
-Background Tertiary: #242424
-Background Hover: #2E2E2E
+Used between every major section instead of hard borders:
 
-Border: #2E2E2E
-Border Light: #242424
-Border Dark: #3A3A3A
-```
-
-**Semantic Colors:**
-```
-Success: #34D399
-Success Background: #064E3B
-
-Error: #F87171
-Error Background: #7F1D1D
-
-Warning: #FBBF24
-Warning Background: #78350F
-
-Info: #60A5FA
-Info Background: #1E3A8A
-```
-
-### Theme Switcher Implementation
-
-```jsx
-import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
-
-const ThemeSwitcher = ({ theme, setTheme }) => {
-  return (
-    <motion.button
-      className="theme-toggle"
-      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-    >
-      <motion.div
-        initial={false}
-        animate={{
-          rotate: theme === 'dark' ? 180 : 0,
-          scale: theme === 'dark' ? 1 : 0,
-        }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="icon-wrapper"
-      >
-        {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-      </motion.div>
-    </motion.button>
-  );
-};
+```tsx
+<div className="flex items-center gap-4">
+  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+  <span className="text-xs font-medium text-black/40 uppercase tracking-wider">
+    Section Label
+  </span>
+  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/10 to-transparent" />
+</div>
 ```
 
 ---
 
-## Animation & Transitions
+## 3. Typography
 
-### Framer Motion Configuration
+### 3.1 Scale
 
-**Page Transitions:**
-```jsx
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    y: 20,
-  },
-  enter: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.61, 1, 0.88, 1], // Custom easing
-    },
-  },
-  exit: {
-    opacity: 0,
-    y: -20,
-    transition: {
-      duration: 0.3,
-      ease: [0.61, 1, 0.88, 1],
-    },
-  },
-};
+```
+text-3xl font-semibold   → Page titles, hero headings
+text-2xl font-semibold   → Section titles (settings, modals)
+text-xl font-semibold    → Card titles
+text-lg font-semibold    → Sub-section headings, sidebar labels
+text-base font-semibold  → Card sub-titles, group labels
+text-sm font-semibold    → Body, labels, buttons, nav items
+text-xs font-semibold    → Tags, badges, table headers, metadata
+text-[10px] font-semibold uppercase tracking-widest → Micro-labels
 ```
 
-**Smooth Scroll:**
-```jsx
-import { motion, useScroll, useSpring } from 'framer-motion';
+### 3.2 Rules
 
-// Smooth scroll progress indicator
-const ScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
+- **No `font-medium` anywhere.** Use `font-semibold` as the heaviest weight.
+- `font-mono` for all numbers, IDs, hashes, monetary values, and code.
+- `uppercase tracking-wider` for section labels and category tags only.
+- Placeholder text: always `placeholder:text-black/30`.
+- All input text: `text-black` (never invisible).
 
-  return (
-    <motion.div
-      className="scroll-progress"
-      style={{ scaleX }}
-    />
-  );
-};
+---
 
-// Smooth scroll container
-<motion.div
-  style={{
-    overflowY: 'scroll',
-    scrollBehavior: 'smooth',
-  }}
->
-  {children}
-</motion.div>
+## 4. Colour System
+
+### 4.1 Semantic Colours
+
+```
+Green   → success, deposits, active status, positive delta
+Red     → error, withdrawals, danger zone, negative delta
+Blue    → info, bets, USDT, unread notifications
+Amber   → tier badges, warnings, premium features
+Purple  → groups, social features
+Orange  → system alerts, moderate warnings
 ```
 
-**Card Animations:**
-```jsx
-const cardVariants = {
-  hidden: { 
-    opacity: 0, 
-    scale: 0.95,
-    y: 20,
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-  hover: {
-    scale: 1.02,
-    y: -4,
-    transition: {
-      duration: 0.2,
-      ease: "easeOut",
-    },
-  },
-  tap: {
-    scale: 0.98,
-  },
-};
+### 4.2 Gradient Cards (stat cards)
 
-<motion.div
-  variants={cardVariants}
-  initial="hidden"
-  animate="visible"
-  whileHover="hover"
-  whileTap="tap"
->
-  {/* Card content */}
-</motion.div>
+All stat cards use directional gradients from a tinted start to white:
+
+```tsx
+bg-gradient-to-br from-blue-50 via-white to-white    // info / primary
+bg-gradient-to-br from-green-50 via-white to-white   // success / deposits
+bg-gradient-to-br from-red-50 via-white to-white     // danger / withdrawals
+bg-gradient-to-br from-amber-50 via-white to-white   // tier / warnings
+bg-gradient-to-br from-purple-50 via-white to-white  // groups / social
 ```
 
-**Stagger Children:**
-```jsx
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
+Blur orb inside each card (gives depth):
 
-const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94],
-    },
-  },
-};
-
-<motion.div variants={containerVariants} initial="hidden" animate="visible">
-  {items.map(item => (
-    <motion.div key={item.id} variants={itemVariants}>
-      {item.content}
-    </motion.div>
-  ))}
-</motion.div>
+```tsx
+<div
+  className="absolute -right-6 -top-6 h-24 w-24 rounded-full 
+                bg-blue-100/50 blur-2xl 
+                transition-all group-hover:bg-blue-200/50"
+/>
 ```
 
-**Button Interactions:**
-```jsx
-const buttonVariants = {
-  hover: {
-    scale: 1.05,
-    transition: {
-      duration: 0.2,
-      ease: "easeOut",
-    },
-  },
-  tap: {
-    scale: 0.95,
-  },
-};
+### 4.3 Primary Action Colour
 
+Primary buttons and selected states: **bg-black text-white**. Never a colour for primary CTAs — keep authority monochrome.
+
+---
+
+## 5. Spacing & Layout
+
+### 5.1 Page Shell
+
+```tsx
+className = "space-y-8 pb-20 pl-0 md:pl-8";
+```
+
+### 5.2 Grid System
+
+```
+lg:grid-cols-12  → master layout grid
+lg:col-span-8    → main content (with sidebar)
+lg:col-span-4    → sidebar
+lg:col-span-3    → settings sidebar
+lg:col-span-9    → settings content
+md:col-span-2    → full-width row in 2-col grid
+```
+
+### 5.3 Consistent Gaps
+
+```
+gap-6    → between cards
+gap-4    → between form fields
+gap-3    → between tags / filter pills
+gap-2    → between icon and label
+gap-1.5  → between small action buttons
+```
+
+### 5.4 Card Padding
+
+```
+p-6 md:p-8   → main content cards
+p-6          → sidebar cards
+p-5          → compact cards / list items
+p-4          → list rows (notification, table rows)
+p-3          → small cards, quick link items
+```
+
+### 5.5 Border Radius
+
+```
+rounded-3xl   → main cards
+rounded-2xl   → inner cards, modals, stat highlights
+rounded-xl    → inputs, dropdowns, buttons, table containers
+rounded-lg    → small buttons, badges
+rounded-full  → tags, pills, toggles, avatar
+```
+
+---
+
+## 6. Component Patterns
+
+### 6.1 Input Fields
+
+Always visible, always editable:
+
+```tsx
+className="w-full pl-10 pr-3 py-2.5 rounded-xl
+           bg-white/60 backdrop-blur-sm
+           border border-black/10
+           text-sm font-semibold text-black
+           placeholder:text-black/30
+           focus:border-black/30 focus:bg-white/80
+           outline-none transition-all cursor-pointer"
+```
+
+Always prepend an icon at `left-3` with `pointer-events-none`.
+
+### 6.2 Buttons
+
+**Primary:**
+
+```tsx
+className="px-4 py-2 rounded-xl bg-black text-white font-semibold
+           hover:bg-black/90 transition-all cursor-pointer
+           disabled:opacity-50 flex items-center gap-2"
+```
+
+**Secondary:**
+
+```tsx
+className="px-4 py-2 rounded-xl bg-white border border-black/10
+           text-black/70 font-semibold hover:bg-black/5
+           transition-all cursor-pointer"
+```
+
+**Danger:**
+
+```tsx
+className="px-4 py-2 rounded-xl bg-red-600 text-white font-semibold
+           hover:bg-red-700 transition-all cursor-pointer"
+```
+
+**Ghost/Link-style:**
+
+```tsx
+className="text-sm font-semibold text-blue-600 hover:text-blue-700
+           hover:underline transition-colors cursor-pointer"
+```
+
+All buttons have `whileHover={{ scale: 1.02 }}` and `whileTap={{ scale: 0.98 }}`.
+
+### 6.3 Toggle Switches
+
+Spring-animated, always:
+
+```tsx
 <motion.button
-  variants={buttonVariants}
-  whileHover="hover"
-  whileTap="tap"
+  onClick={handleToggle}
+  className={cn(
+    "relative w-12 h-6 rounded-full transition-all cursor-pointer",
+    enabled ? "bg-green-500" : "bg-black/20",
+  )}
 >
-  Place Bet
+  <motion.div
+    className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-md"
+    animate={{ left: enabled ? "26px" : "2px" }}
+    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+  />
 </motion.button>
 ```
 
-**Number Counter Animation:**
-```jsx
-import { motion, useSpring, useTransform } from 'framer-motion';
+### 6.4 Dropdown Menus
 
-const AnimatedNumber = ({ value }) => {
-  const spring = useSpring(value, { 
-    stiffness: 100, 
-    damping: 30 
-  });
-  
-  const display = useTransform(spring, current =>
-    Math.round(current).toLocaleString()
-  );
+- Triggered by a styled button with `IconChevronDown` that rotates 180° when open
+- `data-*-menu` attribute for click-outside detection
+- Escape key closes all dropdowns
+- Active option: `bg-black/5 text-black/90`
+- Inactive option: `text-black/60 hover:bg-black/5`
 
-  return (
-    <motion.span className="numeric">
-      {display}
-    </motion.span>
-  );
-};
+```tsx
+<motion.div
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: -10 }}
+  className="absolute top-full mt-2 bg-white border border-black/10 
+             rounded-xl shadow-xl overflow-hidden z-50"
+/>
 ```
 
----
+### 6.5 Loading Spinners (inline)
 
-## Loading States
-
-### Custom Loading Spinner
-
-```jsx
-import { motion } from 'framer-motion';
-
-const LoadingSpinner = ({ size = 40, color = 'currentColor' }) => {
-  return (
-    <motion.div
-      className="spinner-container"
-      style={{ width: size, height: size }}
-    >
-      <motion.div
-        className="spinner"
-        style={{
-          width: size,
-          height: size,
-          border: `3px solid transparent`,
-          borderTopColor: color,
-          borderRadius: '50%',
-        }}
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 1,
-          repeat: Infinity,
-          ease: "linear",
-        }}
-      />
-    </motion.div>
-  );
-};
+```tsx
+<motion.div
+  animate={{ rotate: 360 }}
+  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+>
+  <IconLoader2 className="w-4 h-4" />
+</motion.div>
 ```
 
-### Skeleton Loaders
+Always disable the parent button during loading with `disabled:opacity-50`.
 
-**Card Skeleton:**
-```jsx
-import { motion } from 'framer-motion';
+### 6.6 Section Headers (always outside cards)
 
-const SkeletonCard = () => {
-  return (
+```tsx
+<div className="flex items-center gap-2">
+  <IconName className="h-5 w-5 text-black/40" />
+  <h2 className="text-lg font-semibold text-black/90">Section Title</h2>
+</div>
+```
+
+Then the card follows as a sibling element.
+
+### 6.7 Floating Save / Discard Panel
+
+For any page with editable fields:
+
+```tsx
+<AnimatePresence>
+  {hasChanges && (
     <motion.div
-      className="skeleton-card"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 100, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
     >
-      {/* Header skeleton */}
-      <motion.div
-        className="skeleton-element skeleton-title"
-        animate={{
-          backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-        }}
-        transition={{
-          duration: 1.5,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        style={{ width: '60%', height: '24px', borderRadius: '4px' }}
-      />
-      
-      {/* Body skeleton */}
-      <div className="skeleton-body">
-        <motion.div
-          className="skeleton-element skeleton-line"
-          animate={{
-            backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.1,
-          }}
-          style={{ width: '100%', height: '16px', borderRadius: '4px' }}
-        />
-        <motion.div
-          className="skeleton-element skeleton-line"
-          animate={{
-            backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.2,
-          }}
-          style={{ width: '80%', height: '16px', borderRadius: '4px' }}
-        />
+      <div
+        className="flex items-center gap-3 px-6 py-4 rounded-2xl 
+                      bg-black text-white shadow-2xl border border-white/10"
+      >
+        <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+        <span className="text-sm font-semibold">Unsaved Changes</span>
+        <div className="h-6 w-px bg-white/20" />
+        {/* Discard + Save buttons */}
       </div>
     </motion.div>
-  );
-};
+  )}
+</AnimatePresence>
 ```
 
-**List Skeleton:**
-```jsx
-const SkeletonList = ({ count = 5 }) => {
-  return (
-    <div className="skeleton-list">
-      {Array.from({ length: count }).map((_, index) => (
-        <motion.div
-          key={index}
-          className="skeleton-list-item"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.3,
-            delay: index * 0.05,
-          }}
-        >
-          <motion.div
-            className="skeleton-avatar"
-            animate={{
-              backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: index * 0.1,
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-            }}
-          />
-          <div className="skeleton-content">
-            <motion.div
-              className="skeleton-text"
-              animate={{
-                backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: index * 0.1,
-              }}
-              style={{ width: '60%', height: '16px', borderRadius: '4px' }}
-            />
-            <motion.div
-              className="skeleton-text"
-              animate={{
-                backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: index * 0.1 + 0.1,
-              }}
-              style={{ width: '40%', height: '12px', borderRadius: '4px' }}
-            />
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  );
-};
-```
+### 6.8 Empty States
 
-**Amount Loading:**
-```jsx
-const SkeletonAmount = ({ width = '120px' }) => {
-  return (
-    <motion.div
-      className="skeleton-amount numeric"
-      animate={{
-        backgroundColor: ['#E5E7EB', '#F3F4F6', '#E5E7EB'],
-      }}
-      transition={{
-        duration: 1.5,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-      style={{
-        width,
-        height: '32px',
-        borderRadius: '6px',
-        display: 'inline-block',
-      }}
-    />
-  );
-};
+Every list or table that can be empty needs one:
+
+```tsx
+<div className="flex flex-col items-center justify-center py-20 text-center">
+  <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mb-4">
+    <IconName className="w-8 h-8 text-black/20" />
+  </div>
+  <h3 className="text-lg font-semibold text-black/60 mb-2">Nothing here yet</h3>
+  <p className="text-sm text-black/40">Helpful contextual message</p>
+</div>
 ```
 
 ---
 
-## 2FA Login Flow
+## 7. Motion & Animation
 
-### Login with 2FA
+### 7.1 Page Entry
 
-```jsx
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+Every section animates in on mount. Use staggered delays:
 
-const TwoFactorLogin = () => {
-  const [step, setStep] = useState('credentials'); // credentials, totp, backup
-  const [code, setCode] = useState(['', '', '', '', '', '']);
+```tsx
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.1 }}
+/>
+// 0.1, 0.15, 0.2, 0.25... per section
+// 0.03 to 0.05 per list item
+```
 
-  return (
-    <AnimatePresence mode="wait">
-      {step === 'credentials' && (
-        <motion.div
-          key="credentials"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h2>Login to Ante Social</h2>
-          <input type="email" placeholder="Email" />
-          <input type="password" placeholder="Password" />
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setStep('totp')}
-          >
-            Continue
-          </motion.button>
-        </motion.div>
-      )}
+### 7.2 Hover Lifts (stat cards)
 
-      {step === 'totp' && (
-        <motion.div
-          key="totp"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h2>Enter 6-Digit Code</h2>
-          <p>From your authenticator app</p>
-          
-          <div className="totp-input-group">
-            {code.map((digit, index) => (
-              <motion.input
-                key={index}
-                type="text"
-                maxLength="1"
-                className="totp-input numeric"
-                value={digit}
-                onChange={(e) => {
-                  const newCode = [...code];
-                  newCode[index] = e.target.value;
-                  setCode(newCode);
-                  
-                  // Auto-focus next input
-                  if (e.target.value && index < 5) {
-                    document.getElementById(`totp-${index + 1}`).focus();
-                  }
-                }}
-                id={`totp-${index}`}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: index * 0.05 }}
-              />
-            ))}
-          </div>
+```tsx
+<motion.div
+  whileHover={{ y: -4 }}
+  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+/>
+```
 
-          <motion.button
-            className="link-button"
-            onClick={() => setStep('backup')}
-            whileHover={{ scale: 1.02 }}
-          >
-            Use backup code instead
-          </motion.button>
-        </motion.div>
-      )}
+### 7.3 List Item Slide
 
-      {step === 'backup' && (
-        <motion.div
-          key="backup"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h2>Enter Backup Code</h2>
-          <p>Use one of your recovery codes</p>
-          
-          <input
-            type="text"
-            className="backup-code-input numeric"
-            placeholder="ABC-123-DEF"
-            maxLength="11"
-          />
+For quick links, nav items, and action buttons:
 
-          <motion.button
-            onClick={() => setStep('totp')}
-            whileHover={{ scale: 1.02 }}
-          >
-            Back to authenticator
-          </motion.button>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
+```tsx
+whileHover={{ scale: 1.02, x: 4 }}
+```
+
+### 7.4 Section Transitions (AnimatePresence)
+
+All tab/section content uses:
+
+```tsx
+<AnimatePresence mode="wait">
+  <motion.div
+    key={activeSection}
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+    transition={{ duration: 0.2 }}
+  />
+</AnimatePresence>
+```
+
+### 7.5 Modal Entry
+
+```tsx
+initial={{ opacity: 0, scale: 0.9, y: 20 }}
+animate={{ opacity: 1, scale: 1, y: 0 }}
+exit={{ opacity: 0, scale: 0.9, y: 20 }}
+transition={{ type: "spring", stiffness: 300, damping: 30 }}
+```
+
+### 7.6 Rules
+
+- Every hover state has a visual response (scale, lift, background shift, or colour change)
+- Spring physics for anything toggle-like
+- Linear for spinners
+- Never animate layout-breaking properties (width, height changes should be instant)
+
+---
+
+## 8. Public / Marketing Pages
+
+These pages have a **different but consistent** design language. They share the same colour system and typography but use bolder composition.
+
+### 8.1 Hero Section
+
+- Full-viewport height (`min-h-screen`)
+- Gradient mesh background or grain overlay — not flat white
+- Oversized heading (`text-5xl` to `text-7xl`, `font-semibold`)
+- Short punchy subheading (`text-xl text-black/60`)
+- Two CTAs: primary (black) + secondary (outlined/ghost)
+- Floating glass card(s) showing live data / product preview
+- Animated blur orbs in background at large scale
+
+```tsx
+// Background treatment example
+<div className="absolute inset-0 overflow-hidden pointer-events-none">
+  <div
+    className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full 
+                  bg-blue-100/40 blur-[120px]"
+  />
+  <div
+    className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full 
+                  bg-purple-100/30 blur-[120px]"
+  />
+</div>
+```
+
+### 8.2 Features Section
+
+- Three or four columns, each a glass card
+- Icon at top in a tinted rounded square
+- Bold short title
+- 2–3 line description in `text-black/60`
+- Subtle hover lift
+- Gradient separator above section with label
+
+### 8.3 Game Modes / Product Cards
+
+- Full-width showcase cards with image/illustration on right
+- Alternating layout (image left, image right)
+- Category tag (`text-[10px] uppercase tracking-widest`)
+- Large title, description, feature list with `IconCheck`
+- CTA button
+
+### 8.4 Pricing
+
+- Centered 3-column layout
+- Middle/featured plan: `bg-black text-white` or `bg-gradient-to-br from-amber-50...`
+- Feature list with check/cross icons
+- Clear price in `font-mono`
+- Most popular badge
+- Tier upgrade language consistent with dashboard
+
+### 8.5 Roadmap
+
+- Vertical timeline on desktop, linear list on mobile
+- Each item: category dot, title, description, status badge
+- Status colours: green (done), blue (in progress), black/20 (planned)
+- Glass card per milestone
+
+### 8.6 Navigation (public)
+
+```tsx
+// Sticky, glass
+className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl
+           border-b border-black/5"
+```
+
+- Logo left, links centre, CTAs right
+- Links: `text-sm font-semibold text-black/70 hover:text-black/90`
+- Dropdown menus matching the system dropdowns above
+- Mobile: full-screen overlay, same glass treatment
+
+### 8.7 Footer
+
+Four-column grid matching the sitemap structure:
+
+```
+Product          Resources        Company          Legal
+──────────       ─────────        ───────          ─────
+Features         Documentation    About Us         Terms of Service
+Game Modes       API Reference    Careers          Privacy Policy
+Pricing          Help Center      Contact          Cookie Policy
+Roadmap          Blog             Site Map         Responsible Gaming
+```
+
+- `text-xs font-semibold text-black/40 uppercase tracking-wider` — column headers
+- `text-sm font-semibold text-black/60 hover:text-black/90` — links
+- Gradient separator above footer
+- Logo + tagline + social icons in top row
+- Copyright + legal line at very bottom in `text-xs text-black/40`
+
+---
+
+## 9. UX Behaviour Rules
+
+### 9.1 Loading
+
+- Every page must show `<LoadingLogo fullScreen size="lg" />` while data loads
+- Individual actions use inline spinners, never full-page reloads
+- Buttons disable (`disabled:opacity-50`) during async operations
+- Loading text replaces normal button text (e.g. "Saving..." not just a spinner)
+
+### 9.2 Feedback (Toasts)
+
+Every user action that changes state must fire a toast:
+
+```
+success → green — confirmations, saves, completions
+error   → red   — validation fails, server errors
+warning → amber — reversible actions, caution states
+info    → blue  — neutral feedback, toggles, info
+```
+
+Never show a toast for read-only actions (opening modals, viewing pages).
+
+### 9.3 Forms & Validation
+
+- Show validation inline, not just on submit
+- Error state: `border-red-400 bg-red-50/50`
+- Success state: `border-green-400`
+- Neutral focused: `border-black/30 bg-white/80`
+- Floating save panel appears as soon as `hasChanges` becomes true
+- Discard resets all fields to `initialData`
+
+### 9.4 Interactivity Contract
+
+Everything that does something must feel interactive:
+
+- All buttons: `cursor-pointer` + `whileHover` + `whileTap`
+- All inputs: `cursor-pointer`
+- All links: `cursor-pointer`
+- All toggles: `cursor-pointer` + spring animation
+- Hover states must be visible within 100ms
+
+### 9.5 Click-Outside & Keyboard
+
+- All dropdowns/menus: close on outside click using `data-*-menu` + `mousedown` listener
+- All dropdowns/menus: close on `Escape`
+- All modals: close on backdrop click + `Escape`
+- Cleanup all event listeners in `useEffect` return
+
+### 9.6 Accessibility Minimums
+
+- All icon-only buttons: `title="Action Name"`
+- All inputs: `<label>` element above (not placeholder-only)
+- Labels: `text-xs font-semibold text-black/40 uppercase tracking-wider`
+- Disabled states visually communicate unavailability (`opacity-50`)
+
+---
+
+## 10. Performance Patterns
+
+```tsx
+// Memoize all computed values
+const filteredItems = useMemo(() => { ... }, [items, filter])
+const stats = useMemo(() => { ... }, [data])
+
+// Memoize all handlers
+const handleSave = useCallback(() => { ... }, [deps])
+const handleDelete = useCallback(() => { ... }, [deps])
+
+// Change tracking
+const hasChanges = useMemo(() =>
+  field1 !== initial.field1 || field2 !== initial.field2,
+  [field1, field2]
+)
 ```
 
 ---
 
-## Currency Display
+## 11. Iconography
 
-### Multi-Currency Component
+**Library:** `@tabler/icons-react` exclusively.  
+**Sizes:**
 
-```jsx
-const CurrencyAmount = ({ amount, currency, showConversion = false }) => {
-  const formatAmount = (value, curr) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: curr,
-      minimumFractionDigits: 2,
-    }).format(value);
-  };
-
-  return (
-    <div className="currency-display">
-      <motion.span
-        className="amount numeric"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {formatAmount(amount, currency)}
-      </motion.span>
-      
-      {showConversion && currency === 'KSH' && (
-        <motion.span
-          className="conversion-hint"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          ≈ {formatAmount(amount / 132.45, 'USD')}
-        </motion.span>
-      )}
-    </div>
-  );
-};
+```
+w-3 h-3   → micro-labels, decorative
+w-4 h-4   → default inline (buttons, inputs, list items)
+w-5 h-5   → section headers, nav items
+w-6 h-6   → stat card icons
+w-8 h-8   → empty states, large headers
 ```
 
-### Currency Switcher
+**Colours:**
 
-```jsx
-import { motion } from 'framer-motion';
-
-const CurrencySwitcher = ({ currency, setCurrency }) => {
-  return (
-    <div className="currency-switcher">
-      <motion.button
-        className={currency === 'USD' ? 'active' : ''}
-        onClick={() => setCurrency('USD')}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <span className="numeric">USD</span>
-      </motion.button>
-      
-      <motion.div
-        className="switcher-divider"
-        initial={false}
-        animate={{
-          x: currency === 'KSH' ? 40 : 0,
-        }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      />
-      
-      <motion.button
-        className={currency === 'KSH' ? 'active' : ''}
-        onClick={() => setCurrency('KSH')}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <span className="numeric">KSH</span>
-      </motion.button>
-    </div>
-  );
-};
 ```
+text-black/40   → decorative, label prefix
+text-black/60   → interactive icons
+text-black/90   → primary / active icons
+text-{colour}   → semantic (green for success, red for danger etc.)
+```
+
+Never use `IconLoader3` — use `IconLoader2`.  
+Never render icon names as text (e.g. "IconUser" in a button label).
 
 ---
 
-## Payment Method Components
+## 12. Anti-Patterns (Never Do)
 
-### M-Pesa Payment UI
-
-```jsx
-import { motion } from 'framer-motion';
-import { Copy, CheckCircle } from 'lucide-react';
-
-const MpesaPayment = ({ amount, currency, accountNumber }) => {
-  const [copied, setCopied] = useState(false);
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <motion.div
-      className="mpesa-payment"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <h3>M-Pesa Payment Instructions</h3>
-      
-      <div className="payment-steps">
-        <motion.div
-          className="step"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <span className="step-number numeric">1</span>
-          <span>Go to M-Pesa menu</span>
-        </motion.div>
-        
-        <motion.div
-          className="step"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <span className="step-number numeric">2</span>
-          <span>Select Lipa Na M-Pesa → Pay Bill</span>
-        </motion.div>
-        
-        <motion.div
-          className="step highlight"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="step-content">
-            <span className="step-number numeric">3</span>
-            <div className="step-details">
-              <span>Business Number</span>
-              <div className="copyable-field">
-                <span className="numeric">123456</span>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => copyToClipboard('123456')}
-                >
-                  {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
-                </motion.button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        
-        <motion.div
-          className="step highlight"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="step-content">
-            <span className="step-number numeric">4</span>
-            <div className="step-details">
-              <span>Account Number</span>
-              <div className="copyable-field">
-                <span className="numeric">{accountNumber}</span>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => copyToClipboard(accountNumber)}
-                >
-                  <Copy size={16} />
-                </motion.button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        
-        <motion.div
-          className="step"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <span className="step-number numeric">5</span>
-          <span>Amount: <span className="numeric">{amount} {currency}</span></span>
-        </motion.div>
-      </div>
-      
-      <motion.div
-        className="payment-timer"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-      >
-        <span>Complete within</span>
-        <CountdownTimer duration={900} /> {/* 15 minutes */}
-      </motion.div>
-    </motion.div>
-  );
-};
-```
-
-### Crypto Payment UI
-
-```jsx
-const CryptoPayment = ({ amount, network, address }) => {
-  const [qrCode, setQrCode] = useState(null);
-
-  return (
-    <motion.div
-      className="crypto-payment"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <h3>Send {amount} {network}</h3>
-      
-      <div className="network-badge">
-        <span className="numeric">{network}</span>
-      </div>
-      
-      <motion.div
-        className="qr-code"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        {/* QR Code component */}
-        <QRCodeCanvas value={address} size={200} />
-      </motion.div>
-      
-      <div className="address-display">
-        <label>Wallet Address</label>
-        <div className="copyable-field">
-          <span className="numeric address-text">{address}</span>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Copy size={16} />
-          </motion.button>
-        </div>
-      </div>
-      
-      <motion.div
-        className="crypto-warning"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        ⚠️ Only send {network}. Other assets will be lost.
-      </motion.div>
-    </motion.div>
-  );
-};
-```
+| ❌ Never                     | ✅ Always                                     |
+| ---------------------------- | --------------------------------------------- |
+| `font-medium`                | `font-semibold`                               |
+| `bg-gradient-*` (old)        | `bg-gradient-to-br`                           |
+| `bg-linear-to-*`             | `bg-gradient-to-*`                            |
+| Flat `bg-gray-*` cards       | Glass morphism `bg-white/40 backdrop-blur-xl` |
+| Hard-coded pixel values      | Tailwind spacing scale                        |
+| Invisible placeholder text   | `placeholder:text-black/30`                   |
+| Non-editable input fields    | All inputs editable with `text-black`         |
+| Theme switch / dark mode     | Light only                                    |
+| Icon names as strings in UI  | Actual rendered icons                         |
+| Inline `style={}`            | Tailwind classes                              |
+| `cursor-default` on buttons  | `cursor-pointer` always                       |
+| Section headers inside cards | Section headers outside, sibling to card      |
+| Select dropdowns (native)    | Custom animated dropdowns                     |
+| Missing empty states         | Every list needs an empty state               |
+| Missing loading state        | Every async action needs loading UI           |
+| Missing toast feedback       | Every mutation needs a toast                  |
+| `IconLoader3`                | `IconLoader2`                                 |
 
 ---
 
-## Responsive Breakpoints
+## 13. Quick Reference Checklist
 
-```css
-/* Mobile First */
-$breakpoint-sm: 640px;   /* Small devices */
-$breakpoint-md: 768px;   /* Tablets */
-$breakpoint-lg: 1024px;  /* Laptops */
-$breakpoint-xl: 1280px;  /* Desktops */
-$breakpoint-2xl: 1536px; /* Large desktops */
-```
+For every new page, verify:
 
----
-
-## Component Examples
-
-### Animated Balance Card
-
-```jsx
-const BalanceCard = ({ balance, currency }) => {
-  return (
-    <motion.div
-      className="balance-card"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="balance-header">
-        <span className="label">Available Balance</span>
-        <CurrencySwitcher />
-      </div>
-      
-      <motion.div
-        className="balance-amount"
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.2, type: "spring" }}
-      >
-        <AnimatedNumber value={balance} />
-        <span className="currency numeric">{currency}</span>
-      </motion.div>
-      
-      <div className="balance-actions">
-        <motion.button
-          className="primary"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Deposit
-        </motion.button>
-        <motion.button
-          className="secondary"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Withdraw
-        </motion.button>
-      </div>
-    </motion.div>
-  );
-};
-```
-
----
-
-**CONFIDENTIAL PROPERTY OF ANTE SOCIAL**  
-*UI/UX Design System Version 1.0 | January 2026*
+- [ ] `LoadingLogo` on page mount
+- [ ] `DashboardHeader` (or equivalent public header) at top
+- [ ] Gradient separators between all major sections
+- [ ] Section headings outside cards with icon prefix
+- [ ] All cards use glass morphism + top accent line
+- [ ] All inputs: `text-black`, `placeholder:text-black/30`, `bg-white/60`
+- [ ] All buttons: `cursor-pointer`, `whileHover`, `whileTap`, `disabled:opacity-50`
+- [ ] Staggered entry animations on sections
+- [ ] Toast notifications for all mutations
+- [ ] Loading states for all async operations
+- [ ] Empty state for every filterable list
+- [ ] Click-outside + Escape for all dropdowns
+- [ ] Floating save panel if page has editable fields
+- [ ] `useCallback` for all handlers
+- [ ] `useMemo` for all computed/filtered data
+- [ ] No `font-medium`, no `neutral-*` colours, no `bg-linear-to-*`

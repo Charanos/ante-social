@@ -251,7 +251,7 @@ export default function CreateMarketPage() {
                   <div>
                     <h3
                       className={cn(
-                        "font-bold mb-1 transition-colors",
+                        "font-medium mb-1 transition-colors",
                         colors.title,
                       )}
                     >

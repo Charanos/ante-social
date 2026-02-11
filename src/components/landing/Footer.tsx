@@ -140,7 +140,7 @@ const footerLinks = {
     { label: "About Us", href: "/company/about" },
     { label: "Careers", href: "/company/careers" },
     { label: "Contact", href: "/company/contact" },
-    { label: "Press Kit", href: "/company/press" },
+    { label: "Site Map", href: "/company/site-map" },
   ],
   legal: [
     { label: "Terms of Service", href: "/legal/terms-of-service" },

@@ -991,7 +991,7 @@ export default function GroupSettingsPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <span
                       className={cn(
-                        "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md",
+                        "px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider backdrop-blur-md",
                         selectedMarket.status === "active" &&
                           "bg-green-500/80 text-white",
                         selectedMarket.status === "pending_confirmation" &&

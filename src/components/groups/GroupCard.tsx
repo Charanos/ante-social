@@ -75,7 +75,7 @@ export function GroupCard({
               {showVisibilityBadge && (
                 <div
                   className={cn(
-                    "absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border shadow-sm",
+                    "absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider backdrop-blur-md border shadow-sm",
                     group.isPublic
                       ? "bg-blue-600/40 text-white border-blue-400/30"
                       : "bg-red-600/40 text-white border-red-400/30",
@@ -91,7 +91,7 @@ export function GroupCard({
               )}
 
               {isJoined && !hideJoinedBadge && (
-                <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-600/40 backdrop-blur-md border border-green-400/30 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg">
+                <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-600/40 backdrop-blur-md border border-green-400/30 text-[10px] font-medium text-white uppercase tracking-wider shadow-lg">
                   <IconCircleCheckFilled className="w-3 h-3" />
                   Joined
                 </div>
@@ -106,7 +106,7 @@ export function GroupCard({
                   {showVisibilityBadge && !group.image && (
                     <div
                       className={cn(
-                        "w-fit flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                        "w-fit flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border",
                         group.isPublic
                           ? "bg-blue-50 text-blue-600 border-blue-100"
                           : "bg-red-50 text-red-600 border-red-100",
@@ -121,7 +121,7 @@ export function GroupCard({
                     </div>
                   )}
                   {isJoined && !group.image && !hideJoinedBadge && (
-                    <div className="w-fit flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100 text-[10px] font-bold uppercase tracking-wider">
+                    <div className="w-fit flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100 text-[10px] font-medium uppercase tracking-wider">
                       <IconCircleCheckFilled className="w-3 h-3" />
                       Joined
                     </div>

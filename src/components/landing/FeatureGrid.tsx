@@ -186,7 +186,7 @@ export function FeatureGrid() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-6xl font-medium tracking-tight text-black leading-[1.1]"
           >
-            Everything you need completely reimagined.
+            The market for outcomes.
           </motion.h2>
 
           <motion.p

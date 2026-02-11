@@ -208,7 +208,7 @@ export default function CheckoutContent() {
 
             {/* Payment Method Cards */}
             <div className="space-y-4 my-12">
-              <h3 className="text-[10px] font-bold text-black/40 uppercase tracking-[0.2em] mb-4">
+              <h3 className="text-[10px] font-medium text-black/40 uppercase tracking-[0.2em] mb-4">
                 Select Payment Method
               </h3>
               <div className="grid grid-cols-2 gap-4">
@@ -260,7 +260,7 @@ export default function CheckoutContent() {
                     <div className="text-center space-y-1">
                       <p
                         className={cn(
-                          "font-bold text-sm tracking-tight",
+                          "font-medium text-sm tracking-tight",
                           method === "mpesa"
                             ? "text-green-900"
                             : "text-black/80",
@@ -323,7 +323,7 @@ export default function CheckoutContent() {
                     <div className="text-center space-y-1">
                       <p
                         className={cn(
-                          "font-bold text-sm tracking-tight",
+                          "font-medium text-sm tracking-tight",
                           method === "usdt" ? "text-cyan-900" : "text-black/80",
                         )}
                       >
@@ -389,7 +389,7 @@ export default function CheckoutContent() {
               <div className="space-y-4">
                 {method === "mpesa" ? (
                   <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-black/40 uppercase tracking-widest block ml-1">
+                    <label className="text-[10px] font-medium text-black/40 uppercase tracking-widest block ml-1">
                       M-Pesa Mobile Number
                     </label>
                     <div className="relative group">
@@ -424,12 +424,12 @@ export default function CheckoutContent() {
                     {/* USDT Deposit Address Display */}
                     <div className="p-5 rounded-2xl bg-blue-50/50 border border-blue-500/10 space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-blue-900/60 uppercase tracking-widest">
+                        <span className="text-[10px] font-medium text-blue-900/60 uppercase tracking-widest">
                           Network: TRC20 (Tron)
                         </span>
                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                          <span className="text-[9px] font-bold text-blue-700 uppercase">
+                          <span className="text-[9px] font-medium text-blue-700 uppercase">
                             Active
                           </span>
                         </div>
@@ -456,7 +456,7 @@ export default function CheckoutContent() {
 
                     {/* TRX Hash Input */}
                     <div className="space-y-6">
-                      <label className="text-[10px] font-bold text-black/40 uppercase tracking-widest block ml-1">
+                      <label className="text-[10px] font-medium text-black/40 uppercase tracking-widest block ml-1">
                         Transaction ID / Hash
                       </label>
                       <input
@@ -477,7 +477,7 @@ export default function CheckoutContent() {
                         <IconAlertCircle className="w-3.5 h-3.5 text-blue-600/50 shrink-0 mt-0.5" />
                         <p className="text-[11px] text-black/40 leading-relaxed">
                           Please send exactly{" "}
-                          <span className="font-bold text-blue-900/60">
+                          <span className="font-medium text-blue-900/60">
                             ${amount || "0"}
                           </span>{" "}
                           to the address above before pasting your hash.
@@ -487,7 +487,7 @@ export default function CheckoutContent() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-black/40 uppercase tracking-widest block ml-1">
+                    <label className="text-[10px] font-medium text-black/40 uppercase tracking-widest block ml-1">
                       Your Withdrawal USDT Address
                     </label>
                     <div className="relative group">

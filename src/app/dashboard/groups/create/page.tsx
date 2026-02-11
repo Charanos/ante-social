@@ -367,7 +367,7 @@ export default function CreateGroupPage() {
                         <div>
                           <h3
                             className={cn(
-                              "font-bold mb-1 transition-colors text-lg",
+                              "font-medium mb-1 transition-colors text-lg",
                               colors.title,
                             )}
                           >
@@ -617,7 +617,7 @@ export default function CreateGroupPage() {
                         <div>
                           <h3
                             className={cn(
-                              "font-bold mb-1 transition-colors",
+                              "font-medium mb-1 transition-colors",
                               colors.title,
                             )}
                           >

@@ -10,6 +10,8 @@ import {
   IconTrendingUp,
   IconUsers,
 } from "@tabler/icons-react";
+import router from "next/router";
+import Link from "next/link";
 
 // Enhanced Wave Background with smoother animations
 function WaveBackground() {
@@ -352,11 +354,8 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
         >
-          <motion.button
-            className="group relative inline-flex items-center gap-2 px-8 py-2 text-lg font-normal text-white bg-black rounded-full overflow-hidden shadow-lg"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          <Link href="/register"
+            className="group relative inline-flex items-center gap-2 px-8 py-2 text-lg font-normal text-white bg-black cursor-pointer rounded-full overflow-hidden shadow-lg hover:bg-black/80 hover:scale-105 transition-all duration-300"
           >
             <motion.div
               className="absolute inset-0 bg-linear-to-r from-black via-neutral-800 to-black"
@@ -364,18 +363,16 @@ export function Hero() {
               whileHover={{ x: "100%" }}
               transition={{ duration: 0.6 }}
             />
-            <span className="relative z-10">Get Started for Free</span>
+            <span className="relative z-10">Jump Right In</span>
             <IconArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </motion.button>
+          </Link>
 
-          <motion.button
-            className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full hover:bg-black/5 transition-colors shadow-sm"
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          <Link
+            href="/features"
+            className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full cursor-pointer hover:bg-black/5 hover:scale-105 transition-all duration-300"
           >
             Explore Features
-          </motion.button>
+          </Link>
         </motion.div>
 
         {/* Floating Stats */}
