@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import { leaderboardData } from "@/lib/mockData";
@@ -127,9 +128,11 @@ export default function LeaderboardSection({
                 </span>
               </div>
             </div>
-            <h3 className="font-semibold text-xs md:text-sm text-black/90 mb-1 text-center truncate w-full">
-              {displayData[1].username}
-            </h3>
+            <Link href={`/dashboard/profile/${displayData[1].username}`}>
+              <h3 className="font-semibold text-xs md:text-sm text-black/90 mb-1 text-center truncate w-full hover:text-orange-600 transition-colors cursor-pointer">
+                {displayData[1].username}
+              </h3>
+            </Link>
             <p className="text-[10px] md:text-xs font-mono font-semibold text-black/80">
               {(displayData[1].totalWinnings / 1000).toFixed(0)}K KSH
             </p>
@@ -154,9 +157,11 @@ export default function LeaderboardSection({
                 <IconStar className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </div>
             </div>
-            <h3 className="font-semibold text-sm md:text-base text-black/90 mb-1 text-center truncate w-full">
-              {displayData[0].username}
-            </h3>
+            <Link href={`/dashboard/profile/${displayData[0].username}`}>
+              <h3 className="font-semibold text-sm md:text-base text-black/90 mb-1 text-center truncate w-full hover:text-orange-600 transition-colors cursor-pointer">
+                {displayData[0].username}
+              </h3>
+            </Link>
             <p className="text-xs md:text-sm font-mono font-semibold text-amber-600">
               {(displayData[0].totalWinnings / 1000).toFixed(0)}K KSH
             </p>
@@ -183,9 +188,11 @@ export default function LeaderboardSection({
                 </span>
               </div>
             </div>
-            <h3 className="font-semibold text-xs md:text-sm text-black/90 mb-1 text-center truncate w-full">
-              {displayData[2].username}
-            </h3>
+            <Link href={`/dashboard/profile/${displayData[2].username}`}>
+              <h3 className="font-semibold text-xs md:text-sm text-black/90 mb-1 text-center truncate w-full hover:text-orange-600 transition-colors cursor-pointer">
+                {displayData[2].username}
+              </h3>
+            </Link>
             <p className="text-[10px] md:text-xs font-mono font-semibold text-black/80">
               {(displayData[2].totalWinnings / 1000).toFixed(0)}K KSH
             </p>
@@ -213,9 +220,11 @@ export default function LeaderboardSection({
                 </div>
 
                 <div className="flex flex-col min-w-0">
-                  <h4 className="font-semibold text-xs md:text-sm text-black/90 truncate">
-                    {player.username}
-                  </h4>
+                  <Link href={`/dashboard/profile/${player.username}`}>
+                    <h4 className="font-semibold text-xs md:text-sm text-black/90 truncate hover:text-orange-600 transition-colors">
+                      {player.username}
+                    </h4>
+                  </Link>
                   <div className="flex items-center gap-1.5 md:gap-2">
                     <span className="text-[10px] md:text-xs text-black/50 font-mono">
                       {player.activeBets} bets

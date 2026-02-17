@@ -6,14 +6,13 @@ import { IconInfoCircle, IconMessageShare, IconStar } from '@tabler/icons-react'
 import Marquee from "react-fast-marquee";
 
 const testimonials = [
-  // ... existing testimonials ...
   {
     text: "Finally, a betting platform that feels like a game, not a scam. The Betrayal Game is absolute chaos in the best way possible.",
     author: "Alex K.",
     role: "High Roller",
     location: "Nairobi",
     stats: { wins: "127", streak: "12" },
-    initial: "A",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
   },
   {
     text: "M-Pesa integration is seamless. Deposit in 45 seconds, withdraw just as fast.",
@@ -21,7 +20,7 @@ const testimonials = [
     role: "Novice",
     location: "Mombasa",
     stats: { wins: "43", streak: "5" },
-    initial: "S",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop",
   },
   {
     text: "I created a private group for my friends. We bet on everything now - from sports to who's arriving late. Winner Takes All is brilliant.",
@@ -29,7 +28,7 @@ const testimonials = [
     role: "High Roller",
     location: "Kisumu",
     stats: { wins: "89", streak: "8" },
-    initial: "M",
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop",
   },
   {
     text: "The Reflex Reaction Test is addictive. 5 seconds to predict the crowd's instinct - it's pure adrenaline.",
@@ -37,7 +36,7 @@ const testimonials = [
     role: "Novice",
     location: "Nakuru",
     stats: { wins: "56", streak: "7" },
-    initial: "G",
+    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop",
   },
   {
     text: "Transparent fees, immutable audit logs, 2FA security. This is how betting platforms should be built. No hidden surprises.",
@@ -45,7 +44,7 @@ const testimonials = [
     role: "High Roller",
     location: "Eldoret",
     stats: { wins: "203", streak: "15" },
-    initial: "J",
+    image: "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?q=80&w=800&auto=format&fit=crop",
   },
   {
     text: "Poll-style markets are my favorite. Pro-rata payouts feel fair, and the integrity weighting system prevents manipulation. Well designed.",
@@ -53,7 +52,7 @@ const testimonials = [
     role: "Novice",
     location: "Nairobi",
     stats: { wins: "38", streak: "4" },
-    initial: "L",
+    image: "https://images.unsplash.com/photo-1504199367641-aba8151af406?q=80&w=800&auto=format&fit=crop",
   },
 ];
 
@@ -72,15 +71,23 @@ function TestimonialCard({ testimonial, index }: any) {
           <IconMessageShare className="w-8 h-8 text-black/10 mb-6" />
 
           {/* Testimonial Text */}
-          <p className="text-base md:text-lg text-black/70 font-medium leading-relaxed mb-6 flex-1">
+          <p className="text-base md:text-lg text-black/70 font-medium leading-relaxed mb-6 flex-1 text-pretty">
             "{testimonial.text}"
           </p>
 
           {/* Author Info */}
           <div className="pt-6 border-t border-black/5 mt-auto">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm flex items-center justify-center border border-black/10 font-semibold text-black/70">
-                {testimonial.initial}
+              <div className="w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm overflow-hidden border border-black/10 flex items-center justify-center shadow-sm">
+                {testimonial.image ? (
+                  <img 
+                    src={testimonial.image} 
+                    alt={testimonial.author} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="font-semibold text-black/70">{testimonial.author[0]}</span>
+                )}
               </div>
               <div className="flex-1">
                 <div className="text-sm font-semibold text-black/90">
@@ -133,12 +140,6 @@ export function Testimonials() {
           transition={{ duration: 0.6 }}
           className="mb-16 md:mb-20 text-center space-y-4"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-black/5 rounded-full shadow-sm mb-4">
-            <IconStar className="w-4 h-4 text-black/80" />
-            <span className="text-sm font-semibold text-black/70">
-              Trusted by Players
-            </span>
-          </div>
 
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
             Players Say What?

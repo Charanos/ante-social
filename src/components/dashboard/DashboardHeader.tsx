@@ -124,39 +124,41 @@ export default function DashboardHeader({
           </motion.button>
 
           {/* Profile Avatar */}
-          <motion.button
-            className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-neutral-200/60 rounded-full p-1 pr-3 cursor-pointer hover:bg-white hover:shadow-md transition-all shadow-sm group"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {/* Avatar */}
-            <div className="relative w-6 h-6 rounded-full bg-linear-to-br from-neutral-900 to-neutral-700 flex items-center justify-center text-white text-sm font-semibold overflow-hidden border-2 border-white shadow-sm">
-              {user?.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.username || "User"}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <span>{(user?.username || "G").charAt(0).toUpperCase()}</span>
-              )}
+          <Link href="/dashboard/profile">
+            <motion.button
+              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-neutral-200/60 rounded-full p-1 pr-3 cursor-pointer hover:bg-white hover:shadow-md transition-all shadow-sm group"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Avatar */}
+              <div className="relative w-6 h-6 rounded-full bg-linear-to-br from-neutral-900 to-neutral-700 flex items-center justify-center text-white text-sm font-semibold overflow-hidden border-2 border-white shadow-sm">
+                {user?.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.username || "User"}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <span>{(user?.username || "G").charAt(0).toUpperCase()}</span>
+                )}
 
-              {/* Tier Badge Indicator */}
-              {stats.tier === "high_roller" && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-linear-to-br from-amber-400 to-amber-600 rounded-full border-2 border-white flex items-center justify-center">
-                  <IconAward className="w-2 h-2 text-white" />
-                </div>
-              )}
-            </div>
+                {/* Tier Badge Indicator */}
+                {stats.tier === "high_roller" && (
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-linear-to-br from-amber-400 to-amber-600 rounded-full border-2 border-white flex items-center justify-center">
+                    <IconAward className="w-2 h-2 text-white" />
+                  </div>
+                )}
+              </div>
 
-            {/* Username */}
-            <span className="block text-xs font-semibold text-neutral-700 tracking-wide uppercase">
-              {user?.username || "Guest"}
-            </span>
+              {/* Username */}
+              <span className="block text-xs font-semibold text-neutral-700 tracking-wide uppercase">
+                {user?.username || "Guest"}
+              </span>
 
-            <IconChevronRight className="block w-3 h-3 text-neutral-500" />
-          </motion.button>
+              <IconChevronRight className="block w-3 h-3 text-neutral-500" />
+            </motion.button>
+          </Link>
         </div>
       </div>
     </>

@@ -368,10 +368,10 @@ export function Hero() {
           </Link>
 
           <Link
-            href="/features"
+            href="/product/game-modes"
             className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full cursor-pointer hover:bg-black/5 hover:scale-105 transition-all duration-300"
           >
-            Explore Features
+            Explore Game Modes
           </Link>
         </motion.div>
 

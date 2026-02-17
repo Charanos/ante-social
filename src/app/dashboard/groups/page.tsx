@@ -177,7 +177,7 @@ export default function GroupsPage() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-18"
       >
         {filteredGroups.map((group, index) => (
           <GroupCard

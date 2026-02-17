@@ -32,9 +32,12 @@ import {
   IconClock,
   IconBolt,
   IconCrown,
+  IconSparkles,
+  IconChartLine,
 } from "@tabler/icons-react";
 import { mockUser } from "@/lib/mockData";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ProgressChart } from "@/components/charts/ProgressChart";
 
 export default function ProfilePage() {
   const toast = useToast();
@@ -92,10 +95,22 @@ export default function ProfilePage() {
     },
   ];
 
+  // Mock progress data for the graph
+  const progressData = [
+    { week: 'Week 1', points: 450, accuracy: 62 },
+    { week: 'Week 2', points: 680, accuracy: 68 },
+    { week: 'Week 3', points: 520, accuracy: 65 },
+    { week: 'Week 4', points: 890, accuracy: 74 },
+    { week: 'Week 5', points: 1050, accuracy: 78 },
+    { week: 'Week 6', points: 1240, accuracy: 82 },
+    { week: 'Week 7', points: 1380, accuracy: 85 },
+    { week: 'Week 8', points: 1520, accuracy: 88 },
+  ];
+
   // Get achievement icon component
   const getAchievementIcon = (iconName: string) => {
     const iconProps =
-      "w-5 h-5 text-green-400 group-hover:scale-110 transition-transform";
+      "w-6 h-6";
     switch (iconName) {
       case "trophy":
         return <IconTrophy className={iconProps} />;
@@ -269,7 +284,7 @@ export default function ProfilePage() {
               <div className="space-y-4 pt-2 flex-1 w-full">
                 <div>
                   <h1 className="text-2xl md:text-4xl font-medium text-white">
-                    Your Achievements
+                    Hello {username}
                   </h1>
                   <p className="text-sm md:text-base text-white/70 font-normal max-w-7xl my-3 leading-relaxed">
                     Track your progress, earn badges, and unlock exclusive
@@ -315,54 +330,114 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Featured Achievements Preview */}
-          <div className="pt-6 border-t border-white/10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs md:text-sm font-medium text-white/90 uppercase tracking-wider">
-                Recent Achievements
-              </h3>
-              <Link href="/dashboard/profile/achievements">
-                <button className="text-xs font-medium cursor-pointer uppercase text-orange-500/80 hover:text-orange-500 transition-colors flex items-center gap-1">
-                  View All
-                  <IconArrowRight className="w-3 h-3" />
-                </button>
-              </Link>
-            </div>
 
-            {/* Achievement Cards Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {recentAchievements.slice(0, 4).map((achievement, index) => (
-                <motion.div
-                  key={achievement.title}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.05 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  className="relative overflow-hidden p-3 md:p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer group flex flex-col justify-between"
-                >
-                  {/* Content Left Side */}
-                  <div className="flex-1">
-                    <h4 className="text-xs font-semibold text-white line-clamp-1 uppercase tracking-wider">
+        </div>
+      </motion.div>
+
+      {/* Achievement Stat Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mx-1 md:mx-0"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <SectionHeading 
+            title="Recent Achievements"
+            icon={<IconSparkles className="w-5 h-5 text-neutral-500 my-12" />}
+          />
+          <Link href="/dashboard/profile/achievements">
+            <button className="text-sm font-medium cursor-pointer text-orange-600 hover:text-orange-700 transition-colors flex items-center gap-1.5">
+              View All
+              <IconArrowRight className="w-4 h-4" />
+            </button>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {recentAchievements.map((achievement, index) => {
+            const gradientColors = [
+              { bg: "from-blue-50 via-white to-white", blur: "bg-blue-100/50 group-hover:bg-blue-200/50", icon: "text-blue-600" },
+              { bg: "from-amber-50 via-white to-white", blur: "bg-amber-100/50 group-hover:bg-amber-200/50", icon: "text-amber-600" },
+              { bg: "from-green-50 via-white to-white", blur: "bg-green-100/50 group-hover:bg-green-200/50", icon: "text-green-600" },
+              { bg: "from-purple-50 via-white to-white", blur: "bg-purple-100/50 group-hover:bg-purple-200/50", icon: "text-purple-600" },
+            ];
+            const colors = gradientColors[index % gradientColors.length];
+
+            return (
+              <motion.div
+                key={achievement.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                className={cn(
+                  "relative overflow-hidden rounded-[2rem] border border-black/5 p-6 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all duration-300 group cursor-pointer bg-gradient-to-br",
+                  colors.bg
+                )}
+              >
+                <div className={cn("absolute -right-6 -top-6 h-32 w-32 rounded-full blur-3xl transition-all opacity-60", colors.blur)} />
+                
+                <div className="relative z-10 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="p-3 rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm">
+                      <div className={colors.icon}>
+                        {getAchievementIcon(achievement.icon)}
+                      </div>
+                    </div>
+                    <span className="text-xs text-black font-medium px-2 py-1 rounded-full bg-white/50 backdrop-blur-sm border border-black/5">
+                      {achievement.date}
+                    </span>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold tracking-tight text-black">
                       {achievement.title}
-                    </h4>
-                    <p className="text-[10px] text-white/50 line-clamp-1 mt-1">
+                    </h3>
+                    <p className="text-sm font-medium opacity-60">
                       {achievement.category}
                     </p>
-                  </div>
-
-                  {/* Icon Right Side + Reward */}
-                  <div className="flex items-end justify-between mt-3 pt-3 border-t border-white/10">
-                    <span className="text-xs font-mono font-semibold text-green-400">
-                      +{achievement.reward}
-                    </span>
-                    <div className="p-1.5 md:p-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 group-hover:border-green-400/30 transition-all">
-                      {getAchievementIcon(achievement.icon)}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-medium text-black/50">Reward:</span>
+                      <span className="text-sm font-mono font-semibold text-green-600">
+                        +{achievement.reward} pts
+                      </span>
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Progress Graph Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="mx-1 md:mx-0"
+      >
+        <SectionHeading 
+          title="Performance Over Time"
+          icon={<IconChartLine className="w-5 h-5 text-neutral-500 my-12" />}
+          className="mb-6"
+        />
+        
+        <div className="relative overflow-hidden rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] p-6 md:p-8">
+          <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
+          
+          <ProgressChart
+            data={progressData}
+            xAxisKey="week"
+            lines={[
+              { dataKey: 'points', name: 'Points', color: '#f97316', yAxisId: 'left' },
+              { dataKey: 'accuracy', name: 'Accuracy %', color: '#3b82f6', yAxisId: 'right' },
+            ]}
+            yAxisLabels={{ left: 'Points', right: 'Accuracy %' }}
+            height={300}
+            className="md:h-[400px]"
+          />
         </div>
       </motion.div>
 

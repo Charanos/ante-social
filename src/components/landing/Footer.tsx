@@ -159,7 +159,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative py-16 md:py-20 px-4 md:px-6 bg-linear-to-b from-neutral-50/30 to-white border-t border-black/5 overflow-hidden">
+    <footer className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-neutral-50/30 to-white border-t border-black/5 overflow-hidden">
       {/* Wave Background */}
       <WaveBackground />
 

@@ -35,7 +35,7 @@ interface Notification {
   created_date: string
 }
 
-// Mock notifications data
+// Mock notifications data (same as before)
 const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: "1",
@@ -145,9 +145,17 @@ export default function NotificationsPage() {
   }, [notifications])
 
   // Mark as read
-  const handleMarkAsRead = useCallback(async (id: string) => {
-    setIsMarkingRead(id)
+  const handleMarkAsRead = useCallback(async (id: string, silent = false) => {
+    if (!silent) setIsMarkingRead(id)
     
+    // Optimistic update for silent reads (click to view)
+    if (silent) {
+        setNotifications(prev =>
+            prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+        )
+        return;
+    }
+
     setTimeout(() => {
       setNotifications(prev =>
         prev.map(n => n.id === id ? { ...n, is_read: true } : n)
@@ -177,9 +185,21 @@ export default function NotificationsPage() {
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id))
       setIsDeletingNotif(null)
+      if (selectedNotification?.id === id) {
+          setSelectedNotification(null);
+      }
       toast.success("Deleted", "Notification removed")
     }, 500)
-  }, [toast])
+  }, [toast, selectedNotification])
+
+  // Handle notification click
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.is_read) {
+        handleMarkAsRead(notification.id, true);
+    }
+    setSelectedNotification(notification);
+  };
+
 
   // Close filter menu on click outside
   useEffect(() => {
@@ -244,8 +264,6 @@ export default function NotificationsPage() {
         <div className="lg:col-span-8 space-y-6">
           {/* Header with Actions */}
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            
-
             <div className="flex items-center gap-2">
               {/* Filter Dropdown */}
               <div className="relative" data-filter-menu>
@@ -347,7 +365,6 @@ export default function NotificationsPage() {
                   const style = getNotificationStyle(notification.type)
                   const Icon = style.icon
                   const isDeleting = isDeletingNotif === notification.id
-                  const isMarking = isMarkingRead === notification.id
 
                   return (
                     <motion.div
@@ -356,12 +373,10 @@ export default function NotificationsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      onClick={() => {
-                        setSelectedNotification(notification)
-                      }}
+                      onClick={() => handleNotificationClick(notification)}
                       className={cn(
                         "group relative p-6 hover:bg-white border-b border-black/5 transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6",
-                        !notification.is_read ? "bg-blue-50/20" : "bg-white/40",
+                        !notification.is_read ? "bg-blue-50/30" : "bg-white/40",
                         isDeleting && "opacity-50"
                       )}
                     >
@@ -372,7 +387,7 @@ export default function NotificationsPage() {
                           "h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 border transition-all shadow-sm group-hover:scale-105",
                           style.bg,
                           style.border,
-                          !notification.is_read && "border-blue-500"
+                          !notification.is_read && "border-blue-500 shadow-blue-100"
                         )}>
                           <Icon className={cn("w-4 h-4", style.color)} />
                         </div>
@@ -380,7 +395,10 @@ export default function NotificationsPage() {
                         {/* Content */}
                         <div className="flex-1 min-w-0 pr-4">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-black/90 text-[15px] group-hover:text-black transition-colors truncate">
+                            <h3 className={cn(
+                                "text-[15px] transition-colors truncate",
+                                !notification.is_read ? "font-semibold text-black" : "font-medium text-black/80"
+                            )}>
                               {notification.title}
                             </h3>
                             {!notification.is_read && (
@@ -401,10 +419,10 @@ export default function NotificationsPage() {
                       <div className="flex items-center gap-6 pl-12 md:pl-0">
                         {/* Short Message Preview */}
                         <div className="hidden lg:block max-w-[200px] text-right">
-                          <p className="text-[10px] font-semibold text-black/20 uppercase tracking-widest mb-1">
+                          <p className="text-[10px] font-semibold text-black/30 uppercase tracking-widest mb-1">
                             Preview
                           </p>
-                          <p className="text-sm text-black/50 truncate font-medium">
+                          <p className="text-sm text-black/60 truncate font-medium">
                             {notification.message}
                           </p>
                         </div>
@@ -413,26 +431,6 @@ export default function NotificationsPage() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-1.5 translate-x-2 group-hover:translate-x-0 transition-transform">
-                          {!notification.is_read && (
-                            <motion.button
-                              whileHover={{ scale: 1.15 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleMarkAsRead(notification.id)
-                              }}
-                              disabled={isMarking}
-                              className="p-2.5 hover:bg-blue-50 rounded-xl transition-all cursor-pointer disabled:opacity-50 text-blue-600 hover:shadow-sm"
-                              title="Mark as read"
-                            >
-                              {isMarking ? (
-                                <IconLoader3 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <IconCheck className="w-4 h-4" />
-                              )}
-                            </motion.button>
-                          )}
-
                           <motion.button
                             whileHover={{ scale: 1.15 }}
                             whileTap={{ scale: 0.9 }}
@@ -441,7 +439,7 @@ export default function NotificationsPage() {
                               handleDelete(notification.id)
                             }}
                             disabled={isDeleting}
-                            className="p-2.5 hover:bg-red-50 rounded-xl transition-all cursor-pointer disabled:opacity-50 text-red-500 hover:shadow-sm"
+                            className="p-2.5 hover:bg-neutral-100 rounded-xl transition-all cursor-pointer disabled:opacity-50 text-neutral-400 hover:text-red-500"
                             title="Delete"
                           >
                             {isDeleting ? (
@@ -489,7 +487,7 @@ export default function NotificationsPage() {
               <div className="h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
 
               <div className="space-y-3">
-                <p className="text-xs font-medium text-black/40 uppercase tracking-wider">
+                <p className="text-xs font-semibold text-black/40 uppercase tracking-wider">
                   By Category
                 </p>
 
@@ -542,7 +540,7 @@ export default function NotificationsPage() {
               
               <div className="p-8">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <div className={cn(
                       "p-3 rounded-2xl border transition-all shadow-sm",
@@ -552,7 +550,7 @@ export default function NotificationsPage() {
                       {(() => {
                         const style = getNotificationStyle(selectedNotification.type);
                         const Icon = style.icon;
-                        return <Icon className={cn("w-4 h-4", style.color)} />
+                        return <Icon className={cn("w-5 h-5", style.color)} />
                       })()}
                     </div>
                     <div>
@@ -560,11 +558,11 @@ export default function NotificationsPage() {
                         {selectedNotification.title}
                       </h2>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-semibold text-black/30 uppercase tracking-widest px-2 py-0.5 rounded-md bg-black/5 border border-black/5">
+                        <span className="text-[10px] font-semibold text-black/40 uppercase tracking-widest px-2 py-0.5 rounded-md bg-black/5 border border-black/5">
                           {selectedNotification.type}
                         </span>
                         <span className="text-black/20 text-xs">·</span>
-                        <span className="text-xs text-black/40 font-medium">
+                        <span className="text-xs text-black/50 font-medium">
                           {getTimeAgo(selectedNotification.created_date)}
                         </span>
                       </div>
@@ -580,44 +578,32 @@ export default function NotificationsPage() {
 
                 {/* Modal Body */}
                 <div className="space-y-6">
-                  <div className="p-6 rounded-3xl bg-black/[0.02] border border-black/[0.03] relative overflow-hidden group">
-                    <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-black/[0.02] blur-2xl group-hover:bg-black/[0.04] transition-all" />
-                    <p className="text-base text-black/70 leading-relaxed relative z-10">
+                  <div className="p-8 rounded-3xl bg-neutral-50/50 border border-neutral-100 relative overflow-hidden group">
+                     {/* Subtle background decoration */}
+                    <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-neutral-100/50 blur-3xl pointer-events-none" />
+                    <p className="text-base text-neutral-600 font-medium leading-relaxed relative z-10">
                       {selectedNotification.message}
                     </p>
                   </div>
-
-                  {/* Actions Area */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => {
-                        handleMarkAsRead(selectedNotification!.id);
-                        setSelectedNotification(null);
-                      }}
-                      className="flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-black text-white font-medium hover:bg-black/90 transition-all cursor-pointer shadow-lg shadow-black/10 active:scale-95"
-                    >
-                      <IconCheck className="w-5 h-5" />
-                      Mark Read
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleDelete(selectedNotification!.id);
-                        setSelectedNotification(null);
-                      }}
-                      className="flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-all cursor-pointer border border-red-100 active:scale-95"
-                    >
-                      <IconTrash className="w-5 h-5" />
-                      Delete
-                    </button>
-                  </div>
                 </div>
 
-                {/* Visual Flair at Bottom */}
-                <div className="mt-8 pt-8 border-t border-black/[0.05] flex items-center justify-center">
-                  <div className="flex items-center gap-2 text-[10px] font-semibold text-black/40 uppercase tracking-[0.2em]">
-                    <IconBell className="w-3 h-3" />
-                    Ante Social Notifications
-                  </div>
+                {/* Footer / Actions */}
+                <div className="mt-8 pt-6 border-t border-black/5 flex items-center justify-end">
+                    <button
+                        onClick={() => {
+                        handleDelete(selectedNotification!.id);
+                        setSelectedNotification(null);
+                        }}
+                        disabled={isDeletingNotif === selectedNotification.id}
+                        className="p-3 rounded-xl text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                        title="Delete Notification"
+                    >
+                         {isDeletingNotif === selectedNotification.id ? (
+                            <IconLoader3 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <IconTrash className="w-5 h-5" />
+                          )}
+                    </button>
                 </div>
               </div>
             </motion.div>

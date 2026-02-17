@@ -112,7 +112,7 @@ export function Sidebar({
       {/* Floating Collapse Button */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-9 z-50 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-white/50 bg-black/80 backdrop-blur-md text-white shadow-sm transition-all hover:bg-white hover:text-gray-900 hover:scale-110"
+        className="absolute -right-3 top-13 z-50 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-white/50 bg-black/30 backdrop-blur-md text-white shadow-sm transition-all hover:bg-white hover:text-gray-900 hover:scale-110"
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {collapsed ? (
@@ -136,16 +136,16 @@ export function Sidebar({
           )}
         >
           {collapsed ? (
-            <div className="relative w-12 h-12">
+            <Link href="/" className="relative w-12 h-12">
               <Image
                 src="/ante-logo.png"
                 alt="Ante Social"
                 fill
                 className="object-contain"
               />
-            </div>
+            </Link>
           ) : (
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <div className="relative w-14 h-14">
                 <Image
                   src="/ante-logo.png"
@@ -154,10 +154,10 @@ export function Sidebar({
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-semibold tracking-tight bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <span className="text-xl -ml-2 font-semibold tracking-tight bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                 Ante Social
               </span>
-            </div>
+            </Link>
           )}
         </div>
 

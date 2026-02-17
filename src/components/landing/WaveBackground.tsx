@@ -3,7 +3,12 @@
 
 import { useRef, useEffect } from "react";
 
-export function WaveBackground() {
+interface WaveBackgroundProps {
+  variant?: "top" | "bottom";
+  className?: string; // Allow custom classes
+}
+
+export function WaveBackground({ variant = "bottom", className = "" }: WaveBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -97,7 +102,9 @@ export function WaveBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-50"
+      className={`absolute inset-0 w-full h-full pointer-events-none opacity-50 ${
+          variant === "top" ? "rotate-180" : ""
+        } ${className}`}
       style={{
         maskImage: "linear-gradient(to bottom, black 0%, transparent 100%)",
         WebkitMaskImage: "linear-gradient(to bottom, black 0%, transparent 100%)",
