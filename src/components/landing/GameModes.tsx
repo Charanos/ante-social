@@ -8,66 +8,76 @@ import { useState } from "react";
 const gameModes = [
   {
     id: "poll",
-    title: "Poll-Style Betting",
+    title: "Consensus Markets",
     subtitle: "Majority Rules",
     description:
-      "The classic prediction market. Option with the most votes wins. Winners split the prize pool proportionally by their stake amount.",
+      "The foundational market mechanism. Forecast the outcome with the crowd. Yields are distributed proportionally by position size.",
     icon: IconUsers,
     quote: "The wisdom of the crowd... or the folly?",
-    mechanics: ["Most votes wins", "Pro-rata payouts", "Integrity weighting"],
+    mechanics: ["Vote-weighting", "Pro-rata Yields", "Integrity weighting"],
   },
   {
     id: "betrayal",
-    title: "The Betrayal Game",
-    subtitle: "Trust or Betray",
+    title: "Prisoner's Dilemma",
+    subtitle: "Trust or Defect",
     description:
-      "Choose to Cooperate for a small guaranteed win, or Betray for a chance at the jackpot. But if everyone betrays, everyone loses.",
+      "Choose to Cooperate for a guaranteed yield, or Defect for a chance at outsized returns. If everyone defects, the market collapses.",
     icon: IconAlertCircle,
     quote: "Trust is a currency. Spend it wisely.",
     mechanics: [
-      "All cooperate = small win",
-      "Betrayers win big",
-      "All betray = zero",
+      "All cooperate = steady yield",
+      "Defectors seize liquidty",
+      "All defect = market collapse",
     ],
   },
   {
     id: "reflex",
-    title: "Reflex Reaction Test",
-    subtitle: "5-Second Decision",
+    title: "Reflex Signal Test",
+    subtitle: "5-Second Arbitrage",
     description:
-      "Predict the majority's first instinct when confronted with a situation. You have 5 seconds. Don't think, just react.",
+      "Predict the majority's first instinct. You have 5 seconds to identify the signal before the crowd. Speed is your edge.",
     icon: IconAccessPoint,
     quote: "Fortune favors the absurd.",
     mechanics: [
-      "5-second countdown",
-      "Minority pays more",
+      "5-second window",
+      "Contrarian premiums",
       "2x multiplier tier",
     ],
   },
   {
     id: "majority",
     title: "Majority Prediction Ladder",
-    subtitle: "Rank & Predict",
+    subtitle: "Rank & Forecast",
     description:
-      "Rank items based on what you think the majority will choose. Guess the correct chain to win. Perfect consensus prediction.",
+      "Rank items based on projected consensus. Forecast the exact sequence of the crowd's preference to win the entire pool.",
     icon: IconLayersOff,
     quote: "You joined the parade, not the rebellion.",
     mechanics: [
       "Drag to rank",
-      "Match majority order",
-      "Split if multiple winners",
+      "Match consensus order",
+      "Split if multiple accurate",
     ],
   },
   {
     id: "private",
-    title: "Private Group Bets",
+    title: "Private Syndicates",
     subtitle: "Your Circle, Your Rules",
     description:
-      "Create exclusive markets with friends. Winner Takes All or Odd One Out. Peer confirmation system ensures fairness.",
+      "Create exclusive markets with trusted peers. Winner Takes All or Consensus Divergence. Peer confirmation system ensures settlement integrity.",
     icon: IconAward,
-    quote: "Keep your friends close, and your bets closer.",
-    mechanics: ["Winner Takes All", "Odd One Out", "Group confirmation"],
+    quote: "Keep your friends close, and your positions closer.",
+    mechanics: ["Winner Takes All", "Consensus Divergence", "Group confirmation"],
   },
+  {
+    id: "odd_one_out",
+    title: "Consensus Divergence",
+    subtitle: "Minority Wins",
+    description:
+      "The option with the *fewest* votes wins. A test of your ability to identify the non-consensus view.",
+    icon: IconLayoutGrid,
+    quote: "To be right and alone is the ultimate test.",
+    mechanics: ["Minority wins", "Inverse logic", "Contrarian yields"],
+  }
 ];
 
 export function GameModes() {
@@ -92,7 +102,7 @@ export function GameModes() {
             Choose Your Arena
           </h2>
           <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
-            Five unique betting formats. Each one a different way to outsmart
+            Six unique market types. Each one a different way to outsmart
             the crowd.
           </p>
         </motion.div>
@@ -271,7 +281,7 @@ export function GameModes() {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="text-lg font-normal">Explore All Game Modes</span>
+            <span className="text-lg font-normal">Explore All Markets</span>
             <IconArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </motion.button>
         </motion.div>

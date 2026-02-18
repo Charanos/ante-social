@@ -546,7 +546,7 @@ List all active public markets.
 
 **Query Parameters:**
 
-- `type` (string, optional: "poll_style" | "betrayal_game" | "reflex_reaction" | "majority_prediction")
+- `type` (string, optional: "poll_style" | "betrayal_game" | "reflex_reaction" | "majority_prediction" | "consensus_divergence")
 - `status` (string: "active" | "settling" | "settled")
 - `limit` (int, default: 20)
 

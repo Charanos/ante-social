@@ -16,6 +16,7 @@ import { GroupCard } from "@/components/groups/GroupCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 
 export default function GroupsPage() {
@@ -73,7 +74,7 @@ export default function GroupsPage() {
     <div className="space-y-8 pl-0 md:pl-8 w-full">
       <DashboardHeader
         user={mockUser}
-        subtitle="Join communities and create private betting markets"
+        subtitle="Join communities and create private prediction markets"
       />
 
       <div className="flex justify-end z-10">
@@ -131,7 +132,7 @@ export default function GroupsPage() {
                 </p>
                 <p className="mt-2 text-3xl font-medium numeric text-green-900">
                   {filteredGroups.reduce(
-                    (sum, g) => sum + (g.active_bets || 0),
+                    (sum, g) => sum + (g.activePositionsCount || 0),
                     0,
                   )}
                 </p>
@@ -153,7 +154,7 @@ export default function GroupsPage() {
                 </p>
                 <p className="mt-2 text-3xl font-medium numeric text-purple-900">
                   {filteredGroups.reduce(
-                    (sum, g) => sum + (g.member_count || 0),
+                    (sum, g) => sum + (g.memberCount || 0),
                     0,
                   )}
                 </p>
@@ -173,32 +174,44 @@ export default function GroupsPage() {
       />
 
       {/* Groups Grid */}
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-18"
-      >
-        {filteredGroups.map((group, index) => (
-          <GroupCard
-            key={group.id}
-            group={{
-              id: group.id,
-              name: group.name,
-              description: group.description,
-              members: group.member_count,
-              activeBets: group.active_bets,
-              category: group.category || "Community",
-              isPublic: group.is_public ?? true,
-              image: group.image,
-            }}
-            index={index}
-            showVisibilityBadge={true}
-            isJoined={true}
-            hideJoinedBadge={true}
+      {filteredGroups.length > 0 ? (
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-18"
+        >
+          {filteredGroups.map((group, index) => (
+            <GroupCard
+              key={group.id}
+              group={{
+                id: group.id,
+                name: group.name,
+                description: group.description,
+                members: group.memberCount,
+                activeBets: group.activePositionsCount,
+                category: group.category || "Community",
+                isPublic: group.isPublic ?? true,
+                image: group.image,
+              }}
+              index={index}
+              showVisibilityBadge={true}
+              isJoined={true}
+              hideJoinedBadge={true}
+            />
+          ))}
+        </motion.div>
+      ) : (
+        <div className="mb-18">
+          <EmptyState
+            icon={IconUsers}
+            title="No Active Syndicates"
+            description="You haven't joined any private syndicates yet. Create one to start forecasting with your inner circle."
+            actionLabel="Create Syndicate"
+            onAction={handleCreateGroup}
           />
-        ))}
-      </motion.div>
+        </div>
+      )}
     </div>
   );
 }

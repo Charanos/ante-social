@@ -2,14 +2,14 @@
 
 ## Executive Overview
 
-The ante-social landing page is the premium, "all-in-one" gateway to our social betting platform. It combines the "Atmosphere of bet and prestige" with a sleek, modern SaaS aesthetic. The goal is to convert visitors by showcasing the power of the dashboard—poll-style betting, virtual currency, and community leaderboards—wrapped in a high-end, monochromatic design.
+The ante-social landing page is the premium, "all-in-one" gateway to our social forecasting platform. It combines the "Atmosphere of prestige" with a sleek, modern SaaS aesthetic. The goal is to convert visitors by showcasing the power of the dashboard—poll-style forecasting, virtual currency, and community leaderboards—wrapped in a high-end, monochromatic design.
 
 **Key Characteristics:**
 
 - **Aesthetic:** Premium Monochromatic (Black, Dark Grey, White). "All-in-one platform" vibe.
 - **Typography:** **STRICTLY NO BOLD FONTS.** Use `font-medium` for emphasis and `font-medium` for body/subtitles.
 - **Interactivity:** `cursor-pointer` MUST be on ALL clickable elements. Smooth `framer-motion` animations.
-- **SEO Strategy:** Content derived directly from dashboard utility (Social Betting, Virtual Currency, Community).
+- **SEO Strategy:** Content derived directly from dashboard utility (Social Forecasting, Virtual Currency, Community).
 
 ---
 
@@ -63,12 +63,12 @@ The ante-social landing page is the premium, "all-in-one" gateway to our social 
 
 Leveraging dashboard functionality for high-value keywords:
 
-| Dashboard Feature        | SEO Keyword Focus                                | Headline Inspiration                       |
-| :----------------------- | :----------------------------------------------- | :----------------------------------------- |
-| **Poll-Style Betting**   | "Social Prediction Markets", "Community Betting" | "The Future of Social Prediction."         |
-| **ante-social Points (MP)** | "Risk-Free Betting", "Virtual Currency Casino"   | "All the Thrill. None of the Risk."        |
-| **Leaderboards**         | "Competitive Gaming", "Top Bettors"              | "Join the Hall of the Unreasonably Lucky." |
-| **Market Creation**      | "Custom Bet Markets", "Create Your Own Wager"    | "You Set the Odds. You Run the Market."    |
+| Dashboard Feature           | SEO Keyword Focus                                       | Headline Inspiration                       |
+| :-------------------------- | :------------------------------------------------------ | :----------------------------------------- |
+| **Poll-Style Forecasting**  | "Social Prediction Markets", "Community Forecasting"    | "The Future of Social Prediction."         |
+| **ante-social Points (MP)** | "Risk-Free Forecasting", "Virtual Currency Casino"      | "All the Thrill. None of the Risk."        |
+| **Leaderboards**            | "Competitive Gaming", "Top Forecasters"                 | "Join the Hall of the Unreasonably Lucky." |
+| **Market Creation**         | "Custom Forecast Markets", "Create Your Own Prediction" | "You Set the Odds. You Run the Market."    |
 
 ---
 
@@ -78,18 +78,18 @@ Leveraging dashboard functionality for high-value keywords:
 
 - **Style:** Fixed, Glassmorphism.
 - **Items:** Features, Leaderboard, Community.
-- **CTA:** "Launch Dashboard" (if logged in) or "Start Betting".
+- **CTA:** "Launch Dashboard" (if logged in) or "Start Forecasting".
 
 ### 2. Hero Section ("The All-in-One Platform")
 
-- **Headline:** "The only social betting platform you need." (Semibold).
-- **Subheadline:** "Free easy-to-use tools built for players who want full control. Track your wins, climb the leaderboard, and master the market." (Medium).
+- **Headline:** "The only social forecasting platform you need." (Semibold).
+- **Subheadline:** "Free easy-to-use tools built for forecasters who want full control. Track your wins, climb the leaderboard, and master the market." (Medium).
 - **Visual:** Large, tilted 3D-style screenshot of the Dashboard (Glass effect) floating in void.
 - **CTA:** "Get Started for Free" (White pill button).
 
 ### 3. Feature Showcase (Bento Grid)
 
-- **Card 1 (The Arena):** "Public Betting Markets". Image of active polls.
+- **Card 1 (The Arena):** "Public Forecasting Markets". Image of active polls.
 - **Card 2 (The Vault):** "Virtual Wallet Management". Image of MP balance.
 - **Card 3 (The Fame):** "Daily Leaderboards". Image of top user ranks.
 - **Animation:** Cards stagger in from bottom.
@@ -97,7 +97,7 @@ Leveraging dashboard functionality for high-value keywords:
 ### 4. Social Proof / Testimonials
 
 - **Title:** "What Players Are Saying".
-- **Content:** Mock tweets/reviews about "Finally a fun way to bet without losing money".
+- **Content:** Mock tweets/reviews about "Finally a fun way to forecast without losing money".
 
 ### 5. Footer
 

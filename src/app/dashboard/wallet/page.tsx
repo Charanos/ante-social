@@ -145,7 +145,7 @@ export default function WalletPage() {
                   Available Balance
                 </p>
                 <p className="text-3xl md:text-4xl font-semibold font-mono">
-                  ${mockUser.wallet.balance.toFixed(2)}
+                  ${mockUser.balance.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function WalletPage() {
               <div className="flex items-center gap-2">
                 <IconStar className="w-4 h-4 text-amber-400" />
                 <span className="text-sm font-medium text-amber-200">
-                  Novice Tier
+                  {mockUser.tier.charAt(0).toUpperCase() + mockUser.tier.slice(1)} Tier
                 </span>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function WalletPage() {
                     Total Winnings
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-green-900">
-                    +${mockUser.wallet.total_winnings.toFixed(2)}
+                    +${(mockUser.totalWinnings || 0).toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -269,7 +269,7 @@ export default function WalletPage() {
                     Total Losses
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-red-900">
-                    -${mockUser.wallet.total_losses.toFixed(2)}
+                    -${(mockUser.totalLosses || 0).toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -295,9 +295,9 @@ export default function WalletPage() {
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-purple-900">
                     {(
-                      (mockUser.wallet.total_winnings /
-                        (mockUser.wallet.total_winnings +
-                          mockUser.wallet.total_losses)) *
+                      ((mockUser.totalWinnings || 0) /
+                        ((mockUser.totalWinnings || 1) +
+                          (mockUser.totalLosses || 0))) *
                       100
                     ).toFixed(1)}
                     %

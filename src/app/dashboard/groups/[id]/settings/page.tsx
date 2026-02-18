@@ -69,7 +69,7 @@ export default function GroupSettingsPage() {
   // Find group data
   const group = mockGroups.find((g) => g.id === id) || mockGroups[0];
   const isPlatformAdmin = mockUser.role === "admin";
-  const isGroupAdmin = group.creator_id === mockUser.id;
+  const isGroupAdmin = group.creatorId === mockUser.id;
   const canEdit = isPlatformAdmin || isGroupAdmin;
 
   // Initialize state from group
@@ -234,7 +234,7 @@ export default function GroupSettingsPage() {
                     Group Members
                   </p>
                   <p className="mt-2 text-3xl font-medium numeric text-blue-900">
-                    {group.member_count}
+                    {group.memberCount}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">

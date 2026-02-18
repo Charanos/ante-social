@@ -104,7 +104,7 @@ text-[10px] font-semibold uppercase tracking-widest → Micro-labels
 ```
 Green   → success, deposits, active status, positive delta
 Red     → error, withdrawals, danger zone, negative delta
-Blue    → info, bets, USDT, unread notifications
+Blue    → info, forecasts, USDT, unread notifications
 Amber   → tier badges, warnings, premium features
 Purple  → groups, social features
 Orange  → system alerts, moderate warnings
@@ -498,7 +498,7 @@ Product          Resources        Company          Legal
 Features         Documentation    About Us         Terms of Service
 Game Modes       API Reference    Careers          Privacy Policy
 Pricing          Help Center      Contact          Cookie Policy
-Roadmap          Blog             Site Map         Responsible Gaming
+Roadmap          Blog             Site Map         Responsible Forecasting
 ```
 
 - `text-xs font-semibold text-black/40 uppercase tracking-wider` — column headers

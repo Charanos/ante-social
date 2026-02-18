@@ -328,7 +328,7 @@ db.publicMarkets.createIndex({ createdAt: -1 });
 /\*
 {
 \_id: ObjectId("..."),
-type: "poll_style", // poll_style, betrayal_game, reflex_reaction, majority_prediction
+type: "poll_style", // poll_style, betrayal_game, reflex_reaction, majority_prediction, consensus_divergence
 
 title: "Best Nairobi matatu route?",
 description: "Vote for the most reliable route",

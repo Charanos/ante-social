@@ -53,7 +53,7 @@ const navItems: NavItem[] = [
     icon: IconBasket,
     children: [
       { title: "All Markets", url: "/dashboard/markets" },
-      { title: "My Bets", url: "/dashboard/markets/my-bets" },
+      { title: "My Forecasts", url: "/dashboard/markets/my-forecasts" },
       { title: "Create Market", url: "/dashboard/markets/create" },
     ],
   },

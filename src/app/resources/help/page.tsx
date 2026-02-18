@@ -23,10 +23,10 @@ const faqs = [
     ]
   },
   {
-    category: "Betting & Markets",
+    category: "Trading & Markets",
     items: [
        {
-        question: "Can I create my own betting markets?",
+        question: "Can I create my own prediction markets?",
         answer: "Yes! Any verified user can create a Private Group market. Public market creation is currently limited to trusted creators but will be opening up soon."
       },
       {

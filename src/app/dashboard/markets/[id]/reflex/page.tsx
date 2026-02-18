@@ -417,7 +417,7 @@ export default function ReflexMarketPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 self-start">
             <div className="sticky top-6 space-y-6">
               {/* Bet Placement Card */}
               <motion.div
@@ -429,7 +429,7 @@ export default function ReflexMarketPage() {
                 {/* Header */}
                 <div className="p-6 bg-black">
                   <h3 className="text-xl font-semibold text-white mb-1">
-                    Place Your Bet
+                    Place Your Prediction
                   </h3>
                   <p className="text-sm text-white/60 font-medium">
                     Predict the crowd's reflex

@@ -192,7 +192,7 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8">
-      <DashboardHeader subtitle="Manage public betting markets and platform operations" />
+      <DashboardHeader subtitle="Manage public prediction markets and platform operations" />
 
       <SearchFilterBar
         searchQuery={searchQuery}
@@ -693,17 +693,17 @@ export default function AdminPage() {
                         <div className="mt-5 flex items-center gap-6 text-sm">
                           <div className="flex items-center gap-2">
                             <span className="text-black/40 font-medium">Buy-in</span>
-                            <span className="font-mono font-medium text-black/90">${market.buy_in_amount}</span>
+                            <span className="font-mono font-medium text-black/90">${market.minStake}</span>
                           </div>
                           <div className="h-4 w-px bg-black/10" />
                           <div className="flex items-center gap-2">
                             <span className="text-black/40 font-medium">Participants</span>
-                            <span className="font-mono font-medium text-black/90">{market.participant_count}</span>
+                            <span className="font-mono font-medium text-black/90">{market.participantCount}</span>
                           </div>
                           <div className="h-4 w-px bg-black/10" />
                           <div className="flex items-center gap-2">
                             <span className="text-black/40 font-medium">Total Pool</span>
-                            <span className="font-mono font-medium text-green-600">${market.total_pool}</span>
+                            <span className="font-mono font-medium text-green-600">${market.poolAmount}</span>
                           </div>
                         </div>
                       </div>

@@ -29,11 +29,11 @@ type PaymentMethod = "mpesa" | "usdt";
 const QUICK_AMOUNTS = [100, 500, 1000, 5000];
 const DEPOSIT_LIMITS = {
   novice: { min: 10, max: 500 },
-  high_roller: { min: 10, max: 5000 },
+  whale: { min: 10, max: 5000 },
 };
 const WITHDRAWAL_LIMITS = {
   novice: { min: 10, max: 250 },
-  high_roller: { min: 10, max: 1000 },
+  whale: { min: 10, max: 1000 },
 };
 
 // Brand Icons
@@ -77,7 +77,7 @@ export default function CheckoutContent() {
 
   const limits = useMemo(() => {
     const tier =
-      mockUser.user_level === "high_roller" ? "high_roller" : "novice";
+      mockUser.tier === "whale" || mockUser.tier === "oracle" ? "whale" : "novice";
     return mode === "deposit" ? DEPOSIT_LIMITS[tier] : WITHDRAWAL_LIMITS[tier];
   }, [mode]);
 
@@ -427,6 +427,11 @@ export default function CheckoutContent() {
                         <span className="text-[10px] font-medium text-blue-900/60 uppercase tracking-widest">
                           Network: TRC20 (Tron)
                         </span>
+                        {mockUser.tier === "whale" || mockUser.tier === "oracle" ? (
+                          <div className="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold border border-amber-200">
+                            VIP TIER
+                          </div>
+                        ) : null}
                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                           <span className="text-[9px] font-medium text-blue-700 uppercase">
@@ -531,9 +536,9 @@ export default function CheckoutContent() {
                 <div className="flex gap-3 justify-between">
                   <div className="space-y-1">
                     <p className="text-xs font-semibold text-amber-900 uppercase tracking-wider">
-                      {mockUser.user_level === "high_roller"
-                        ? "High Roller"
-                        : "Novice"}{" "}
+                      {mockUser.tier === "whale" || mockUser.tier === "oracle"
+                        ? "Platinum VIP"
+                        : "Standard Member"}{" "}
                       Limits
                     </p>
                     <p className="text-xs text-amber-700">

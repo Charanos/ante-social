@@ -2,14 +2,14 @@
 
 ## Executive Overview
 
-ante-social is a betting market platform focused on poll-style betting with Motlaire Points (MP) as the virtual currency. The platform features public betting markets where users can place bets on various outcomes, with dynamic weighting for early bettors and a comprehensive admin panel for market management.
+ante-social is a forecasting market platform focused on poll-style forecasting with Motlaire Points (MP) as the virtual currency. The platform features public forecasting markets where users can place forecasts on various outcomes, with dynamic weighting for early forecasters and a comprehensive admin panel for market management.
 
 **Key Characteristics:**
 
 - Points-based virtual currency system (no real money)
-- Poll-style betting markets with multiple outcomes
+- Poll-style forecasting markets with multiple outcomes
 - Daily leaderboard and user rankings
-- Early bettor advantage with dynamic payout weighting
+- Early forecaster advantage with dynamic payout weighting
 - Manual admin settlement and verification
 - Clean, modern UI with mobile-first design
 
@@ -138,7 +138,7 @@ model PublicBetMarket {
   description               String
   tags                      String[]  @default([])
 
-  // Betting Configuration
+  // Forecasting Configuration
   bet_type                  String    @default("poll_style") // Only "poll_style" supported
   market_duration           String    @default("daily") // "daily" or "weekly"
   buy_in_amount             Float
@@ -266,8 +266,8 @@ model MarketParticipant {
   amount_contributed    Float
   quantity              Int              @default(1)
 
-  // Bet Context Snapshot (immutable at time of bet)
-  bet_context_snapshot  Json? // Stores payout_weight, dominance, early_bettor status, etc.
+  // Forecast Context Snapshot (immutable at time of forecast)
+  bet_context_snapshot  Json? // Stores payout_weight, dominance, early_forecaster status, etc.
 
   potential_payout      Float?
   actual_payout         Float            @default(0)
@@ -319,7 +319,7 @@ model UserNotification {
   user_id            String   @db.ObjectId
   user               User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  notification_type  String   // "bet_placed", "market_closing_soon", "payout_received", etc.
+  notification_type  String   // "forecast_placed", "market_closing_soon", "payout_received", etc.
   title              String
   message            String
 
@@ -369,7 +369,7 @@ model AuditLog {
   sequence_number     Int      @unique
   timestamp           DateTime @default(now())
 
-  event_type          String   // "bet_placement", "payout", "market_settled", etc.
+  event_type          String   // "forecast_placement", "payout", "market_settled", etc.
   actor_id            String   @db.ObjectId
   actor_type          String   @default("user") // "user", "admin", "system"
 
@@ -511,7 +511,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token }) => !!token,
     },
-  }
+  },
 );
 
 export const config = {
@@ -556,7 +556,7 @@ export async function requireAdmin() {
 
 - Welcome message with username display.
 - User stats cards:
-  - Total Bets (count)
+  - Total Forecasts (count)
   - Points Balance (MP)
   - Total Winnings (MP)
   - Win Rate (percentage)
@@ -573,7 +573,7 @@ export async function requireAdmin() {
   - Title and description.
   - Time remaining until close.
   - Total pool and participant count.
-  - "Join Bet" button (disabled if scheduled or closed).
+  - "Join Forecast" button (disabled if scheduled or closed).
 - Auto-refresh every 60 seconds.
 - Manual refresh button.
 - Countdown timers for market closing.
@@ -591,12 +591,12 @@ const loadMarkets = async () => {
 // Load user stats
 const loadUserStats = async (userId) => {
   const participants = await fetch(`/api/participants/user/${userId}`).then(
-    (r) => r.json()
+    (r) => r.json(),
   );
   const wallet = await fetch(`/api/wallet/${userId}`).then((r) => r.json());
 
   return {
-    totalBets: participants.length,
+    totalForecasts: participants.length,
     pointsBalance: wallet.balance,
     totalWinnings: participants.reduce((sum, p) => sum + p.actual_payout, 0),
     winRate: calculateWinRate(participants),
@@ -609,7 +609,7 @@ const loadLeaderboard = async () => {
 };
 ```
 
-### 2. Market Details & Betting
+### 2. Market Details & Forecasting
 
 **Location:** `/markets/[id]`
 
@@ -625,24 +625,24 @@ const loadLeaderboard = async () => {
 - Each outcome shows:
   - Option text
   - Media (if available)
-  - Current votes/bets
+  - Current votes/forecasts
   - Selection state
-- Bet placement form:
+- Forecast placement form:
   - Outcome selection (single choice)
   - Quantity selector (number of stakes)
   - Total cost display
   - Wallet balance check
-  - "Place Bet" button
-- User's active bets section.
+  - "Place Forecast" button
+- User's active forecasts section.
 - Recent participants live ticker.
-- Success modal after bet placement.
+- Success modal after forecast placement.
 
-**Bet Placement Logic:**
+**Forecast Placement Logic:**
 
 ```javascript
-// Place bet API call
-async function placeBet(marketId, outcomeId, quantity) {
-  const response = await fetch("/api/bets/place", {
+// Place forecast API call
+async function placeForecast(marketId, outcomeId, quantity) {
+  const response = await fetch("/api/forecasts/place", {
     method: "POST",
     body: JSON.stringify({
       market_id: marketId,
@@ -761,9 +761,9 @@ export async function POST(req: Request) {
   await prisma.userNotification.create({
     data: {
       user_id: userId,
-      notification_type: "bet_placed",
-      title: "Bet Placed Successfully",
-      message: `You placed ${quantity} bet(s) on "${market.title}"`,
+      notification_type: "forecast_placed",
+      title: "Forecast Placed Successfully",
+      message: `You placed ${quantity} forecast(s) on "${market.title}"`,
       market_id,
       market_title: market.title,
       amount: totalCost,
@@ -773,8 +773,8 @@ export async function POST(req: Request) {
   return Response.json({ success: true, participant: result });
 }
 
-// Build bet context for early bettor weighting
-async function buildBetContext(market, outcomeId, quantity) {
+// Build forecast context for early forecaster weighting
+async function buildForecastContext(market, outcomeId, quantity) {
   const now = new Date();
   const startTime = market.start_time
     ? new Date(market.start_time)
@@ -786,15 +786,15 @@ async function buildBetContext(market, outcomeId, quantity) {
   const totalDuration =
     (closeTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
 
-  // Early bettor logic
-  let isEarlyBettor = false;
-  let earlyBettorReason = "";
+  // Early forecaster logic
+  let isEarlyForecaster = false;
+  let earlyForecasterReason = "";
 
   if (market.market_duration === "daily") {
     // First 4 hours = early
     if (hoursSinceStart < 4) {
-      isEarlyBettor = true;
-      earlyBettorReason = "Bet placed within first 4 hours";
+      isEarlyForecaster = true;
+      earlyForecasterReason = "Forecast placed within first 4 hours";
     }
   } else if (market.market_duration === "weekly") {
     // First 24 hours = early
@@ -962,7 +962,7 @@ export async function GET() {
 
   // Sort by earnings
   const leaderboard = Object.values(userEarnings).sort(
-    (a, b) => b.total_earned - a.total_earned
+    (a, b) => b.total_earned - a.total_earned,
   );
 
   return Response.json({
@@ -1049,7 +1049,7 @@ export async function POST(req: Request) {
   if (!data.outcomes || data.outcomes.length < 2) {
     return Response.json(
       { error: "At least 2 outcomes required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -1126,7 +1126,7 @@ async function processSettlement(marketId, winningOutcomeId) {
   });
 
   const winners = market.participants.filter(
-    (p) => p.selected_outcome_id === winningOutcomeId
+    (p) => p.selected_outcome_id === winningOutcomeId,
   );
 
   if (winners.length === 0) {

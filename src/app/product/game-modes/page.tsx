@@ -58,6 +58,16 @@ const gameModes = [
     gradient: "from-orange-500/20 via-red-500/20 to-transparent",
     image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2670&auto=format&fit=crop",
     stats: { players: "4.3K", winRate: "73%" }
+  },
+  {
+    icon: IconHierarchy,
+    title: "Consensus Divergence",
+    description: "The ultimate contrarian test. Predict the minority outcome to win. When everyone thinks the same, the one who thinks different takes it all.",
+    tag: "Contrarian",
+    tagColor: "bg-purple-100 text-purple-800 border-purple-200",
+    gradient: "from-purple-500/20 via-pink-500/20 to-transparent",
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2670&auto=format&fit=crop",
+    stats: { players: "3.1K", winRate: "28%" }
   }
 ];
 

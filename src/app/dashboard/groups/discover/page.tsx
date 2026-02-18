@@ -119,10 +119,10 @@ export default function DiscoverGroupsPage() {
         });
         break;
       case "members":
-        filtered.sort((a, b) => (b.member_count || 0) - (a.member_count || 0));
+        filtered.sort((a, b) => (b.memberCount || 0) - (a.memberCount || 0));
         break;
       case "active":
-        filtered.sort((a, b) => (b.active_bets || 0) - (a.active_bets || 0));
+        filtered.sort((a, b) => (b.activePositionsCount || 0) - (a.activePositionsCount || 0));
         break;
       case "newest":
         filtered.sort((a, b) =>
@@ -234,9 +234,9 @@ export default function DiscoverGroupsPage() {
                     key={group.id}
                     group={{
                       ...group,
-                      members: group.member_count || 0,
-                      activeBets: group.active_bets || 0,
-                      isPublic: group.is_public ?? true,
+                      members: group.memberCount || 0,
+                      activeBets: group.activePositionsCount || 0,
+                      isPublic: group.isPublic ?? true,
                       category: group.category || "Community",
                     }}
                     featured={true}
@@ -298,9 +298,9 @@ export default function DiscoverGroupsPage() {
                     key={group.id}
                     group={{
                       ...group,
-                      members: group.member_count || 0,
-                      activeBets: group.active_bets || 0,
-                      isPublic: group.is_public ?? true,
+                      members: group.memberCount || 0,
+                      activeBets: group.activePositionsCount || 0,
+                      isPublic: group.isPublic ?? true,
                       category: group.category || "Community",
                     }}
                     index={index}

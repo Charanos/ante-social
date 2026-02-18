@@ -6,6 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { leaderboardData } from "@/lib/mockData";
 import { IconAward, IconStar, IconTrendingUp } from '@tabler/icons-react';
+import { UserAvatar } from "../ui/UserAvatar";
 
 const RankBadge = ({ rank }: { rank: number }) => {
   if (rank === 1) {
@@ -74,10 +75,10 @@ const TrendIndicator = ({ trend }: { trend: string }) => {
 interface LeaderboardPlayer {
   rank: number;
   username: string;
-  avatar: React.ReactNode | string;
+  avatarUrl?: string | null;
   totalWinnings: number;
   winRate: number;
-  activeBets?: number;
+  activePositions?: number;
   trend?: "up" | "down" | "same";
 }
 
@@ -95,7 +96,7 @@ export default function LeaderboardSection({
   const displayData = data || leaderboardData;
 
   return (
-    <div className="space-y-6 my-24 md:my-0">
+    <div className="space-y-6 my-24 md:my-12">
       {/* Section Header */}
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
@@ -119,9 +120,12 @@ export default function LeaderboardSection({
           >
             <div className="relative mb-3">
               <div className="absolute inset-0 bg-linear-to-br from-slate-300/50 to-slate-400/50 rounded-full blur-xl" />
-              <div className="relative w-12 h-12 md:w-16 md:h-16 rounded-full bg-linear-to-br from-slate-200 to-slate-300 flex items-center justify-center text-sm md:text-lg font-semibold text-slate-700 border-4 border-white shadow-lg">
-                {displayData[1].avatar}
-              </div>
+              <UserAvatar 
+                src={displayData[1].avatarUrl} 
+                name={displayData[1].username} 
+                size="lg" 
+                className="relative border-4 border-white shadow-lg"
+              />
               <div className="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full bg-linear-to-br from-slate-300 to-slate-400 flex items-center justify-center border-2 border-white">
                 <span className="text-[8px] md:text-[10px] font-semibold text-white">
                   2
@@ -150,9 +154,12 @@ export default function LeaderboardSection({
           >
             <div className="relative mb-3">
               <div className="absolute inset-0 bg-linear-to-br from-yellow-400/50 to-amber-500/50 rounded-full blur-2xl" />
-              <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-linear-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-base md:text-xl font-semibold text-white border-4 border-white shadow-2xl">
-                {displayData[0].avatar}
-              </div>
+              <UserAvatar 
+                src={displayData[0].avatarUrl} 
+                name={displayData[0].username} 
+                size="lg" 
+                className="relative w-16 h-16 md:w-20 md:h-20 border-4 border-white shadow-2xl"
+              />
               <div className="absolute -top-2 -right-2 w-6 h-6 md:w-8 md:h-8 rounded-full bg-linear-to-br from-yellow-400 to-amber-500 flex items-center justify-center border-2 border-white shadow-lg">
                 <IconStar className="w-3 h-3 md:w-4 md:h-4 text-white" />
               </div>
@@ -179,9 +186,12 @@ export default function LeaderboardSection({
           >
             <div className="relative mb-3">
               <div className="absolute inset-0 bg-linear-to-br from-orange-400/50 to-orange-500/50 rounded-full blur-xl" />
-              <div className="relative w-11 h-11 md:w-14 md:h-14 rounded-full bg-linear-to-br from-orange-300 to-orange-400 flex items-center justify-center text-xs md:text-base font-semibold text-orange-800 border-4 border-white shadow-lg">
-                {displayData[2].avatar}
-              </div>
+              <UserAvatar 
+                src={displayData[2].avatarUrl} 
+                name={displayData[2].username} 
+                size="md" 
+                className="relative w-11 h-11 md:w-14 md:h-14 border-4 border-white shadow-lg"
+              />
               <div className="absolute -bottom-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full bg-linear-to-br from-orange-400 to-orange-500 flex items-center justify-center border-2 border-white">
                 <span className="text-[8px] md:text-[10px] font-semibold text-white">
                   3
@@ -215,9 +225,12 @@ export default function LeaderboardSection({
               <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
                 <RankBadge rank={player.rank} />
 
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/5 flex items-center justify-center text-xs md:text-sm font-semibold text-black/70 group-hover:scale-110 transition-transform">
-                  {player.avatar}
-                </div>
+                <UserAvatar 
+                  src={player.avatarUrl} 
+                  name={player.username} 
+                  size="sm" 
+                  className="group-hover:scale-110 transition-transform"
+                />
 
                 <div className="flex flex-col min-w-0">
                   <Link href={`/dashboard/profile/${player.username}`}>
@@ -227,7 +240,7 @@ export default function LeaderboardSection({
                   </Link>
                   <div className="flex items-center gap-1.5 md:gap-2">
                     <span className="text-[10px] md:text-xs text-black/50 font-mono">
-                      {player.activeBets} bets
+                      {player.activePositions} positions
                     </span>
                     <span className="text-black/20">•</span>
                     <span className="text-[10px] md:text-xs text-black/50 font-semibold">

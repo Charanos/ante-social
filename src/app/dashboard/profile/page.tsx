@@ -48,7 +48,7 @@ export default function ProfilePage() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Profile data
-  const [fullName, setFullName] = useState(mockUser.full_name);
+  const [fullName, setFullName] = useState(mockUser.fullName || "");
   const [username, setUsername] = useState(mockUser.username);
   const [email, setEmail] = useState(mockUser.email);
   const [phone, setPhone] = useState("+254712345678");
@@ -131,7 +131,7 @@ export default function ProfilePage() {
   // Track changes
   const [hasChanges, setHasChanges] = useState(false);
   const [initialData, setInitialData] = useState({
-    fullName: mockUser.full_name,
+    fullName: mockUser.fullName || "",
     username: mockUser.username,
     email: mockUser.email,
     phone: "+254712345678",
@@ -513,7 +513,7 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         value={fullName}
-                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setFullName(e.target.value)}
+                        onChange={(e) => setFullName(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
@@ -528,7 +528,7 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         value={username}
-                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setUsername(e.target.value)}
+                        onChange={(e) => setUsername(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
@@ -543,7 +543,7 @@ export default function ProfilePage() {
                       <input
                         type="email"
                         value={email}
-                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
@@ -558,7 +558,7 @@ export default function ProfilePage() {
                       <input
                         type="tel"
                         value={phone}
-                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
@@ -573,7 +573,7 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         value={location}
-                        onChange={(e: { target: { value: SetStateAction<string>; }; }) => setLocation(e.target.value)}
+                        onChange={(e) => setLocation(e.target.value)}
                         className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all cursor-pointer"
                       />
                     </div>
@@ -586,7 +586,7 @@ export default function ProfilePage() {
                   </label>
                   <textarea
                     value={bio}
-                    onChange={(e: { target: { value: SetStateAction<string>; }; }) => setBio(e.target.value)}
+                    onChange={(e) => setBio(e.target.value)}
                     rows={3}
                     className="w-full px-3 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-black/10 text-sm font-medium text-black placeholder:text-black/30 focus:border-black/30 focus:bg-white/80 outline-none transition-all resize-none cursor-pointer"
                   />
@@ -782,7 +782,7 @@ export default function ProfilePage() {
                         Current Tier
                       </p>
                       <p className="text-xl font-medium text-amber-900 capitalize">
-                        {mockUser.user_level.replace("_", " ")}
+                        {mockUser.tier.replace("_", " ")}
                       </p>
                     </div>
                     <motion.div
@@ -844,22 +844,21 @@ export default function ProfilePage() {
                       </div>
                       <span className="font-mono font-medium text-black/90 text-xs">
                         $
-                        {mockUser.user_level === "high_roller"
+                        {mockUser.tier === "whale"
                           ? "5,000"
                           : "500"}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between p-3 rounded-xl bg-white/60 backdrop-blur-sm border border-black/5">
-                      <div className="flex items-center gap-2">
-                        <IconWallet className="w-4 h-4 text-red-600" />
-                        <span className="text-xs font-medium text-black/70">
-                          Withdrawals
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-400/20 border border-orange-400/30">
+                        <span className="text-[10px] font-semibold text-orange-900 uppercase">
+                          {mockUser.tier === "whale" ? "High Stake" : "Standard"}
                         </span>
                       </div>
                       <span className="font-mono font-medium text-black/90 text-xs">
                         $
-                        {mockUser.user_level === "high_roller"
+                        {mockUser.tier === "whale"
                           ? "1,000"
                           : "250"}
                       </span>

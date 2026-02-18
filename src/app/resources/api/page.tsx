@@ -65,7 +65,7 @@ export default function ApiPage() {
                     
                     <p className="text-lg text-neutral-600 font-medium leading-relaxed">
                         Our API is designed for scale. Whether you're building a trading bot, an analytics dashboard, 
-                        or a completely new betting interface, we give you the tools to do it.
+                        or a completely new trading interface, we give you the tools to do it.
                     </p>
                     
                     <div className="flex flex-col gap-4">

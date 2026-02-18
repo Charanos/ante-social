@@ -20,17 +20,17 @@ export function CurrencySection() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 border border-neutral-200 text-sm font-medium text-black">
               <IoWalletOutline className="w-4 h-4" />
-              <span>Real Money Betting</span>
+              <span>Real Money Markets</span>
             </div>
 
-            <h2 className="text-5xl md:text-7xl font-medium tracking-tighter text-black leading-[1.1]">
-              Bet with real money. <br />
+            <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-black leading-[1.1]">
+              Predict outcomes. <br />
               <span className="text-neutral-500">Win real rewards.</span>
             </h2>
 
             <p className="text-xl text-neutral-600 leading-relaxed max-w-xl font-medium">
-              Ante Social is a social casino platform for the Kenyan market
-              featuring real money betting with USD and KSH. Secure deposits via
+              Ante Social is a social predictive market for the Kenyan market
+              featuring real money markets with USD and KSH. Secure deposits via
               M-Pesa and crypto, with transparent tier-based limits.
             </p>
 
@@ -123,8 +123,8 @@ export function CurrencySection() {
                           {i === 0
                             ? "M-Pesa Deposit"
                             : i === 1
-                              ? "Won Bet: 'Best Meme'"
-                              : "Bet Entry: 'Risk It All'"}
+                              ? "Won Forecast: 'Best Meme'"
+                              : "Forecast Entry: 'Risk It All'"}
                         </p>
                         <p className="text-xs text-neutral-600">
                           Today, 10:2{i} AM

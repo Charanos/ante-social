@@ -20,12 +20,12 @@ const features: Feature[] = [
   {
     title: "Public Markets",
     description:
-      "Join poll-style markets, reflex games, and majority predictions. Bet on outcomes, earn when you're right.",
+      "Join consensus markets, reflex signal tests, and majority predictions. Forecast outcomes, earn yield when you're right.",
     icon: IconTrendingUp,
     stats: { label: "Active Markets", value: "342" },
     highlights: [
-      "Poll-Style Betting",
-      "Reflex Reaction Tests",
+      "Consensus Markets",
+      "Reflex Signal Tests",
       "Majority Ladder",
     ],
     colSpan: "md:col-span-12 lg:col-span-7",
@@ -33,10 +33,10 @@ const features: Feature[] = [
   {
     title: "M-Pesa & Crypto",
     description:
-      "Instant deposits via M-Pesa or USDT. Withdraw winnings in KSH or USD immediately.",
+      "Instant liquidity via M-Pesa or USDT. Withdraw yields in KSH or USD immediately.",
     icon: IoPhonePortraitOutline,
     stats: { label: "Avg. Deposit", value: "45s" },
-    highlights: ["M-Pesa Integration", "USDT-TRC20", "Instant Payouts"],
+    highlights: ["M-Pesa Integration", "USDT-TRC20", "Instant Liquidity"],
     colSpan: "md:col-span-12 lg:col-span-5",
   },
   {
@@ -49,12 +49,12 @@ const features: Feature[] = [
     colSpan: "md:col-span-12 lg:col-span-5",
   },
   {
-    title: "Group Betting",
+    title: "Syndicated Markets",
     description:
-      "Create private circles with friends. Winner-takes-all, odd-one-out, and custom markets for your crew.",
+      "Create private circles with friends. Winner-takes-all, consensus divergence, and custom markets for your crew.",
     icon: IconUsers,
     stats: { label: "Active Groups", value: "1.2K" },
-    highlights: ["Private Groups", "Custom Markets", "Social Features"],
+    highlights: ["Private Syndicates", "Custom Markets", "Social Features"],
     colSpan: "md:col-span-12 lg:col-span-7",
   },
   {
@@ -67,7 +67,7 @@ const features: Feature[] = [
     colSpan: "md:col-span-12 lg:col-span-6",
   },
   {
-    title: "Live Updates",
+    title: "Live Signals",
     description:
       "Real-time market changes, instant notifications, live settlement.",
     icon: IconAccessPoint,
@@ -175,7 +175,7 @@ export function FeatureGrid() {
           >
             <IconCurrencyDollar className="w-4 h-4" />
             <span className="text-sm font-semibold text-black/80 tracking-wide uppercase">
-              Built for Modern Bettors
+              Built for Modern Analysts
             </span>
           </motion.div>
 
@@ -218,7 +218,7 @@ export function FeatureGrid() {
         >
           <button className="group relative inline-flex cursor-pointer items-center gap-3 px-8 py-3 bg-black text-white rounded-full overflow-hidden shadow-md hover:shadow-xl transition-all hover:-translate-y-1">
             <span className="relative z-10 font-normal tracking-wide text-lg">
-              Start Betting Now
+              Start Forecasting Now
             </span>
             <IconArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
             <div className="absolute inset-0 bg-neutral-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />

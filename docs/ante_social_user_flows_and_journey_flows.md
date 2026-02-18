@@ -39,7 +39,7 @@ START
 [2FA Setup - Optional but Recommended]
   - "Secure Your Account"
   - Skip / Set Up Now
-  
+
   IF Set Up:
     → QR code displayed
     → Scan with Google Authenticator / Authy
@@ -53,8 +53,8 @@ START
   Card 3: "Choose your currency: USD or KSH" (currency selector)
   Card 4: "Browse Public Markets" (animated preview)
   Card 5: "Create or Join Groups" (animated preview)
-  Card 6: "Ready to place your first bet?" (CTA)
-  
+  Card 6: "Ready to place your first forecast?" (CTA)
+
   [Smooth swipe transitions with Framer Motion]
   ↓
 [Onboarding Incentive]
@@ -70,7 +70,8 @@ END
 ```
 
 ### Key UX Decisions
-- **No KYC initially** - Start betting immediately, trigger KYC at withdrawal
+
+- **No KYC initially** - Start forecasting immediately, trigger KYC at withdrawal
 - **Gamified tutorial** - Skip option available but incentivized completion
 - **Localized** - Kenyan phone format, M-Pesa as default payment
 
@@ -105,7 +106,7 @@ END
 [M-Pesa Instructions]
   - Animated step-by-step guide
   - Each step fades in with stagger effect
-  
+
   1. Go to M-Pesa menu
   2. Select Lipa Na M-Pesa
   3. Select Pay Bill
@@ -113,7 +114,7 @@ END
   5. Enter Account Number: ANTE-USER123 (auto-copied, success toast)
   6. Enter Amount: 5,000 KSH (monospace)
   7. Enter PIN
-  
+
   [Countdown Timer: 15:00 minutes (monospace, updates every second)]
   ↓
 [Pending Confirmation]
@@ -154,7 +155,7 @@ END
   - Wallet address (monospace, copy button)
   - "Send exactly: 5,000 KSH ≈ 37.75 USDT" (live conversion)
   - Warning: "Only send USDT-TRC20. Other assets will be lost."
-  
+
   [Countdown: 30:00 minutes]
   ↓
 [Pending Confirmation]
@@ -170,6 +171,7 @@ END
 ```
 
 ### Error Handling
+
 - **Timeout (15 min)**: Modal with warning icon, "Payment expired. Please try again."
 - **Payment failed**: "M-Pesa transaction failed. Check your balance and try again."
 - **Limit exceeded**: "You've reached your daily deposit limit of 66,225 KSH. Resets in 8h 23m" (countdown in monospace)
@@ -199,7 +201,7 @@ IF 2FA Enabled:
     - Each digit box has focus animation
     - Auto-submit when 6 digits entered
     - "Use backup code instead" link
-    
+
     IF backup code selected:
       → [Backup Code Entry]
          - Single input: "ABC-123-DEF" format
@@ -227,7 +229,7 @@ END
 
 ---
 
-## 3. Public Market Betting Flow
+## 3. Public Market Forecasting Flow
 
 ### Poll-Style Market Example: "Best Nairobi Matatu Route"
 
@@ -248,14 +250,14 @@ END
   - Description
   - Options (with images):
     • Route 46 (Ngong Road)
-    • Route 33 (Thika Road)  
+    • Route 33 (Thika Road)
     • Route 23 (Jogoo Road)
     • Route 11 (City Stadium)
-  
+
   - Participants list (no option shown):
     • @jomo_bets - 50 USDT - 45 min ago
     • @nairobi_king - 125 USDT - 2h ago
-    
+
   - Pool breakdown:
     Total: 2,450 USDT
     Fee (5%): 122.50 USDT
@@ -270,31 +272,31 @@ END
   - Quick amounts: 10, 25, 50, 100
   - Balance shown: 500 USDT
   - Min stake: 5 USDT
-  
+
   - Preview:
     "You're betting 50 USDT on Route 33"
     "Potential pool share if winner: ~2-5x"
   ↓
 [Confirmation Modal]
-  - "Confirm Your Bet"
+  - "Confirm Your Forecast"
   - Option: Route 33 (Thika Road)
   - Stake: 50 USDT
   - "Your choice is hidden from others"
-  - [Cancel] [Confirm Bet]
+  - [Cancel] [Confirm Forecast]
   ↓
 [Bet Placed Success]
   - Haptic feedback
-  - "Bet placed! 50 USDT on Route 33"
+  - "Forecast placed! 50 USDT on Route 33"
   - "Results in 2h 15m"
   - New balance: 450 USDT
-  
+
   - Quick actions:
     • Share to Group
     • Browse More Markets
-    • View My Bets
+    • View My Forecasts
   ↓
-[My Bets Tab - Active]
-  - Shows all active bets
+[My Forecasts Tab - Active]
+  - Shows all active forecasts
   - Countdown timers
   - Status: "Waiting for results"
   ↓
@@ -310,13 +312,13 @@ END
     • Route 46: 12 votes (25%)
     • Route 23: 5 votes (11%)
     • Route 11: 2 votes (4%)
-  
+
   - Your result:
     ✅ YOU WON!
     Stake: 50 USDT
     Payout: 165.50 USDT
     Profit: +115.50 USDT
-  
+
   - Winners (28):
     • You - 165.50 USDT
     • @nairobi_king - 412.90 USDT
@@ -356,46 +358,46 @@ END
   ↓
 [Group Dashboard - Admin View]
   - Members (1/∞)
-  - Active bets (0)
-  - Total bets (0)
-  - "Create Bet" button (primary)
+  - Active forecasts (0)
+  - Total forecasts (0)
+  - "Create Forecast" button (primary)
   ↓
-[Create Bet Form]
-  - Bet type selector:
+[Create Forecast Form]
+  - Forecast type selector:
     • Winner Takes All (selected)
     • Odd One Out
-  
+
   - Title: "Who will arrive last to the party?"
-  - Description: "Annual late-arrival bet"
-  
+  - Description: "Annual late-arrival forecast"
+
   - Options:
     [+ Add option]
     1. Alex
     2. Jamie
     3. Morgan
     4. Riley
-  
+
   - Settings:
     • Minimum stake: 10 USDT
     • Closes: Manual (when I declare winner)
-  
-  - [Cancel] [Create Bet]
+
+  - [Cancel] [Create Forecast]
   ↓
-[Bet Created - Active]
+[Forecast Created - Active]
   - Status: Active
-  - Pool: 0 USDT (nobody bet yet)
-  
+  - Pool: 0 USDT (nobody forecast yet)
+
   - Activity Feed:
-    "You created the bet 'Who will arrive last'"
+    "You created the forecast 'Who will arrive last'"
   ↓
--- MEMBERS JOIN & BET --
-  
+-- MEMBERS JOIN & FORECAST --
+
   Activity updates:
   - "@jamie joined the group"
   - "@jamie placed 25 USDT on Option: Jamie"
   - "@alex placed 50 USDT on Option: Alex"
   - "@morgan placed 25 USDT on Option: Morgan"
-  
+
   Pool now: 100 USDT
   ↓
 -- REAL WORLD EVENT HAPPENS --
@@ -409,11 +411,11 @@ END
   - Confirm
   ↓
 [Status: Pending Confirmation]
-  
+
   - Notification to all members:
     "🏆 Admin declared @riley as winner"
     "Confirm or disagree within 12 hours"
-  
+
   - Member view shows:
     [@riley - 25 USDT] - DECLARED WINNER
     [Confirm Winner] [Disagree]
@@ -423,7 +425,7 @@ END
   - 5 min: @jamie confirmed
   - 15 min: @alex confirmed
   - 30 min: @morgan confirmed
-  
+
   Status: 3/3 non-admin confirmations
   ↓
 [Auto-Finalization After 12h OR ≥1 Confirmation]
@@ -432,13 +434,13 @@ END
   - Pool: 100 USDT
   - Fee: 5 USDT (5%)
   - Prize: 95 USDT
-  
+
   - Payout:
     @riley receives 95 USDT
   ↓
 [Winner Notification]
   "🎉 You won 95 USDT in Friday Night Crew!"
-  "Bet: Who will arrive last to the party?"
+  "Forecast: Who will arrive last to the party?"
   ↓
 [Group Activity Feed - Final]
   - "@admin declared @riley as winner"
@@ -459,18 +461,18 @@ END
 [@morgan clicks "Disagree"]
   ↓
 [Confirmation Modal]
-  "Are you sure? This will pause payout for 
+  "Are you sure? This will pause payout for
   everyone until the admin reviews."
-  
+
   [Cancel] [Yes, Disagree]
   ↓
 [Disagreement Recorded]
   - Status: Disputed
   - Payout: PAUSED
-  
+
   - Notification to admin:
     "⚠️ @morgan disagreed with the winner declaration"
-  
+
   - Activity feed:
     "@morgan disagreed - payout paused"
   ↓
@@ -479,10 +481,10 @@ END
   - Options:
     • Re-declare different winner (1 time only)
     • Contact support for manual resolution
-  
+
   - If re-declares:
     → Back to pending confirmation flow
-  
+
   - If doesn't re-declare within 48h:
     → Escalated to Ante Social support
   ↓
@@ -521,7 +523,7 @@ END
   - Max: 250 USDT (daily limit)
   - Shows: "0/250 USDT used today"
   - Available: 615.50 USDT
-  
+
   - "Withdraw 200 USDT"
   ↓
 [Withdrawal Method]
@@ -539,17 +541,17 @@ END
   Phone: +254 712 345 678
   Processing time: 24-48 hours
   Fee: 0 USDT (we cover it)
-  
+
   You'll receive: 200 USDT
-  
+
   [Cancel] [Confirm Withdrawal]
   ↓
 [Withdrawal Requested]
   - "Withdrawal request submitted"
-  - Reference: WD-20240125-A1B2
+  - reference: WD-20240125-A1B2
   - Status: Pending
   - "We'll notify you when processed"
-  
+
   - New balance: 415.50 USDT
     (200 USDT in pending withdrawal)
   ↓
@@ -587,16 +589,16 @@ END
   - Closes: 30 minutes
   ↓
 [Market Details]
-  Question: "When suddenly added to a new 
+  Question: "When suddenly added to a new
   group chat, the majority would..."
-  
+
   Options:
   A. Leave immediately
   B. Mute notifications
   C. Ask "who's this?"
   D. Pretend they didn't see it
   E. Participate just for fun
-  
+
   Rules explained:
   "Predict minority = bigger multiplier!
    < 45% = 2.0x
@@ -610,25 +612,25 @@ END
   - Can't change after countdown
   ↓
 [Countdown Begins]
-  
+
   [Large centered counter]
-  
+
   5... "READY"
   4... "SET"
-  3... 
+  3...
   2...
   1...
   0... "CHOOSE NOW!"
-  
+
   [Options appear, fullscreen takeover]
-  
+
   Tap FAST:
   [Leave immediately]
   [Mute notifications]
   [Ask "who's this?"]
   [Pretend they didn't see it]
   [Participate just for fun]
-  
+
   → User taps "Mute notifications"
   ↓
 [Immediate Feedback]
@@ -640,27 +642,27 @@ END
 -- MARKET CLOSES --
   ↓
 [Results Reveal - Animated]
-  
+
   Vote distribution:
   - Leave immediately: 15% (13 votes)
   - Mute notifications: 38% (32 votes) ← YOU
   - Ask "who's this?": 8% (7 votes)
   - Pretend didn't see: 19% (16 votes)
   - Participate for fun: 20% (17 votes)
-  
+
   Majority picked: Mute notifications (38%)
-  
+
   Your tier: A (minority < 45%)
   Multiplier: 2.0x! 🎯
-  
+
   Calculation:
   - Your stake: 50 USDT
   - Base payout: 62.50 USDT
   - With 2.0x multiplier: 125 USDT
-  
-  Message: "Fortune favors the absurd. 
-  You bet against reason and reason lost!"
-  
+
+  Message: "Fortune favors the absurd.
+  You forecast against reason and reason lost!"
+
   Final payout: 125 USDT
   Profit: +75 USDT
   ↓
@@ -692,7 +694,7 @@ END
   - Filter chips: All, Poll, Betrayal, Reflex, Prediction
   - Sort: Closing Soon, Highest Pool, New
   - Market cards (infinite scroll)
-  - "My Active Bets" pinned section
+  - "My Active Forecasts" pinned section
 
 [Groups Tab]
   - "My Groups" list
@@ -711,7 +713,7 @@ END
 [Profile Tab]
   - Avatar & username
   - Tier badge
-  - Stats: Total bets, Win rate, Biggest win
+  - Stats: Total forecasts, Win rate, Biggest win
   - Settings
   - Help & Support
   - Logout
@@ -722,29 +724,32 @@ END
 ## 8. Edge Cases & Error States
 
 ### Insufficient Balance
+
 ```
-User tries to bet 100 USDT with 50 USDT balance
+User tries to forecast 100 USDT with 50 USDT balance
   ↓
 [Error Modal]
   "Insufficient Balance"
   "You need 100 USDT but have 50 USDT"
-  
+
   [Deposit Now] [Cancel]
 ```
 
 ### Market Closed During Bet
+
 ```
-User places bet, but market closed 1 second prior
+User places forecast, but market closed 1 second prior
   ↓
 [Error State]
   "Market just closed!"
-  "This market closed while you were placing your bet"
+  "This market closed while you were placing your forecast"
   "Your wallet was not charged"
-  
+
   [Browse Other Markets]
 ```
 
 ### Daily Limit Reached
+
 ```
 User tries to deposit 600 USDT as novice (limit: 500)
   ↓
@@ -754,7 +759,7 @@ User tries to deposit 600 USDT as novice (limit: 500)
    You've used: 450 USDT
    Available: 50 USDT
    Resets in: 8h 23m"
-  
+
   Options:
   - Deposit 50 USDT (max available)
   - Try again tomorrow
@@ -762,16 +767,18 @@ User tries to deposit 600 USDT as novice (limit: 500)
 ```
 
 ### Network Error
+
 ```
 [Offline State - Banner]
   "⚠️ No internet connection"
   "Some features may not work"
-  
+
   Cached content still viewable
   Actions disabled until reconnected
 ```
 
 ### Settlement Tie (Odd One Out)
+
 ```
 Everyone in group picks same option
   ↓
@@ -780,10 +787,10 @@ Everyone in group picks same option
   "Everyone chose the same option"
   "House keeps the 5% fee"
   "Remaining 95% refunded to all"
-  
+
   Your refund: 47.50 USDT (from 50 stake)
-  
-  Message: "Everyone chose the same. 
+
+  Message: "Everyone chose the same.
   House keeps the fee; try again, fools."
 ```
 
@@ -794,31 +801,36 @@ Everyone in group picks same option
 ### Push Notifications
 
 **Transactional:**
+
 - Deposit confirmed
 - Withdrawal processed
-- Bet placed successfully
+- Forecast placed successfully
 - Market settled (you participated)
 - Payout received
 
 **Social:**
+
 - Friend joined your group
-- New bet created in group
+- New forecast created in group
 - Winner declared (needs confirmation)
 - Someone confirmed/disagreed result
 - Group invitation
 
 **Engagement:**
+
 - Market closing soon (1 hour before)
-- "You haven't bet in 3 days"
+- "You haven't forecast in 3 days"
 - Weekly summary (wins, losses, highlight)
 - Tier upgrade notification
 
 **Compliance:**
+
 - Daily limit warning (80% reached)
 - Account verification required
 - Suspicious activity detected
 
 ### In-App Notifications
+
 - Real-time activity feed in groups
 - Market status changes
 - Wallet balance updates
@@ -839,4 +851,4 @@ Everyone in group picks same option
 ---
 
 **CONFIDENTIAL PROPERTY OF ANTE SOCIAL**  
-*User Flows Version 1.0 | January 2026*
+_User Flows Version 1.0 | January 2026_

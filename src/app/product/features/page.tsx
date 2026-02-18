@@ -10,7 +10,7 @@ import Link from "next/link";
 // Feature Data
 const features = [
   {
-    title: "Social Betting",
+    title: "Social Markets",
     description: "Create private groups, challenge friends, and turn every match into a rivalry. It's not just about winning; it's about bragging rights.",
     icon: IconUsersGroup,
     colSpan: "col-span-1 md:col-span-2 lg:col-span-2",
@@ -151,7 +151,7 @@ export default function FeaturesPage() {
     <PageLayout>
       <PageHeader
         title="The Architecture of Play"
-        description="Experience the future of social betting. Where community meets competition."
+        description="Experience the future of social markets. Where community meets competition."
       />
 
       <section className="pb-24 px-6 max-w-7xl mx-auto">
@@ -175,7 +175,7 @@ export default function FeaturesPage() {
              <div className="relative z-10 space-y-8 p-12 md:p-24 text-center">
                  <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-white mb-6">Ready to experience the future?</h2>
                  <p className="text-neutral-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8">
-                     Join thousands of players who have already switched to Ante Social. Experience betting re-imagined.
+                     Join thousands of analysts who have already switched to Ante Social. Experience markets re-imagined.
                  </p>
                  <Link href="/register" className="pt-4 flex justify-center">
                     <div className="inline-flex items-center gap-2 px-10 py-2 bg-white text-black rounded-full font-medium text-lg hover:bg-neutral-200 hover:scale-105 transition-all shadow-xl hover:shadow-2xl hover:shadow-white/10 cursor-pointer">

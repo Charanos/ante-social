@@ -23,12 +23,12 @@ export default function PricingPage() {
             viewport={{ once: true }}
             className="p-10 md:p-16 rounded-[2.5rem] bg-neutral-50 border border-neutral-200/60 opacity-60 hover:opacity-100 transition-opacity duration-500"
           >
-            <h3 className="text-lg font-semibold text-neutral-500 uppercase tracking-widest mb-4">Traditional Casinos</h3>
+            <h3 className="text-lg font-semibold text-neutral-500 uppercase tracking-widest mb-4">Traditional Bookies</h3>
             <div className="text-5xl font-medium text-neutral-400 mb-8 tracking-tighter">House Edge</div>
             <ul className="space-y-6">
               {[
                   "Hidden odds manipulation", 
-                  "Betting against the house", 
+                  "Trading against the house", 
                   "Opaque fee structures", 
                   "Slow withdrawals"
               ].map((item) => (
@@ -80,7 +80,7 @@ export default function PricingPage() {
                             <p className="text-sm text-neutral-400 font-medium">No withdrawal fees</p>
                         </div>
                         <a href="/register" className="px-8 py-2 bg-white text-black rounded-full font-medium hover:bg-neutral-200 transition-colors">
-                            Start Betting
+                            Start Trading
                         </a>
                     </div>
                 </div>

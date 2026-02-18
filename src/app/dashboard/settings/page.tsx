@@ -19,7 +19,6 @@ import {
   IconCreditCard,
   IconLogout,
   IconDeviceFloppy,
-  IconCheck,
   IconChevronRight,
   IconMail,
   IconPhone,
@@ -28,6 +27,9 @@ import {
   IconBrandApple,
   IconTrash,
   IconAlertTriangle,
+  IconAlertCircle,
+  IconCheck,
+  IconAward,
   IconLoader3,
 } from "@tabler/icons-react";
 
@@ -105,6 +107,9 @@ export default function SettingsPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  const [dailyLimit, setDailyLimit] = useState(500);
+  const [autoWithdraw, setAutoWithdraw] = useState(true);
+
   // Track unsaved changes
   useEffect(() => {
     const changed =
@@ -117,13 +122,8 @@ export default function SettingsPage() {
       newPassword !== "" ||
       confirmPassword !== "" ||
       twoFactorEnabled !== false ||
-      emailNotifications !== true ||
-      pushNotifications !== true ||
-      notificationPrefs.bets !== true ||
-      notificationPrefs.groups !== true ||
-      notificationPrefs.social !== false ||
-      notificationPrefs.marketing !== false ||
-      language !== "en";
+      dailyLimit !== 500 ||
+      autoWithdraw !== true;
     setHasUnsavedChanges(changed);
   }, [
     username,
@@ -135,6 +135,8 @@ export default function SettingsPage() {
     newPassword,
     confirmPassword,
     twoFactorEnabled,
+    dailyLimit,
+    autoWithdraw,
     emailNotifications,
     pushNotifications,
     notificationPrefs,
@@ -981,25 +983,26 @@ export default function SettingsPage() {
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="text-2xl font-semibold text-amber-900">
-                            {mockUser.user_level === "high_roller"
-                              ? "High Roller"
-                              : "Novice"}
+                            {mockUser.tier === "whale" || mockUser.tier === "oracle"
+                              ? "Platinum VIP"
+                              : "Standard Member"}
                           </h3>
                         </div>
                         <motion.div
-                          animate={{ rotate: [0, 10, -10, 0] }}
-                          transition={{ repeat: Infinity, duration: 3 }}
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="w-12 h-12 rounded-full bg-amber-200/50 flex items-center justify-center border-2 border-amber-400"
                         >
-                          <IconCreditCard className="w-6 h-6 text-amber-600" />
+                          <IconAward className="w-6 h-6 text-amber-600" />
                         </motion.div>
                       </div>
                       <p className="text-xs text-amber-700 mb-4">
                         Daily limits: $
-                        {mockUser.user_level === "high_roller"
+                        {mockUser.tier === "whale" || mockUser.tier === "oracle"
                           ? "5,000"
                           : "500"}{" "}
                         deposits • $
-                        {mockUser.user_level === "high_roller"
+                        {mockUser.tier === "whale" || mockUser.tier === "oracle"
                           ? "1,000"
                           : "250"}{" "}
                         withdrawals

@@ -24,7 +24,7 @@ export function VisualShowcase() {
             Built for the <span className="italic text-orange-600">Culture</span>
           </h2>
           <p className="text-lg md:text-xl text-black/70 leading-relaxed font-normal">
-            More than just betting. It's about who you win with. Join a community that celebrates every victory together.
+            More than just markets. It's about who you win with. Join a community that celebrates every victory together.
           </p>
         </motion.div>
 

@@ -37,7 +37,7 @@ Group Admins can define custom parameters for their communities:
 
 - **Membership Approval**: Manual vs Automatic.
 - **Market Creation**: Who can propose markets (Admin-only vs Member-voted).
-- **Betting Limits**: Min/Max buy-in for group markets.
+- **Forecasting Limits**: Min/Max buy-in for group markets.
 
 ### 2. Viral Growth (Invites)
 

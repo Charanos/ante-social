@@ -7,7 +7,7 @@ import Marquee from "react-fast-marquee";
 
 const testimonials = [
   {
-    text: "Finally, a betting platform that feels like a game, not a scam. The Betrayal Game is absolute chaos in the best way possible.",
+    text: "Finally, a market platform that feels like a game, not a scam. The Prisoner's Dilemma is absolute chaos in the best way possible.",
     author: "Alex K.",
     role: "High Roller",
     location: "Nairobi",
@@ -23,7 +23,7 @@ const testimonials = [
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=800&auto=format&fit=crop",
   },
   {
-    text: "I created a private group for my friends. We bet on everything now - from sports to who's arriving late. Winner Takes All is brilliant.",
+    text: "I created a private group for my friends. We forecast on everything now - from sports to who's arriving late. Winner Takes All is brilliant.",
     author: "Mike O.",
     role: "High Roller",
     location: "Kisumu",
@@ -39,7 +39,7 @@ const testimonials = [
     image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop",
   },
   {
-    text: "Transparent fees, immutable audit logs, 2FA security. This is how betting platforms should be built. No hidden surprises.",
+    text: "Transparent fees, immutable audit logs, 2FA security. This is how prediction platforms should be built. No hidden surprises.",
     author: "James N.",
     role: "High Roller",
     location: "Eldoret",
@@ -145,7 +145,7 @@ export function Testimonials() {
             Players Say What?
           </h2>
           <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
-            Join thousands of Kenyan bettors who've found their new home on Ante
+            Join thousands of Kenyan forecasters who've found their new home on Ante
             Social.
           </p>
         </motion.div>

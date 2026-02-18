@@ -13,7 +13,7 @@ const tools = [
   {
     icon: IconClock,
     title: "Time Out",
-    description: "Take a short break from betting. Lock your account for 24 hours, 7 days, or up to 6 weeks.",
+    description: "Take a short break from the markets. Lock your account for 24 hours, 7 days, or up to 6 weeks.",
   },
   {
     icon: IconUserOff,
@@ -23,19 +23,19 @@ const tools = [
 ];
 
 const signs = [
-  "Chasing losses to win back money.",
-  "Betting with money you can't afford to lose.",
-  "Validating borrowing money or selling assets to bet.",
+  "Chasing market losses to win back money.",
+  "Trading with money you can't afford to lose.",
+  "Validating borrowing money or selling assets to trade.",
   "Neglecting work, family, or personal responsibilities.",
-  "Feeling anxious or stressed about your betting habits."
+  "Feeling anxious or stressed about your trading habits."
 ];
 
 export default function ResponsibleGamingPage() {
   return (
     <PageLayout>
       <PageHeader
-        title="Responsible Gaming"
-        description="We are committed to helping you stay in control. Betting should be entertainment, not a problem."
+        title="Responsible Trading"
+        description="We are committed to helping you stay in control. Trading should be entertainment, not a problem."
       />
 
       <section className="pb-24 px-6 max-w-5xl mx-auto space-y-24">
@@ -74,7 +74,7 @@ export default function ResponsibleGamingPage() {
                         <IconAlertCircle className="w-6 h-6" />
                         <span className="font-semibold tracking-wide uppercase text-xs">Warning Signs</span>
                      </div>
-                     <h3 className="text-2xl font-semibold text-black">Know the signs of problem gambling.</h3>
+                     <h3 className="text-2xl font-semibold text-black">Know the signs of problematic behavior.</h3>
                 </div>
                 
                 <div className="md:w-2/3">

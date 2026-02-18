@@ -313,7 +313,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative max-w-5xl mx-auto space-y-8 pt-16 z-10"
+        className="relative max-w-5xl mx-auto space-y-8 pt-28 z-10"
       >
         <motion.h1
           className="text-5xl md:text-6xl lg:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
@@ -325,9 +325,9 @@ export function Hero() {
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
         >
-          The only social betting <br className="hidden md:block" />
+          Monetize your {" "} 
           <span className="relative inline-block">
-            platform you need
+            {" "} conviction
             <motion.span
               className="absolute -bottom-2 left-0 right-0 h-1 bg-black/10 rounded-full"
               initial={{ scaleX: 0 }}
@@ -344,8 +344,9 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          Free easy-to-use tools built for players who want full control. Track
-          your wins, climb the leaderboard, and master the market.
+          The first predictive market built on social trust. Turn your instinct
+          into a signal asset. Track your accuracy, climb the leaderboard, and
+          master the signal economy.
         </motion.p>
 
         <motion.div
@@ -363,7 +364,7 @@ export function Hero() {
               whileHover={{ x: "100%" }}
               transition={{ duration: 0.6 }}
             />
-            <span className="relative z-10">Jump Right In</span>
+            <span className="relative z-10">Open Position</span>
             <IconArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
 
@@ -371,7 +372,7 @@ export function Hero() {
             href="/product/game-modes"
             className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full cursor-pointer hover:bg-black/5 hover:scale-105 transition-all duration-300"
           >
-            Explore Game Modes
+            Explore Markets
           </Link>
         </motion.div>
 

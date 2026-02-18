@@ -17,36 +17,37 @@ import {
   IconTrendingUp,
   IconUsers,
 } from "@tabler/icons-react";
+import { ProbabilityTrend } from "@/components/ui/ProbabilityTrend";
+import { MarketChart } from "./MarketChart";
+
+import { Market } from "@/types/market";
 
 interface MarketCardProps {
-  market: {
-    id: string;
-    title: string;
-    description: string;
-    image: string;
-    type: string;
-    buyIn?: string;
-    pool: string;
-    participants?: string | number;
-    bets?: string | number;
-    timeLeft: string;
-    status?: string;
-    tag?: string;
-  };
+  market: Market;
   index?: number;
   href?: string;
 }
 
+const formatTimeLeft = (endsAt: string) => {
+  const diff = new Date(endsAt).getTime() - new Date().getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h left`;
+  return "Ending soon";
+};
+
 const getTypeStyles = (type: string) => {
   switch (type.toLowerCase()) {
-    case "poll":
-      return { label: "Poll", color: "blue", icon: IconClipboard };
+    case "consensus":
+      return { label: "Consensus", color: "blue", icon: IconClipboard };
     case "reflex":
       return { label: "Reflex", color: "amber", icon: IconAccessPoint };
     case "ladder":
       return { label: "Ladder", color: "purple", icon: IconAward };
-    case "betrayal":
-      return { label: "Betrayal", color: "red", icon: IconTarget };
+    case "prisoner_dilemma":
+      return { label: "Dilemma", color: "red", icon: IconTarget };
     default:
       return { label: "Market", color: "gray", icon: IconAlertCircle };
   }
@@ -55,10 +56,26 @@ const getTypeStyles = (type: string) => {
 export function MarketCard({ market, index = 0, href }: MarketCardProps) {
   const typeInfo = getTypeStyles(market.type);
   const linkHref = href || `/dashboard/markets/${market.id}/${market.type}`;
-  const participantsCount = market.participants || market.bets || 0;
-  const buyIn = market.buyIn || "500 KSH";
+  const participantsCount = market.participantCount || 0;
+  const minStake = market.minStake || 0;
   const status = market.status || "active";
   const TypeIcon = typeInfo.icon;
+  const timeLeft = formatTimeLeft(market.endsAt || new Date().toISOString());
+  
+  // Format pool amount strictly
+  const formattedPool = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    notation: 'compact',
+    maximumFractionDigits: 1
+  }).format(market.poolAmount || 0);
+  
+  // Format stake strictly
+  const formattedStake = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+  }).format(minStake);
 
   return (
     <motion.div
@@ -100,7 +117,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
             <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/80 backdrop-blur-sm rounded-full">
               <IconClock className="w-3 h-3 text-white" />
               <span className="text-[10px] font-semibold font-mono text-white tracking-wider">
-                {market.timeLeft}
+                {timeLeft}
               </span>
             </div>
 
@@ -136,20 +153,27 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                   </p>
                 </div>
                 <p className="text-xs font-semibold font-mono text-black/80">
-                  {buyIn}
+                  {formattedStake}
                 </p>
               </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-1 text-black/30">
+              
+              {/* Signal Trend */}
+              <div className="space-y-1 flex flex-col justify-center">
+                <div className="flex items-center gap-1 text-black/30 mb-1">
                   <IconTrendingUp className="w-3 h-3" />
                   <p className="text-[10px] font-semibold uppercase tracking-wider">
-                    Pool
+                    Signal {market.signalStrength}%
                   </p>
                 </div>
-                <p className="text-xs font-semibold font-mono text-black/80">
-                  {market.pool}
-                </p>
+                 <div className="h-6 w-16">
+                   <MarketChart 
+                      data={market.priceHistory || [50, 50]} 
+                      height={24} 
+                      color={market.probability > 50 ? "#10b981" : "#ef4444"} 
+                   />
+                 </div>
               </div>
+
               <div className="space-y-1 flex flex-col items-center">
                 <div className="flex items-center gap-1 text-black/30">
                   <IconUsers className="w-3 h-3" />
@@ -169,7 +193,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              JOIN MARKET
+              OPEN POSITION
               <IconArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </motion.button>
           </div>

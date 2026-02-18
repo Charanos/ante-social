@@ -13,7 +13,7 @@ export default function TermsPage() {
       title: "1. Eligibility",
       content: (
         <p>
-          You must be at least 18 years old to use Ante Social. We verify the identity and age of all users to ensure compliance with Kenyan gaming regulations.
+          You must be at least 18 years old to use Ante Social. We verify the identity and age of all users to ensure compliance with Kenyan market regulations.
           By creating an account, you represent and warrant that you meet these eligibility requirements.
         </p>
       ),
@@ -54,7 +54,7 @@ export default function TermsPage() {
       title: "5. Limitation of Liability",
       content: (
         <p>
-          Ante Social provides a platform for user-generated betting markets. We are not responsible for the outcome of any specific event or the actions of any third party.
+          Ante Social provides a platform for user-generated prediction markets. We are not responsible for the outcome of any specific event or the actions of any third party.
           Our liability is limited to the amount of fees paid by you to the platform in the 12 months preceding any claim.
         </p>
       ),

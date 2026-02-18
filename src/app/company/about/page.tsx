@@ -20,7 +20,7 @@ export default function AboutPage() {
     <PageLayout>
       <PageHeader
         title="We're not just a platform."
-        description="Ante Social is a movement. Born in Nairobi, built for the world. We are rewriting the rules of social betting."
+        description="Ante Social is a movement. Born in Nairobi, built for the world. We are rewriting the rules of social markets."
       />
 
       <section ref={containerRef} className="py-24 px-6 max-w-7xl mx-auto space-y-32">
@@ -59,10 +59,10 @@ export default function AboutPage() {
                 </h2>
                 <div className="space-y-6 text-lg text-neutral-600 font-medium leading-relaxed">
                     <p>
-                        In the bustling streets of Nairobi, betting isn't a solitary act—it's a communal event. It's the banter at the local kibanda, the debates in WhatsApp groups, the collective roar when a goal is scored.
+                        In the bustling streets of Nairobi, trading isn't a solitary act—it's a communal event. It's the banter at the local kibanda, the debates in WhatsApp groups, the collective roar when a goal is scored.
                     </p>
                     <p>
-                        Yet, digital platforms felt cold and isolated. Usernames without faces, numbers without context. We asked ourselves: <span className="text-black font-semibold">Why can't online betting feel as alive as the real thing?</span>
+                        Yet, digital platforms felt cold and isolated. Usernames without faces, numbers without context. We asked ourselves: <span className="text-black font-semibold">Why can't online markets feel as alive as the real thing?</span>
                     </p>
                 </div>
             </motion.div>

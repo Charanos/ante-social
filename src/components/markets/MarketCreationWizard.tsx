@@ -284,7 +284,7 @@ export function MarketCreationWizard() {
                     Choose Market Type
                   </h2>
                   <p className="text-gray-500">
-                    Select the mechanism for this betting market
+                    Select the mechanism for this prediction market
                   </p>
                 </div>
 
@@ -486,7 +486,7 @@ export function MarketCreationWizard() {
                 <div className="grid grid-cols-2 gap-6 bg-gray-50 p-6 rounded-3xl border border-gray-100">
                   <div className="space-y-2">
                     <label className="text-xs font-medium uppercase tracking-wider text-gray-500 ml-1">
-                      Buy-In
+                      Entry Amount
                     </label>
                     <div className="relative">
                       <IconCurrencyDollar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -631,7 +631,7 @@ export function MarketCreationWizard() {
 
                 <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-left max-w-md mx-auto space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Buy-In Amount</span>
+                    <span className="text-gray-500">Entry Amount</span>
                     <span className="font-mono font-normal">
                       ${formData.buyIn || "0"}
                     </span>

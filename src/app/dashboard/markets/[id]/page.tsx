@@ -21,6 +21,8 @@ import Image from "next/image";
 import { mockUser } from "@/lib/mockData";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
+import { MarketChart } from "@/components/markets/MarketChart";
+import { cn } from "@/lib/utils";
 
 const getMockMarket = (id: string) => ({
   id,
@@ -30,11 +32,11 @@ const getMockMarket = (id: string) => ({
   category: "Poll",
   image:
     "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&auto=format&fit=crop",
-  buy_in_amount: 500,
-  total_pool: 145600,
-  participant_count: 42,
+  minStake: 500,
+  poolAmount: 145600,
+  participantCount: 42,
   status: "active",
-  close_date: new Date(Date.now() + 86400000 * 2),
+  endsAt: new Date(Date.now() + 86400000 * 2).toISOString(),
   options: [
     {
       id: "opt1",
@@ -110,14 +112,14 @@ export default function MarketDetailPage() {
   const router = useRouter();
   const toast = useToast();
 
-  const handlePlaceBet = async () => {
+  const handlePlaceForecast = async () => {
     if (!market || !selectedOption || !stakeAmount) return;
 
     // Check balance
-    if (mockUser.wallet.balance < parseFloat(stakeAmount)) {
+    if (mockUser.balance < parseFloat(stakeAmount)) {
       toast.error(
         "Insufficient Balance",
-        "Please top up your wallet to place this bet."
+        "Please top up your wallet to participate in this market."
       );
       setTimeout(() => {
         router.push("/dashboard/wallet/checkout");
@@ -126,14 +128,14 @@ export default function MarketDetailPage() {
     }
 
     setIsSubmitting(true);
-    const newBetId = `bet-${Date.now()}`;
+    const newPositionId = `pos-${Date.now()}`;
     const selectedOptText =
       market.options.find((o: any) => o.id === selectedOption)?.option_text ||
       "Unknown";
 
     // Show loading toast
     const toastId = toast.loading(
-      "Confirming your bet...",
+      "Confirming your forecast...",
       "Processing transaction securely",
     );
 
@@ -144,7 +146,7 @@ export default function MarketDetailPage() {
       // Update toast to success
       toast.removeToast(toastId);
       toast.success(
-        "Bet Placed Successfully!",
+        "Forecast Submitted Successfully!",
         "Good luck! Redirecting to your ticket...",
       );
 
@@ -161,7 +163,7 @@ export default function MarketDetailPage() {
       // Redirect to the bet slip page with params
       setTimeout(() => {
         router.push(
-          `/dashboard/markets/my-bets/${newBetId}?${params.toString()}`,
+          `/dashboard/markets/my-forecasts/${newPositionId}?${params.toString()}`,
         );
       }, 1000);
     }, 2000);
@@ -169,7 +171,8 @@ export default function MarketDetailPage() {
 
   const getTimeRemaining = () => {
     if (!market) return "";
-    const diff = market.close_date.getTime() - Date.now();
+    const endsAt = new Date(market.endsAt);
+    const diff = endsAt.getTime() - Date.now();
     if (diff <= 0) return "Closed";
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -253,7 +256,7 @@ export default function MarketDetailPage() {
                       </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
-                      {market.total_pool.toLocaleString()}
+                      {market.poolAmount.toLocaleString()}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">
                       KSH
@@ -268,7 +271,7 @@ export default function MarketDetailPage() {
                       </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
-                      {market.participant_count}
+                      {market.participantCount}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">
                       Active
@@ -290,6 +293,37 @@ export default function MarketDetailPage() {
                     </p>
                   </div>
                 </div>
+              </div>
+            </motion.div>
+
+            {/* Market Analytics Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-black/90">Market Performance</h3>
+                  <p className="text-sm text-black/40 font-medium tracking-tight">
+                    Historical consensus probability movement
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-bold text-green-600 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                    +12.4% Trend
+                  </span>
+                </div>
+              </div>
+              
+              <div className="h-[240px] w-full pt-4">
+                <MarketChart 
+                  data={[45, 48, 42, 51, 58, 54, 62, 65]} 
+                  height={240}
+                  color="#000"
+                  showAxes
+                />
               </div>
             </motion.div>
 
@@ -411,9 +445,9 @@ export default function MarketDetailPage() {
                         <p className="text-sm font-semibold text-black/90">
                           {participant.username}
                         </p>
-                        <p className="text-xs text-black/50 font-medium">
-                          Placed bet
-                        </p>
+                          <p className="text-xs text-black/50 font-medium">
+                            Submitted forecast
+                          </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -434,7 +468,7 @@ export default function MarketDetailPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 self-start">
             <div className="sticky top-6 space-y-6">
               {/* Bet Placement Card */}
               <motion.div
@@ -446,7 +480,7 @@ export default function MarketDetailPage() {
                 {/* Header */}
                 <div className="p-6 bg-black">
                   <h3 className="text-xl font-semibold text-white mb-1">
-                    Place Your Bet
+                    Submit Your Forecast
                   </h3>
                   <p className="text-sm text-white/60 font-medium">
                     Join the pool and win
@@ -488,8 +522,8 @@ export default function MarketDetailPage() {
                     <div className="relative">
                       <input
                         type="number"
-                        placeholder={market.buy_in_amount.toLocaleString()}
-                        min={market.buy_in_amount}
+                        placeholder={market.minStake.toLocaleString()}
+                        min={market.minStake}
                         value={stakeAmount}
                         onChange={(e) => setStakeAmount(e.target.value)}
                         className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
@@ -500,10 +534,10 @@ export default function MarketDetailPage() {
                     </div>
                     <div className="flex justify-between text-xs px-1">
                       <span className="text-black/40 font-medium">
-                        Minimum buy-in
+                        Minimum staking amount
                       </span>
                       <span className="font-mono font-semibold text-black/70">
-                        {market.buy_in_amount.toLocaleString()} KSH
+                        {market.minStake.toLocaleString()} KSH
                       </span>
                     </div>
                   </div>
@@ -530,7 +564,7 @@ export default function MarketDetailPage() {
 
                   {/* CTA Button */}
                   <motion.button
-                    onClick={handlePlaceBet}
+                    onClick={handlePlaceForecast}
                     disabled={isSubmitting || !selectedOption || !stakeAmount}
                     className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
                       isSubmitting || !selectedOption || !stakeAmount
@@ -555,7 +589,7 @@ export default function MarketDetailPage() {
                       </>
                     ) : (
                       <>
-                        Confirm Bet
+                        Confirm Forecast
                         <IconArrowRight className="w-5 h-5" />
                       </>
                     )}

@@ -14,12 +14,10 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { UserProfile } from "@/types/user";
 
 interface MobileHeaderProps {
-  user?: {
-    username?: string | null;
-    image?: string | null;
-  };
+  user: UserProfile;
 }
 
 export function MobileHeader({ user }: MobileHeaderProps) {
@@ -57,16 +55,16 @@ export function MobileHeader({ user }: MobileHeaderProps) {
           className="flex items-center gap-2 p-1 rounded-full active:bg-black/5 transition-colors"
         >
           <div className="relative w-8 h-8 rounded-full overflow-hidden border border-black/10">
-            {user?.image ? (
+            {user.avatarUrl ? (
               <Image 
-                src={user.image} 
+                src={user.avatarUrl} 
                 alt={user.username || "User"} 
                 fill 
                 className="object-cover"
               />
             ) : (
               <div className="w-full h-full bg-neutral-100 flex items-center justify-center text-neutral-600 font-medium text-xs">
-                {(user?.username || "G").charAt(0).toUpperCase()}
+                {(user.username || "G").charAt(0).toUpperCase()}
               </div>
             )}
           </div>
@@ -88,11 +86,16 @@ export function MobileHeader({ user }: MobileHeaderProps) {
               >
                 <div className="px-4 py-3 border-b border-black/5">
                   <p className="text-sm font-semibold text-neutral-900 truncate">
-                    {user?.username || "Guest"}
+                    {user.username || "Guest"}
                   </p>
-                  <p className="text-xs text-neutral-500">
-                    Novice
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-neutral-500 capitalize">
+                        {user.tier.replace(/_/g, " ")}
+                    </p>
+                    <p className="text-xs font-mono text-purple-600 font-medium">
+                        {user.reputationScore} Rep
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="p-1">

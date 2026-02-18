@@ -25,6 +25,7 @@ import { MarketCard } from "@/components/markets/MarketCard";
 import Marquee from "react-fast-marquee";
 import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 
 const liveWins = [
   {
@@ -81,9 +82,12 @@ function LiveWinCard({ win }: any) {
   return (
     <div className="w-60 shrink-0 px-2">
       <div className="flex items-center gap-3 px-4 py-3 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-md transition-all cursor-pointer group">
-        <div className="w-10 h-10 rounded-full bg-linear-to-br from-black/5 to-black/10 flex items-center justify-center text-lg border border-black/5 group-hover:scale-110 transition-transform">
-          {win.avatar}
-        </div>
+        <UserAvatar 
+          name={win.name} 
+          size="sm" 
+          border={false}
+          className="group-hover:scale-110 transition-transform"
+        />
         <div className="flex flex-col flex-1 min-w-0">
           <span className="text-sm font-semibold text-black/90 truncate">
             {win.name}
@@ -111,9 +115,9 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("All Markets");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const rank = user?.user_level === "high_roller" ? "High Roller" : "Novice";
+  const rank = user?.tier === "whale" || user?.tier === "oracle" ? "Expert" : "Novice";
   const progress = 75;
-  const nextRank = "High Roller";
+  const nextRank = "Expert";
 
   const ITEMS_PER_PAGE = 6;
 
@@ -126,78 +130,97 @@ export default function DashboardPage() {
         id: "poll-001",
         type: "poll",
         title: "Best Nairobi Matatu Route",
-        description:
-          "Vote for the most reliable and comfortable matatu route in Nairobi",
-        image:
-          "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
-        pool: "245,000 KSH",
-        bets: 47,
-        timeLeft: "2h 15m",
-        tag: "Poll",
+        description: "Vote for the most reliable and comfortable matatu route in Nairobi",
+        image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
+        poolAmount: 245000,
+        participantCount: 47,
+        minStake: 100,
+        endsAt: "2024-12-31T23:59:59Z",
+        category: "poll",
+        status: "active",
+        signalStrength: 82,
+        probability: 65,
+        priceHistory: [40, 45, 55, 60, 65],
       },
       {
         id: "poll-002",
         type: "poll",
         title: "Who Wins the Derby?",
-        description:
-          "AFC Leopards vs Gor Mahia - predict the winner of Kenya's biggest rivalry",
-        image:
-          "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
-        pool: "182,500 KSH",
-        bets: 93,
-        timeLeft: "5h 30m",
-        tag: "Poll",
+        description: "AFC Leopards vs Gor Mahia - predict the winner of Kenya's biggest rivalry",
+        image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
+        poolAmount: 182500,
+        participantCount: 93,
+        minStake: 200,
+        endsAt: "2024-12-31T23:59:59Z",
+        category: "poll",
+        status: "active",
+        signalStrength: 88,
+        probability: 52,
+        priceHistory: [50, 52, 55, 56, 52],
       },
       {
         id: "reflex-001",
         type: "reflex",
         title: "Reflex Test: First Instinct",
-        description:
-          "When suddenly added to a group chat, what would you do? 5 seconds to decide",
-        image:
-          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
-        pool: "98,750 KSH",
-        bets: 156,
-        timeLeft: "45m",
-        tag: "Reflex",
+        description: "When suddenly added to a group chat, what would you do? 5 seconds to decide",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
+        poolAmount: 98750,
+        participantCount: 156,
+        minStake: 50,
+        endsAt: "2024-12-31T23:59:59Z",
+        category: "reflex",
+        status: "active",
+        signalStrength: 94,
+        probability: 82,
+        priceHistory: [70, 75, 78, 80, 82],
       },
       {
         id: "ladder-001",
         type: "ladder",
         title: "Top Kenyan Musician 2024",
-        description:
-          "Rank the top 5 Kenyan musicians based on what the crowd thinks",
-        image:
-          "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
-        pool: "156,200 KSH",
-        bets: 78,
-        timeLeft: "1d 3h",
-        tag: "Ladder",
+        description: "Rank the top 5 Kenyan musicians based on what the crowd thinks",
+        image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
+        poolAmount: 156200,
+        participantCount: 78,
+        minStake: 150,
+        endsAt: "2025-01-31T23:59:59Z",
+        category: "ladder",
+        status: "active",
+        signalStrength: 76,
+        probability: 44,
+        priceHistory: [50, 48, 46, 45, 44],
       },
       {
         id: "poll-003",
         type: "poll",
         title: "Nairobi Traffic Chaos",
         description: "Which time of day has the worst traffic in Nairobi CBD?",
-        image:
-          "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
-        pool: "67,800 KSH",
-        bets: 34,
-        timeLeft: "8h 20m",
-        tag: "Poll",
+        image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
+        poolAmount: 67800,
+        participantCount: 34,
+        minStake: 50,
+        endsAt: "2024-12-30T23:59:59Z",
+        category: "poll",
+        status: "active",
+        signalStrength: 64,
+        probability: 38,
+        priceHistory: [45, 42, 40, 39, 38],
       },
       {
         id: "betrayal-001",
         type: "betrayal",
         title: "Betrayal Game: Trust or Cash",
-        description:
-          "Cooperate for small win or betray for jackpot - what will you choose?",
-        image:
-          "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop",
-        pool: "324,100 KSH",
-        bets: 121,
-        timeLeft: "3h 45m",
-        tag: "Betrayal",
+        description: "Cooperate for small win or betray for jackpot - what will you choose?",
+        image: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop",
+        poolAmount: 324100,
+        participantCount: 121,
+        minStake: 250,
+        endsAt: "2024-12-25T23:59:59Z",
+        category: "betrayal",
+        status: "active",
+        signalStrength: 91,
+        probability: 48,
+        priceHistory: [55, 52, 50, 49, 48],
       },
     ];
 

@@ -121,6 +121,23 @@ This document outlines all frontend market pages and features implemented for th
 
 ---
 
+### Consensus Divergence (`/dashboard/markets/[id]/odd-one-out`)
+
+**Features:**
+
+- **Minority Wins** logic implementation
+- Contrarian yield multipliers
+- Hidden vote counts until settlement
+- Badge achievement: "Contrarian of the Day"
+- Inverse probability visualization
+
+**Compliance:**
+✅ Rewards non-consensus behavior
+✅ Maintains strategic uncertainty
+✅ Peer-verified settlement logic
+
+---
+
 ## 🎨 Design System
 
 ### Stats Cards Pattern

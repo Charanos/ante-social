@@ -111,7 +111,7 @@ export default function MarketManagerPage() {
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
         {/* Header */}
-        <DashboardHeader subtitle="Manage all public betting markets" />
+        <DashboardHeader subtitle="Manage all public prediction markets" />
 
         <div className="flex justify-end -mt-16 mb-4 relative z-10 px-2">
           <Link href="/dashboard/admin/create-market">

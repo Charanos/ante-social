@@ -17,19 +17,25 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 
 // Mock markets data with Kenyan context
-const mockMarkets = [
+const mockMarkets: any[] = [
   {
     id: "1",
     title: "Best Nairobi Matatu Route",
     description: "Vote for the most reliable and comfortable matatu route",
     image:
       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
-    type: "poll",
+    type: "consensus",
+    category: "poll",
     buyIn: "500 KSH",
     pool: "145,600 KSH",
-    participants: 42,
-    timeLeft: "2h 15m",
+    poolAmount: 145600,
+    participantCount: 42,
+    minStake: 50,
+    endsAt: "2024-12-31T23:59:59Z",
     status: "active",
+    signalStrength: 85,
+    probability: 65,
+    priceHistory: [40, 45, 55, 60, 65],
   },
   {
     id: "2",
@@ -38,12 +44,18 @@ const mockMarkets = [
       "Cooperate for small win or betray for jackpot - choose wisely",
     image:
       "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
-    type: "betrayal",
+    type: "prisoner_dilemma",
+    category: "betrayal",
     buyIn: "1,000 KSH",
     pool: "66,250 KSH",
-    participants: 50,
-    timeLeft: "4h 30m",
+    poolAmount: 66250,
+    participantCount: 50,
+    minStake: 100,
+    endsAt: "2024-12-31T23:59:59Z",
     status: "active",
+    signalStrength: 72,
+    probability: 45,
+    priceHistory: [60, 55, 50, 48, 45],
   },
   {
     id: "3",
@@ -52,11 +64,17 @@ const mockMarkets = [
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
     type: "reflex",
+    category: "reflex",
     buyIn: "750 KSH",
     pool: "33,125 KSH",
-    participants: 50,
-    timeLeft: "45m",
+    poolAmount: 33125,
+    participantCount: 50,
+    minStake: 75,
+    endsAt: "2024-12-31T23:59:59Z",
     status: "active",
+    signalStrength: 91,
+    probability: 82,
+    priceHistory: [70, 75, 78, 80, 82],
   },
   {
     id: "4",
@@ -65,11 +83,17 @@ const mockMarkets = [
     image:
       "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
     type: "ladder",
+    category: "ladder",
     buyIn: "500 KSH",
     pool: "46,375 KSH",
-    participants: 70,
-    timeLeft: "6h 20m",
+    poolAmount: 46375,
+    participantCount: 70,
+    minStake: 50,
+    endsAt: "2024-12-31T23:59:59Z",
     status: "active",
+    signalStrength: 64,
+    probability: 52,
+    priceHistory: [50, 51, 50, 53, 52],
   },
   {
     id: "5",
@@ -77,12 +101,18 @@ const mockMarkets = [
     description: "AFC Leopards vs Gor Mahia - predict Kenya's biggest rivalry",
     image:
       "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
-    type: "poll",
+    type: "consensus",
+    category: "poll",
     buyIn: "1,200 KSH",
     pool: "98,750 KSH",
-    participants: 93,
-    timeLeft: "1d 3h",
+    poolAmount: 98750,
+    participantCount: 93,
+    minStake: 120,
+    endsAt: "2024-12-31T23:59:59Z",
     status: "active",
+    signalStrength: 88,
+    probability: 58,
+    priceHistory: [50, 52, 55, 56, 58],
   },
   {
     id: "6",
@@ -91,11 +121,17 @@ const mockMarkets = [
     image:
       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
     type: "ladder",
+    category: "ladder",
     buyIn: "600 KSH",
     pool: "52,100 KSH",
-    participants: 78,
-    timeLeft: "8h 45m",
+    poolAmount: 52100,
+    participantCount: 78,
+    minStake: 60,
+    endsAt: "2024-12-31T23:59:59Z",
     status: "active",
+    signalStrength: 76,
+    probability: 44,
+    priceHistory: [50, 48, 46, 45, 44],
   },
 ];
 
@@ -132,7 +168,7 @@ export default function MarketsPage() {
   }, [searchQuery, filterType]);
 
   const totalParticipants = mockMarkets.reduce(
-    (sum, m) => sum + m.participants,
+    (sum, m) => sum + m.participantCount,
     0,
   );
   const totalPool = mockMarkets.reduce((sum, m) => {
@@ -144,7 +180,7 @@ export default function MarketsPage() {
     const matchesSearch = market.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesFilter = filterType === "all" || market.type === filterType;
+    const matchesFilter = filterType === "all" || market.category === filterType;
     return matchesSearch && matchesFilter;
   });
 

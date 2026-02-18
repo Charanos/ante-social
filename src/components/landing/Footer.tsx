@@ -146,7 +146,7 @@ const footerLinks = {
     { label: "Terms of Service", href: "/legal/terms-of-service" },
     { label: "Privacy Policy", href: "/legal/privacy-policy" },
     { label: "Cookie Policy", href: "/legal/cookie-policy" },
-    { label: "Responsible Gaming", href: "/legal/responsible-gaming" },
+    { label: "Responsible Forecasting", href: "/legal/responsible-gaming" },
   ],
 };
 
@@ -189,7 +189,7 @@ export function Footer() {
             </Link>
 
             <p className="text-base text-black/80 font-medium leading-relaxed max-w-md">
-              The modern social betting platform for Kenya. M-Pesa ready, crypto
+              The modern social forecasting platform for Kenya. M-Pesa ready, crypto
               enabled, built for players who demand transparency and speed.
             </p>
 
@@ -355,9 +355,9 @@ export function Footer() {
         {/* Disclaimer */}
         <div className="mt-8 p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
           <p className="text-xs text-black/80 font-medium leading-relaxed text-center">
-            Gambling can be addictive. Please play responsibly. Ante Social is
+            Trading involves risk. Please trade responsibly. Ante Social is
             licensed and regulated in Kenya. Players must be 18 years or older.
-            If you or someone you know has a gambling problem, please seek help.
+            If you or someone you know has a problem, please seek help.
           </p>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { IconLayoutGrid, IconTag, IconTrendingUp } from '@tabler/icons-react';
+import { ProbabilityTrend } from "@/components/ui/ProbabilityTrend";
 
 import { cn } from "@/lib/utils";
 
@@ -129,9 +130,13 @@ export function MarketCard({
                 {volume}
               </span>
             </div>
-            <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white border border-zinc-100 shadow-sm">
+            {/* Trend / Analysts */}
+            <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white border border-zinc-100 shadow-sm relative overflow-hidden">
+             <div className="absolute inset-0 opacity-10 flex items-center justify-center pointer-events-none">
+                 {/* Background decoration */}
+             </div>
               <span className="text-[10px] uppercase tracking-wider text-zinc-400 mb-1">
-                Users
+                Analysts
               </span>
               <span className="text-base font-mono font-medium text-zinc-900">
                 {participants}
@@ -139,11 +144,11 @@ export function MarketCard({
             </div>
             <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-white border border-zinc-100 shadow-sm">
               <span className="text-[10px] uppercase tracking-wider text-zinc-400 mb-1">
-                Ends
+                Prognosis
               </span>
-              <span className="text-base font-mono font-medium text-zinc-900">
-                {endingAt}
-              </span>
+              <div className="flex items-center gap-1">
+                 <ProbabilityTrend data={[40, 45, 42, 55, 60, 58, 65]} width={40} height={15} trend="up" />
+              </div>
             </div>
           </div>
         </CardContent>

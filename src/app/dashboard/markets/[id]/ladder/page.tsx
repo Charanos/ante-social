@@ -24,6 +24,8 @@ import { CSS } from "@dnd-kit/utilities";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
 import { mockUser } from "@/lib/mockData";
+import { UserAvatar } from "@/components/ui/UserAvatar";
+import { MarketChart } from "@/components/markets/MarketChart";
 import Image from "next/image";
 import {
   IconAccessPoint,
@@ -305,6 +307,39 @@ export default function LadderMarketPage() {
               </div>
             </motion.div>
 
+            {/* Performance Chart */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-sm"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-green-500/10 border border-green-500/20">
+                    <IconTrendingUp className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-black/90 tracking-tight">Market Performance</h3>
+                    <p className="text-xs text-black/40 font-semibold uppercase tracking-wider">Historical Consensus Movement</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-semibold font-mono text-black/90">76%</p>
+                  <p className="text-[10px] text-green-600 font-bold uppercase tracking-wider">+5.2% Consensus Strength</p>
+                </div>
+              </div>
+              
+              <div className="h-64 mt-4">
+                <MarketChart 
+                  data={[60, 62, 65, 68, 70, 72, 74, 76]} 
+                  height="100%" 
+                  color="#10b981" 
+                  showAxes 
+                />
+              </div>
+            </motion.div>
+
             {/* Instructions */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -383,9 +418,11 @@ export default function LadderMarketPage() {
                     className="flex items-center justify-between p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 hover:border-black/10 transition-all cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center text-sm font-semibold text-black/70">
-                        {participant.username.substring(1, 3).toUpperCase()}
-                      </div>
+                      <UserAvatar 
+                        name={participant.username} 
+                        size="md" 
+                        border={false}
+                      />
                       <div>
                         <p className="text-sm font-semibold text-black/90">
                           {participant.username}
@@ -413,7 +450,7 @@ export default function LadderMarketPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 self-start">
             <div className="sticky top-6 space-y-6">
               {/* Bet Placement Card */}
               <motion.div
@@ -425,7 +462,7 @@ export default function LadderMarketPage() {
                 {/* Header */}
                 <div className="p-6 bg-black">
                   <h3 className="text-xl font-semibold text-white mb-1">
-                    Place Your Bet
+                    Place Your Prediction
                   </h3>
                   <p className="text-sm text-white/60 font-medium">
                     Submit your ranking

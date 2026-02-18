@@ -52,7 +52,7 @@ export default function DocsPage() {
     <PageLayout>
       <PageHeader
         title="Documentation"
-        description="Your guide to mastering the platform. From basic betting to advanced strategies."
+        description="Your guide to mastering the platform. From basic trading to advanced strategies."
       >
         <div className="relative max-w-xl mx-auto mt-8 group">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-purple-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

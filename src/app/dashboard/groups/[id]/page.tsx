@@ -45,11 +45,13 @@ import { useToast } from "@/components/ui/toast-notification";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useEffect, useState, useMemo, useCallback, useRef, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
-import { mockUser, mockMyBets } from "@/lib/mockData";
+import { mockUser, mockMyBets, mockMarkets } from "@/lib/mockData";
 import { isGroupMember, joinGroup, leaveGroup } from "@/lib/membership";
 import Link from "next/link";
 import Image from "next/image";
 import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
+import { UserAvatar } from "@/components/ui/UserAvatar";
+import { MarketChart } from "@/components/markets/MarketChart";
 
 // Types
 interface GroupMember {
@@ -58,7 +60,7 @@ interface GroupMember {
   avatar: string;
   role: string;
   joined: string;
-  totalBets: number;
+  totalPositions: number;
   totalWinnings: number;
   winRate: number;
 }
@@ -73,7 +75,7 @@ interface GroupActivity {
   timestamp: string;
 }
 
-interface GroupBet {
+interface GroupPosition {
   id: string;
   type: string;
   title: string;
@@ -89,15 +91,14 @@ interface UnifiedGroup {
   name: string;
   description: string;
   category?: string;
-  is_public: boolean;
-  isPublic?: boolean;
-  member_count: number;
-  active_bets: number;
-  created_at: string | Date;
-  creator_id: string;
+  isPublic: boolean;
+  memberCount: number;
+  activePositionsCount: number;
+  createdAt: string | Date;
+  creatorId: string;
   image: string;
   members?: (string | GroupMember)[];
-  activeBets?: GroupBet[];
+  activePositions?: GroupPosition[];
   activityFeed?: GroupActivity[];
 }
 
@@ -106,14 +107,13 @@ const mockGroupDetails: UnifiedGroup = {
   id: 1,
   name: "Premier League Fanatics",
   description:
-    "Discuss matches, predict outcomes, and bet on your favorite teams. Weekly analysis and live match betting.",
+    "Discuss matches, predict outcomes, and forecast on your favorite teams. Weekly analysis and live match markets.",
   category: "Sports",
-  is_public: true,
   isPublic: true,
-  member_count: 1240,
-  active_bets: 15,
-  created_at: "2024-01-15",
-  creator_id: "user_001",
+  memberCount: 1240,
+  activePositionsCount: 15,
+  createdAt: "2024-01-15",
+  creatorId: "user_001",
   image:
     "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
   members: [
@@ -123,7 +123,7 @@ const mockGroupDetails: UnifiedGroup = {
       avatar: "MG",
       role: "admin",
       joined: "2024-01-15",
-      totalBets: 234,
+      totalPositions: 234,
       totalWinnings: 456700,
       winRate: 78,
     },
@@ -133,7 +133,7 @@ const mockGroupDetails: UnifiedGroup = {
       avatar: "GK",
       role: "member",
       joined: "2024-01-16",
-      totalBets: 189,
+      totalPositions: 189,
       totalWinnings: 398200,
       winRate: 72,
     },
@@ -143,7 +143,7 @@ const mockGroupDetails: UnifiedGroup = {
       avatar: "SP",
       role: "member",
       joined: "2024-01-18",
-      totalBets: 156,
+      totalPositions: 156,
       totalWinnings: 345100,
       winRate: 69,
     },
@@ -153,7 +153,7 @@ const mockGroupDetails: UnifiedGroup = {
       avatar: "PK",
       role: "member",
       joined: "2024-01-20",
-      totalBets: 142,
+      totalPositions: 142,
       totalWinnings: 298400,
       winRate: 65,
     },
@@ -163,27 +163,27 @@ const mockGroupDetails: UnifiedGroup = {
       avatar: "TE",
       role: "member",
       joined: "2024-01-22",
-      totalBets: 98,
+      totalPositions: 98,
       totalWinnings: 245600,
       winRate: 61,
     },
   ],
-  activeBets: [],
+  activePositions: [],
   activityFeed: [
     {
       id: "act_001",
-      type: "bet_settled",
+      type: "forecastSettled",
       user: "MatchGuru",
-      action: "settled bet",
+      action: "settled forecast",
       details: "Chelsea vs Arsenal",
       amount: "32,400 KSH",
       timestamp: "2026-02-03T14:30:00",
     },
     {
       id: "act_002",
-      type: "bet_created",
+      type: "forecastCreated",
       user: "ScorePredictor",
-      action: "created bet",
+      action: "created forecast",
       details: "Least popular team",
       amount: "28,400 KSH",
       timestamp: "2026-02-03T12:15:00",
@@ -197,16 +197,16 @@ const mockGroupDetails: UnifiedGroup = {
     },
     {
       id: "act_004",
-      type: "bet_participated",
+      type: "forecastParticipated", // Renamed from bet_participated
       user: "PenaltyKing",
-      action: "placed bet",
+      action: "placed forecast", // Renamed from placed bet
       details: "Man Utd vs Liverpool",
       amount: "2,500 KSH",
       timestamp: "2026-02-03T09:20:00",
     },
     {
       id: "act_005",
-      type: "bet_disputed",
+      type: "forecastDisputed",
       user: "GoalKeeper",
       action: "disputed result",
       details: "Top scorer",
@@ -217,11 +217,11 @@ const mockGroupDetails: UnifiedGroup = {
 
 const ActivityIcon = ({ type }: { type: string }) => {
   const icons = {
-    bet_settled: <IconCircleCheckFilled className="w-4 h-4 text-green-600" />,
-    bet_created: <IconStar className="w-4 h-4 text-blue-600" />,
+    forecastSettled: <IconCircleCheckFilled className="w-4 h-4 text-green-600" />,
+    forecastCreated: <IconStar className="w-4 h-4 text-blue-600" />,
     member_joined: <IconUserPlus className="w-4 h-4 text-purple-600" />,
-    bet_participated: <IconTrendingUp className="w-4 h-4 text-orange-600" />,
-    bet_disputed: <IconAlertCircle className="w-4 h-4 text-red-600" />,
+    forecastParticipated: <IconTrendingUp className="w-4 h-4 text-orange-600" />,
+    forecastDisputed: <IconAlertCircle className="w-4 h-4 text-red-600" />,
   };
   return (
     icons[type as keyof typeof icons] || (
@@ -230,17 +230,18 @@ const ActivityIcon = ({ type }: { type: string }) => {
   );
 };
 
-// NEW BET PLACEMENT COMPONENT (for Featured Markets)
-const PlaceBetSlip = ({
+// NEW FORECAST PLACEMENT COMPONENT (for Featured Markets)
+const PlaceForecastSlip = ({
+  group,
   activeMarket,
   selectedOption,
   setSelectedOption,
-  betSuccess,
-  setBetSuccess,
-  onBetPlaced
+  forecastSuccess,
+  setForecastSuccess,
+  onForecastPlaced
 }: any) => {
   const [stakeAmount, setStakeAmount] = useState("");
-  const [isSubmittingBet, setIsSubmittingBet] = useState(false);
+  const [isSubmittingForecast, setIsSubmittingForecast] = useState(false);
   const toast = useToast();
   const router = useRouter();
 
@@ -252,14 +253,14 @@ const PlaceBetSlip = ({
     return stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
   }, [stakeAmount, platformFee]);
 
-  const handlePlaceBet = useCallback(() => {
+  const handlePlaceForecast = useCallback(() => {
     if (!selectedOption || !stakeAmount || parseFloat(stakeAmount) < 50) return;
 
     // Check balance
-    if (mockUser.wallet.balance < parseFloat(stakeAmount)) {
+    if (mockUser.balance < parseFloat(stakeAmount)) {
       toast.error(
         "Insufficient Balance",
-        "Please top up your wallet to place this bet."
+        "Please top up your wallet to place this forecast."
       );
       setTimeout(() => {
         router.push("/dashboard/wallet/checkout");
@@ -267,15 +268,15 @@ const PlaceBetSlip = ({
       return;
     }
 
-    setIsSubmittingBet(true);
+    setIsSubmittingForecast(true);
     setTimeout(() => {
       try {
-        setBetSuccess(true);
-        toast.success("Bet Placed!", "Redirecting to your bet slip..."); // Updated message
+        setForecastSuccess(true);
+        toast.success("Forecast Submitted!", "Redirecting to your forecast slip..."); // Updated message
 
-        // Create new bet object
-        const newBet = {
-             id: `bet_${Date.now()}`,
+        // Create new forecast object
+        const newForecast = {
+             id: `pos_${Date.now()}`,
              title: activeMarket?.title || "Unknown Market",
              amount: parseFloat(stakeAmount),
              potentialWin: parseFloat(stakeAmount) * 1.95, // Mock odds
@@ -287,24 +288,24 @@ const PlaceBetSlip = ({
 
         // Redirect after short delay
         setTimeout(() => {
-          setBetSuccess(false);
+          setForecastSuccess(false);
           setStakeAmount("");
           setSelectedOption(null);
-          if (onBetPlaced) {
-             onBetPlaced(newBet);
+          if (onForecastPlaced) {
+             onForecastPlaced(newForecast);
           }
         }, 1500);
       } catch (error) {
-        toast.error("Error", "Failed to place bet");
+        toast.error("Error", "Failed to place forecast");
       } finally {
-        setIsSubmittingBet(false);
+        setIsSubmittingForecast(false);
       }
     }, 1500);
-  }, [selectedOption, stakeAmount, toast, setBetSuccess, setSelectedOption, activeMarket, onBetPlaced]);
+  }, [selectedOption, stakeAmount, toast, setForecastSuccess, setSelectedOption, activeMarket, onForecastPlaced]);
 
   return (
     <AnimatePresence mode="wait">
-      {betSuccess ? (
+      {forecastSuccess ? (
         <motion.div
           key="success"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -316,7 +317,7 @@ const PlaceBetSlip = ({
             <IconCircleCheckFilled className="w-14 h-14" />
           </div>
           <div>
-            <h3 className="text-2xl font-semibold mb-2">Bet Confirmed!</h3>
+            <h3 className="text-2xl font-semibold mb-2">Forecast Confirmed!</h3>
             <p className="text-sm text-white/90">
               Ticket #GRP-{Math.floor(Math.random() * 10000)} locked
             </p>
@@ -343,7 +344,7 @@ const PlaceBetSlip = ({
                 </div>
                 <div>
                   <p className="text-[10px] font-semibold text-white/50 uppercase tracking-widest">
-                    Place Bet
+                    Place Forecast
                   </p>
                   <p className="text-sm font-semibold">Live Market</p>
                 </div>
@@ -443,15 +444,35 @@ const PlaceBetSlip = ({
               </div>
             </div>
 
+            {/* Group Stats */}
+            <div className="space-y-3 pt-4 border-t border-dashed border-black/10">
+              <div className="flex justify-between items-center p-4 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
+                <span className="text-sm font-semibold text-black/70 uppercase tracking-wide">
+                  Group Members
+                </span>
+                <span className="text-lg font-semibold font-mono text-black">
+                  {group.memberCount.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-4 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
+                <span className="text-sm font-semibold text-black/70 uppercase tracking-wide">
+                  Active Forecasts
+                </span>
+                <span className="text-lg font-semibold font-mono text-black">
+                  {group.activePositionsCount}
+                </span>
+              </div>
+            </div>
+
             {/* Submit Button */}
             <button
               disabled={
                 !selectedOption ||
                 !stakeAmount ||
                 parseFloat(stakeAmount) < 50 ||
-                isSubmittingBet
+                isSubmittingForecast
               }
-              onClick={handlePlaceBet}
+              onClick={handlePlaceForecast}
               className={cn(
                 "w-full py-3 rounded-xl font-semibold uppercase tracking-wider text-sm transition-all flex items-center justify-center gap-2",
                 !selectedOption || !stakeAmount || parseFloat(stakeAmount) < 50
@@ -459,7 +480,7 @@ const PlaceBetSlip = ({
                   : "bg-black text-white hover:bg-neutral-900 shadow-lg hover:shadow-xl active:scale-95 cursor-pointer",
               )}
             >
-              {isSubmittingBet ? (
+              {isSubmittingForecast ? (
                 <>
                   <IconLoader3 className="w-5 h-5 animate-spin" />
                   Processing...
@@ -467,7 +488,7 @@ const PlaceBetSlip = ({
               ) : (
                 <>
                   <IconCircleCheckFilled className="w-5 h-5" />
-                  Confirm & Place Bet
+                  Confirm & Submit Forecast
                 </>
               )}
             </button>
@@ -494,22 +515,22 @@ const PlaceBetSlip = ({
   );
 };
 
-// EXISTING BET MANAGEMENT COMPONENT (for Activity Feed & Bets Tab)
-const ManageBetSlip = ({ bet, onClose }: any) => {
+// EXISTING FORECAST MANAGEMENT COMPONENT (for Activity Feed & Bets Tab)
+const ManageForecastSlip = ({ position, onClose }: any) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedAmount, setEditedAmount] = useState(
-    bet.amount?.toString() || "0",
+    position.amount?.toString() || "0",
   );
   const [isSaving, setIsSaving] = useState(false);
   const toast = useToast();
 
-  // Calculate if bet can still be edited (within 5 minutes of placement)
-  const betPlacedAt = new Date(
-    bet.date || bet.timestamp || Date.now(),
+  // Calculate if position can still be edited (within 5 minutes of placement)
+  const positionPlacedAt = new Date(
+    position.date || position.timestamp || Date.now(),
   ).getTime();
   const now = Date.now();
-  const minutesSincePlacement = (now - betPlacedAt) / (1000 * 60);
-  const canEdit = minutesSincePlacement < 5 && bet.status === "active";
+  const minutesSincePlacement = (now - positionPlacedAt) / (1000 * 60);
+  const canEdit = minutesSincePlacement < 5 && position.status === "active";
   const timeRemaining = canEdit
     ? Math.max(0, 5 - Math.floor(minutesSincePlacement))
     : 0;
@@ -526,18 +547,18 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
   const handleCancel = () => {
     if (
       confirm(
-        "Are you sure you want to cancel this bet? Your stake will be refunded.",
+        "Are you sure you want to cancel this forecast? Your stake will be refunded.",
       )
     ) {
-      toast.info("Bet Cancelled", "Funds returned to your wallet");
+      toast.info("Forecast Cancelled", "Funds returned to your wallet");
       setTimeout(onClose, 1500);
     }
   };
 
   const StatusIcon =
-    bet.status === "won"
+    position.status === "won"
       ? IconTrophy
-      : bet.status === "lost"
+      : position.status === "lost"
         ? IconX
         : IconClock;
 
@@ -551,17 +572,17 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
       {/* Header */}
       <div className="bg-linear-to-br from-neutral-800 to-black text-white p-6 pb-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="relative z-10 flex items-start justify-between mb-6">
+        <div className="relative z-10 flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10">
               <StatusIcon className="w-5 h-5" />
             </div>
             <div>
               <p className="text-[10px] font-semibold text-white/50 uppercase tracking-widest">
-                Bet Status
+                Position Status
               </p>
               <p className="text-sm font-semibold capitalize">
-                {bet.status || "Active"}
+                {position.status || "Active"}
               </p>
             </div>
           </div>
@@ -574,10 +595,10 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
         </div>
         <div className="relative z-10">
           <h3 className="text-xl font-semibold leading-relaxed mb-2">
-            {bet.title}
+            {position.title}
           </h3>
           <p className="text-xs text-white/50">
-            Ticket #{bet.id.slice(0, 8).toUpperCase()}
+            Ticket #{position.id.slice(0, 8).toUpperCase()}
           </p>
         </div>
       </div>
@@ -590,7 +611,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
           </p>
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold text-black">
-              {bet.outcome || bet.details || "Selection"}
+              {position.outcome || position.details || "Selection"}
             </p>
             <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
               <IconTrendingDown className="w-5 h-5 text-black/40" />
@@ -650,7 +671,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                 <button
                   onClick={() => {
                     setIsEditing(false);
-                    setEditedAmount(bet.amount?.toString() || "0");
+                    setEditedAmount(position.amount?.toString() || "0");
                   }}
                   className="py-3 bg-neutral-100 text-black/70 rounded-xl font-semibold text-sm hover:bg-neutral-200 transition-all"
                 >
@@ -661,7 +682,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
           ) : (
             <div className="px-5 py-2 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
               <p className="text-xl font-mono font-semibold text-black">
-                {bet.amount || editedAmount} KSH
+                {position.amount || editedAmount} KSH
               </p>
             </div>
           )}
@@ -670,15 +691,15 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
         {/* Potential Payout */}
         <div className="px-5 py-2 rounded-xl bg-linear-to-br from-green-50 to-white border border-green-200">
           <p className="text-xs font-semibold text-green-800 uppercase tracking-widest mb-2">
-            {bet.status === "won" ? "Total Won" : "Potential Payout"}
+            {position.status === "won" ? "Total Won" : "Potential Payout"}
           </p>
           <p className="text-xl font-mono font-semibold text-green-700">
-            {bet.potentialWin || (parseFloat(editedAmount) * 1.95).toFixed(2)}{" "}
+            {position.potentialWin || (parseFloat(editedAmount) * 1.95).toFixed(2)}{" "}
             KSH
           </p>
         </div>
 
-        {/* IconEdit Time Warning */}
+        {/* Edit Time Warning */}
         {canEdit && (
           <div className="py-2 px-4 rounded-xl bg-amber-50 border border-amber-200">
             <div className="flex gap-3">
@@ -690,7 +711,7 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
                 <p className="text-xs text-amber-700 leading-relaxed">
                   You have {timeRemaining} minute
                   {timeRemaining !== 1 ? "s" : ""} left to edit or cancel this
-                  bet.
+                  forecast.
                 </p>
               </div>
             </div>
@@ -703,13 +724,13 @@ const ManageBetSlip = ({ bet, onClose }: any) => {
             onClick={handleCancel}
             className="w-full py-2 rounded-xl border-2 border-red-200 bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-all"
           >
-            Cancel Bet & Refund
+            Cancel Forecast & Refund
           </button>
         )}
 
         {/* Market Link */}
         <Link
-          href={`/dashboard/markets/${bet.marketId || bet.id}`}
+          href={`/dashboard/markets/${position.marketId || position.id}`}
           className="block w-full py-3 rounded-xl border border-black/10 text-center text-xs font-semibold text-black/80 hover:bg-neutral-50 hover:text-black transition-all uppercase tracking-widest"
         >
           View Market Details →
@@ -737,22 +758,24 @@ export default function GroupPage() {
   const [isTabLoading, setIsTabLoading] = useState(false);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
-  // NEW: Separate state for Featured Market betting
+  // NEW: Separate state for Featured Market trading
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [betSuccess, setBetSuccess] = useState(false);
+  const [forecastSuccess, setForecastSuccess] = useState(false);
+  const [activeMarket, setActiveMarket] = useState<any>(mockMarkets[0]);
+  const [forecasts, setForecasts] = useState<any[]>([]);
 
-  // NEW: State for managing existing bets from Activity/Bets tab
+  // NEW: State for managing existing positions from Activity/Positions tab
   const [selectedBetToManage, setSelectedBetToManage] = useState<any | null>(
     null,
   );
 
-  // Memoized group data
+    // Memoized group data
   const group = useMemo((): UnifiedGroup => {
     const details = { ...mockGroupDetails };
-    if (!details.activeBets || details.activeBets.length === 0) {
-      details.activeBets = [
+    if (!details.activePositions || details.activePositions.length === 0) {
+      details.activePositions = [
         {
-          id: "bet_001",
+          id: "pos_001",
           type: "winner_takes_all",
           title: "Who wins Man United vs Liverpool?",
           creator: "MatchGuru",
@@ -763,11 +786,11 @@ export default function GroupPage() {
         },
       ];
     }
-    return details;
-  }, []);
+    return details as UnifiedGroup;
+  }, [mockGroupDetails]);
 
   const isPlatformAdmin = mockUser.role === "admin";
-  const isGroupAdmin = group.creator_id === mockUser.id;
+  const isGroupAdmin = group.creatorId === mockUser.id;
   const canManageMembers = isPlatformAdmin || isGroupAdmin;
 
   const [isMember, setIsMember] = useState(() => isGroupMember(groupId));
@@ -848,6 +871,8 @@ export default function GroupPage() {
       }
     }, 1200);
   }, [groupId, group.name, toast]);
+
+  const userBets = mockMyBets;
 
   const handleLeaveGroup = useCallback(() => {
     setIsActionLoading(true);
@@ -1010,8 +1035,8 @@ export default function GroupPage() {
                   <span className="text-sm text-white/50 font-normal flex items-center gap-1.5">
                     <IconCalendar className="w-3.5 h-3.5" />
                     Created{" "}
-                    {group.created_at
-                      ? new Date(group.created_at).toLocaleDateString()
+                    {group.createdAt
+                      ? new Date(group.createdAt).toLocaleDateString()
                       : "Unknown"}
                   </span>
                   {isMember && (
@@ -1123,13 +1148,13 @@ export default function GroupPage() {
             <div className="space-y-1">
               <p className="text-sm font-normal text-white/50">Members</p>
               <p className="text-2xl font-medium text-white font-mono">
-                {group.member_count.toLocaleString()}
+                {group.memberCount.toLocaleString()}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-normal text-white/50">Active Bets</p>
+              <p className="text-sm font-normal text-white/50">Active Forecasts</p>
               <p className="text-2xl font-medium text-green-400 font-mono">
-                {group.active_bets}
+                {group.activePositionsCount}
               </p>
             </div>
             <div className="space-y-1">
@@ -1142,8 +1167,8 @@ export default function GroupPage() {
         </div>
       </div>
 
-      {/* Featured Market Betting Section */}
-      {isMember && group.activeBets && group.activeBets.length > 0 && (
+      {/* Featured Market Trading Section */}
+      {isMember && group.activePositions && group.activePositions.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1183,8 +1208,8 @@ export default function GroupPage() {
                         <div className="px-2.5 py-1 rounded-full bg-black/5 border border-black/10">
                           <span className="text-[10px] font-semibold text-black/40 uppercase tracking-widest flex items-center gap-1.5">
                             <IconClock className="w-3 h-3" />
-                            {group.activeBets && group.activeBets[0]
-                              ? timeUntil(group.activeBets[0].endsAt)
+                            {group.activePositions && group.activePositions[0]
+                              ? timeUntil(group.activePositions[0].endsAt)
                               : "2h 15m"}{" "}
                             left
                           </span>
@@ -1197,8 +1222,8 @@ export default function GroupPage() {
                         </div>
                       </div>
                       <h2 className="text-2xl my-3 mt-6 font-semibold text-black tracking-tight leading-relaxed">
-                        {group.activeBets && group.activeBets[0]
-                          ? group.activeBets[0].title
+                        {group.activePositions && group.activePositions[0]
+                          ? group.activePositions[0].title
                           : "Who wins Man United vs Liverpool?"}
                       </h2>
                     </div>
@@ -1208,141 +1233,114 @@ export default function GroupPage() {
                         Total Pool
                       </p>
                       <p className="text-xl font-semibold font-mono text-black">
-                        {group.activeBets && group.activeBets[0]
-                          ? group.activeBets[0].pool
+                        {group.activePositions && group.activePositions[0]
+                          ? group.activePositions[0].pool
                           : "45,600 KSH"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      {
-                        id: "opt1",
-                        text: "Man United Win",
-                        percentage: 45,
-                        image:
-                          "https://images.unsplash.com/photo-1624880357913-a8539238245b?w=400&auto=format&fit=crop",
-                      },
-                      {
-                        id: "opt2",
-                        text: "Draw",
-                        percentage: 25,
-                        image:
-                          "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop",
-                      },
-                      {
-                        id: "opt3",
-                        text: "Liverpool Win",
-                        percentage: 30,
-                        image:
-                          "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&auto=format&fit=crop",
-                      },
-                    ].map((option, index) => {
-                      const isSelected = selectedOption === option.id;
+                  <div className="flex flex-col gap-8">
+                    <div className="grid grid-cols-1 gap-4">
+                      {[
+                        {
+                          id: "opt1",
+                          text: "Man United Win",
+                          percentage: 45,
+                          image:
+                            "https://images.unsplash.com/photo-1624880357913-a8539238245b?w=400&auto=format&fit=crop",
+                        },
+                        {
+                          id: "opt2",
+                          text: "Draw",
+                          percentage: 25,
+                          image:
+                            "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop",
+                        },
+                        {
+                          id: "opt3",
+                          text: "Liverpool Win",
+                          percentage: 30,
+                          image:
+                            "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&auto=format&fit=crop",
+                        },
+                      ].map((option, index) => {
+                        const isSelected = selectedOption === option.id;
 
-                      return (
-                        <motion.button
-                          key={option.id}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => {
-                            setSelectedOption(option.id);
-                            setBetSuccess(false);
-                          }}
-                          className={cn(
-                            "relative p-6 rounded-2xl border transition-all overflow-hidden text-left h-full flex flex-col justify-between group cursor-pointer",
-                            isSelected
-                              ? "bg-black text-white border-black shadow-xl scale-[1.02]"
-                              : "bg-white border-black/5 hover:border-black/10 hover:shadow-md",
-                          )}
-                        >
-                          <div className="relative h-24 -mx-6 -mt-6 mb-4 overflow-hidden">
-                            <Image
-                              src={option.image}
-                              alt={option.text}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-black/40 transition-opacity group-hover:bg-black/30" />
-                            {isSelected && (
-                              <div className="absolute top-3 right-3 bg-blue-500 rounded-full p-1 z-10">
-                                <IconCircleCheckFilled className="w-3 h-3 text-white" />
-                              </div>
+                        return (
+                          <motion.button
+                            key={option.id}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            onClick={() => {
+                              setSelectedOption(option.id);
+                              setForecastSuccess(false);
+                            }}
+                            className={cn(
+                              "relative p-4 rounded-xl border transition-all overflow-hidden text-left flex items-center justify-between group cursor-pointer",
+                              isSelected
+                                ? "bg-black text-white border-black shadow-lg"
+                                : "bg-white border-black/5 hover:border-black/10",
                             )}
-                          </div>
-
-                          <div className="relative z-10 space-y-4">
-                            <div className="space-y-1">
-                              <p
-                                className={cn(
-                                  "text-[10px] font-semibold uppercase tracking-widest",
-                                  isSelected
-                                    ? "text-white/40"
-                                    : "text-black/30",
-                                )}
-                              >
-                                {option.percentage}% consensus
-                              </p>
-                              <p
-                                className={cn(
-                                  "font-semibold text-sm leading-snug",
-                                  isSelected ? "text-white" : "text-black",
-                                )}
-                              >
-                                {option.text}
-                              </p>
+                          >
+                            <div className="relative z-10 flex items-center gap-4 flex-1">
+                               <div className="shrink-0 w-12 h-12 rounded-lg overflow-hidden relative">
+                                  <Image src={option.image} alt={option.text} fill className="object-cover" />
+                               </div>
+                               <div>
+                                  <p className={cn("text-[9px] font-semibold uppercase tracking-widest mb-1", isSelected ? "text-white/40" : "text-black/30")}>
+                                    {option.percentage}% signal
+                                  </p>
+                                  <p className={cn("font-semibold text-sm", isSelected ? "text-white" : "text-black")}>
+                                    {option.text}
+                                  </p>
+                               </div>
                             </div>
 
-                            <div className="space-y-2">
-                              <div
-                                className={cn(
-                                  "h-1.5 rounded-full overflow-hidden",
-                                  isSelected ? "bg-white/20" : "bg-black/5",
-                                )}
-                              >
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${option.percentage}%` }}
-                                  transition={{
-                                    duration: 1,
-                                    ease: "easeOut",
-                                    delay: 0.3 + index * 0.1,
-                                  }}
-                                  className={cn(
-                                    "h-full rounded-full",
-                                    isSelected ? "bg-white" : "bg-black/40",
-                                  )}
-                                />
-                              </div>
+                            <div className="text-right shrink-0">
+                               <p className={cn("text-xs font-bold font-mono", isSelected ? "text-white/80" : "text-black/60")}>
+                                 {option.percentage}%
+                               </p>
                             </div>
-                          </div>
 
-                          {isSelected && (
-                            <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-transparent pointer-events-none" />
-                          )}
-                        </motion.button>
-                      );
-                    })}
+                            {isSelected && (
+                              <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-transparent pointer-events-none" />
+                            )}
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-black/5 border border-black/5 space-y-4">
+                       <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">Market Performance</p>
+                            <p className="text-xs text-black/20 font-semibold">Historical Consensus movement</p>
+                          </div>
+                          <p className="text-xs font-bold text-green-600">+12% Confidence</p>
+                       </div>
+                       <MarketChart 
+                          data={[40, 42, 45, 48, 52, 58, 62, 65]} 
+                          height={300} 
+                          color="#000" 
+                          showAxes 
+                       />
+                    </div>
                   </div>
-                </div>
               </div>
             </div>
-
-            {/* Place Bet Slip Sidebar - ONLY FOR PLACING NEW BETS */}
-            <div className="lg:col-span-4">
-              <PlaceBetSlip
-                activeMarket={group.activeBets && group.activeBets[0]}
+            </div>
+            <div className="lg:col-span-4 sticky top-6 self-start">
+              <PlaceForecastSlip
+                group={group}
+                activeMarket={activeMarket}
                 selectedOption={selectedOption}
                 setSelectedOption={setSelectedOption}
-                betSuccess={betSuccess}
-                setBetSuccess={setBetSuccess}
-                onBetPlaced={(newBet: any) => {
-                  setActiveTab("bets");
-                  // Small delay to allow tab transition before showing the bet
-                  setTimeout(() => {
-                      setSelectedBetToManage(newBet);
-                  }, 100);
+                forecastSuccess={forecastSuccess}
+                setForecastSuccess={setForecastSuccess}
+                onForecastPlaced={(newForecast: any) => {
+                  toast.success("Position confirmed!");
+                  router.push(`/dashboard/markets/my-forecasts/${newForecast.id}`);
                 }}
               />
             </div>
@@ -1354,18 +1352,14 @@ export default function GroupPage() {
       {isMember && leaderboard.length > 0 && (
         <LeaderboardSection
           title="Group Leaderboard"
-          icon={<IconAward className="w-4 h-4 text-amber-500" />}
+          icon={<IconAward className="w-4 h-4 text-amber-500 my-13" />}
           data={leaderboard.map((member, index) => ({
             rank: index + 1,
             username: member.username,
-            avatar: (
-              <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-black/70">
-                {member.avatar}
-              </div>
-            ),
+            avatarUrl: member.id.startsWith('user_00') ? `https://i.pravatar.cc/150?u=${member.username}` : null,
             totalWinnings: member.totalWinnings,
             winRate: member.winRate,
-            activeBets: member.totalBets,
+            activePositions: member.totalPositions,
             trend: "same",
           }))}
         />
@@ -1373,7 +1367,7 @@ export default function GroupPage() {
 
       {isMember ? (
         <>
-          <SectionHeading title="Group Activity" className="my-16 md:my-18" />
+          <SectionHeading title="Group Activity" className="my-16 md:my-22" />
 
           {/* Tabs */}
           <div className="flex items-center gap-6 border-b border-black/5">
@@ -1386,7 +1380,7 @@ export default function GroupPage() {
               },
               {
                 id: "bets",
-                label: "Active Bets",
+                label: "Active Forecasts",
                 icon: IconAward,
                 count: mockMyBets.length,
               },
@@ -1394,7 +1388,7 @@ export default function GroupPage() {
                 id: "members",
                 label: "Members",
                 icon: IconUsers,
-                count: group.member_count,
+                count: group.memberCount,
               },
             ].map((tab) => (
               <button
@@ -1462,7 +1456,7 @@ export default function GroupPage() {
                             transition={{ delay: index * 0.05 }}
                             onClick={() => {
                               // If it's a bet-related activity, show management slip
-                              if (activity.type.includes("bet")) {
+                              if (activity.type.includes("forecast")) {
                                 setSelectedBetToManage({
                                   id: activity.id,
                                   title: activity.details || activity.action,
@@ -1474,7 +1468,7 @@ export default function GroupPage() {
                                       activity.amount?.replace(/[^\d]/g, "") || "0",
                                     ) * 1.95,
                                   status:
-                                    activity.type === "bet_settled"
+                                    activity.type === "forecastSettled"
                                       ? "settled"
                                       : "active",
                                   outcome: activity.details || "Unknown",
@@ -1485,10 +1479,14 @@ export default function GroupPage() {
                             }}
                             className="p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all cursor-pointer"
                           >
+
                             <div className="flex items-start gap-4">
-                              <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
-                                <ActivityIcon type={activity.type} />
-                              </div>
+                              <UserAvatar 
+                                name={activity.user} 
+                                size="md" 
+                                border={false}
+                                className="shrink-0"
+                              />
 
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-4">
@@ -1527,12 +1525,12 @@ export default function GroupPage() {
                   )}
                 </div>
 
-                {/* Manage Bet Slip Sidebar - ONLY SHOWS WHEN BET IS SELECTED */}
+                {/* Manage Forecast Slip Sidebar - ONLY SHOWS WHEN FORECAST IS SELECTED */}
                 <div className="lg:col-span-4">
                   <AnimatePresence mode="wait">
                     {selectedBetToManage ? (
-                      <ManageBetSlip
-                        bet={selectedBetToManage}
+                      <ManageForecastSlip
+                        position={selectedBetToManage}
                         onClose={() => setSelectedBetToManage(null)}
                       />
                     ) : (
@@ -1546,11 +1544,11 @@ export default function GroupPage() {
                         </div>
                         <div>
                           <p className="font-medium text-black/80 mb-2">
-                            Select a Bet
+                            Select a Forecast
                           </p>
                           <p className="text-sm text-black/40 leading-relaxed">
-                            Click on any bet activity to view details and manage
-                            your stake
+                            Click on any activity to view details and manage
+                            your position
                           </p>
                         </div>
                       </motion.div>
@@ -1568,81 +1566,86 @@ export default function GroupPage() {
                 exit={{ opacity: 0, y: -10 }}
                 className="grid grid-cols-1 lg:grid-cols-12 gap-6"
               >
-                {/* Bets List */}
-                <div className="lg:col-span-8 space-y-4">
-                  {mockMyBets.map((bet, index) => (
-                    <motion.div
-                      key={bet.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={() => setSelectedBetToManage(bet)}
-                      className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div
-                          className={cn(
-                            "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
-                            bet.status === "won"
-                              ? "bg-green-100 text-green-600"
-                              : bet.status === "lost"
-                                ? "bg-red-100 text-red-600"
-                                : "bg-blue-100 text-blue-600",
-                          )}
-                        >
-                          {bet.status === "won" ? (
-                            <IconCircleCheckFilled className="w-5 h-5" />
-                          ) : bet.status === "lost" ? (
-                            <IconX className="w-5 h-5" />
-                          ) : (
-                            <IconTrendingUp className="w-5 h-5" />
-                          )}
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-black/90">{bet.title}</h4>
-                          <div className="flex items-center gap-3 mt-1 text-sm text-black/50 font-normal">
-                            <span>{new Date(bet.date).toLocaleDateString()}</span>
-                            <span>•</span>
-                            <span className="text-black/70">
-                              Pick: {bet.outcome}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-6 md:text-right w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-black/5">
-                        <div>
-                          <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
-                            Stake
-                          </p>
-                          <p className="font-mono font-medium">{bet.amount} KSH</p>
-                        </div>
-                        <div>
-                          <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
-                            Potential
-                          </p>
-                          <p
+                 {/* Bets List */}
+                 <div className="lg:col-span-8 space-y-4">
+                    {userBets.map((forecast, index) => {
+                      const market = mockMarkets.find(m => m.id === forecast.marketId);
+                      const isWon = forecast.status === 'settled' && (forecast.pnl || 0) > 0;
+                      const isLost = forecast.status === 'settled' && (forecast.pnl || 0) <= 0;
+                      
+                      return (
+                      <motion.div
+                        key={forecast.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        onClick={() => setSelectedBetToManage(forecast)}
+                        className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div
                             className={cn(
-                              "font-mono font-semibold",
-                              bet.status === "won"
-                                ? "text-green-600"
-                                : "text-black/90",
+                              "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
+                              isWon
+                                ? "bg-green-100 text-green-600"
+                                : isLost
+                                  ? "bg-red-100 text-red-600"
+                                  : "bg-blue-100 text-blue-600",
                             )}
                           >
-                            {bet.potentialWin} KSH
-                          </p>
+                            {isWon ? (
+                              <IconCircleCheckFilled className="w-5 h-5" />
+                            ) : isLost ? (
+                              <IconX className="w-5 h-5" />
+                            ) : (
+                              <IconTrendingUp className="w-5 h-5" />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-black/90">{market?.title || "Unknown Market"}</h4>
+                            <div className="flex items-center gap-3 mt-1 text-sm text-black/50 font-normal">
+                              <span>Opened {new Date(forecast.openedAt).toLocaleDateString()}</span>
+                              <span className="text-black/70">
+                                Pick: {forecast.outcome}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+  
+                        <div className="flex items-center gap-6 md:text-right w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-none border-black/5">
+                          <div>
+                            <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
+                              Stake
+                            </p>
+                            <p className="font-mono font-medium">{forecast.stakeAmount} KSH</p>
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
+                              Value
+                            </p>
+                            <p
+                              className={cn(
+                                "font-mono font-semibold",
+                                isWon
+                                  ? "text-green-600"
+                                  : "text-black/90",
+                              )}
+                            >
+                               {forecast.status === 'active' ? `${forecast.currentValue}` : (isWon ? `+${forecast.pnl}` : `-${forecast.stakeAmount}`)} KSH
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                      );
+                    })}
+                 </div>
 
-                {/* Manage Bet Slip Sidebar */}
+                {/* Manage Forecast Slip Sidebar */}
                 <div className="lg:col-span-4">
                   <AnimatePresence mode="wait">
                     {selectedBetToManage ? (
-                      <ManageBetSlip
-                        bet={selectedBetToManage}
+                      <ManageForecastSlip
+                        position={selectedBetToManage}
                         onClose={() => setSelectedBetToManage(null)}
                       />
                     ) : (
@@ -1656,10 +1659,10 @@ export default function GroupPage() {
                         </div>
                         <div>
                           <p className="font-medium text-black/80 mb-2">
-                            Select a Bet
+                            Select a Forecast
                           </p>
                           <p className="text-sm text-black/40 leading-relaxed">
-                            Click on any bet to view details, edit stake, or cancel
+                            Click on any forecast to view details, edit stake, or cancel
                           </p>
                         </div>
                       </motion.div>
@@ -1698,11 +1701,13 @@ export default function GroupPage() {
                           typeof memberItem === "string"
                             ? ({
                                 id: memberItem,
-                                username: `IconUser ${memberItem}`,
+                                username: memberItem,
                                 avatar: "U",
                                 role: "member",
-                                joined: group.created_at,
-                                totalBets: 0,
+                                joined: (group.createdAt as any)?.toString() || new Date().toISOString(),
+                                totalPositions: 0,
+                                totalWinnings: 0,
+                                winRate: 0,
                               } as GroupMember)
                             : (memberItem as GroupMember);
 
@@ -1745,10 +1750,10 @@ export default function GroupPage() {
                               <div className="flex items-center gap-4">
                                 <div className="text-right">
                                   <p className="text-sm font-mono font-medium text-black/90">
-                                    {member.totalBets}
+                                    {member.totalPositions}
                                   </p>
                                   <p className="text-xs text-black/40 font-normal">
-                                    Total Bets
+                                    Total Forecasts
                                   </p>
                                 </div>
 
@@ -1864,7 +1869,7 @@ export default function GroupPage() {
                 <div>
                   <h3 className="font-medium text-black/90 mb-1">Exclusive Markets</h3>
                   <p className="text-sm text-black/50 leading-relaxed">
-                    Access group-specific betting opportunities
+                    Access group-specific unique markets
                   </p>
                 </div>
               </div>
@@ -1874,7 +1879,7 @@ export default function GroupPage() {
             <div className="flex items-center justify-center gap-8 pt-6 border-t border-black/5">
               <div className="text-center">
                 <p className="text-2xl font-semibold font-mono text-black">
-                  {group.member_count.toLocaleString()}
+                  {group.memberCount.toLocaleString()}
                 </p>
                 <p className="text-xs text-black/40 uppercase tracking-wider font-medium mt-1">
                   Members
@@ -1882,10 +1887,10 @@ export default function GroupPage() {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-semibold font-mono text-green-600">
-                  {group.active_bets}
+                  {group.activePositionsCount}
                 </p>
                 <p className="text-xs text-black/40 uppercase tracking-wider font-medium mt-1">
-                  Active Bets
+                  Active Forecasts
                 </p>
               </div>
               <div className="text-center">

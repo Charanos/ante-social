@@ -86,7 +86,7 @@ export default function LoginPage() {
               Elevate your game.
             </h1>
             <p className="text-lg text-neutral-600 font-normal leading-relaxed mb-12 md:mb-0">
-              Join Kenya's most exclusive social betting circle. Connect with
+              Join Kenya's most exclusive social trading circle. Connect with
               fellow analysts, master the markets, and play with unmatched
               precision.
             </p>

@@ -26,7 +26,7 @@ Every transaction MUST log:
 - `platform_fee_collected`
 - `prize_pool_after_fees`
 - `total_paid_out`
-- `user_tier_at_bet_time`
+- `user_tier_at_forecast_time`
 - `settlement_timestamp`
 
 ### Privacy Rules
@@ -45,16 +45,16 @@ Every transaction MUST log:
 market_type: "poll";
 ```
 
-### Bet Placement Endpoint
+### Forecast Placement Endpoint
 
 ```typescript
-POST /api/markets/:marketId/bet
+POST /api/markets/:marketId/forecast
 {
   option_id: string
   stake_amount: number
 }
 
-Response: { success: true, message: "Bet placed" }
+Response: { success: true, message: "Forecast placed" }
 ```
 
 ### Settlement Logic
@@ -330,7 +330,7 @@ The backend implements a middleware-based RBAC system:
 
 1.  **Platform Admin**: Full access to global settings, market settlements, and user management.
 2.  **Group Admin**: Access to specific group dashboards, invite generation, and creation of group-restricted markets.
-3.  **User**: General participation, betting, and profile management.
+3.  **User**: General participation, forecasting, and profile management.
 
 ### Integrity Weight Persistence
 
@@ -368,7 +368,7 @@ To ensure high scalability and real-time updates for market activities, we will 
 
 ### 🔄 Data Flow Example: Bet Placement
 
-1.  **User Service** receives `POST /bet`.
+1.  **User Service** receives `POST /forecast`.
 2.  Validates user balance and market status.
 3.  Publishes `BetPlacedEvent` to `bet.placements` topic.
     - _Payload_: `{ userId, marketId, amount, timestamp, odds }`

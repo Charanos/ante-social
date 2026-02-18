@@ -9,7 +9,7 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 
 const posts = [
   {
-    title: "Understanding Betting Odds in 2026",
+    title: "Understanding Market Odds in 2026",
     excerpt: "How social prediction markets are replacing traditional bookmakers. We dive into the math and the psychology behind crowd-driven odds.",
     date: "Feb 10, 2026",
     category: "Industry",
@@ -24,7 +24,7 @@ const posts = [
   },
   {
     title: "Ante Social Raises Series A",
-    excerpt: "Accelerating our mission to create the world's most transparent betting platform. Read about our new partners and roadmap.",
+    excerpt: "Accelerating our mission to create the world's most transparent prediction platform. Read about our new partners and roadmap.",
     date: "Jan 28, 2026",
     category: "Company",
     image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?q=80&w=2560&auto=format&fit=crop"
