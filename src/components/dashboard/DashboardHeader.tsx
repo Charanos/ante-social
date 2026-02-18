@@ -49,7 +49,7 @@ export default function DashboardHeader({
     <>
       <MobileHeader user={user} />
       
-      <div className="hidden md:flex md:items-center justify-between gap-4 px-2 mb-10">
+      <div className="hidden md:flex md:items-center justify-between gap-4 px-1 mb-10">
         {/* Left: Back Button & Title */}
         <div className="flex items-center gap-6">
           {!isHome && (

@@ -989,7 +989,7 @@ export default function GroupPage() {
   }
 
   return (
-    <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full">
+    <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full px-2">
       <DashboardHeader
         user={mockUser}
         subtitle="Discover communities and join the conversation"
@@ -1178,7 +1178,7 @@ export default function GroupPage() {
           <div className="flex items-center justify-between">
             <SectionHeading
               title="Featured Market"
-              className="my-16 md:my-18"
+              className="my-10 md:my-16"
               icon={<IconTrendingUp className="w-4 h-4 text-green-500" />}
             />
             <Link
@@ -1298,7 +1298,7 @@ export default function GroupPage() {
                             </div>
 
                             <div className="text-right shrink-0">
-                               <p className={cn("text-xs font-bold font-mono", isSelected ? "text-white/80" : "text-black/60")}>
+                               <p className={cn("text-xs font-medium font-mono", isSelected ? "text-white/80" : "text-black/60")}>
                                  {option.percentage}%
                                </p>
                             </div>
@@ -1314,14 +1314,14 @@ export default function GroupPage() {
                     <div className="p-6 rounded-2xl bg-black/5 border border-black/5 space-y-4">
                        <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest">Market Performance</p>
+                            <p className="text-[10px] font-medium text-black/40 uppercase tracking-widest">Market Performance</p>
                             <p className="text-xs text-black/20 font-semibold">Historical Consensus movement</p>
                           </div>
-                          <p className="text-xs font-bold text-green-600">+12% Confidence</p>
+                          <p className="text-xs font-medium text-green-600">+12% Confidence</p>
                        </div>
                        <MarketChart 
                           data={[40, 42, 45, 48, 52, 58, 62, 65]} 
-                          height={300} 
+                           height={275}
                           color="#000" 
                           showAxes 
                        />
@@ -1330,7 +1330,7 @@ export default function GroupPage() {
               </div>
             </div>
             </div>
-            <div className="lg:col-span-4 sticky top-6 self-start">
+            <div className="lg:col-span-4">
               <PlaceForecastSlip
                 group={group}
                 activeMarket={activeMarket}
@@ -1352,7 +1352,7 @@ export default function GroupPage() {
       {isMember && leaderboard.length > 0 && (
         <LeaderboardSection
           title="Group Leaderboard"
-          icon={<IconAward className="w-4 h-4 text-amber-500 my-13" />}
+          icon={<IconAward className="w-4 h-4 text-amber-500" />}
           data={leaderboard.map((member, index) => ({
             rank: index + 1,
             username: member.username,
@@ -1367,7 +1367,7 @@ export default function GroupPage() {
 
       {isMember ? (
         <>
-          <SectionHeading title="Group Activity" className="my-16 md:my-22" />
+          <SectionHeading title="Group Activity" className="my-12 md:my-18" />
 
           {/* Tabs */}
           <div className="flex items-center gap-6 border-b border-black/5">

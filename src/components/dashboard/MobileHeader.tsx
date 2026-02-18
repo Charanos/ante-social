@@ -34,7 +34,7 @@ export function MobileHeader({ user }: MobileHeaderProps) {
   };
 
   return (
-    <div className="md:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-black/5 h-16 flex items-center justify-between mb-16">
+    <div className="md:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-black/5 h-16 flex items-center justify-between mb-8">
       {/* Left: Back Button */}
       <button 
         onClick={() => router.back()}

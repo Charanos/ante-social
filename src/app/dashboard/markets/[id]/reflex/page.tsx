@@ -165,12 +165,10 @@ export default function ReflexMarketPage() {
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
-        {/* Dashboard Header */}
-        <DashboardHeader user={mockUser} />
+    <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
+      <DashboardHeader user={mockUser} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
             {/* Hero Section */}
@@ -296,7 +294,7 @@ export default function ReflexMarketPage() {
             </motion.div>
 
             {/* Visual Separator */}
-            <div className="flex items-center gap-4 my-18">
+            <div className="flex items-center gap-4 my-10 md:my-16">
               <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
               <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
                 Quick Reactions
@@ -417,18 +415,18 @@ export default function ReflexMarketPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4 self-start">
-            <div className="sticky top-6 space-y-6">
+          <div className="lg:col-span-4">
+            <div className="space-y-6">
               {/* Bet Placement Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="overflow-hidden rounded-3xl bg-white/60 backdrop-blur-xl border border-black/5 shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)]"
+                className="bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-6 rounded-3xl"
               >
                 {/* Header */}
                 <div className="p-6 bg-black">
-                  <h3 className="text-xl font-semibold text-white mb-1">
+                  <h3 className="text-xl font-semibold text-white mb-1 rounded-3xl">
                     Place Your Prediction
                   </h3>
                   <p className="text-sm text-white/60 font-medium">
@@ -437,7 +435,7 @@ export default function ReflexMarketPage() {
                 </div>
 
                 {/* Content */}
-                <div className="p-6 space-y-6">
+                <div className="space-y-6 px-6 py-4">
                   {/* Selected Option */}
                   <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
                     <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-2">
@@ -569,7 +567,6 @@ export default function ReflexMarketPage() {
               </motion.div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );

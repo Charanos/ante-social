@@ -50,7 +50,7 @@ export function MarketChart({
               if (active && payload && payload.length) {
                 return (
                   <div className="bg-white/80 backdrop-blur-md border border-black/5 p-2 rounded-lg shadow-xl">
-                    <p className="text-xs font-bold text-black/80">
+                    <p className="text-xs font-medium text-black/80">
                       {payload[0].value}%
                     </p>
                   </div>

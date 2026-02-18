@@ -428,7 +428,7 @@ export default function CheckoutContent() {
                           Network: TRC20 (Tron)
                         </span>
                         {mockUser.tier === "whale" || mockUser.tier === "oracle" ? (
-                          <div className="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold border border-amber-200">
+                          <div className="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium border border-amber-200">
                             VIP TIER
                           </div>
                         ) : null}

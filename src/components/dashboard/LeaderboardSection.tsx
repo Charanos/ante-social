@@ -96,9 +96,9 @@ export default function LeaderboardSection({
   const displayData = data || leaderboardData;
 
   return (
-    <div className="space-y-6 my-24 md:my-12">
+    <div className="space-y-6 my-12 md:my-16">
       {/* Section Header */}
-      <div className="flex items-center justify-between px-2">
+      <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           {icon || <IconAward className="w-5 h-5 text-amber-500" />}
           <h2 className="text-lg font-semibold text-black/90">{title}</h2>

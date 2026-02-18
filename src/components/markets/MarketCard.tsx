@@ -8,6 +8,7 @@ import {
   IconAlertCircle,
   IconArrowRight,
   IconAward,
+  IconBriefcase,
   IconClipboard,
   IconClock,
   IconCurrencyDollar,
@@ -48,6 +49,8 @@ const getTypeStyles = (type: string) => {
       return { label: "Ladder", color: "purple", icon: IconAward };
     case "prisoner_dilemma":
       return { label: "Dilemma", color: "red", icon: IconTarget };
+    case "syndicate":
+      return { label: "Syndicate", color: "blue", icon: IconBriefcase };
     default:
       return { label: "Market", color: "gray", icon: IconAlertCircle };
   }
@@ -55,11 +58,24 @@ const getTypeStyles = (type: string) => {
 
 export function MarketCard({ market, index = 0, href }: MarketCardProps) {
   const typeInfo = getTypeStyles(market.type);
-  const linkHref = href || `/dashboard/markets/${market.id}/${market.type}`;
   const participantsCount = market.participantCount || 0;
   const minStake = market.minStake || 0;
   const status = market.status || "active";
   const TypeIcon = typeInfo.icon;
+  
+  // Mapping type to folder slug
+  const typeToSlug: Record<string, string> = {
+    'poll': 'consensus',
+    'betrayal': 'prisoner_dilemma',
+    'prisoner_dilemma': 'prisoner_dilemma',
+    'consensus': 'consensus',
+    'reflex': 'reflex',
+    'ladder': 'ladder',
+    'syndicate': 'syndicate'
+  };
+  
+  const marketTypeSlug = typeToSlug[market.type.toLowerCase()] || 'consensus';
+  const linkHref = href || `/dashboard/markets/${market.id}/${marketTypeSlug}`;
   const timeLeft = formatTimeLeft(market.endsAt || new Date().toISOString());
   
   // Format pool amount strictly
@@ -144,7 +160,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid w-full grid-cols-3 gap-3 border-y py-4 my-6 border-gray-100/50">
+            <div className="grid w-full grid-cols-3 gap-3 border-y py-10 my-2 border-gray-100/50">
               <div className="space-y-1">
                 <div className="flex items-center gap-1 text-black/30">
                   <IconCurrencyDollar className="w-3 h-3" />
@@ -186,6 +202,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
                 </p>
               </div>
             </div>
+
 
             {/* CTA Button */}
             <motion.button
