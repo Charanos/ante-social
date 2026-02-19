@@ -19,18 +19,9 @@ export default function CreateMarketPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Simulate checking permissions - Only platform admins can create markets
-    const checkAccess = () => {
-      if (user.role !== "admin") {
-        setTimeout(() => router.push("/dashboard"), 2000);
-      } else {
-        setIsAdmin(true);
-      }
-      setIsLoading(false);
-    };
-
-    setTimeout(checkAccess, 1000);
-  }, [router, user.role]);
+    setIsAdmin(user.role === "admin");
+    setIsLoading(false);
+  }, [user.role]);
 
   const handleSubmit = async (data: any) => {
     if (!data.type || !data.title || !data.description || !data.buyIn) {
@@ -104,7 +95,7 @@ export default function CreateMarketPage() {
           </div>
           <h2 className="text-xl font-semibold text-gray-900">Access Denied</h2>
           <p className="text-gray-500">
-            Only platform administrators can create new markets. Redirecting...
+            Only platform administrators can create new markets.
           </p>
         </div>
       </div>

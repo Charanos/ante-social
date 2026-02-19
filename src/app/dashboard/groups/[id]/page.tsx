@@ -15,9 +15,7 @@ import {
   IconCopy,
   IconCrown,
   IconCurrencyDollar,
-  IconDeviceFloppy,
   IconDots,
-  IconEdit,
   IconEye,
   IconInfoCircle,
   IconLoader3,
@@ -43,7 +41,7 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { useEffect, useState, useMemo, useCallback, useRef, SetStateAction } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { isGroupMember, joinGroup, leaveGroup } from "@/lib/membership";
 import Link from "next/link";
@@ -361,7 +359,9 @@ const PlaceForecastSlip = ({
                 <input
                   type="number"
                   value={stakeAmount}
-                  onChange={(e: { target: { value: SetStateAction<string>; }; }) => setStakeAmount(e.target.value)}
+                  onChange={(e: { target: { value: string } }) =>
+                    setStakeAmount(e.target.value)
+                  }
                   placeholder="50"
                   min="50"
                   className="w-full pl-16 pr-1 py-2 bg-neutral-50 border-2 border-black/10 rounded-xl font-mono font-semibold text-lg text-black focus:border-black focus:bg-white focus:outline-none transition-all placeholder:text-black/20"
@@ -454,7 +454,7 @@ const PlaceForecastSlip = ({
                   </p>
                   <p className="text-xs text-blue-700 leading-relaxed">
                     Winners split the pool proportionally. 5% platform fee
-                    applies to all bets.
+                    applies to all forecasts.
                   </p>
                 </div>
               </div>
@@ -466,43 +466,63 @@ const PlaceForecastSlip = ({
   );
 };
 
-// EXISTING FORECAST MANAGEMENT COMPONENT (for Activity Feed & Bets Tab)
-const ManageForecastSlip = ({ position, onClose }: any) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedAmount, setEditedAmount] = useState(
-    position.amount?.toString() || "0",
-  );
-  const [isSaving, setIsSaving] = useState(false);
+// EXISTING FORECAST MANAGEMENT COMPONENT (for Activity Feed & Positions Tab)
+const ManageForecastSlip = ({
+  position,
+  onClose,
+  onPositionCancelled,
+}: {
+  position: any;
+  onClose: () => void;
+  onPositionCancelled?: (positionId: string) => void;
+}) => {
+  const [isCancelling, setIsCancelling] = useState(false);
   const toast = useToast();
 
-  // Calculate if position can still be edited (within 5 minutes of placement)
   const positionPlacedAt = new Date(
     position.date || position.timestamp || Date.now(),
   ).getTime();
   const now = Date.now();
   const minutesSincePlacement = (now - positionPlacedAt) / (1000 * 60);
-  const canEdit = minutesSincePlacement < 5 && position.status === "active";
-  const timeRemaining = canEdit
+  const isWithinWindow =
+    minutesSincePlacement < 5 && position.status === "active";
+  const timeRemaining = isWithinWindow
     ? Math.max(0, 5 - Math.floor(minutesSincePlacement))
     : 0;
+  const canCancelForecast =
+    isWithinWindow && position.source === "market_position";
+  const stakeAmount = Number(position.stakeAmount || position.amount || 0);
+  const projectedPayout = Number(position.potentialWin || stakeAmount * 1.95);
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      setIsEditing(false);
-      toast.success("Stake Updated", `New stake: ${editedAmount} KSH`);
-    }, 1000);
-  };
+  const handleCancelForecast = async () => {
+    if (!canCancelForecast) return;
+    const shouldCancel = confirm(
+      "Are you sure you want to cancel this forecast? Your stake will be refunded.",
+    );
+    if (!shouldCancel) return;
 
-  const handleCancel = () => {
-    if (
-      confirm(
-        "Are you sure you want to cancel this forecast? Your stake will be refunded.",
-      )
-    ) {
-      toast.info("Forecast Cancelled", "Funds returned to your wallet");
-      setTimeout(onClose, 1500);
+    setIsCancelling(true);
+    try {
+      const response = await fetch(`/api/markets/my/positions/${position.id}`, {
+        method: "DELETE",
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(
+          payload?.message || payload?.error || "Failed to cancel forecast",
+        );
+      }
+
+      toast.success("Forecast Cancelled", "Funds returned to your wallet");
+      onPositionCancelled?.(position.id);
+      onClose();
+    } catch (error) {
+      toast.error(
+        "Cancel Failed",
+        error instanceof Error ? error.message : "Failed to cancel forecast",
+      );
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -520,7 +540,6 @@ const ManageForecastSlip = ({ position, onClose }: any) => {
       exit={{ opacity: 0, x: 20 }}
       className="overflow-hidden rounded-3xl bg-white shadow-2xl border border-black/5"
     >
-      {/* Header */}
       <div className="bg-linear-to-br from-neutral-800 to-black text-white p-6 pb-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="relative z-10 flex items-start justify-between">
@@ -554,7 +573,6 @@ const ManageForecastSlip = ({ position, onClose }: any) => {
         </div>
       </div>
 
-      {/* Selected Option Card */}
       <div className="relative -mt-6 mx-6 z-20">
         <div className="bg-white border-2 border-black/10 rounded-2xl py-2 px-5 shadow-xl">
           <p className="text-[10px] font-semibold text-black/40 uppercase tracking-widest my-2">
@@ -571,120 +589,65 @@ const ManageForecastSlip = ({ position, onClose }: any) => {
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-6 pt-6 space-y-6">
-        {/* Stake Section */}
         <div className="space-y-3">
           <div className="flex items-center my-3 justify-between">
             <label className="text-xs font-semibold text-black/80 uppercase tracking-widest">
               Stake Amount
             </label>
-            {canEdit && !isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
-              >
-                <IconEdit className="w-3 h-3" />
-                Edit
-              </button>
-            )}
+            <span className="text-[10px] font-semibold text-black/40 uppercase tracking-wider">
+              Fixed at entry
+            </span>
           </div>
-
-          {isEditing ? (
-            <div className="space-y-3">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-semibold text-black/30">
-                  KSH
-                </span>
-                <input
-                  type="number"
-                  value={editedAmount}
-                  onChange={(e: { target: { value: any; }; }) => setEditedAmount(e.target.value)}
-                  className="w-full pl-14 pr-4 py-2 bg-neutral-50 border-2 border-black/10 rounded-xl font-mono font-semibold text-xl focus:border-black focus:bg-white outline-none"
-                  autoFocus
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className="py-3 bg-black text-white rounded-xl font-semibold text-sm hover:bg-neutral-900 transition-all flex items-center justify-center gap-2"
-                >
-                  {isSaving ? (
-                    <IconLoader3 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <IconDeviceFloppy className="w-4 h-4" />
-                      Save
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditedAmount(position.amount?.toString() || "0");
-                  }}
-                  className="py-3 bg-neutral-100 text-black/70 rounded-xl font-semibold text-sm hover:bg-neutral-200 transition-all"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="px-5 py-2 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
-              <p className="text-xl font-mono font-semibold text-black">
-                {position.amount || editedAmount} KSH
-              </p>
-            </div>
-          )}
+          <div className="px-5 py-2 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
+            <p className="text-xl font-mono font-semibold text-black">
+              {stakeAmount} KSH
+            </p>
+          </div>
         </div>
 
-        {/* Potential Payout */}
         <div className="px-5 py-2 rounded-xl bg-linear-to-br from-green-50 to-white border border-green-200">
           <p className="text-xs font-semibold text-green-800 uppercase tracking-widest mb-2">
             {position.status === "won" ? "Total Won" : "Potential Payout"}
           </p>
           <p className="text-xl font-mono font-semibold text-green-700">
-            {position.potentialWin || (parseFloat(editedAmount) * 1.95).toFixed(2)}{" "}
-            KSH
+            {projectedPayout.toFixed(2)} KSH
           </p>
         </div>
 
-        {/* Edit Time Warning */}
-        {canEdit && (
+        {isWithinWindow && (
           <div className="py-2 px-4 rounded-xl bg-amber-50 border border-amber-200">
             <div className="flex gap-3">
               <IconClock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-amber-900">
-                  Edit Window Active
+                  Update Window Active
                 </p>
                 <p className="text-xs text-amber-700 leading-relaxed">
-                  You have {timeRemaining} minute
-                  {timeRemaining !== 1 ? "s" : ""} left to edit or cancel this
-                  forecast.
+                  {canCancelForecast
+                    ? `You have ${timeRemaining} minute${timeRemaining !== 1 ? "s" : ""} left to cancel this forecast.`
+                    : "This position is read-only in this panel."}
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Actions */}
-        {canEdit && (
+        {canCancelForecast && (
           <button
-            onClick={handleCancel}
-            className="w-full py-2 rounded-xl border-2 border-red-200 bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-all"
+            onClick={handleCancelForecast}
+            disabled={isCancelling}
+            className="w-full py-2 rounded-xl border-2 border-red-200 bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-all disabled:opacity-70"
           >
-            Cancel Forecast & Refund
+            {isCancelling ? "Cancelling Forecast..." : "Cancel Forecast & Refund"}
           </button>
         )}
 
-        {/* Market Link */}
         <Link
           href={`/dashboard/markets/${position.marketId || position.id}`}
           className="block w-full py-3 rounded-xl border border-black/10 text-center text-xs font-semibold text-black/80 hover:bg-neutral-50 hover:text-black transition-all uppercase tracking-widest"
         >
-          View Market Details →
+          View Market Details &rarr;
         </Link>
       </div>
     </motion.div>
@@ -720,10 +683,10 @@ export default function GroupPage() {
     id: groupId,
   });
   const [groupMarkets, setGroupMarkets] = useState<any[]>([]);
-  const [userBets, setUserBets] = useState<any[]>([]);
+  const [userForecasts, setUserForecasts] = useState<any[]>([]);
 
   // NEW: State for managing existing positions from Activity/Positions tab
-  const [selectedBetToManage, setSelectedBetToManage] = useState<any | null>(
+  const [selectedForecastToManage, setSelectedForecastToManage] = useState<any | null>(
     null,
   );
 
@@ -809,9 +772,14 @@ export default function GroupPage() {
         activePositionsCount: mappedMarkets.filter((market: any) => market.status === "active").length || mappedMarkets.length,
       }));
 
-      const normalizedPositions = normalizePositions(positionsPayload).filter((position) =>
-        mappedMarkets.some((market: any) => market.id === position.marketId),
-      );
+      const normalizedPositions = normalizePositions(positionsPayload)
+        .filter((position) =>
+          mappedMarkets.some((market: any) => market.id === position.marketId),
+        )
+        .map((position) => ({
+          ...position,
+          source: "market_position",
+        }));
 
       const resolveUserId = (value: any) => {
         if (!value) return "";
@@ -820,7 +788,7 @@ export default function GroupPage() {
         return "";
       };
 
-      const groupParticipantBets = mappedMarkets.flatMap((market: any) => {
+      const groupParticipantForecasts = mappedMarkets.flatMap((market: any) => {
         return (market.participantsRaw || [])
           .filter((participant: any) => resolveUserId(participant?.userId) === user.id)
           .map((participant: any, index: number) => ({
@@ -836,13 +804,15 @@ export default function GroupPage() {
                 ? Number(participant?.payoutAmount || 0) - Number(market.buyInAmount || 0)
                 : undefined,
             openedAt: participant?.joinedAt || market.endsAt || new Date().toISOString(),
+            source: "group_position",
           }));
       });
 
-      const combined = [...groupParticipantBets, ...normalizedPositions].filter(
-        (bet, index, allBets) => allBets.findIndex((item) => item.id === bet.id) === index,
+      const combined = [...groupParticipantForecasts, ...normalizedPositions].filter(
+        (forecast, index, allForecasts) =>
+          allForecasts.findIndex((item) => item.id === forecast.id) === index,
       );
-      setUserBets(combined);
+      setUserForecasts(combined);
       setForecasts(combined);
       setIsLoading(false);
     };
@@ -899,43 +869,27 @@ export default function GroupPage() {
       })
       .filter(Boolean);
 
-    if (normalized.length >= 2) return normalized;
-    return [
-      {
-        id: "opt1",
-        text: "Option A",
-        percentage: 50,
-        image: "https://images.unsplash.com/photo-1624880357913-a8539238245b?w=400&auto=format&fit=crop",
-      },
-      {
-        id: "opt2",
-        text: "Option B",
-        percentage: 50,
-        image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop",
-      },
-    ];
+    return normalized;
   }, [activeMarket]);
 
   // Handlers
   const handleToggleNotifications = useCallback(() => {
     setIsActionLoading(true);
     const newState = !isNotificationsOn;
-    setTimeout(() => {
-      try {
-        setIsNotificationsOn(newState);
-        setShowSettingsMenu(false);
-        toast.success(
-          newState ? "Notifications Enabled" : "Notifications Muted",
-          newState
-            ? "You'll stay updated on all group activity."
-            : "You won't receive updates for this group.",
-        );
-      } catch (error) {
-        toast.error("Error", "Failed to update notification settings");
-      } finally {
-        setIsActionLoading(false);
-      }
-    }, 800);
+    try {
+      setIsNotificationsOn(newState);
+      setShowSettingsMenu(false);
+      toast.success(
+        newState ? "Notifications Enabled" : "Notifications Muted",
+        newState
+          ? "You'll stay updated on all group activity."
+          : "You won't receive updates for this group.",
+      );
+    } catch (error) {
+      toast.error("Error", "Failed to update notification settings");
+    } finally {
+      setIsActionLoading(false);
+    }
   }, [isNotificationsOn, toast]);
 
   const handleJoinGroup = useCallback(async () => {
@@ -1104,8 +1058,8 @@ export default function GroupPage() {
       if (tabId === activeTab) return;
       setActiveTab(tabId);
       setIsTabLoading(true);
-      // Close any open bet management when switching tabs
-      setSelectedBetToManage(null);
+      // Close any open forecast management panel when switching tabs
+      setSelectedForecastToManage(null);
       setTimeout(() => setIsTabLoading(false), 500);
     },
     [activeTab],
@@ -1445,7 +1399,7 @@ export default function GroupPage() {
                 setForecastSuccess={setForecastSuccess}
                 onForecastPlaced={(_newForecast: any) => {
                   toast.success("Position confirmed!");
-                  setActiveTab("bets");
+                  setActiveTab("forecasts");
                 }}
               />
             </div>
@@ -1484,10 +1438,10 @@ export default function GroupPage() {
                 count: null,
               },
               {
-                id: "bets",
+                id: "forecasts",
                 label: "Active Forecasts",
                 icon: IconAward,
-                count: userBets.length,
+                count: userForecasts.length,
               },
               {
                 id: "members",
@@ -1560,9 +1514,9 @@ export default function GroupPage() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
                             onClick={() => {
-                              // If it's a bet-related activity, show management slip
+                              // If it's a forecast-related activity, show management slip
                               if (activity.type.includes("forecast")) {
-                                setSelectedBetToManage({
+                                setSelectedForecastToManage({
                                   id: activity.id,
                                   title: activity.details || activity.action,
                                   amount: parseInt(
@@ -1633,10 +1587,19 @@ export default function GroupPage() {
                 {/* Manage Forecast Slip Sidebar - ONLY SHOWS WHEN FORECAST IS SELECTED */}
                 <div className="lg:col-span-4">
                   <AnimatePresence mode="wait">
-                    {selectedBetToManage ? (
+                    {selectedForecastToManage ? (
                       <ManageForecastSlip
-                        position={selectedBetToManage}
-                        onClose={() => setSelectedBetToManage(null)}
+                        position={selectedForecastToManage}
+                        onClose={() => setSelectedForecastToManage(null)}
+                        onPositionCancelled={(positionId) => {
+                          setUserForecasts((prev) =>
+                            prev.filter((item: any) => item.id !== positionId),
+                          );
+                          setForecasts((prev) =>
+                            prev.filter((item: any) => item.id !== positionId),
+                          );
+                          setSelectedForecastToManage(null);
+                        }}
                       />
                     ) : (
                       <motion.div
@@ -1663,17 +1626,17 @@ export default function GroupPage() {
               </motion.div>
             )}
 
-            {activeTab === "bets" && (
+            {activeTab === "forecasts" && (
               <motion.div
-                key="bets"
+                key="forecasts"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 className="grid grid-cols-1 lg:grid-cols-12 gap-6"
               >
-                 {/* Bets List */}
+                 {/* Forecast List */}
                  <div className="lg:col-span-8 space-y-4">
-                    {userBets.map((forecast, index) => {
+                    {userForecasts.map((forecast, index) => {
                       const market = groupMarkets.find((m) => m.id === forecast.marketId);
                       const isWon = forecast.status === 'settled' && (forecast.pnl || 0) > 0;
                       const isLost = forecast.status === 'settled' && (forecast.pnl || 0) <= 0;
@@ -1684,7 +1647,7 @@ export default function GroupPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        onClick={() => setSelectedBetToManage(forecast)}
+                        onClick={() => setSelectedForecastToManage(forecast)}
                         className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 hover:bg-white hover:border-black/10 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer"
                       >
                         <div className="flex items-start gap-4">
@@ -1748,10 +1711,19 @@ export default function GroupPage() {
                 {/* Manage Forecast Slip Sidebar */}
                 <div className="lg:col-span-4">
                   <AnimatePresence mode="wait">
-                    {selectedBetToManage ? (
+                    {selectedForecastToManage ? (
                       <ManageForecastSlip
-                        position={selectedBetToManage}
-                        onClose={() => setSelectedBetToManage(null)}
+                        position={selectedForecastToManage}
+                        onClose={() => setSelectedForecastToManage(null)}
+                        onPositionCancelled={(positionId) => {
+                          setUserForecasts((prev) =>
+                            prev.filter((item: any) => item.id !== positionId),
+                          );
+                          setForecasts((prev) =>
+                            prev.filter((item: any) => item.id !== positionId),
+                          );
+                          setSelectedForecastToManage(null);
+                        }}
                       />
                     ) : (
                       <motion.div
@@ -1767,7 +1739,7 @@ export default function GroupPage() {
                             Select a Forecast
                           </p>
                           <p className="text-sm text-black/40 leading-relaxed">
-                            Click on any forecast to view details, edit stake, or cancel
+                            Click on any forecast to view details and manage cancellation
                           </p>
                         </div>
                       </motion.div>
@@ -1946,7 +1918,7 @@ export default function GroupPage() {
                 Join to unlock full access
               </h2>
               <p className="text-base text-black/60 leading-relaxed max-w-xl mx-auto">
-                Become a member to participate in bets, view live activity, and compete on the leaderboard.
+                Become a member to participate in forecasts, view live activity, and compete on the leaderboard.
               </p>
             </div>
 
@@ -1956,7 +1928,7 @@ export default function GroupPage() {
                 <div>
                   <h3 className="font-medium text-black/90 mb-1">Live Activity Feed</h3>
                   <p className="text-sm text-black/50 leading-relaxed">
-                    Track every bet, win, and update in real-time
+                    Track every forecast, win, and update in real-time
                   </p>
                 </div>
               </div>

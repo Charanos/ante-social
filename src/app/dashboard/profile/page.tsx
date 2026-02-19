@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo, SetStateAction } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
-import { useLiveUser } from "@/lib/live-data";
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import {
   IconAward,
   IconBell,
@@ -17,7 +17,6 @@ import {
   IconHash,
   IconMail,
   IconSettings,
-  IconShield,
   IconTrendingUp,
   IconUser,
   IconLoader3,
@@ -27,7 +26,6 @@ import {
   IconX,
   IconCreditCard,
   IconLanguage,
-  IconWallet,
   IconArrowRight,
   IconTrophy,
   IconClock,
@@ -44,6 +42,106 @@ const DEFAULT_LOCATION = "Nairobi, Kenya";
 const DEFAULT_BIO = "Passionate prediction market enthusiast";
 const DEFAULT_TIMEZONE = "Africa/Nairobi";
 const DEFAULT_LANGUAGE = "en";
+
+type ProfilePayload = {
+  fullName?: string;
+  username?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  bio?: string;
+  timezone?: string;
+  language?: string;
+  notificationEmail?: boolean;
+  notificationPush?: boolean;
+  avatarUrl?: string;
+};
+
+type ActivityRecord = {
+  type?: string;
+  description?: string;
+  createdAt?: string;
+  metadata?: Record<string, unknown>;
+};
+
+type AchievementCard = {
+  title: string;
+  description: string;
+  category: string;
+  reward: number;
+  date: string;
+  icon: string;
+};
+
+function toRelativeTime(dateValue?: string) {
+  if (!dateValue) return "Recently";
+  const createdAt = new Date(dateValue).getTime();
+  if (!Number.isFinite(createdAt)) return "Recently";
+  const diffMs = Date.now() - createdAt;
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  if (minutes < 60) return `${Math.max(1, minutes)}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  const months = Math.floor(days / 30);
+  return `${Math.max(1, months)}mo ago`;
+}
+
+function mapActivityToAchievement(activity: ActivityRecord): AchievementCard {
+  const type = (activity.type || "").toLowerCase();
+  if (type.endsWith("_won")) {
+    return {
+      title: "Winning Forecast",
+      description: activity.description || "Successfully settled a forecast",
+      category: "Performance",
+      reward: 250,
+      date: toRelativeTime(activity.createdAt),
+      icon: "trophy",
+    };
+  }
+  if (type.endsWith("_placed")) {
+    return {
+      title: "Market Entry",
+      description: activity.description || "Placed a new forecast",
+      category: "Participation",
+      reward: 100,
+      date: toRelativeTime(activity.createdAt),
+      icon: "zap",
+    };
+  }
+  if (type === "deposit_completed") {
+    return {
+      title: "Capital Added",
+      description: activity.description || "Wallet funded successfully",
+      category: "Finance",
+      reward: 150,
+      date: toRelativeTime(activity.createdAt),
+      icon: "crown",
+    };
+  }
+  if (type === "group_joined") {
+    return {
+      title: "Community Joined",
+      description: activity.description || "Joined a prediction group",
+      category: "Social",
+      reward: 100,
+      date: toRelativeTime(activity.createdAt),
+      icon: "clock",
+    };
+  }
+
+  return {
+    title: "Account Activity",
+    description: activity.description || "Recent platform activity",
+    category: "General",
+    reward: 50,
+    date: toRelativeTime(activity.createdAt),
+    icon: "clock",
+  };
+}
 
 export default function ProfilePage() {
   const toast = useToast();
@@ -66,54 +164,83 @@ export default function ProfilePage() {
   // Preferences
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+  const [activityRecords, setActivityRecords] = useState<ActivityRecord[]>([]);
 
-  // Mock recent achievements data
-  const recentAchievements = [
-    {
-      title: "First Win",
-      description: "Won your first market",
-      category: "Beginner",
-      reward: 100,
-      date: "2 days ago",
-      icon: "trophy",
-    },
-    {
-      title: "Early Bird",
-      description: "Placed bet within first hour",
-      category: "Time Based",
-      reward: 150,
-      date: "1 week ago",
-      icon: "clock",
-    },
-    {
-      title: "Lucky Day",
-      description: "Won 3 markets in one day",
-      category: "Performance",
-      reward: 200,
-      date: "3 days ago",
-      icon: "zap",
-    },
-    {
-      title: "High Roller",
-      description: "Reached High Roller tier",
-      category: "Prestige",
-      reward: 500,
-      date: "1 month ago",
-      icon: "crown",
-    },
-  ];
+  const recentAchievements = useMemo(() => {
+    if (activityRecords.length === 0) {
+      return [
+        {
+          title: "Account Ready",
+          description: "Complete forecasts to unlock achievement history",
+          category: "Getting Started",
+          reward: 0,
+          date: "Recently",
+          icon: "clock",
+        },
+      ];
+    }
 
-  // Mock progress data for the graph
-  const progressData = [
-    { week: 'Week 1', points: 450, accuracy: 62 },
-    { week: 'Week 2', points: 680, accuracy: 68 },
-    { week: 'Week 3', points: 520, accuracy: 65 },
-    { week: 'Week 4', points: 890, accuracy: 74 },
-    { week: 'Week 5', points: 1050, accuracy: 78 },
-    { week: 'Week 6', points: 1240, accuracy: 82 },
-    { week: 'Week 7', points: 1380, accuracy: 85 },
-    { week: 'Week 8', points: 1520, accuracy: 88 },
-  ];
+    return activityRecords
+      .slice(0, 4)
+      .map(mapActivityToAchievement);
+  }, [activityRecords]);
+
+  const progressData = useMemo(() => {
+    const buckets = Array.from({ length: 8 }, (_, index) => ({
+      week: `Week ${index + 1}`,
+      points: 0,
+      wins: 0,
+      forecasts: 0,
+    }));
+
+    for (const activity of activityRecords) {
+      const createdAt = new Date(activity.createdAt || "").getTime();
+      if (!Number.isFinite(createdAt)) continue;
+
+      const daysAgo = Math.floor((Date.now() - createdAt) / (1000 * 60 * 60 * 24));
+      if (daysAgo < 0 || daysAgo >= 56) continue;
+
+      const bucketIndex = 7 - Math.floor(daysAgo / 7);
+      const bucket = buckets[bucketIndex];
+      const type = (activity.type || "").toLowerCase();
+
+      if (type.endsWith("_won")) {
+        bucket.points += 120;
+        bucket.wins += 1;
+        bucket.forecasts += 1;
+        continue;
+      }
+      if (type.endsWith("_lost")) {
+        bucket.points += 20;
+        bucket.forecasts += 1;
+        continue;
+      }
+      if (type.endsWith("_placed")) {
+        bucket.points += 40;
+        bucket.forecasts += 1;
+        continue;
+      }
+      if (type === "deposit_completed" || type === "group_joined") {
+        bucket.points += 30;
+      }
+    }
+
+    const baseline = Math.max(0, Math.round(user.reputationScore * 10));
+    let runningPoints = baseline;
+    return buckets.map((bucket) => {
+      runningPoints += bucket.points;
+      const weeklyAccuracy =
+        bucket.forecasts > 0
+          ? Math.round((bucket.wins / bucket.forecasts) * 100)
+          : Math.round(user.signalAccuracy);
+
+      return {
+        week: bucket.week,
+        points: runningPoints,
+        accuracy: Math.max(0, Math.min(100, weeklyAccuracy)),
+      };
+    });
+  }, [activityRecords, user.reputationScore, user.signalAccuracy]);
 
   // Get achievement icon component
   const getAchievementIcon = (iconName: string) => {
@@ -135,6 +262,17 @@ export default function ProfilePage() {
 
   const [emailNotif, setEmailNotif] = useState(true);
   const [pushNotif, setPushNotif] = useState(true);
+  const achievementStats = useMemo(() => {
+    const completed = activityRecords.filter(
+      (record) => (record.type || "").toLowerCase().endsWith("_won"),
+    ).length;
+    const streak = Math.max(1, Math.min(30, Math.round(user.signalAccuracy / 10)));
+    return {
+      totalBadges: recentAchievements.length,
+      completed,
+      streakDays: streak,
+    };
+  }, [activityRecords, recentAchievements.length, user.signalAccuracy]);
 
   // Track changes
   const [hasChanges, setHasChanges] = useState(false);
@@ -154,32 +292,46 @@ export default function ProfilePage() {
   useEffect(() => {
     if (isUserLoading || hasHydratedProfile) return;
 
-    const profileState = {
-      fullName: user.fullName || "",
-      username: user.username || "",
-      email: user.email || "",
-      phone: DEFAULT_PHONE,
-      location: DEFAULT_LOCATION,
-      bio: DEFAULT_BIO,
-      timezone: DEFAULT_TIMEZONE,
-      language: DEFAULT_LANGUAGE,
-      emailNotif: true,
-      pushNotif: true,
+    const hydrateProfile = async () => {
+      const [profilePayload, activityPayload] = await Promise.all([
+        fetchJsonOrNull<ProfilePayload>("/api/user/profile"),
+        fetchJsonOrNull<{ data?: ActivityRecord[] }>("/api/user/activity?limit=120&offset=0"),
+      ]);
+
+      const profileState = {
+        fullName: profilePayload?.fullName || user.fullName || "",
+        username: profilePayload?.username || user.username || "",
+        email: profilePayload?.email || user.email || "",
+        phone: profilePayload?.phone || DEFAULT_PHONE,
+        location: profilePayload?.location || DEFAULT_LOCATION,
+        bio: profilePayload?.bio || DEFAULT_BIO,
+        timezone: profilePayload?.timezone || DEFAULT_TIMEZONE,
+        language: profilePayload?.language || DEFAULT_LANGUAGE,
+        emailNotif: profilePayload?.notificationEmail ?? true,
+        pushNotif: profilePayload?.notificationPush ?? true,
+      };
+
+      const records = Array.isArray(activityPayload?.data)
+        ? activityPayload.data
+        : [];
+
+      setActivityRecords(records);
+      setInitialData(profileState);
+      setFullName(profileState.fullName);
+      setUsername(profileState.username);
+      setEmail(profileState.email);
+      setPhone(profileState.phone);
+      setLocation(profileState.location);
+      setBio(profileState.bio);
+      setTimezone(profileState.timezone);
+      setLanguage(profileState.language);
+      setEmailNotif(profileState.emailNotif);
+      setPushNotif(profileState.pushNotif);
+      setHasHydratedProfile(true);
+      setIsPageLoading(false);
     };
 
-    setInitialData(profileState);
-    setFullName(profileState.fullName);
-    setUsername(profileState.username);
-    setEmail(profileState.email);
-    setPhone(profileState.phone);
-    setLocation(profileState.location);
-    setBio(profileState.bio);
-    setTimezone(profileState.timezone);
-    setLanguage(profileState.language);
-    setEmailNotif(profileState.emailNotif);
-    setPushNotif(profileState.pushNotif);
-    setHasHydratedProfile(true);
-    setIsPageLoading(false);
+    void hydrateProfile();
   }, [hasHydratedProfile, isUserLoading, user.email, user.fullName, user.username]);
 
   // Check for changes
@@ -226,12 +378,18 @@ export default function ProfilePage() {
         bio,
         timezone,
         language,
+        notificationEmail: emailNotif,
+        notificationPush: pushNotif,
       }),
     });
 
     if (!response.ok) {
+      const payload = await response.json().catch(() => null);
       setIsSaving(false);
-      toast.error("Save Failed", "Unable to update your profile");
+      toast.error(
+        "Save Failed",
+        payload?.message || payload?.error || "Unable to update your profile",
+      );
       return;
     }
 
@@ -285,12 +443,35 @@ export default function ProfilePage() {
   }, [initialData, toast]);
 
   const handleAvatarUpload = useCallback(() => {
-    setIsUploadingAvatar(true);
-    setTimeout(() => {
+    const current = user.avatarUrl || "";
+    const nextUrl = window.prompt("Paste a profile image URL", current)?.trim();
+    if (!nextUrl || nextUrl === current) return;
+
+    const run = async () => {
+      setIsUploadingAvatar(true);
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: nextUrl }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        toast.error(
+          "Avatar Update Failed",
+          payload?.message || payload?.error || "Could not update avatar",
+        );
+        setIsUploadingAvatar(false);
+        return;
+      }
+
+      await refresh();
       setIsUploadingAvatar(false);
       toast.success("Avatar Updated", "Your profile picture has been changed");
-    }, 1500);
-  }, [toast]);
+    };
+
+    void run();
+  }, [refresh, toast, user.avatarUrl]);
 
   const handleEmailToggle = useCallback(() => {
     setEmailNotif((prev) => !prev);
@@ -346,11 +527,11 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-center md:justify-start gap-4 md:gap-8 flex-wrap w-full">
                   <span className="text-sm text-white/50 font-normal flex items-center gap-1.5">
                     <IconTrendingUp className="w-3.5 h-3.5" />
-                    12 Badges Earned
+                    {achievementStats.totalBadges} Badges Earned
                   </span>
                   <span className="text-sm text-green-400 font-normal flex items-center gap-1.5">
                     <IconCheck className="w-3.5 h-3.5" />
-                    28 Completed
+                    {achievementStats.completed} Completed
                   </span>
                 </div>
               </div>
@@ -361,14 +542,16 @@ export default function ProfilePage() {
           <div className="grid text-center grid-cols-3 gap-2 md:gap-6 pt-6 border-t border-white/10">
             <div className="space-y-1">
               <p className="text-xs md:text-sm font-medium text-white/80">Total Badges</p>
-              <p className="text-xl md:text-2xl font-normal text-white font-mono">12</p>
+              <p className="text-xl md:text-2xl font-normal text-white font-mono">
+                {achievementStats.totalBadges}
+              </p>
             </div>
             <div className="space-y-1">
               <p className="text-xs md:text-sm font-medium text-white/80">
                 Completed
               </p>
               <p className="text-xl md:text-2xl font-normal text-green-400 font-mono">
-                28
+                {achievementStats.completed}
               </p>
             </div>
             <div className="space-y-1">
@@ -376,7 +559,7 @@ export default function ProfilePage() {
                 Streak
               </p>
               <p className="text-xl md:text-2xl font-normal text-orange-400 font-mono">
-                5 days
+                {achievementStats.streakDays} days
               </p>
             </div>
           </div>

@@ -21,6 +21,15 @@ export class User {
   phone?: string;
 
   @Prop()
+  location?: string;
+
+  @Prop()
+  bio?: string;
+
+  @Prop({ default: 'en' })
+  language!: string;
+
+  @Prop()
   dateOfBirth?: Date;
 
   @Prop()

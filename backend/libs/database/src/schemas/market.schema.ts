@@ -6,6 +6,9 @@ export type MarketDocument = HydratedDocument<Market>;
 // ─── Embedded subdocument: MarketOption ─────────────
 @Schema({ _id: true })
 export class MarketOption {
+  // Generated automatically for embedded outcome documents.
+  _id!: Types.ObjectId;
+
   @Prop({ required: true })
   optionText!: string;
 

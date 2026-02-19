@@ -4,7 +4,7 @@
   "private": true,
   "description": "Ante Social — NestJS Microservices Backend",
   "scripts": {
-    "build": "nx run-many --target=build --all",
+    "build": "nest build api-gateway && nest build auth-service && nest build market-engine && nest build wallet-service && nest build notification-service && nest build websocket-gateway && nest build admin-service && nest build reputation-engine",
     "dev": "nx run-many --target=serve --all --parallel",
     "dev:gateway": "nx serve api-gateway",
     "dev:auth": "nx serve auth-service",
