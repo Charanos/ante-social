@@ -4,6 +4,8 @@ import { FeatureGrid } from "@/components/landing/FeatureGrid";
 import { GameModes } from "@/components/landing/GameModes";
 import { VisualShowcase } from "@/components/landing/VisualShowcase";
 import { CurrencySection } from "@/components/landing/CurrencySection";
+import { HallOfFameSection } from "@/components/landing/HallOfFameSection";
+import { PageHeader } from "@/components/landing/PageHeader";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { Footer } from "@/components/landing/Footer";
 import { WaveBackground } from "@/components/landing/WaveBackground";
@@ -48,6 +50,15 @@ export default function LandingPage() {
         <div className="relative">
         <CurrencySection />
         <WaveBackground variant="bottom" className="text-black/5" />
+      </div>
+
+      <div className="relative">
+        <PageHeader
+          title="Hall of Fame"
+          description="See who's dominating the markets. Compete, climb the ranks, and earn your place among the elite."
+          className="pt-20 pb-12 md:pt-24 md:pb-16"
+        />
+        <HallOfFameSection />
       </div>
 
       <div className="relative">

@@ -190,14 +190,27 @@ function WaveBackground() {
 // Floating stats component
 function FloatingStats() {
   const stats = [
-    { icon: IconUsers, label: "Active Players", value: "12.5K", delay: 0.2 },
+    {
+      icon: IconUsers,
+      label: "Active Players",
+      value: "12.5K",
+      delay: 0.2,
+      gradient: "from-blue-50/70 via-white/55 to-white/45",
+    },
     {
       icon: IconTrendingUp,
       label: "Total Volume",
       value: "KSH 8.2M",
       delay: 0.4,
+      gradient: "from-amber-50/70 via-white/55 to-white/45",
     },
-    { icon: IconAccessPoint, label: "Markets Live", value: "342", delay: 0.6 },
+    {
+      icon: IconAccessPoint,
+      label: "Markets Live",
+      value: "342",
+      delay: 0.6,
+      gradient: "from-green-50/70 via-white/55 to-white/45",
+    },
   ];
 
   return (
@@ -213,7 +226,7 @@ function FloatingStats() {
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
           whileHover={{ scale: 1.05, y: -2 }}
-          className="flex items-center gap-3 px-4 md:px-6 py-3 bg-white/80 backdrop-blur-sm border border-black/5 rounded-full shadow-sm hover:shadow-md transition-shadow"
+          className={`flex items-center gap-3 px-4 md:px-6 py-3 bg-gradient-to-br ${stat.gradient} bg-white/40 backdrop-blur-lg border border-white/50 rounded-full shadow-sm hover:shadow-md transition-shadow`}
         >
           <stat.icon className="w-4 h-4 text-black/80" />
           <div className="flex flex-col items-start">

@@ -82,7 +82,6 @@ export default function GameModesPage() {
           title="Game Modes"
           description="From improved classics to psychological experiments. Discover new ways to play and win."
         />
-        <WaveBackground variant="bottom" />
       </div>
 
       {/* Main Content */}

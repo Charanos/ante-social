@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1558,7 +1559,7 @@ export default function GroupPage() {
                                       {activity.details && (
                                         <span className="text-black/80">
                                           {" "}
-                                          "{activity.details}"
+                                          {activity.details}
                                         </span>
                                       )}
                                     </p>

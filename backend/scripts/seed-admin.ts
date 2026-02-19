@@ -22,7 +22,7 @@ async function seedAdmin() {
   const adminData = {
     fullName: 'Platform Administrator',
     username: process.env.SEED_ADMIN_USERNAME || 'admin',
-    email: process.env.SEED_ADMIN_EMAIL || 'admin@antesocial.local',
+    email: process.env.SEED_ADMIN_EMAIL || 'dennismunge960@gmail.com',
     phone: process.env.SEED_ADMIN_PHONE || '+10000000000',
     dateOfBirth: new Date('1990-01-01'),
     password: process.env.SEED_ADMIN_PASSWORD || 'Password123!',
@@ -41,9 +41,13 @@ async function seedAdmin() {
 
     if (existing) {
       console.log(`User ${existing.username} already exists. Promoting to admin...`);
+      const passwordHash = await bcrypt.hash(adminData.password, 12);
       existing.role = 'admin';
+      existing.username = adminData.username;
+      existing.email = adminData.email;
       existing.fullName = adminData.fullName;
       existing.phone = adminData.phone;
+      existing.passwordHash = passwordHash;
       existing.tier = 'high_roller';
       existing.isVerified = true;
       existing.emailVerified = true;
