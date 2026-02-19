@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { RequestLoggingMiddleware } from './middleware/request-logging.middleware';
 
 @Module({
@@ -18,8 +18,12 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         createProxyMiddleware({
-          target: process.env.AUTH_SERVICE_URL || 'http://localhost:3002',
+          target: process.env.AUTH_SERVICE_URL || 'http://127.0.0.1:3002',
           changeOrigin: true,
+          proxyTimeout: 10000,
+          on: {
+            proxyReq: fixRequestBody,
+          },
           pathRewrite: {
             '^/api/v1/auth': '/auth',
             '^/api/v1/user': '/user',
@@ -37,8 +41,12 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         createProxyMiddleware({
-          target: process.env.MARKET_SERVICE_URL || 'http://localhost:3003',
+          target: process.env.MARKET_SERVICE_URL || 'http://127.0.0.1:3003',
           changeOrigin: true,
+          proxyTimeout: 10000,
+          on: {
+            proxyReq: fixRequestBody,
+          },
           pathRewrite: {
             '^/api/v1/markets': '/markets',
             '^/api/v1/predictions': '/predictions',
@@ -56,8 +64,12 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         createProxyMiddleware({
-          target: process.env.WALLET_SERVICE_URL || 'http://localhost:3004',
+          target: process.env.WALLET_SERVICE_URL || 'http://127.0.0.1:3004',
           changeOrigin: true,
+          proxyTimeout: 10000,
+          on: {
+            proxyReq: fixRequestBody,
+          },
           pathRewrite: { '^/api/v1/wallet': '/wallet' },
         }),
       )
@@ -67,8 +79,12 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         createProxyMiddleware({
-          target: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3005',
+          target: process.env.NOTIFICATION_SERVICE_URL || 'http://127.0.0.1:3005',
           changeOrigin: true,
+          proxyTimeout: 10000,
+          on: {
+            proxyReq: fixRequestBody,
+          },
           pathRewrite: { '^/api/v1/notifications': '/notifications' },
         }),
       )
@@ -78,8 +94,12 @@ export class AppModule implements NestModule {
     consumer
       .apply(
         createProxyMiddleware({
-          target: process.env.ADMIN_SERVICE_URL || 'http://localhost:3007',
+          target: process.env.ADMIN_SERVICE_URL || 'http://127.0.0.1:3007',
           changeOrigin: true,
+          proxyTimeout: 10000,
+          on: {
+            proxyReq: fixRequestBody,
+          },
           pathRewrite: { '^/api/v1/admin': '/admin' },
         }),
       )

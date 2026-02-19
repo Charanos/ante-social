@@ -6,7 +6,8 @@ import compression from 'compression';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Gateway is a pure proxy layer; keep raw request streams for forwarding.
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
   const logger = new Logger('ApiGateway');
   
   // Security & Performance

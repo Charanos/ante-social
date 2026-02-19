@@ -15,11 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@app/common": ["libs/common/src/index.ts"],
+      "@app/common": ["libs/common/src/index"],
       "@app/common/*": ["libs/common/src/*"],
-      "@app/database": ["libs/database/src/index.ts"],
+      "@app/database": ["libs/database/src/index"],
       "@app/database/*": ["libs/database/src/*"],
-      "@app/kafka": ["libs/kafka/src/index.ts"],
+      "@app/kafka": ["libs/kafka/src/index"],
       "@app/kafka/*": ["libs/kafka/src/*"]
     },
     "esModuleInterop": true,

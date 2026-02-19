@@ -40,8 +40,8 @@ export class Transaction {
   @Prop()
   externalTransactionId?: string;
 
-  @Prop()
-  paymentMetadata?: Record<string, any>;
+  @Prop({ type: Object })
+  paymentMetadata?: Record<string, unknown>;
 
   // ─── Exchange Rate ────────────────────────────
   @Prop()

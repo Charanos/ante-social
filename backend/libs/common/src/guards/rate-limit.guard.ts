@@ -13,13 +13,30 @@ export class RateLimitGuard implements CanActivate {
     private reflector: Reflector,
     private configService: ConfigService,
   ) {
-    // Initialize Redis client locally for the guard if not provided
-    // In a real app, this should be injected, but for common lib portability we can lazy-init
-    const redisHost = this.configService.get('REDIS_HOST') || 'localhost';
-    const redisPort = this.configService.get('REDIS_PORT') || 6379;
+    // Initialize Redis client for rate limiting with URL-first config.
+    const redisUrl =
+      this.configService.get<string>('REDIS_URL') ||
+      this.configService.get<string>('REDIS_URI');
+
+    if (redisUrl) {
+      this.redis = new Redis(redisUrl, {
+        lazyConnect: true,
+      });
+      return;
+    }
+
+    const redisHost = this.configService.get<string>('REDIS_HOST') || 'localhost';
+    const redisPort = this.configService.get<number>('REDIS_PORT') || 6379;
+    const redisUsername = this.configService.get<string>('REDIS_USERNAME');
+    const redisPassword = this.configService.get<string>('REDIS_PASSWORD');
+    const redisTls = this.configService.get<string>('REDIS_TLS') === 'true';
+
     this.redis = new Redis({
       host: redisHost,
       port: Number(redisPort),
+      username: redisUsername || undefined,
+      password: redisPassword || undefined,
+      tls: redisTls ? {} : undefined,
       lazyConnect: true,
     });
   }

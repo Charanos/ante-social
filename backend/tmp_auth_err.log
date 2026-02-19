@@ -1,0 +1,19 @@
+(node:14840) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+C:\Users\denni\Desktop\ante-social\backend\node_modules\@nestjs\mongoose\dist\decorators\prop.decorator.js:21
+                throw new errors_1.CannotDetermineTypeError(target.constructor?.name, propertyKey);
+                ^
+
+CannotDetermineTypeError: Cannot determine a type for the "Transaction.paymentMetadata" field (union/intersection/ambiguous type was used). Make sure your property is decorated with a "@Prop({ type: TYPE_HERE })" decorator.
+    at C:\Users\denni\Desktop\ante-social\backend\node_modules\@nestjs\mongoose\dist\decorators\prop.decorator.js:21:23
+    at DecorateProperty (C:\Users\denni\Desktop\ante-social\backend\node_modules\reflect-metadata\Reflect.js:561:33)
+    at Reflect.decorate (C:\Users\denni\Desktop\ante-social\backend\node_modules\reflect-metadata\Reflect.js:136:24)
+    at Object.__decorate (C:\Users\denni\Desktop\ante-social\backend\node_modules\tslib\tslib.js:106:96)
+    at Object.<anonymous> (C:\Users\denni\Desktop\ante-social\backend\libs\database\src\schemas\transaction.schema.ts:44:3)
+    at Module._compile (node:internal/modules/cjs/loader:1804:14)
+    at Object..js (node:internal/modules/cjs/loader:1936:10)
+    at Module.load (node:internal/modules/cjs/loader:1525:32)
+    at Module._load (node:internal/modules/cjs/loader:1327:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+
+Node.js v24.13.1

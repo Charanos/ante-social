@@ -1,12 +1,13 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { authenticator } = require('otplib');
 import * as qrcode from 'qrcode';
 import { User, UserDocument } from '@app/database';
 import { Verify2FADto } from '@app/common'; // We made this earlier
 import { AuthService } from '../auth/auth.service';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const otplibModule = require('otplib') as { authenticator?: any; default?: { authenticator?: any } };
+const authenticator = otplibModule.authenticator || otplibModule.default?.authenticator;
 
 @Injectable()
 export class TwoFactorService {
@@ -14,10 +15,16 @@ export class TwoFactorService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private authService: AuthService,
   ) {
-    authenticator.options = { window: 1 }; // Allow 30sec slack
+    if (authenticator) {
+      authenticator.options = { window: 1 }; // Allow 30sec slack
+    }
   }
 
   async generateSecret(user: UserDocument) {
+    if (!authenticator) {
+      throw new BadRequestException('2FA provider is not configured');
+    }
+
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(user.email, 'AnteSocial', secret);
 
@@ -36,6 +43,10 @@ export class TwoFactorService {
   }
 
   async verifyAndEnable(user: UserDocument, code: string) {
+    if (!authenticator) {
+      throw new BadRequestException('2FA provider is not configured');
+    }
+
     if (!user.twoFactorSecret) {
       throw new BadRequestException('2FA setup not initiated');
     }
@@ -57,6 +68,10 @@ export class TwoFactorService {
   }
 
   async validateForLogin(userId: string, code: string) {
+    if (!authenticator) {
+      throw new UnauthorizedException('2FA provider unavailable');
+    }
+
     const user = await this.userModel.findById(userId);
     if (!user?.twoFactorSecret) {
       throw new UnauthorizedException('2FA not enabled');
