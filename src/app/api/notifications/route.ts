@@ -1,36 +1,43 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
+import { NextRequest } from "next/server"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const notifications = await prisma.userNotification.findMany({
-    where: { user_id: session.user.id },
-    orderBy: { created_date: 'desc' }
+  return proxyBackendRequest({
+    path: "/api/v1/notifications",
+    method: "GET",
+    token,
+    searchParams: req.nextUrl.searchParams,
   })
-
-  return Response.json(notifications)
 }
 
 export async function PUT(req: Request) {
   const session = await getServerSession(authOptions)
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { id } = await req.json()
+  const body = await req.json().catch(() => ({}))
 
-  if (id === 'all') {
-      await prisma.userNotification.updateMany({
-          where: { user_id: session.user.id, is_read: false },
-          data: { is_read: true }
-      })
-  } else {
-      await prisma.userNotification.update({
-          where: { id },
-          data: { is_read: true }
-      })
+  if (body.id === "all") {
+    return proxyBackendRequest({
+      path: "/api/v1/notifications/read-all",
+      method: "PATCH",
+      token,
+    })
   }
 
-  return Response.json({ success: true })
+  if (!body.id) {
+    return Response.json({ error: "Missing notification id" }, { status: 400 })
+  }
+
+  return proxyBackendRequest({
+    path: `/api/v1/notifications/${body.id}/read`,
+    method: "PATCH",
+    token,
+  })
 }

@@ -1,42 +1,35 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const groups = await prisma.group.findMany({
-    include: {
-      _count: {
-        select: { members: true }
-      }
-    }
+  const url = new URL(req.url)
+  return proxyBackendRequest({
+    path: "/api/v1/groups",
+    method: "GET",
+    token,
+    searchParams: url.searchParams,
   })
-
-  return Response.json(groups)
 }
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { name, description, avatar_url } = await req.json()
-
-  const group = await prisma.group.create({
-    data: {
-      name,
-      description,
-      avatar_url,
-      created_by: session.user.id,
-      members: {
-        create: {
-          user_id: session.user.id,
-          role: 'admin'
-        }
-      }
-    }
+  const body = await req.json().catch(() => ({}))
+  return proxyBackendRequest({
+    path: "/api/v1/groups",
+    method: "POST",
+    token,
+    jsonBody: {
+      name: body.name,
+      description: body.description,
+      isPublic: body.isPublic,
+    },
   })
-
-  return Response.json(group)
 }

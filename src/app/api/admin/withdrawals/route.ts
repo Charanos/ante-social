@@ -1,59 +1,47 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
+import { NextRequest } from "next/server"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'admin') {
-      return Response.json({ error: "Unauthorized" }, { status: 403 })
-  }
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const withdrawals = await prisma.transaction.findMany({
-      where: { type: 'withdrawal', status: 'pending' },
-      include: { user: { select: { email: true, username: true } } }
+  return proxyBackendRequest({
+    path: "/api/v1/admin/withdrawals",
+    method: "GET",
+    token,
+    searchParams: req.nextUrl.searchParams,
   })
-
-  return Response.json(withdrawals)
 }
 
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== 'admin') {
-        return Response.json({ error: "Unauthorized" }, { status: 403 })
-    }
+  const session = await getServerSession(authOptions)
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { transactionId, action } = await req.json() // action: "approve", "reject"
+  const body = await req.json().catch(() => ({}))
+  if (!body.transactionId || !body.action) {
+    return Response.json({ error: "Missing transactionId or action" }, { status: 400 })
+  }
 
-    const transaction = await prisma.transaction.findUnique({
-        where: { id: transactionId }
+  if (body.action === "approve") {
+    return proxyBackendRequest({
+      path: `/api/v1/admin/withdrawals/${body.transactionId}/approve`,
+      method: "POST",
+      token,
     })
+  }
 
-    if (!transaction) return Response.json({ error: "Transaction not found" }, { status: 404 })
+  if (body.action === "reject") {
+    return proxyBackendRequest({
+      path: `/api/v1/admin/withdrawals/${body.transactionId}/reject`,
+      method: "POST",
+      token,
+      jsonBody: { reason: body.reason },
+    })
+  }
 
-    if (action === 'reject') {
-        await prisma.$transaction(async (tx) => {
-            // Refund balance
-            await tx.wallet.update({
-                where: { user_id: transaction.user_id },
-                data: { 
-                    balance: { increment: transaction.amount },
-                    daily_withdrawal_total: { decrement: transaction.amount }
-                }
-            })
-            
-            await tx.transaction.update({
-                where: { id: transactionId },
-                data: { status: 'failed', description: transaction.description + " (Rejected by Admin)" }
-            })
-        })
-    } else {
-        // Approve (Mark as completed, money already deducted)
-        // In real app, trigger actual payout via NOWPayments Payout API here
-        await prisma.transaction.update({
-            where: { id: transactionId },
-            data: { status: 'completed' }
-        })
-    }
-
-    return Response.json({ success: true })
+  return Response.json({ error: "Invalid action" }, { status: 400 })
 }

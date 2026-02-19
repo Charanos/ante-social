@@ -1,29 +1,15 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
-export async function GET(req: Request) {
+export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'admin') {
-      return Response.json({ error: "Unauthorized" }, { status: 403 })
-  }
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const totalUsers = await prisma.user.count()
-  const totalMarkets = await prisma.publicBetMarket.count()
-  const pendingWithdrawals = await prisma.transaction.count({
-      where: { type: 'withdrawal', status: 'pending' }
-  })
-
-  // Calculate revenue (sum of platform fees from settled markets)
-  // Simplified: just summing a field, in real app might be more complex
-  const revenue = await prisma.publicBetMarket.aggregate({
-      _sum: { platform_fee_collected: true }
-  })
-
-  return Response.json({
-      totalUsers,
-      totalMarkets,
-      pendingWithdrawals,
-      revenue: revenue._sum.platform_fee_collected || 0
+  return proxyBackendRequest({
+    path: "/api/v1/admin/dashboard",
+    method: "GET",
+    token,
   })
 }

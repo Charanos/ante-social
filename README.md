@@ -28,16 +28,20 @@ Comprehensive social betting platform for the Kenyan market, supporting real-mon
    npm install
    ```
 
-2. **Database Setup**:
+2. **Backend Setup**:
    ```bash
-   npx prisma generate
-   npx prisma db push
+   cd backend
+   npm install
+   npm run dev
    ```
 
 3. **Run Development Server**:
    ```bash
    npm run dev
    ```
+
+4. **Frontend Backend URL**:
+   Set `BACKEND_API_URL=http://localhost:3001` in your root `.env` so NextAuth and `/api/*` proxy routes target the Nest API gateway.
 
 ## 📄 Documentation
 

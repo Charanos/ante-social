@@ -1,27 +1,31 @@
 import NextAuth, { AuthOptions } from "next-auth"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import EmailProvider from "next-auth/providers/email"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { prisma } from "@/lib/prisma"
-import bcrypt from "bcryptjs"
+import type { Session } from "next-auth"
+import type { JWT } from "next-auth/jwt"
+
+const BACKEND_API_URL =
+  process.env.BACKEND_API_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+  "http://localhost:3001"
+
+type AuthUser = {
+  id: string
+  email: string
+  username: string | null
+  role: string
+  user_level: string
+  email_verified: boolean
+  access_token?: string
+}
+
+type AuthToken = JWT & Partial<AuthUser>
+type AuthSession = Session & { access_token?: string }
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt" as const, // Mandatory for credentials login
+    strategy: "jwt" as const,
   },
   providers: [
-    EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: process.env.EMAIL_SERVER_PORT,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
-      from: process.env.EMAIL_FROM,
-    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -33,49 +37,73 @@ export const authOptions: AuthOptions = {
           throw new Error("Missing credentials")
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+        const response = await fetch(`${BACKEND_API_URL}/api/v1/auth/login`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+          cache: "no-store",
         })
 
-        if (!user || !user.password_hash) {
-          throw new Error("No user found with this email")
+        const payload = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          const message =
+            payload?.error?.message ||
+            payload?.message ||
+            "Invalid email or password"
+          throw new Error(message)
         }
 
-        const isValid = await bcrypt.compare(credentials.password, user.password_hash)
-
-        if (!isValid) {
-          throw new Error("Invalid password")
+        if (payload?.requires_2fa) {
+          throw new Error("2FA required")
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-          user_level: user.user_level,
-          emailVerified: user.email_verified ? new Date() : null
-        } as any
+        const authUser: AuthUser = {
+          id: payload?.user?.id || payload?.user?._id || payload?.userId,
+          email: payload?.user?.email || credentials.email,
+          username: payload?.user?.username || null,
+          role: payload?.user?.role || "user",
+          user_level: payload?.user?.tier || payload?.user?.user_level || "novice",
+          email_verified: Boolean(payload?.user?.emailVerified),
+          access_token: payload?.access_token,
+        }
+
+        return authUser
       }
     })
   ],
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
+      const authToken = token as AuthToken
       if (user) {
-        token.id = user.id
-        token.role = user.role
-        token.username = user.username
-        token.user_level = user.user_level
+        const authUser = user as unknown as AuthUser
+        authToken.id = authUser.id
+        authToken.role = authUser.role
+        authToken.username = authUser.username
+        authToken.user_level = authUser.user_level
+        authToken.email_verified = authUser.email_verified
+        authToken.access_token = authUser.access_token
       }
-      return token
+      return authToken
     },
-    async session({ session, token }: any) {
-      if (session.user) {
-        session.user.id = token.id
-        session.user.role = token.role
-        session.user.username = token.username
-        session.user.user_level = token.user_level
+    async session({ session, token }) {
+      const authToken = token as AuthToken
+      const authSession = session as AuthSession
+
+      if (authSession.user) {
+        authSession.user.id = authToken.id || ""
+        authSession.user.role = authToken.role || "user"
+        authSession.user.username = authToken.username || null
+        authSession.user.user_level = authToken.user_level || "novice"
+        authSession.user.email_verified = Boolean(authToken.email_verified)
       }
-      return session
+      authSession.access_token = authToken.access_token
+      return authSession
     },
   },
   pages: {

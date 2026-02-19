@@ -1,7 +1,8 @@
-import NextAuth, { DefaultSession } from "next-auth"
+import { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
   interface Session {
+    access_token?: string
     user: {
       id: string
       role: string
@@ -14,8 +15,9 @@ declare module "next-auth" {
   interface User {
     role: string
     username: string | null
-    emailVerified: Date | null
+    email_verified?: boolean
     user_level: string
+    access_token?: string
   }
 }
 
@@ -25,5 +27,7 @@ declare module "next-auth/jwt" {
     role: string
     username: string | null
     user_level: string
+    email_verified?: boolean
+    access_token?: string
   }
 }

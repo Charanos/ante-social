@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { WsGateway } from './ws.gateway';
+import { WsBroadcastConsumer } from './consumers/ws-broadcast.consumer';
+import { JwtModule } from '@nestjs/jwt';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.register({}),
+  ],
+  providers: [WsGateway],
+  controllers: [WsBroadcastConsumer],
+})
+export class WsModule {}

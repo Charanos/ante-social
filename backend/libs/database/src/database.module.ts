@@ -1,0 +1,50 @@
+import { Module, Global } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { User, UserSchema } from './schemas/user.schema';
+import { Wallet, WalletSchema } from './schemas/wallet.schema';
+import { Market, MarketSchema } from './schemas/market.schema';
+import { MarketBet, MarketBetSchema } from './schemas/market-bet.schema';
+import { Group, GroupSchema } from './schemas/group.schema';
+import { GroupBet, GroupBetSchema } from './schemas/group-bet.schema';
+import { Transaction, TransactionSchema } from './schemas/transaction.schema';
+import { Notification, NotificationSchema } from './schemas/notification.schema';
+import { AuditLog, AuditLogSchema } from './schemas/audit-log.schema';
+import { DailyLimit, DailyLimitSchema } from './schemas/daily-limit.schema';
+import { ComplianceFlag, ComplianceFlagSchema } from './schemas/compliance-flag.schema';
+import { ExchangeRate, ExchangeRateSchema } from './schemas/exchange-rate.schema';
+import { ActivityLog, ActivityLogSchema } from './schemas/activity-log.schema';
+
+const schemas = [
+  { name: User.name, schema: UserSchema },
+  { name: Wallet.name, schema: WalletSchema },
+  { name: Market.name, schema: MarketSchema },
+  { name: MarketBet.name, schema: MarketBetSchema },
+  { name: Group.name, schema: GroupSchema },
+  { name: GroupBet.name, schema: GroupBetSchema },
+  { name: Transaction.name, schema: TransactionSchema },
+  { name: Notification.name, schema: NotificationSchema },
+  { name: AuditLog.name, schema: AuditLogSchema },
+  { name: DailyLimit.name, schema: DailyLimitSchema },
+  { name: ComplianceFlag.name, schema: ComplianceFlagSchema },
+  { name: ExchangeRate.name, schema: ExchangeRateSchema },
+  { name: ActivityLog.name, schema: ActivityLogSchema },
+];
+
+@Global()
+@Module({
+  imports: [
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        uri: config.get<string>('MONGODB_URI'),
+        retryAttempts: 3,
+        retryDelay: 1000,
+      }),
+    }),
+    MongooseModule.forFeature(schemas),
+  ],
+  exports: [MongooseModule],
+})
+export class DatabaseModule {}

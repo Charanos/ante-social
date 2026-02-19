@@ -10,7 +10,6 @@ import {
   IconHome,
 } from "@tabler/icons-react";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { MobileHeader } from "./MobileHeader";
@@ -49,7 +48,7 @@ export default function DashboardHeader({
     <>
       <MobileHeader user={user} />
       
-      <div className="hidden md:flex md:items-center justify-between gap-4 px-1 mb-10">
+      <div className="hidden md:flex md:items-center justify-between gap-4 px-1 mb-16">
         {/* Left: Back Button & Title */}
         <div className="flex items-center gap-6">
           {!isHome && (
@@ -63,7 +62,7 @@ export default function DashboardHeader({
             </motion.button>
           )}
           <div className="space-y-0.5">
-            <h1 className="text-3xl font-semibold tracking-tight text-neutral-900 capitalize leading-none">
+            <h1 className="text-2xl font-medium tracking-tight text-neutral-900 capitalize leading-none">
               {title}
             </h1>
             <p className="text-sm text-neutral-500 font-medium">
@@ -81,9 +80,9 @@ export default function DashboardHeader({
               whileTap={{ scale: 0.95 }}
             >
               <IconAccessPoint className="w-3.5 h-3.5 text-amber-600" />
-              <span className="text-xs font-semibold text-amber-700 tracking-wide uppercase">
-                {user.signalAccuracy}% Accuracy
-              </span>
+              <span className="text-xs font-semibold text-amber-700 font-mono tracking-wide uppercase">
+                {user.signalAccuracy}%
+              </span> <span className="text-xs text-amber-700 font-semibold tracking-wide uppercase">Accuracy</span>
             </motion.div>
 
           {/* Balance / Tier Pill */}
@@ -110,7 +109,7 @@ export default function DashboardHeader({
             whileTap={{ scale: 0.98 }}
           >
              <IconAward className="w-4 h-4 text-purple-600" />
-             <span className="text-xs font-semibold text-purple-900">
+             <span className="text-xs font-mono font-semibold text-purple-900">
                 {user.reputationScore} Rep
              </span>
           </motion.div>

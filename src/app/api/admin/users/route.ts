@@ -1,39 +1,33 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
+import { NextRequest } from "next/server"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'admin') {
-      return Response.json({ error: "Unauthorized" }, { status: 403 })
-  }
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const users = await prisma.user.findMany({
-      select: {
-          id: true,
-          email: true,
-          username: true,
-          role: true,
-          user_level: true,
-          created_date: true
-      }
+  return proxyBackendRequest({
+    path: "/api/v1/admin/users",
+    method: "GET",
+    token,
+    searchParams: req.nextUrl.searchParams,
   })
-
-  return Response.json(users)
 }
 
 export async function PUT(req: Request) {
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== 'admin') {
-        return Response.json({ error: "Unauthorized" }, { status: 403 })
-    }
+  const session = await getServerSession(authOptions)
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-    const { userId, user_level } = await req.json()
+  const body = await req.json().catch(() => ({}))
+  if (!body.userId) return Response.json({ error: "Missing userId" }, { status: 400 })
 
-    await prisma.user.update({
-        where: { id: userId },
-        data: { user_level }
-    })
-
-    return Response.json({ success: true })
+  return proxyBackendRequest({
+    path: `/api/v1/admin/users/${body.userId}/tier`,
+    method: "PATCH",
+    token,
+    jsonBody: { tier: body.tier || body.user_level },
+  })
 }

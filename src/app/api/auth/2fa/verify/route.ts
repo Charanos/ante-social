@@ -1,44 +1,36 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
-import { OTP } from "otplib"
 import { authOptions } from "../../[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions)
-    if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const body = await req.json().catch(() => ({}))
+  const code = body.token || body.code
 
-    const { token } = await req.json()
+  if (!code) {
+    return Response.json({ error: "Missing 2FA code" }, { status: 400 })
+  }
 
-    const user = await prisma.user.findUnique({
-        where: { id: session.user.id }
+  const session = await getServerSession(authOptions)
+  const token = getSessionToken(session)
+
+  // Authenticated flow: enable 2FA for current user
+  if (token) {
+    return proxyBackendRequest({
+      path: "/api/v1/auth/2fa/enable",
+      method: "POST",
+      token,
+      jsonBody: { token: code },
     })
+  }
 
-    if (!user || !user.two_factor_secret) {
-        return Response.json({ error: "2FA setup not initiated" }, { status: 400 })
-    }
+  // Login completion flow: verify 2FA with userId + code
+  if (!body.userId) {
+    return Response.json({ error: "Missing userId" }, { status: 400 })
+  }
 
-    const authenticator = new OTP()
-
-    // Verify Token
-    const isValid = await authenticator.verify({
-        token,
-        secret: user.two_factor_secret
-    })
-
-    if (!isValid) {
-        return Response.json({ error: "Invalid OTP code" }, { status: 400 })
-    }
-
-    // Enable 2FA
-    await prisma.user.update({
-        where: { id: user.id },
-        data: {
-            two_factor_enabled: true
-        }
-    })
-
-    return Response.json({
-        success: true,
-        message: "2FA enabled successfully"
-    })
+  return proxyBackendRequest({
+    path: "/api/v1/auth/2fa/verify",
+    method: "POST",
+    jsonBody: { userId: body.userId, token: code },
+  })
 }

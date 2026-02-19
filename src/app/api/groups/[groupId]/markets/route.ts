@@ -1,38 +1,22 @@
 import { getServerSession } from "next-auth"
-import { prisma } from "@/lib/prisma"
 import { authOptions } from "../../../auth/[...nextauth]/route"
+import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
-export async function POST(req: Request, { params }: any) {
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ groupId: string }> }
+) {
   const session = await getServerSession(authOptions)
-  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { groupId } = params as { groupId: string }
-  const { title, description, market_type, buy_in_amount } = await req.json()
+  const { groupId } = await params
+  const body = await req.json().catch(() => ({}))
 
-  // Verify membership
-  const membership = await prisma.groupMember.findUnique({
-    where: {
-      group_id_user_id: {
-        group_id: groupId,
-        user_id: session.user.id
-      }
-    }
+  return proxyBackendRequest({
+    path: `/api/v1/groups/${groupId}/bets`,
+    method: "POST",
+    token,
+    jsonBody: body,
   })
-
-  if (!membership) {
-    return Response.json({ error: "Not a member of this group" }, { status: 403 })
-  }
-
-  const market = await prisma.privateGroupMarket.create({
-    data: {
-      group_id: groupId,
-      title,
-      description,
-      market_type, // "winner_takes_all" or "odd_one_out"
-      buy_in_amount,
-      created_by: session.user.id
-    }
-  })
-
-  return Response.json(market)
 }

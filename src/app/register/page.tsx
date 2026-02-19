@@ -43,7 +43,33 @@ export default function RegisterPage() {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+          dob: formData.dob,
+          currency: formData.currency,
+        }),
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const message =
+          payload?.error?.message ||
+          payload?.message ||
+          payload?.error ||
+          "Registration failed.";
+        toast.error("Registration Failed", message);
+        return;
+      }
+
       toast.success("Identity Created", "Welcome to the inner circle.");
       router.push("/login");
     } catch (error) {
