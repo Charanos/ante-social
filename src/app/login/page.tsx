@@ -5,11 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  IconCode,
   IconEye,
   IconEyeOff,
   IconLoader3,
-  IconPhoto,
 } from "@tabler/icons-react";
 
 import { signIn } from "next-auth/react";
@@ -24,8 +22,47 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleAuthError = (errorMessage?: string | null) => {
+    if (!errorMessage) {
+      toast.error("Login Failed", "Unable to authenticate. Please try again.");
+      return;
+    }
+
+    if (
+      errorMessage.includes("AUTH_SERVICE_UNAVAILABLE") ||
+      errorMessage.toLowerCase().includes("service unavailable")
+    ) {
+      toast.error(
+        "Service Unavailable",
+        "Authentication service is offline. Start backend services and try again.",
+      );
+      return;
+    }
+
+    if (errorMessage.includes("AUTH_RESPONSE_INVALID")) {
+      toast.error("Login Failed", "Unexpected authentication response. Please try again.");
+      return;
+    }
+
+    if (
+      errorMessage.toLowerCase().includes("invalid credentials") ||
+      errorMessage.toLowerCase().includes("invalid email or password")
+    ) {
+      toast.error("Login Failed", "Invalid email or password.");
+      return;
+    }
+
+    if (errorMessage.includes("2FA_INPUT_INCOMPLETE")) {
+      toast.error("2FA Required", "Please provide your full 2FA code.");
+      return;
+    }
+
+    toast.error("Login Failed", errorMessage);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,21 +71,38 @@ export default function LoginPage() {
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        email,
+        email: email.trim().toLowerCase(),
         password,
       });
 
       if (res?.error) {
-        if (res.error.includes("2FA")) {
+        if (res.error.startsWith("2FA_REQUIRED")) {
+          const userId = res.error.split(":")[1];
+          if (!userId) {
+            handleAuthError("2FA_REQUIRED");
+            return;
+          }
+          setPendingUserId(userId);
+          setTwoFactorCode("");
           setStep("2fa");
-        } else {
-          toast.error("Login Failed", "Invalid email or password.");
+          toast.info("Two-Factor Verification", "Enter your authentication code to continue.");
+          return;
         }
-      } else {
+
+        handleAuthError(res.error);
+        return;
+      }
+
+      if (res?.ok) {
+        setPendingUserId(null);
+        setTwoFactorCode("");
         toast.success("Welcome Back", "Successfully logged in.");
         router.push("/dashboard");
+        return;
       }
-    } catch (error) {
+
+      handleAuthError(res?.error);
+    } catch {
       toast.error("Error", "Something went wrong.");
     } finally {
       setIsLoading(false);
@@ -57,8 +111,46 @@ export default function LoginPage() {
 
   const handleVerify2FA = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.info("Feature Update", "2FA pending. Converting...");
-    handleLogin(e);
+
+    if (!pendingUserId) {
+      toast.error("2FA Session Missing", "Please sign in with email and password again.");
+      setStep("credentials");
+      return;
+    }
+
+    if (twoFactorCode.length !== 6) {
+      toast.error("Invalid Code", "Enter a valid 6-digit code.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        userId: pendingUserId,
+        twoFactorCode,
+      });
+
+      if (res?.error) {
+        handleAuthError(res.error);
+        return;
+      }
+
+      if (res?.ok) {
+        setPendingUserId(null);
+        setTwoFactorCode("");
+        toast.success("Verified", "Successfully logged in.");
+        router.push("/dashboard");
+        return;
+      }
+
+      handleAuthError(res?.error);
+    } catch {
+      toast.error("Error", "Something went wrong.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -220,7 +312,11 @@ export default function LoginPage() {
                 <div className="grid grid-cols-2 gap-4 mt-8">
                   <button
                     type="button"
-                    onClick={() => setStep("credentials")}
+                    onClick={() => {
+                      setStep("credentials");
+                      setPendingUserId(null);
+                      setTwoFactorCode("");
+                    }}
                     className="w-full bg-transparent border border-neutral-800 text-neutral-500 font-medium py-3 rounded-full hover:border-neutral-600 hover:text-white transition-colors cursor-pointer"
                   >
                     Back

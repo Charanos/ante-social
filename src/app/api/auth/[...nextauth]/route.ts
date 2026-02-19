@@ -20,6 +20,60 @@ type AuthUser = {
 
 type AuthToken = JWT & Partial<AuthUser>
 type AuthSession = Session & { access_token?: string }
+type AuthCredentials = {
+  email?: string
+  password?: string
+  userId?: string
+  twoFactorCode?: string
+}
+
+function getErrorMessage(payload: any, fallback: string) {
+  const message = payload?.error?.message || payload?.message || payload?.error
+  return typeof message === "string" && message.trim() ? message : fallback
+}
+
+function mapAuthUser(payload: any, fallbackEmail?: string): AuthUser {
+  const id = payload?.user?.id || payload?.user?._id || payload?.userId
+
+  if (!id) {
+    throw new Error("AUTH_RESPONSE_INVALID")
+  }
+
+  return {
+    id: String(id),
+    email: payload?.user?.email || fallbackEmail || "",
+    username: payload?.user?.username || null,
+    role: payload?.user?.role || "user",
+    user_level: payload?.user?.tier || payload?.user?.user_level || "novice",
+    email_verified: Boolean(payload?.user?.emailVerified || payload?.user?.email_verified),
+    access_token: payload?.access_token,
+  }
+}
+
+async function postToBackend(path: string, body: Record<string, unknown>) {
+  let response: Response
+
+  try {
+    response = await fetch(`${BACKEND_API_URL}${path}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    })
+  } catch {
+    throw new Error("AUTH_SERVICE_UNAVAILABLE")
+  }
+
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(payload, "Authentication failed"))
+  }
+
+  return payload
+}
 
 export const authOptions: AuthOptions = {
   session: {
@@ -30,50 +84,49 @@ export const authOptions: AuthOptions = {
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        userId: { label: "User ID", type: "text" },
+        twoFactorCode: { label: "2FA Code", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const authCredentials = credentials as AuthCredentials | undefined
+        const userId = authCredentials?.userId?.trim()
+        const twoFactorCode = authCredentials?.twoFactorCode?.trim()
+
+        if (userId || twoFactorCode) {
+          if (!userId || !twoFactorCode) {
+            throw new Error("2FA_INPUT_INCOMPLETE")
+          }
+
+          const payload = await postToBackend("/api/v1/auth/2fa/verify", {
+            userId,
+            token: twoFactorCode,
+          })
+
+          return mapAuthUser(payload)
+        }
+
+        const email = authCredentials?.email?.trim().toLowerCase()
+        const password = authCredentials?.password
+
+        if (!email || !password) {
           throw new Error("Missing credentials")
         }
 
-        const response = await fetch(`${BACKEND_API_URL}/api/v1/auth/login`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify({
-            email: credentials.email,
-            password: credentials.password,
-          }),
-          cache: "no-store",
+        const payload = await postToBackend("/api/v1/auth/login", {
+          email,
+          password,
         })
 
-        const payload = await response.json().catch(() => null)
-
-        if (!response.ok) {
-          const message =
-            payload?.error?.message ||
-            payload?.message ||
-            "Invalid email or password"
-          throw new Error(message)
-        }
-
         if (payload?.requires_2fa) {
-          throw new Error("2FA required")
+          const pendingUserId = payload?.userId || payload?.session_token
+          if (!pendingUserId) {
+            throw new Error("2FA_REQUIRED")
+          }
+          throw new Error(`2FA_REQUIRED:${pendingUserId}`)
         }
 
-        const authUser: AuthUser = {
-          id: payload?.user?.id || payload?.user?._id || payload?.userId,
-          email: payload?.user?.email || credentials.email,
-          username: payload?.user?.username || null,
-          role: payload?.user?.role || "user",
-          user_level: payload?.user?.tier || payload?.user?.user_level || "novice",
-          email_verified: Boolean(payload?.user?.emailVerified),
-          access_token: payload?.access_token,
-        }
-
-        return authUser
+        return mapAuthUser(payload, email)
       }
     })
   ],

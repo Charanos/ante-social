@@ -61,7 +61,7 @@ export default function DiscoverGroupsPage() {
   }, [searchTerm, selectedCategory, sortBy]);
 
   const filteredAndSortedGroups = useMemo(() => {
-    let filtered = allGroups.filter((group) => {
+    const filtered = allGroups.filter((group) => {
       const matchesSearch =
         group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         group.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -95,7 +95,7 @@ export default function DiscoverGroupsPage() {
     }
 
     return filtered;
-  }, [searchTerm, selectedCategory, sortBy]);
+  }, [allGroups, searchTerm, selectedCategory, sortBy]);
 
   const trendingGroups = useMemo(
     () =>

@@ -11,9 +11,9 @@ const tabs = [
   { id: "onetime", label: "One-Time Markets" },
 ]
 
-function toEndingLabel(endsAt: string) {
+function toEndingLabel(endsAt: string, referenceTime: number) {
   const ends = new Date(endsAt)
-  const diffMs = ends.getTime() - Date.now()
+  const diffMs = ends.getTime() - referenceTime
   const diffHours = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60)))
   if (diffHours >= 24) return `${Math.floor(diffHours / 24)}d`
   return `${diffHours}h`
@@ -24,10 +24,16 @@ export function MarketsFeed() {
   const [activeTab, setActiveTab] = useState("all")
 
   const cardMarkets = useMemo(() => {
+    const referenceTime = markets.reduce((latest, market) => {
+      const createdAt = new Date(market.createdAt || 0).getTime()
+      if (!Number.isFinite(createdAt)) return latest
+      return Math.max(latest, createdAt)
+    }, 0)
+
     return markets.map((market) => {
-      const endingAt = toEndingLabel(market.endsAt)
+      const endingAt = toEndingLabel(market.endsAt, referenceTime)
       const mappedType =
-        new Date(market.endsAt).getTime() - Date.now() > 7 * 24 * 60 * 60 * 1000
+        new Date(market.endsAt).getTime() - referenceTime > 7 * 24 * 60 * 60 * 1000
           ? "recurring"
           : "onetime"
       const impliedOdds = Number(

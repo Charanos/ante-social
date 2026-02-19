@@ -19,6 +19,48 @@ interface ProgressChartProps {
   className?: string;
 }
 
+type TooltipEntry = {
+  color?: string;
+  name?: string;
+  value?: string | number;
+};
+
+type ProgressTooltipProps = {
+  active?: boolean;
+  payload?: TooltipEntry[];
+  xAxisKey: string;
+};
+
+function ProgressTooltip({ active, payload, xAxisKey }: ProgressTooltipProps) {
+  if (active && payload && payload.length) {
+    const firstEntry = payload[0] as TooltipEntry & {
+      payload?: Record<string, string | number>;
+    };
+
+    return (
+      <div className="bg-white/95 backdrop-blur-xl border border-black/10 rounded-2xl p-4 shadow-xl">
+        <p className="text-sm font-semibold text-black mb-2">
+          {firstEntry.payload?.[xAxisKey]}
+        </p>
+        <div className="space-y-1">
+          {payload.map((entry, index) => (
+            <p
+              key={index}
+              className="text-xs font-medium"
+              style={{ color: entry.color }}
+            >
+              {entry.name}:{" "}
+              <span className="font-mono font-semibold">{entry.value}</span>
+            </p>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export function ProgressChart({ 
   data, 
   lines, 
@@ -27,28 +69,6 @@ export function ProgressChart({
   yAxisLabels,
   className 
 }: ProgressChartProps) {
-  
-  // Custom tooltip component
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white/95 backdrop-blur-xl border border-black/10 rounded-2xl p-4 shadow-xl">
-          <p className="text-sm font-semibold text-black mb-2">
-            {payload[0].payload[xAxisKey]}
-          </p>
-          <div className="space-y-1">
-            {payload.map((entry: any, index: number) => (
-              <p key={index} className="text-xs font-medium" style={{ color: entry.color }}>
-                {entry.name}: <span className="font-mono font-semibold">{entry.value}</span>
-              </p>
-            ))}
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
-
   const hasLeftAxis = lines.some(line => !line.yAxisId || line.yAxisId === 'left');
   const hasRightAxis = lines.some(line => line.yAxisId === 'right');
 
@@ -95,7 +115,7 @@ export function ProgressChart({
             />
           )}
           
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<ProgressTooltip xAxisKey={xAxisKey} />} />
           
           {lines.map((line, index) => (
             <Line 

@@ -9,9 +9,9 @@ import {
   IconEye,
   IconEyeOff,
   IconLoader3,
-  IconPhoto,
 } from "@tabler/icons-react";
 
+import { signIn } from "next-auth/react";
 import { useToast } from "@/components/ui/toast-notification";
 import Image from "next/image";
 
@@ -32,12 +32,44 @@ export default function RegisterPage() {
     agreed: false,
   });
 
+  const isStrongPassword = (value: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/.test(value);
+
+  const isAdult = (dateString: string) => {
+    const dob = new Date(dateString);
+    if (Number.isNaN(dob.getTime())) return false;
+
+    const now = new Date();
+    let age = now.getFullYear() - dob.getFullYear();
+    const monthDiff = now.getMonth() - dob.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) {
+      age--;
+    }
+
+    return age >= 18;
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     if (!formData.agreed) {
       toast.error("Agreement Required", "You must agree to the terms.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!isStrongPassword(formData.password)) {
+      toast.error(
+        "Weak Password",
+        "Use at least 8 characters with uppercase, lowercase, and a number.",
+      );
+      setIsLoading(false);
+      return;
+    }
+
+    if (!isAdult(formData.dob)) {
+      toast.error("Age Restriction", "You must be at least 18 years old to register.");
       setIsLoading(false);
       return;
     }
@@ -49,9 +81,9 @@ export default function RegisterPage() {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          phone: formData.phone,
+          username: formData.username.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
           password: formData.password,
           dateOfBirth: formData.dob,
           currency: formData.currency,
@@ -66,13 +98,34 @@ export default function RegisterPage() {
           payload?.message ||
           payload?.error ||
           "Registration failed.";
+
+        if (message.toLowerCase().includes("service unavailable")) {
+          toast.error(
+            "Service Unavailable",
+            "Registration service is offline. Start backend services and try again.",
+          );
+          return;
+        }
+
         toast.error("Registration Failed", message);
         return;
       }
 
-      toast.success("Identity Created", "Welcome to the inner circle.");
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
+
+      if (signInResult?.ok) {
+        toast.success("Identity Created", "Welcome to the inner circle.");
+        router.push("/dashboard");
+        return;
+      }
+
+      toast.success("Identity Created", "Account created. Please sign in.");
       router.push("/login");
-    } catch (error) {
+    } catch {
       toast.error("Registration Failed", "System error.");
     } finally {
       setIsLoading(false);

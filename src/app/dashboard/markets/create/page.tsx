@@ -9,6 +9,21 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { MarketCreationForm } from "@/components/market/MarketCreationForm";
 import { useLiveUser } from "@/lib/live-data";
 
+type MarketFormOption = {
+  text?: string;
+};
+
+type MarketFormData = {
+  type?: string;
+  title?: string;
+  description?: string;
+  buyIn?: string | number;
+  closeDate?: string;
+  scenario?: string;
+  options?: MarketFormOption[];
+  ladderItems?: MarketFormOption[];
+};
+
 export default function CreateMarketPage() {
   const router = useRouter();
   const toast = useToast();
@@ -23,7 +38,7 @@ export default function CreateMarketPage() {
     setIsLoading(false);
   }, [user.role]);
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: MarketFormData) => {
     if (!data.type || !data.title || !data.description || !data.buyIn) {
       toast.error("Missing Fields", "Please fill in all required fields");
       return;
@@ -41,8 +56,8 @@ export default function CreateMarketPage() {
 
       const outcomesSource = data.type === "ladder" ? data.ladderItems : data.options;
       const outcomes = (outcomesSource || [])
-        .map((item: any) => ({ optionText: item?.text }))
-        .filter((item: any) => item.optionText);
+        .map((item: MarketFormOption) => ({ optionText: item?.text }))
+        .filter((item): item is { optionText: string } => Boolean(item.optionText));
 
       const closeTime = data.closeDate
         ? new Date(data.closeDate).toISOString()
@@ -76,9 +91,11 @@ export default function CreateMarketPage() {
       );
       setIsSubmitting(false);
       router.push("/dashboard/markets");
-    } catch (error: any) {
+    } catch (error: unknown) {
       setIsSubmitting(false);
-      toast.error("Create Failed", error?.message || "Could not create market");
+      const message =
+        error instanceof Error ? error.message : "Could not create market";
+      toast.error("Create Failed", message);
     }
   };
 

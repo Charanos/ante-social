@@ -10,10 +10,15 @@ async function bootstrap() {
   const port = configService.get<number>('WEBSOCKET_GATEWAY_PORT') || 3006;
   const logger = new Logger('WebSocketGateway');
 
-  // Redis Adapter for horizontal scaling
+  // Redis adapter is optional in local development.
   const redisIoAdapter = new RedisIoAdapter(app);
-  await redisIoAdapter.connectToRedis();
-  app.useWebSocketAdapter(redisIoAdapter);
+  try {
+    await redisIoAdapter.connectToRedis();
+    app.useWebSocketAdapter(redisIoAdapter);
+    logger.log('Redis adapter connected');
+  } catch {
+    logger.warn('Redis unavailable. Falling back to in-memory socket adapter.');
+  }
 
   await app.listen(port);
   logger.log(`WebSocket Gateway running on port ${port}`);

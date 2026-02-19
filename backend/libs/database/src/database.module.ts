@@ -37,11 +37,19 @@ const schemas = [
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        uri: config.get<string>('MONGODB_URI'),
-        retryAttempts: 3,
-        retryDelay: 1000,
-      }),
+      useFactory: (config: ConfigService) => {
+        const uri = config.get<string>('MONGODB_URI') || config.get<string>('DATABASE_URL');
+
+        if (!uri) {
+          throw new Error('Missing MongoDB connection string. Set MONGODB_URI or DATABASE_URL.');
+        }
+
+        return {
+          uri,
+          retryAttempts: 3,
+          retryDelay: 1000,
+        };
+      },
     }),
     MongooseModule.forFeature(schemas),
   ],

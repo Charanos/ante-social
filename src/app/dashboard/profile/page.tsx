@@ -23,7 +23,6 @@ import {
   IconCamera,
   IconPhone,
   IconMapPin,
-  IconX,
   IconCreditCard,
   IconLanguage,
   IconArrowRight,
@@ -186,6 +185,12 @@ export default function ProfilePage() {
   }, [activityRecords]);
 
   const progressData = useMemo(() => {
+    const referenceNow = activityRecords.reduce((latest, activity) => {
+      const createdAt = new Date(activity.createdAt || "").getTime();
+      if (!Number.isFinite(createdAt)) return latest;
+      return Math.max(latest, createdAt);
+    }, new Date(user.joinedAt || "1970-01-01T00:00:00.000Z").getTime());
+
     const buckets = Array.from({ length: 8 }, (_, index) => ({
       week: `Week ${index + 1}`,
       points: 0,
@@ -197,7 +202,7 @@ export default function ProfilePage() {
       const createdAt = new Date(activity.createdAt || "").getTime();
       if (!Number.isFinite(createdAt)) continue;
 
-      const daysAgo = Math.floor((Date.now() - createdAt) / (1000 * 60 * 60 * 24));
+      const daysAgo = Math.floor((referenceNow - createdAt) / (1000 * 60 * 60 * 24));
       if (daysAgo < 0 || daysAgo >= 56) continue;
 
       const bucketIndex = 7 - Math.floor(daysAgo / 7);
@@ -240,7 +245,7 @@ export default function ProfilePage() {
         accuracy: Math.max(0, Math.min(100, weeklyAccuracy)),
       };
     });
-  }, [activityRecords, user.reputationScore, user.signalAccuracy]);
+  }, [activityRecords, user.joinedAt, user.reputationScore, user.signalAccuracy]);
 
   // Get achievement icon component
   const getAchievementIcon = (iconName: string) => {
@@ -275,7 +280,6 @@ export default function ProfilePage() {
   }, [activityRecords, recentAchievements.length, user.signalAccuracy]);
 
   // Track changes
-  const [hasChanges, setHasChanges] = useState(false);
   const [initialData, setInitialData] = useState({
     fullName: "",
     username: "",
@@ -288,6 +292,33 @@ export default function ProfilePage() {
     emailNotif: true,
     pushNotif: true,
   });
+
+  const hasChanges = useMemo(
+    () =>
+      fullName !== initialData.fullName ||
+      username !== initialData.username ||
+      email !== initialData.email ||
+      phone !== initialData.phone ||
+      location !== initialData.location ||
+      bio !== initialData.bio ||
+      timezone !== initialData.timezone ||
+      language !== initialData.language ||
+      emailNotif !== initialData.emailNotif ||
+      pushNotif !== initialData.pushNotif,
+    [
+      fullName,
+      username,
+      email,
+      phone,
+      location,
+      bio,
+      timezone,
+      language,
+      emailNotif,
+      pushNotif,
+      initialData,
+    ],
+  );
 
   useEffect(() => {
     if (isUserLoading || hasHydratedProfile) return;
@@ -334,35 +365,6 @@ export default function ProfilePage() {
     void hydrateProfile();
   }, [hasHydratedProfile, isUserLoading, user.email, user.fullName, user.username]);
 
-  // Check for changes
-  useEffect(() => {
-    const changed =
-      fullName !== initialData.fullName ||
-      username !== initialData.username ||
-      email !== initialData.email ||
-      phone !== initialData.phone ||
-      location !== initialData.location ||
-      bio !== initialData.bio ||
-      timezone !== initialData.timezone ||
-      language !== initialData.language ||
-      emailNotif !== initialData.emailNotif ||
-      pushNotif !== initialData.pushNotif;
-
-    setHasChanges(changed);
-  }, [
-    fullName,
-    username,
-    email,
-    phone,
-    location,
-    bio,
-    timezone,
-    language,
-    emailNotif,
-    pushNotif,
-    initialData,
-  ]);
-
   const handleSave = useCallback(async () => {
     setIsSaving(true);
 
@@ -393,7 +395,6 @@ export default function ProfilePage() {
       return;
     }
 
-    setHasChanges(false);
     setInitialData({
       fullName,
       username,
@@ -438,7 +439,6 @@ export default function ProfilePage() {
     setLanguage(initialData.language);
     setEmailNotif(initialData.emailNotif);
     setPushNotif(initialData.pushNotif);
-    setHasChanges(false);
     toast.info("Changes Discarded", "All changes have been reverted");
   }, [initialData, toast]);
 
