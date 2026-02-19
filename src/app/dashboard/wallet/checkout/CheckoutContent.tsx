@@ -19,22 +19,14 @@ import {
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-notification";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { mockUser } from "@/lib/mockData";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IoPhonePortraitOutline } from "react-icons/io5";
+import { useLiveUser, useNormalizedLimits } from "@/lib/live-data";
 
 type TransactionType = "deposit" | "withdrawal";
 type PaymentMethod = "mpesa" | "usdt";
 
 const QUICK_AMOUNTS = [100, 500, 1000, 5000];
-const DEPOSIT_LIMITS = {
-  novice: { min: 10, max: 500 },
-  whale: { min: 10, max: 5000 },
-};
-const WITHDRAWAL_LIMITS = {
-  novice: { min: 10, max: 250 },
-  whale: { min: 10, max: 1000 },
-};
 
 // Brand Icons
 const MpesaIcon = ({ className }: { className?: string }) => (
@@ -66,6 +58,7 @@ export default function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
+  const { user } = useLiveUser();
 
   const [mode, setMode] = useState<TransactionType>("deposit");
   const [method, setMethod] = useState<PaymentMethod>("mpesa");
@@ -75,11 +68,7 @@ export default function CheckoutContent() {
   const [trxHash, setTrxHash] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const limits = useMemo(() => {
-    const tier =
-      mockUser.tier === "whale" || mockUser.tier === "oracle" ? "whale" : "novice";
-    return mode === "deposit" ? DEPOSIT_LIMITS[tier] : WITHDRAWAL_LIMITS[tier];
-  }, [mode]);
+  const limits = useNormalizedLimits(user, mode);
 
   useEffect(() => {
     const typeParam = searchParams.get("type");
@@ -135,20 +124,52 @@ export default function CheckoutContent() {
       }
 
       setIsProcessing(true);
-      setTimeout(() => {
+
+      const amountNumber = Number(amount);
+      const currency = method === "mpesa" ? "KSH" : "USD";
+      const endpoint =
+        mode === "deposit" ? "/api/wallet/deposit" : "/api/wallet/withdraw";
+      const payload =
+        mode === "deposit"
+          ? {
+              amount: amountNumber,
+              currency,
+              phoneNumber: method === "mpesa" ? phoneNumber : undefined,
+            }
+          : {
+              amount: amountNumber,
+              currency,
+              phoneNumber: method === "mpesa" ? phoneNumber : undefined,
+              cryptoAddress: method === "usdt" ? cryptoAddress : undefined,
+            };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
         setIsProcessing(false);
-        if (mode === "deposit") {
-          toast.success(
-            method === "mpesa" ? "STK Push Sent" : "Deposit Confirmed",
-            method === "mpesa" ? "Check your phone" : "Processing your deposit",
-          );
-        } else {
-          toast.success("Withdrawal Submitted", "Processing within 24 hours");
-        }
-        router.push("/dashboard/wallet");
-      }, 2000);
+        toast.error(
+          "Request Failed",
+          result?.message || result?.error || "Unable to process request",
+        );
+        return;
+      }
+
+      setIsProcessing(false);
+      if (mode === "deposit") {
+        toast.success(
+          method === "mpesa" ? "STK Push Sent" : "Deposit Submitted",
+          method === "mpesa" ? "Check your phone" : "Deposit is now pending",
+        );
+      } else {
+        toast.success("Withdrawal Submitted", "Processing within 24 hours");
+      }
+      router.push("/dashboard/wallet");
     },
-    [canSubmit, mode, method, router, toast],
+    [amount, canSubmit, cryptoAddress, method, mode, phoneNumber, router, toast],
   );
 
   const handleCopyAddress = useCallback(() => {
@@ -159,7 +180,7 @@ export default function CheckoutContent() {
   return (
     <div className="space-y-6 pb-12 pl-0 md:pl-8 w-full">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle={
           mode === "deposit"
             ? "Add funds to your wallet instantly"
@@ -427,7 +448,7 @@ export default function CheckoutContent() {
                         <span className="text-[10px] font-medium text-blue-900/60 uppercase tracking-widest">
                           Network: TRC20 (Tron)
                         </span>
-                        {mockUser.tier === "whale" || mockUser.tier === "oracle" ? (
+                        {user.tier === "whale" || user.tier === "oracle" ? (
                           <div className="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium border border-amber-200">
                             VIP TIER
                           </div>
@@ -536,7 +557,7 @@ export default function CheckoutContent() {
                 <div className="flex gap-3 justify-between">
                   <div className="space-y-1">
                     <p className="text-xs font-semibold text-amber-900 uppercase tracking-wider">
-                      {mockUser.tier === "whale" || mockUser.tier === "oracle"
+                      {user.tier === "whale" || user.tier === "oracle"
                         ? "Platinum VIP"
                         : "Standard Member"}{" "}
                       Limits

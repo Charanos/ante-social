@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconLayoutGrid } from "@tabler/icons-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { cn } from "@/lib/utils";
-import { mockUser, mockGroups } from "@/lib/mockData";
 import { getJoinedGroups } from "@/lib/membership";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
@@ -16,50 +13,13 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
 import { useEffect } from "react";
+import { useGroupList, useLiveUser } from "@/lib/live-data";
 import {
   IoPeopleOutline,
   IoSearchOutline,
   IoChevronDownOutline,
   IoFunnelOutline,
 } from "react-icons/io5";
-
-const allGroups = mockGroups;
-
-const categories = [
-  { name: "All", count: allGroups.length },
-  {
-    name: "Sports",
-    count: allGroups.filter((g) => g.category === "Sports").length,
-  },
-  {
-    name: "Politics",
-    count: allGroups.filter((g) => g.category === "Politics").length,
-  },
-  {
-    name: "Crypto",
-    count: allGroups.filter((g) => g.category === "Crypto").length,
-  },
-  {
-    name: "Pop Culture",
-    count: allGroups.filter((g) => g.category === "Pop Culture").length,
-  },
-  {
-    name: "Business",
-    count: allGroups.filter((g) => g.category === "Business").length,
-  },
-  {
-    name: "Science",
-    count: allGroups.filter((g) => g.category === "Science").length,
-  },
-  {
-    name: "Technology",
-    count: allGroups.filter((g) => g.category === "Technology").length,
-  },
-  {
-    name: "Gaming",
-    count: allGroups.filter((g) => g.category === "Gaming").length,
-  },
-];
 
 const sortOptions = [
   { value: "trending", label: "Trending" },
@@ -69,19 +29,29 @@ const sortOptions = [
 ];
 
 export default function DiscoverGroupsPage() {
+  const { user, isLoading: isUserLoading } = useLiveUser();
+  const { groups: allGroups, isLoading: isGroupsLoading } = useGroupList();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("trending");
   const [showSortMenu, setShowSortMenu] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
   const [joinedGroupIds, setJoinedGroupIds] = useState<string[]>([]);
-  const toast = useToast();
+  const categories = useMemo(() => {
+    const counts = allGroups.reduce<Record<string, number>>((acc, group) => {
+      const category = group.category || "Community";
+      acc[category] = (acc[category] || 0) + 1;
+      return acc;
+    }, {});
+
+    const dynamic = Object.keys(counts)
+      .sort((a, b) => a.localeCompare(b))
+      .map((name) => ({ name, count: counts[name] }));
+    return [{ name: "All", count: allGroups.length }, ...dynamic];
+  }, [allGroups]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
     setJoinedGroupIds(getJoinedGroups());
-    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -103,20 +73,11 @@ export default function DiscoverGroupsPage() {
     // Sort
     switch (sortBy) {
       case "trending":
-        filtered.sort((a, b) => {
-          const aTrending = (a as any).trending || false;
-          const bTrending = (b as any).trending || false;
-          if (aTrending && !bTrending) return -1;
-          if (!aTrending && bTrending) return 1;
-
-          const aGrowth = parseInt(
-            (a as any).growth?.replace(/[^0-9-]/g, "") || "0",
-          );
-          const bGrowth = parseInt(
-            (b as any).growth?.replace(/[^0-9-]/g, "") || "0",
-          );
-          return bGrowth - aGrowth;
-        });
+        filtered.sort(
+          (a, b) =>
+            (b.activePositionsCount || 0) * 2 + (b.memberCount || 0) -
+            ((a.activePositionsCount || 0) * 2 + (a.memberCount || 0)),
+        );
         break;
       case "members":
         filtered.sort((a, b) => (b.memberCount || 0) - (a.memberCount || 0));
@@ -125,8 +86,10 @@ export default function DiscoverGroupsPage() {
         filtered.sort((a, b) => (b.activePositionsCount || 0) - (a.activePositionsCount || 0));
         break;
       case "newest":
-        filtered.sort((a, b) =>
-          b.id.localeCompare(a.id, undefined, { numeric: true }),
+        filtered.sort(
+          (a, b) =>
+            new Date(b.createdAt || 0).getTime() -
+            new Date(a.createdAt || 0).getTime(),
         );
         break;
     }
@@ -134,16 +97,26 @@ export default function DiscoverGroupsPage() {
     return filtered;
   }, [searchTerm, selectedCategory, sortBy]);
 
-  const trendingGroups = allGroups.filter((g) => g.trending).slice(0, 3);
+  const trendingGroups = useMemo(
+    () =>
+      [...allGroups]
+        .sort(
+          (a, b) =>
+            (b.activePositionsCount || 0) * 2 + (b.memberCount || 0) -
+            ((a.activePositionsCount || 0) * 2 + (a.memberCount || 0)),
+        )
+        .slice(0, 3),
+    [allGroups],
+  );
 
-  if (isLoading) {
+  if (isUserLoading || isGroupsLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Discover communities and join the conversation"
       />
 

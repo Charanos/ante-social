@@ -9,11 +9,11 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/hooks/useToast";
-import { mockUser } from "@/lib/mockData";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { IconAccessPoint, IconAward, IconBriefcase, IconChevronLeft, IconChevronRight, IconCoffee, IconDeviceGamepad, IconDeviceLaptop, IconFlask, IconGlobe, IconLayersOff, IconLoader3, IconLock, IconPalette, IconPlus, IconShield, IconStar, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import { useLiveUser } from "@/lib/live-data";
 
 const steps = [
   { id: 1, title: "Category" },
@@ -133,15 +133,10 @@ const visibilityOptions = [
 export default function CreateGroupPage() {
   const router = useRouter();
   const toast = useToast();
+  const { user, isLoading: isUserLoading } = useLiveUser();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Group State
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -196,19 +191,57 @@ export default function CreateGroupPage() {
     setCurrentStep((prev) => prev - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsCreating(true);
-    toast.success(
-      "Launching Experience...",
-      `Creating ${name} and your first market!`,
-    );
+    try {
+      const createGroupResponse = await fetch("/api/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          description,
+          isPublic: selectedVisibility === "public",
+        }),
+      });
+      const createdGroup = await createGroupResponse.json().catch(() => null);
+      if (!createGroupResponse.ok) {
+        throw new Error(createdGroup?.message || createdGroup?.error || "Failed to create group");
+      }
 
-    // Simulate navigation after creation
-    setTimeout(() => {
+      const groupId = createdGroup?._id || createdGroup?.id;
+      if (groupId && marketTitle && marketDescription && buyIn) {
+        const outcomeOptions = options
+          .map((option) => option.text.trim())
+          .filter((optionText) => optionText.length > 0)
+          .map((optionText) => ({ optionText }));
+
+        await fetch(`/api/groups/${groupId}/markets`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: marketTitle,
+            description: marketDescription,
+            marketType:
+              selectedMarketType === "poll" ? "winner_takes_all" : "odd_one_out",
+            buyInAmount: Number(buyIn),
+            options: outcomeOptions,
+            selectedOption: outcomeOptions[0]?.optionText || "Yes",
+            closeTime: closeDate || undefined,
+          }),
+        });
+      }
+
+      toast.success(
+        "Group Created",
+        `${name} and your first market are now live.`,
+      );
       router.push("/dashboard/groups");
-    }, 1500);
+    } catch (error: any) {
+      toast.error("Creation Failed", error?.message || "Unable to create group");
+      setIsCreating(false);
+    }
   };
-  if (isLoading) {
+  if (isUserLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
@@ -216,7 +249,7 @@ export default function CreateGroupPage() {
     <div className="min-h-screen pb-12 pl-0 md:pl-8">
       <div className="w-full mx-auto px-0 md:px-6 pb-8">
         <DashboardHeader
-          user={mockUser}
+          user={user}
           subtitle="Start a new community and launch your first betting market"
         />
 

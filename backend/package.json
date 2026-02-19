@@ -16,6 +16,9 @@
     "dev:reputation": "nx serve reputation-engine",
     "lint": "nx run-many --target=lint --all",
     "test": "nx run-many --target=test --all",
+    "seed:admin": "ts-node -r tsconfig-paths/register scripts/seed-admin.ts",
+    "seed:markets": "ts-node -r tsconfig-paths/register scripts/seed-markets.ts",
+    "seed:all": "npm run seed:admin && npm run seed:markets",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"

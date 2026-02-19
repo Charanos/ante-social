@@ -23,6 +23,10 @@ interface User {
   avatarUrl?: string;
 }
 
+interface UsersResponse {
+  data?: User[];
+}
+
 const tabs = [
   { id: "lookup", label: "User Lookup", icon: IconSearch },
   { id: "levels", label: "User Levels", icon: IconCrown },
@@ -41,7 +45,7 @@ export default function UserManagementPage() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Fetch Users
-  const { data: users = [], isLoading } = useQuery<User[]>({
+  const { data: usersResponse, isLoading } = useQuery<UsersResponse>({
     queryKey: ['admin-users'],
     queryFn: async () => {
       const res = await fetch('/api/admin/users');
@@ -49,6 +53,8 @@ export default function UserManagementPage() {
       return res.json();
     }
   });
+
+  const users = usersResponse?.data || [];
 
   // Update Tier Mutation
   const updateTierMutation = useMutation({

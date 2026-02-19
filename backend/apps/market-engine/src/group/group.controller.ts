@@ -41,6 +41,41 @@ export class GroupController {
     return this.groupService.leaveGroup(id, user._id.toString());
   }
 
+  @Patch(':id')
+  async updateGroup(
+    @Param('id') id: string,
+    @Body()
+    data: {
+      name?: string;
+      description?: string;
+      category?: string;
+      isPublic?: boolean;
+      imageUrl?: string;
+    },
+    @CurrentUser() user: UserDocument,
+  ) {
+    return this.groupService.updateGroup(id, data, user._id.toString());
+  }
+
+  @Patch(':id/members/:memberId/role')
+  async updateMemberRole(
+    @Param('id') groupId: string,
+    @Param('memberId') memberId: string,
+    @Body('role') role: string,
+    @CurrentUser() user: UserDocument,
+  ) {
+    return this.groupService.updateMemberRole(groupId, memberId, role, user._id.toString());
+  }
+
+  @Post(':id/members/:memberId/remove')
+  async removeMember(
+    @Param('id') groupId: string,
+    @Param('memberId') memberId: string,
+    @CurrentUser() user: UserDocument,
+  ) {
+    return this.groupService.removeMember(groupId, memberId, user._id.toString());
+  }
+
   // ─── Group Bets ───────────────────────────────────
   @Post(':id/bets')
   async createBet(

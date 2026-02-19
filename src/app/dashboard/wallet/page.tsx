@@ -1,19 +1,37 @@
 "use client";
 
-import { useRef, useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { IconArrowDownLeft, IconArrowUpRight, IconCalendar, IconCheck, IconClock, IconCurrencyDollar, IconDownload, IconFilter, IconHistory, IconStar, IconTarget, IconTrendingDown, IconTrendingUp, IconX } from '@tabler/icons-react';;
+import {
+  IconArrowDownLeft,
+  IconArrowUpRight,
+  IconCalendar,
+  IconCheck,
+  IconClock,
+  IconCurrencyDollar,
+  IconDownload,
+  IconHistory,
+  IconStar,
+  IconTarget,
+  IconTrendingDown,
+  IconTrendingUp,
+  IconX,
+} from "@tabler/icons-react";
 
 
-import { mockUser, mockTransactions } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { useToast } from "@/components/ui/toast-notification";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
+import {
+  fetchJsonOrNull,
+  normalizeTransactions,
+  useLiveUser,
+  type LiveTransaction,
+} from "@/lib/live-data";
 
 const TRANSACTION_TYPES = [
   { value: "all", label: "All Transactions" },
@@ -23,26 +41,34 @@ const TRANSACTION_TYPES = [
   { value: "payout", label: "Payouts" },
 ];
 
-const QUICK_AMOUNTS = [10, 50, 100, 250, 500];
-
 export default function WalletPage() {
   const router = useRouter();
-  const toast = useToast();
-  const [transactions] = useState(mockTransactions);
+  const { user, isLoading: isUserLoading } = useLiveUser();
+  const [transactions, setTransactions] = useState<LiveTransaction[]>([]);
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isTransactionsLoading, setIsTransactionsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
+  const loadTransactions = useCallback(async () => {
+    setIsTransactionsLoading(true);
+    const payload = await fetchJsonOrNull<any>(
+      "/api/wallet/transactions?limit=200&offset=0",
+    );
+    setTransactions(normalizeTransactions(payload));
+    setIsTransactionsLoading(false);
   }, []);
+
+  useEffect(() => {
+    void loadTransactions();
+  }, [loadTransactions]);
 
   useEffect(() => {
     setIsFiltering(true);
     const timer = setTimeout(() => setIsFiltering(false), 500);
     return () => clearTimeout(timer);
   }, [selectedFilter]);
+
+  const isLoading = isUserLoading || isTransactionsLoading;
 
   // Calculate statistics
   const stats = useMemo(() => {
@@ -120,7 +146,7 @@ export default function WalletPage() {
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Manage your balance and transactions"
       />
 
@@ -145,7 +171,7 @@ export default function WalletPage() {
                   Available Balance
                 </p>
                 <p className="text-3xl md:text-4xl font-semibold font-mono">
-                  ${mockUser.balance.toFixed(2)}
+                  ${user.balance.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -155,7 +181,7 @@ export default function WalletPage() {
               <div className="flex items-center gap-2">
                 <IconStar className="w-4 h-4 text-amber-400" />
                 <span className="text-sm font-medium text-amber-200">
-                  {mockUser.tier.charAt(0).toUpperCase() + mockUser.tier.slice(1)} Tier
+                  {user.tier.charAt(0).toUpperCase() + user.tier.slice(1)} Tier
                 </span>
               </div>
             </div>
@@ -244,7 +270,7 @@ export default function WalletPage() {
                     Total Winnings
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-green-900">
-                    +${(mockUser.totalWinnings || 0).toFixed(2)}
+                    +${(user.totalWinnings || 0).toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -269,7 +295,7 @@ export default function WalletPage() {
                     Total Losses
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-red-900">
-                    -${(mockUser.totalLosses || 0).toFixed(2)}
+                    -${(user.totalLosses || 0).toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -295,9 +321,11 @@ export default function WalletPage() {
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-purple-900">
                     {(
-                      ((mockUser.totalWinnings || 0) /
-                        ((mockUser.totalWinnings || 1) +
-                          (mockUser.totalLosses || 0))) *
+                      ((user.totalWinnings || 0) /
+                        Math.max(
+                          1,
+                          (user.totalWinnings || 0) + (user.totalLosses || 0),
+                        )) *
                       100
                     ).toFixed(1)}
                     %

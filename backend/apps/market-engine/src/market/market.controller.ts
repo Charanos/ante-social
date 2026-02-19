@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Put, Patch, Delete } from '@nestjs/common';
 import { MarketService } from './market.service';
 import { CreateMarketDto, JwtAuthGuard, CurrentUser, Roles, UserRole, RolesGuard } from '@app/common';
 import { UserDocument } from '@app/database';
@@ -22,6 +22,24 @@ export class MarketController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.marketService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+  async update(
+    @Param('id') id: string,
+    @Body() updates: Partial<CreateMarketDto>,
+    @CurrentUser() user: UserDocument,
+  ) {
+    return this.marketService.updateMarket(id, updates, user._id.toString());
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async remove(@Param('id') id: string, @CurrentUser() user: UserDocument) {
+    return this.marketService.deleteMarket(id, user._id.toString());
   }
 
   @Put(':id/close')

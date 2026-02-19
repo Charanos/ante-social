@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   IconAccessPoint,
@@ -18,115 +18,137 @@ import {
 } from "@tabler/icons-react";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { mockUser } from "@/lib/mockData";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useLiveUser } from "@/lib/live-data";
 
-// --- Mock Data ---
-const mockAchievements = {
-  stats: {
-    balance: 2450,
-    unlocked: 12,
-    total: 28,
-    earned: 3800,
-    streak: 7,
+const ACHIEVEMENT_LIBRARY = [
+  {
+    title: "First Win",
+    description: "Win your first market",
+    category: "Beginner",
+    reward: 100,
   },
-  dailyBonus: [
-    { day: 1, reward: 100, claimed: false },
-    { day: 2, reward: 150, claimed: false },
-    { day: 3, reward: 200, claimed: false },
-    { day: 4, reward: 300, claimed: false },
-    { day: 5, reward: 400, claimed: false },
-    { day: 6, reward: 600, claimed: false },
-    { day: 7, reward: 1000, claimed: false },
-  ],
-  inProgress: [
+  {
+    title: "Early Bird",
+    description: "Place a forecast early in market lifecycle",
+    category: "Time Based",
+    reward: 150,
+  },
+  {
+    title: "Lucky Day",
+    description: "Win 3 markets in one day",
+    category: "Performance",
+    reward: 200,
+  },
+  {
+    title: "High Roller",
+    description: "Reach high-roller tier",
+    category: "Prestige",
+    reward: 500,
+  },
+  {
+    title: "10-Win Streak",
+    description: "Win 10 markets in a row",
+    category: "Performance",
+    reward: 1000,
+  },
+  {
+    title: "Big Spender",
+    description: "Deposit over 100,000 KSH equivalent",
+    category: "Risk",
+    reward: 750,
+  },
+  {
+    title: "Social Butterfly",
+    description: "Refer 5 friends",
+    category: "Social",
+    reward: 500,
+  },
+  {
+    title: "Perfect Week",
+    description: "Win every bet for 7 days",
+    category: "Performance",
+    reward: 2000,
+  },
+  {
+    title: "Market Master",
+    description: "Win 50 different markets",
+    category: "Prestige",
+    reward: 1500,
+  },
+  {
+    title: "Night Owl",
+    description: "Place a forecast after midnight",
+    category: "Time Based",
+    reward: 100,
+  },
+] as const;
+
+function buildAchievementData(user: any) {
+  const reputation = Number(user?.reputationScore || 0);
+  const accuracy = Number(user?.signalAccuracy || 0);
+  const totalWinnings = Number(user?.totalWinnings || 0);
+  const totalLosses = Number(user?.totalLosses || 0);
+  const totalPnl = totalWinnings - totalLosses;
+  const total = ACHIEVEMENT_LIBRARY.length;
+
+  const progressSignal = reputation + accuracy + Math.max(0, totalPnl) / 10;
+  const unlockedCount = Math.max(0, Math.min(total, Math.floor(progressSignal / 40)));
+
+  const unlocked = ACHIEVEMENT_LIBRARY.slice(0, unlockedCount).map((item, index) => ({
+    ...item,
+    date: `${index + 1} ${index === 0 ? "day" : "weeks"} ago`,
+  }));
+  const locked = ACHIEVEMENT_LIBRARY.slice(unlockedCount);
+
+  const winProgress = Math.max(5, Math.min(100, Math.round(accuracy)));
+  const streakProgress = Math.max(5, Math.min(100, Math.round(reputation / 8)));
+
+  const inProgress = [
     {
       title: "Win 10 Markets",
       description: "Win 10 different betting markets",
-      progress: 60,
+      progress: winProgress,
       reward: 500,
       category: "Performance",
     },
     {
       title: "7-Day Streak",
       description: "Login for 7 consecutive days",
-      progress: 85,
+      progress: streakProgress,
       reward: 300,
       category: "Consistency",
     },
-  ],
-  unlocked: [
-    {
-      title: "First Win",
-      description: "Won your first market",
-      category: "Beginner",
-      reward: 100,
-      date: "2 days ago",
+  ];
+
+  const currentStreak = Math.max(1, Math.min(30, Math.round(accuracy / 10)));
+  const maxClaimedDay = Math.min(7, currentStreak);
+  const dailyRewards = [100, 150, 200, 300, 400, 600, 1000];
+  const dailyBonus = dailyRewards.map((reward, index) => ({
+    day: index + 1,
+    reward,
+    claimed: index + 1 < maxClaimedDay,
+  }));
+
+  const earned = unlocked.reduce((sum, item) => sum + item.reward, 0);
+
+  return {
+    stats: {
+      balance: Math.max(0, Math.round(totalWinnings)),
+      unlocked: unlocked.length,
+      total,
+      earned,
+      streak: currentStreak,
     },
-    {
-      title: "Early Bird",
-      description: "Placed bet within first hour",
-      category: "Time Based",
-      reward: 150,
-      date: "1 week ago",
-    },
-    {
-      title: "Lucky Day",
-      description: "Won 3 markets in one day",
-      category: "Performance",
-      reward: 200,
-      date: "3 days ago",
-    },
-    {
-      title: "High Roller",
-      description: "Reached High Roller tier",
-      category: "Prestige",
-      reward: 500,
-      date: "1 month ago",
-    },
-  ],
-  locked: [
-    {
-      title: "10-Win Streak",
-      description: "Win 10 markets in a row",
-      category: "Performance",
-      reward: 1000,
-    },
-    {
-      title: "Big Spender",
-      description: "Deposit over 100,000 KSH",
-      category: "Risk",
-      reward: 750,
-    },
-    {
-      title: "Social Butterfly",
-      description: "Refer 5 friends",
-      category: "Social",
-      reward: 500,
-    },
-    {
-      title: "Perfect Week",
-      description: "Win every bet for 7 days",
-      category: "Performance",
-      reward: 2000,
-    },
-    {
-      title: "Market Master",
-      description: "Win 50 different markets",
-      category: "Prestige",
-      reward: 1500,
-    },
-    {
-      title: "Night Owl",
-      description: "Place bet after midnight",
-      category: "Time Based",
-      reward: 100,
-    },
-  ],
-};
+    dailyBonus,
+    inProgress,
+    unlocked,
+    locked,
+  };
+}
 
 const getCategoryIcon = (category: string) => {
   switch (category.toLowerCase()) {
@@ -151,6 +173,8 @@ const getCategoryIcon = (category: string) => {
 
 export default function AchievementsPage() {
   const toast = useToast();
+  const { user } = useLiveUser();
+  const achievementData = useMemo(() => buildAchievementData(user), [user]);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [showBonusModal, setShowBonusModal] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -172,7 +196,7 @@ export default function AchievementsPage() {
       setShowBonusModal(false);
       toast.success(
         "Daily Bonus Claimed!",
-        "You've received 100 KSH. Come back tomorrow for more!"
+        `You've received ${nextBonusReward} KSH. Come back tomorrow for more!`
       );
     }, 1500);
   };
@@ -190,9 +214,9 @@ export default function AchievementsPage() {
     });
   };
 
-  const filteredInProgress = filterItems(mockAchievements.inProgress);
-  const filteredUnlocked = filterItems(mockAchievements.unlocked);
-  const filteredLocked = filterItems(mockAchievements.locked);
+  const filteredInProgress = filterItems(achievementData.inProgress);
+  const filteredUnlocked = filterItems(achievementData.unlocked);
+  const filteredLocked = filterItems(achievementData.locked);
 
   const tabs = [
     { id: "All", label: "All" },
@@ -201,6 +225,10 @@ export default function AchievementsPage() {
     { id: "Prestige", label: "Prestige" },
     { id: "Social", label: "Social" },
   ];
+  const nextBonusReward =
+    achievementData.dailyBonus.find((day) => !day.claimed)?.reward ||
+    achievementData.dailyBonus[achievementData.dailyBonus.length - 1]?.reward ||
+    0;
 
   if (isPageLoading) {
     return <LoadingLogo fullScreen size="lg" />;
@@ -210,7 +238,7 @@ export default function AchievementsPage() {
     <div className="space-y-6 md:space-y-16 pl-0 md:pl-6 pb-12 md:pb-16 px-1 md:px-0">
       {/* Header */}
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Track your progress and unlock exclusive rewards"
       />
 
@@ -240,7 +268,7 @@ export default function AchievementsPage() {
                   Cash Earned
                 </p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-green-900">
-                  {mockAchievements.stats.balance} KSH
+                  {achievementData.stats.balance} KSH
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -265,8 +293,8 @@ export default function AchievementsPage() {
                   Unlocked
                 </p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-amber-900">
-                  {mockAchievements.stats.unlocked}/
-                  {mockAchievements.stats.total}
+                  {achievementData.stats.unlocked}/
+                  {achievementData.stats.total}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -291,7 +319,7 @@ export default function AchievementsPage() {
                   Total Rewards
                 </p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-blue-900">
-                  {mockAchievements.stats.earned} KSH
+                  {achievementData.stats.earned} KSH
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -316,7 +344,7 @@ export default function AchievementsPage() {
                   Day Streak
                 </p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-purple-900">
-                  {mockAchievements.stats.streak}
+                  {achievementData.stats.streak}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -547,7 +575,7 @@ export default function AchievementsPage() {
                     Today's Reward
                   </p>
                   <p className="text-4xl font-semibold font-mono text-amber-900">
-                    100 <span className="text-2xl">KSH</span>
+                    {nextBonusReward} <span className="text-2xl">KSH</span>
                   </p>
                 </div>
 
@@ -572,7 +600,7 @@ export default function AchievementsPage() {
                 </motion.button>
 
                 <p className="text-xs text-black/40 font-medium">
-                  Come back tomorrow for 150 KSH
+                  Come back tomorrow for the next reward
                 </p>
               </div>
             </motion.div>

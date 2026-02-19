@@ -1,40 +1,35 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../apps/auth-service/src/app.module'; // Import Auth Service Module to access DB
-import { User, UserSchema } from '../libs/database/src/schemas/user.schema';
-import { Wallet, WalletSchema } from '../libs/database/src/schemas/wallet.schema';
-import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
-import { Connection, Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import * as dotenv from 'dotenv';
-import { UserRole, UserTier } from '../libs/common/src/constants';
+import * as mongoose from 'mongoose';
+import { UserSchema } from '../libs/database/src/schemas/user.schema';
+import { WalletSchema } from '../libs/database/src/schemas/wallet.schema';
 
-// Load env from root ante-social folder
 dotenv.config({ path: '../.env' });
 
+const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL;
+
 async function seedAdmin() {
-  // Direct Mongoose Connection to avoid robust NestJS app bootstrap overhead
-  const mongoose = await import('mongoose');
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL is not defined in .env');
+  if (!MONGODB_URI) {
+    throw new Error('MONGODB_URI (or DATABASE_URL) is not defined in .env');
   }
 
   console.log('Connecting to MongoDB...');
-  await mongoose.connect(process.env.DATABASE_URL);
+  await mongoose.connect(MONGODB_URI);
 
   const UserModel = mongoose.model('User', UserSchema);
   const WalletModel = mongoose.model('Wallet', WalletSchema);
 
   const adminData = {
-    fullName: 'Dennis Munge',
-    username: 'Charanos',
-    email: 'dennismunge@960gmail.com',
-    phone: '074885157',
-    dateOfBirth: new Date('1999-10-10'),
-    password: 'Password123!', // Temporary password
+    fullName: 'Platform Administrator',
+    username: process.env.SEED_ADMIN_USERNAME || 'admin',
+    email: process.env.SEED_ADMIN_EMAIL || 'admin@antesocial.local',
+    phone: process.env.SEED_ADMIN_PHONE || '+10000000000',
+    dateOfBirth: new Date('1990-01-01'),
+    password: process.env.SEED_ADMIN_PASSWORD || 'Password123!',
     role: 'admin',
     tier: 'high_roller',
     emailVerified: true,
-    isVerified: true, // KYC verified
+    isVerified: true,
     reputationScore: 1000,
     integrityWeight: 1.0,
   };
@@ -45,31 +40,38 @@ async function seedAdmin() {
     });
 
     if (existing) {
-      console.log(`User ${existing.username} already exists. Updating role to admin...`);
+      console.log(`User ${existing.username} already exists. Promoting to admin...`);
       existing.role = 'admin';
       existing.fullName = adminData.fullName;
       existing.phone = adminData.phone;
+      existing.tier = 'high_roller';
       existing.isVerified = true;
       existing.emailVerified = true;
       await existing.save();
+
+      const wallet = await WalletModel.findOne({ userId: existing._id });
+      if (!wallet) {
+        await WalletModel.create({
+          userId: existing._id,
+          balanceUsd: 10000,
+          balanceKsh: 1000000,
+        });
+      }
       console.log('Admin user updated successfully.');
     } else {
       console.log('Creating new admin user...');
       const passwordHash = await bcrypt.hash(adminData.password, 12);
-      
-      const user = new UserModel({
+
+      const user = await UserModel.create({
         ...adminData,
         passwordHash,
       });
-      const savedUser = await user.save();
-      
-      // Create Wallet
-      const wallet = new WalletModel({
-        userId: savedUser._id,
-        balanceUsd: 10000, // Seed with some funds
-        balanceKsh: 100000,
+
+      await WalletModel.create({
+        userId: user._id,
+        balanceUsd: 10000,
+        balanceKsh: 1000000,
       });
-      await wallet.save();
 
       console.log('Admin user created successfully.');
       console.log('Credentials:', {
@@ -77,14 +79,15 @@ async function seedAdmin() {
         password: adminData.password,
       });
     }
-
-  } catch (error) {
-    console.error('Seeding failed:', error);
   } finally {
     await mongoose.disconnect();
     console.log('Disconnected.');
-    process.exit(0);
   }
 }
 
-seedAdmin();
+seedAdmin()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error('Seeding failed:', error);
+    process.exit(1);
+  });

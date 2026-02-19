@@ -4,9 +4,26 @@ import { AdminController } from './admin.controller';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { ComplianceService } from '../compliance/compliance.service';
 import { DatabaseModule } from '@app/database';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    DatabaseModule,
+    ClientsModule.registerAsync([
+      {
+        name: 'WALLET_SERVICE',
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get('WALLET_SERVICE_HOST') || 'localhost',
+            port: configService.get('WALLET_SERVICE_PORT') || 3004,
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+  ],
   controllers: [AdminController],
   providers: [AdminService, AnalyticsService, ComplianceService],
 })

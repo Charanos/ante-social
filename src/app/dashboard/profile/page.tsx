@@ -7,6 +7,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
+import { useLiveUser } from "@/lib/live-data";
 import {
   IconAward,
   IconBell,
@@ -35,29 +36,36 @@ import {
   IconSparkles,
   IconChartLine,
 } from "@tabler/icons-react";
-import { mockUser } from "@/lib/mockData";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProgressChart } from "@/components/charts/ProgressChart";
 
+const DEFAULT_PHONE = "+254712345678";
+const DEFAULT_LOCATION = "Nairobi, Kenya";
+const DEFAULT_BIO = "Passionate prediction market enthusiast";
+const DEFAULT_TIMEZONE = "Africa/Nairobi";
+const DEFAULT_LANGUAGE = "en";
+
 export default function ProfilePage() {
   const toast = useToast();
+  const { user, isLoading: isUserLoading, refresh } = useLiveUser();
 
   // Loading states
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [hasHydratedProfile, setHasHydratedProfile] = useState(false);
 
   // Profile data
-  const [fullName, setFullName] = useState(mockUser.fullName || "");
-  const [username, setUsername] = useState(mockUser.username);
-  const [email, setEmail] = useState(mockUser.email);
-  const [phone, setPhone] = useState("+254712345678");
-  const [location, setLocation] = useState("Nairobi, Kenya");
-  const [bio, setBio] = useState("Passionate prediction market enthusiast");
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState(DEFAULT_PHONE);
+  const [location, setLocation] = useState(DEFAULT_LOCATION);
+  const [bio, setBio] = useState(DEFAULT_BIO);
 
   // Preferences
-  const [timezone, setTimezone] = useState("Africa/Nairobi");
-  const [language, setLanguage] = useState("en");
+  const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
+  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
 
   // Mock recent achievements data
   const recentAchievements = [
@@ -131,24 +139,48 @@ export default function ProfilePage() {
   // Track changes
   const [hasChanges, setHasChanges] = useState(false);
   const [initialData, setInitialData] = useState({
-    fullName: mockUser.fullName || "",
-    username: mockUser.username,
-    email: mockUser.email,
-    phone: "+254712345678",
-    location: "Nairobi, Kenya",
-    bio: "Passionate prediction market enthusiast",
-    timezone: "Africa/Nairobi",
-    language: "en",
+    fullName: "",
+    username: "",
+    email: "",
+    phone: DEFAULT_PHONE,
+    location: DEFAULT_LOCATION,
+    bio: DEFAULT_BIO,
+    timezone: DEFAULT_TIMEZONE,
+    language: DEFAULT_LANGUAGE,
     emailNotif: true,
     pushNotif: true,
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
+    if (isUserLoading || hasHydratedProfile) return;
+
+    const profileState = {
+      fullName: user.fullName || "",
+      username: user.username || "",
+      email: user.email || "",
+      phone: DEFAULT_PHONE,
+      location: DEFAULT_LOCATION,
+      bio: DEFAULT_BIO,
+      timezone: DEFAULT_TIMEZONE,
+      language: DEFAULT_LANGUAGE,
+      emailNotif: true,
+      pushNotif: true,
+    };
+
+    setInitialData(profileState);
+    setFullName(profileState.fullName);
+    setUsername(profileState.username);
+    setEmail(profileState.email);
+    setPhone(profileState.phone);
+    setLocation(profileState.location);
+    setBio(profileState.bio);
+    setTimezone(profileState.timezone);
+    setLanguage(profileState.language);
+    setEmailNotif(profileState.emailNotif);
+    setPushNotif(profileState.pushNotif);
+    setHasHydratedProfile(true);
+    setIsPageLoading(false);
+  }, [hasHydratedProfile, isUserLoading, user.email, user.fullName, user.username]);
 
   // Check for changes
   useEffect(() => {
@@ -179,14 +211,13 @@ export default function ProfilePage() {
     initialData,
   ]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      setHasChanges(false);
 
-      // Update initial data
-      setInitialData({
+    const response = await fetch("/api/user/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         fullName,
         username,
         email,
@@ -195,15 +226,34 @@ export default function ProfilePage() {
         bio,
         timezone,
         language,
-        emailNotif,
-        pushNotif,
-      });
+      }),
+    });
 
-      toast.success(
-        "Profile Updated",
-        "Your changes have been saved successfully",
-      );
-    }, 1000);
+    if (!response.ok) {
+      setIsSaving(false);
+      toast.error("Save Failed", "Unable to update your profile");
+      return;
+    }
+
+    setHasChanges(false);
+    setInitialData({
+      fullName,
+      username,
+      email,
+      phone,
+      location,
+      bio,
+      timezone,
+      language,
+      emailNotif,
+      pushNotif,
+    });
+    await refresh();
+    setIsSaving(false);
+    toast.success(
+      "Profile Updated",
+      "Your changes have been saved successfully",
+    );
   }, [
     fullName,
     username,
@@ -215,6 +265,7 @@ export default function ProfilePage() {
     language,
     emailNotif,
     pushNotif,
+    refresh,
     toast,
   ]);
 
@@ -256,7 +307,7 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 md:space-y-8 pb-12 md:pb-20 pl-0 md:pl-8">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Manage your account and preferences"
       />
 
@@ -782,7 +833,7 @@ export default function ProfilePage() {
                         Current Tier
                       </p>
                       <p className="text-xl font-medium text-amber-900 capitalize">
-                        {mockUser.tier.replace("_", " ")}
+                        {user.tier.replace("_", " ")}
                       </p>
                     </div>
                     <motion.div
@@ -817,7 +868,7 @@ export default function ProfilePage() {
                         User ID
                       </p>
                       <p className="text-sm font-mono font-medium text-black/90">
-                        {mockUser.id}
+                        {user.id || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -844,7 +895,7 @@ export default function ProfilePage() {
                       </div>
                       <span className="font-mono font-medium text-black/90 text-xs">
                         $
-                        {mockUser.tier === "whale"
+                        {user.tier === "whale"
                           ? "5,000"
                           : "500"}
                       </span>
@@ -853,12 +904,12 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-between p-3 rounded-xl bg-white/60 backdrop-blur-sm border border-black/5">
                       <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-400/20 border border-orange-400/30">
                         <span className="text-[10px] font-semibold text-orange-900 uppercase">
-                          {mockUser.tier === "whale" ? "High Stake" : "Standard"}
+                          {user.tier === "whale" ? "High Stake" : "Standard"}
                         </span>
                       </div>
                       <span className="font-mono font-medium text-black/90 text-xs">
                         $
-                        {mockUser.tier === "whale"
+                        {user.tier === "whale"
                           ? "1,000"
                           : "250"}
                       </span>

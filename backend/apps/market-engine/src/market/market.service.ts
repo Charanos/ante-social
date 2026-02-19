@@ -16,6 +16,10 @@ export class MarketService {
   ) {}
 
   async create(createMarketDto: CreateMarketDto, userId: string) {
+    if (!createMarketDto.outcomes || createMarketDto.outcomes.length < 2) {
+      throw new BadRequestException('At least two outcomes are required');
+    }
+
     const market = new this.marketModel({
       ...createMarketDto,
       createdBy: new Types.ObjectId(userId),
@@ -23,48 +27,141 @@ export class MarketService {
     });
     const saved = await market.save();
 
-    // Emit Kafka event
-    this.kafkaClient.emit(KAFKA_TOPICS.MARKET_EVENTS, new MarketCreatedEvent({
-      marketId: saved._id.toString(),
-      type: saved.betType,
-      title: saved.title,
-      category: saved.tags?.[0] || '',
-      createdBy: userId,
-      opensAt: saved.startTime?.toISOString() || new Date().toISOString(),
-      closesAt: saved.closeTime?.toISOString() || '',
-    }));
+    this.kafkaClient.emit(
+      KAFKA_TOPICS.MARKET_EVENTS,
+      new MarketCreatedEvent({
+        marketId: saved._id.toString(),
+        type: saved.betType,
+        title: saved.title,
+        category: saved.tags?.[0] || '',
+        createdBy: userId,
+        opensAt: saved.startTime?.toISOString() || new Date().toISOString(),
+        closesAt: saved.closeTime?.toISOString() || '',
+      }),
+    );
 
     return saved;
   }
 
   async findAll(query: any) {
-    const { status, type, tag, limit = 20, offset = 0 } = query;
-    const filter: any = {};
+    const {
+      status,
+      type,
+      tag,
+      search,
+      includeDeleted = 'false',
+      limit = 20,
+      offset = 0,
+    } = query;
+
+    const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 200);
+    const safeOffset = Math.max(Number(offset) || 0, 0);
+
+    const filter: Record<string, any> = {};
+    if (includeDeleted !== 'true') {
+      filter.isDeleted = { $ne: true };
+    }
     if (status) filter.status = status;
     if (type) filter.betType = type;
     if (tag) filter.tags = tag;
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      filter.$or = [{ title: regex }, { description: regex }];
+    }
 
-    const markets = await this.marketModel.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(Number(offset))
-      .limit(Number(limit))
-      .exec();
-      
-    const total = await this.marketModel.countDocuments(filter);
-    
-    return { data: markets, meta: { total, limit, offset } };
+    const [markets, total] = await Promise.all([
+      this.marketModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(safeOffset)
+        .limit(safeLimit)
+        .exec(),
+      this.marketModel.countDocuments(filter),
+    ]);
+
+    return { data: markets, meta: { total, limit: safeLimit, offset: safeOffset } };
   }
 
   async findOne(id: string) {
-    const market = await this.marketModel.findById(id);
+    const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
     if (!market) throw new NotFoundException('Market not found');
     return market;
   }
 
-  async closeMarket(id: string) {
-    const market = await this.marketModel.findById(id);
+  async updateMarket(id: string, updates: Partial<CreateMarketDto>, userId: string) {
+    const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
     if (!market) throw new NotFoundException('Market not found');
-    
+
+    if (updates.outcomes && updates.outcomes.length < 2) {
+      throw new BadRequestException('At least two outcomes are required');
+    }
+
+    const updateDoc: Record<string, any> = {};
+
+    if (updates.title !== undefined) updateDoc.title = updates.title;
+    if (updates.description !== undefined) updateDoc.description = updates.description;
+    if (updates.betType !== undefined) updateDoc.betType = updates.betType;
+    if (updates.buyInAmount !== undefined) updateDoc.buyInAmount = updates.buyInAmount;
+    if (updates.marketDuration !== undefined) updateDoc.marketDuration = updates.marketDuration;
+    if (updates.minParticipants !== undefined) updateDoc.minParticipants = updates.minParticipants;
+    if (updates.maxParticipants !== undefined) updateDoc.maxParticipants = updates.maxParticipants;
+    if (updates.settlementMethod !== undefined) updateDoc.settlementMethod = updates.settlementMethod;
+    if (updates.externalApiEndpoint !== undefined) {
+      updateDoc.externalApiEndpoint = updates.externalApiEndpoint;
+    }
+    if (updates.oddsType !== undefined) updateDoc.oddsType = updates.oddsType;
+    if (updates.tags !== undefined) updateDoc.tags = updates.tags;
+    if (updates.mediaUrl !== undefined) updateDoc.mediaUrl = updates.mediaUrl;
+    if (updates.mediaType !== undefined) updateDoc.mediaType = updates.mediaType;
+    if (updates.regionsAllowed !== undefined) updateDoc.regionsAllowed = updates.regionsAllowed;
+    if (updates.regionsBlocked !== undefined) updateDoc.regionsBlocked = updates.regionsBlocked;
+    if (updates.outcomes !== undefined) {
+      updateDoc.outcomes = updates.outcomes.map((outcome) => ({
+        optionText: outcome.optionText,
+        fixedOdds: outcome.fixedOdds,
+        mediaUrl: outcome.mediaUrl,
+        mediaType: outcome.mediaType || 'none',
+      }));
+    }
+
+    if (updates.startTime !== undefined) {
+      updateDoc.startTime = new Date(updates.startTime);
+    }
+    if (updates.closeTime !== undefined) {
+      updateDoc.closeTime = new Date(updates.closeTime);
+    }
+    if (updates.settlementTime !== undefined) {
+      updateDoc.settlementTime = new Date(updates.settlementTime);
+    }
+    if (updates.scheduledPublishTime !== undefined) {
+      updateDoc.scheduledPublishTime = new Date(updates.scheduledPublishTime);
+    }
+
+    updateDoc.lastEditedBy = new Types.ObjectId(userId);
+    updateDoc.version = (market.version || 1) + 1;
+
+    const updated = await this.marketModel.findByIdAndUpdate(id, updateDoc, { new: true });
+    if (!updated) throw new NotFoundException('Market not found');
+    return updated;
+  }
+
+  async deleteMarket(id: string, userId: string) {
+    const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
+    if (!market) throw new NotFoundException('Market not found');
+
+    market.isDeleted = true;
+    market.deletedAt = new Date();
+    market.deletedBy = new Types.ObjectId(userId);
+    market.status = MarketStatus.CANCELLED;
+    await market.save();
+
+    return { success: true };
+  }
+
+  async closeMarket(id: string) {
+    const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
+    if (!market) throw new NotFoundException('Market not found');
+
     if (market.status !== MarketStatus.ACTIVE) {
       throw new BadRequestException('Market is not active');
     }
@@ -73,20 +170,22 @@ export class MarketService {
     market.closeTime = new Date();
     const saved = await market.save();
 
-    // Emit Kafka event
-    this.kafkaClient.emit(KAFKA_TOPICS.MARKET_EVENTS, new MarketClosedEvent({
-      marketId: saved._id.toString(),
-      type: saved.betType,
-      totalPool: saved.totalPool || 0,
-      participantCount: saved.participantCount || 0,
-      closedAt: saved.closeTime.toISOString(),
-    }));
+    this.kafkaClient.emit(
+      KAFKA_TOPICS.MARKET_EVENTS,
+      new MarketClosedEvent({
+        marketId: saved._id.toString(),
+        type: saved.betType,
+        totalPool: saved.totalPool || 0,
+        participantCount: saved.participantCount || 0,
+        closedAt: saved.closeTime.toISOString(),
+      }),
+    );
 
     return saved;
   }
 
   async settleMarket(id: string, winningOptionId?: string) {
-    const market = await this.marketModel.findById(id);
+    const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
     if (!market) throw new NotFoundException('Market not found');
 
     if (market.status !== MarketStatus.CLOSED) {
@@ -99,7 +198,6 @@ export class MarketService {
     }
     await market.save();
 
-    // Run settlement
     await this.settlementDispatcher.dispatch(market);
 
     market.status = MarketStatus.SETTLED;

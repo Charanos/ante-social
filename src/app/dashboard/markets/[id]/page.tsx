@@ -18,81 +18,20 @@ import {
 } from "@tabler/icons-react";
 
 import Image from "next/image";
-import { mockUser } from "@/lib/mockData";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { MarketChart } from "@/components/markets/MarketChart";
 import { cn } from "@/lib/utils";
-
-const getMockMarket = (id: string) => ({
-  id,
-  title: "Best Nairobi Matatu Route",
-  description:
-    "Vote for the most reliable, comfortable, and iconic matatu route in Nairobi. Considerations include music quality, graffiti art, speed (safely!), conductor vibes, and overall passenger experience.",
-  category: "Poll",
-  image:
-    "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&auto=format&fit=crop",
-  minStake: 500,
-  poolAmount: 145600,
-  participantCount: 42,
-  status: "active",
-  endsAt: new Date(Date.now() + 86400000 * 2).toISOString(),
-  options: [
-    {
-      id: "opt1",
-      option_text: "Route 111 (Ngong Road)",
-      votes: 35,
-      image:
-        "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop",
-    },
-    {
-      id: "opt2",
-      option_text: "Route 125/126 (Rongai)",
-      votes: 45,
-      image:
-        "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
-    },
-    {
-      id: "opt3",
-      option_text: "Route 23 (Westlands)",
-      votes: 28,
-      image:
-        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop",
-    },
-    {
-      id: "opt4",
-      option_text: "Route 58 (Buruburu)",
-      votes: 18,
-      image:
-        "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop",
-    },
-  ],
-  participants: [
-    {
-      username: "@matatu_king",
-      total_stake: 5000,
-      timestamp: new Date(Date.now() - 7200000),
-    },
-    {
-      username: "@nai_guy",
-      total_stake: 1500,
-      timestamp: new Date(Date.now() - 3600000),
-    },
-    {
-      username: "@city_hopper",
-      total_stake: 1000,
-      timestamp: new Date(Date.now() - 1800000),
-    },
-    {
-      username: "@route_master",
-      total_stake: 2500,
-      timestamp: new Date(Date.now() - 900000),
-    },
-  ],
-});
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import {
+  extractCreatedPredictionId,
+  mapMarketToDetailView,
+  parseApiError,
+} from "@/lib/market-detail-view";
 
 export default function MarketDetailPage() {
   const params = useParams();
+  const { user } = useLiveUser();
   const marketId = params.id as string;
   const [market, setMarket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -102,11 +41,20 @@ export default function MarketDetailPage() {
 
   useEffect(() => {
     if (!marketId) return;
-    // Keep loading slightly longer to show off the logo
-    setTimeout(() => {
-      setMarket(getMockMarket(marketId));
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
+      if (cancelled) return;
+      setMarket(payload ? mapMarketToDetailView(payload) : null);
       setLoading(false);
-    }, 1200);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, [marketId]);
 
   const router = useRouter();
@@ -114,9 +62,17 @@ export default function MarketDetailPage() {
 
   const handlePlaceForecast = async () => {
     if (!market || !selectedOption || !stakeAmount) return;
+    const stakeValue = Number.parseFloat(stakeAmount);
+    if (!Number.isFinite(stakeValue) || stakeValue < market.minStake) {
+      toast.error(
+        "Invalid Stake",
+        `Minimum stake is ${market.minStake.toLocaleString()} KSH`,
+      );
+      return;
+    }
 
     // Check balance
-    if (mockUser.balance < parseFloat(stakeAmount)) {
+    if (user.balance < stakeValue) {
       toast.error(
         "Insufficient Balance",
         "Please top up your wallet to participate in this market."
@@ -128,45 +84,44 @@ export default function MarketDetailPage() {
     }
 
     setIsSubmitting(true);
-    const newPositionId = `pos-${Date.now()}`;
-    const selectedOptText =
-      market.options.find((o: any) => o.id === selectedOption)?.option_text ||
-      "Unknown";
-
-    // Show loading toast
     const toastId = toast.loading(
       "Confirming your forecast...",
       "Processing transaction securely",
     );
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          outcomeId: selectedOption,
+          amount: stakeValue,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(
+          parseApiError(payload, "Failed to place forecast. Please try again."),
+        );
+      }
 
-      // Update toast to success
+      const positionId = extractCreatedPredictionId(payload);
       toast.removeToast(toastId);
       toast.success(
         "Forecast Submitted Successfully!",
         "Good luck! Redirecting to your ticket...",
       );
-
-      const params = new URLSearchParams({
-        marketId: market.id,
-        amount: stakeAmount,
-        outcome: selectedOptText,
-        title: market.title,
-        status: "active",
-        date: new Date().toISOString(),
-        new: "true",
-      });
-
-      // Redirect to the bet slip page with params
-      setTimeout(() => {
-        router.push(
-          `/dashboard/markets/my-forecasts/${newPositionId}?${params.toString()}`,
-        );
-      }, 1000);
-    }, 2000);
+      if (positionId) {
+        router.push(`/dashboard/markets/my-forecasts/${positionId}?new=true`);
+      } else {
+        router.push("/dashboard/markets/my-forecasts");
+      }
+    } catch (error: any) {
+      toast.removeToast(toastId);
+      toast.error("Submission Failed", error?.message || "Unable to place forecast.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getTimeRemaining = () => {
@@ -179,8 +134,15 @@ export default function MarketDetailPage() {
     return `${days}d ${hours}h`;
   };
 
-  if (loading || !market) {
+  if (loading) {
     return <LoadingLogo fullScreen size="lg" />;
+  }
+  if (!market) {
+    return (
+      <div className="p-8 text-sm text-black/50">
+        Market not found or unavailable.
+      </div>
+    );
   }
 
   const totalVotes = market.options.reduce(
@@ -194,7 +156,7 @@ export default function MarketDetailPage() {
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-2 space-y-8">
         {/* Dashboard Header */}
-        <DashboardHeader user={mockUser} />
+        <DashboardHeader user={user} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8 px-4">
           {/* Main Content */}

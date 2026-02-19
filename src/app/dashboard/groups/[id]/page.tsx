@@ -45,13 +45,18 @@ import { useToast } from "@/components/ui/toast-notification";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useEffect, useState, useMemo, useCallback, useRef, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
-import { mockUser, mockMyBets, mockMarkets } from "@/lib/mockData";
 import { isGroupMember, joinGroup, leaveGroup } from "@/lib/membership";
 import Link from "next/link";
 import Image from "next/image";
 import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { MarketChart } from "@/components/markets/MarketChart";
+import {
+  fetchJsonOrNull,
+  normalizeGroup,
+  normalizePositions,
+  useLiveUser,
+} from "@/lib/live-data";
 
 // Types
 interface GroupMember {
@@ -102,117 +107,20 @@ interface UnifiedGroup {
   activityFeed?: GroupActivity[];
 }
 
-// Extended mock data
-const mockGroupDetails: UnifiedGroup = {
-  id: 1,
-  name: "Premier League Fanatics",
-  description:
-    "Discuss matches, predict outcomes, and forecast on your favorite teams. Weekly analysis and live match markets.",
-  category: "Sports",
+const defaultGroupDetails: UnifiedGroup = {
+  id: "",
+  name: "Group",
+  description: "",
+  category: "Community",
   isPublic: true,
-  memberCount: 1240,
-  activePositionsCount: 15,
-  createdAt: "2024-01-15",
-  creatorId: "user_001",
-  image:
-    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
-  members: [
-    {
-      id: "user_001",
-      username: "MatchGuru",
-      avatar: "MG",
-      role: "admin",
-      joined: "2024-01-15",
-      totalPositions: 234,
-      totalWinnings: 456700,
-      winRate: 78,
-    },
-    {
-      id: "user_002",
-      username: "GoalKeeper",
-      avatar: "GK",
-      role: "member",
-      joined: "2024-01-16",
-      totalPositions: 189,
-      totalWinnings: 398200,
-      winRate: 72,
-    },
-    {
-      id: "user_003",
-      username: "ScorePredictor",
-      avatar: "SP",
-      role: "member",
-      joined: "2024-01-18",
-      totalPositions: 156,
-      totalWinnings: 345100,
-      winRate: 69,
-    },
-    {
-      id: "user_004",
-      username: "PenaltyKing",
-      avatar: "PK",
-      role: "member",
-      joined: "2024-01-20",
-      totalPositions: 142,
-      totalWinnings: 298400,
-      winRate: 65,
-    },
-    {
-      id: "user_005",
-      username: "TacticsExpert",
-      avatar: "TE",
-      role: "member",
-      joined: "2024-01-22",
-      totalPositions: 98,
-      totalWinnings: 245600,
-      winRate: 61,
-    },
-  ],
+  memberCount: 0,
+  activePositionsCount: 0,
+  createdAt: new Date().toISOString(),
+  creatorId: "",
+  image: "",
+  members: [],
   activePositions: [],
-  activityFeed: [
-    {
-      id: "act_001",
-      type: "forecastSettled",
-      user: "MatchGuru",
-      action: "settled forecast",
-      details: "Chelsea vs Arsenal",
-      amount: "32,400 KSH",
-      timestamp: "2026-02-03T14:30:00",
-    },
-    {
-      id: "act_002",
-      type: "forecastCreated",
-      user: "ScorePredictor",
-      action: "created forecast",
-      details: "Least popular team",
-      amount: "28,400 KSH",
-      timestamp: "2026-02-03T12:15:00",
-    },
-    {
-      id: "act_003",
-      type: "member_joined",
-      user: "TacticsExpert",
-      action: "joined the group",
-      timestamp: "2026-02-03T10:45:00",
-    },
-    {
-      id: "act_004",
-      type: "forecastParticipated", // Renamed from bet_participated
-      user: "PenaltyKing",
-      action: "placed forecast", // Renamed from placed bet
-      details: "Man Utd vs Liverpool",
-      amount: "2,500 KSH",
-      timestamp: "2026-02-03T09:20:00",
-    },
-    {
-      id: "act_005",
-      type: "forecastDisputed",
-      user: "GoalKeeper",
-      action: "disputed result",
-      details: "Top scorer",
-      timestamp: "2026-02-02T16:30:00",
-    },
-  ],
+  activityFeed: [],
 };
 
 const ActivityIcon = ({ type }: { type: string }) => {
@@ -240,6 +148,7 @@ const PlaceForecastSlip = ({
   setForecastSuccess,
   onForecastPlaced
 }: any) => {
+  const { user } = useLiveUser();
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmittingForecast, setIsSubmittingForecast] = useState(false);
   const toast = useToast();
@@ -253,11 +162,49 @@ const PlaceForecastSlip = ({
     return stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
   }, [stakeAmount, platformFee]);
 
-  const handlePlaceForecast = useCallback(() => {
-    if (!selectedOption || !stakeAmount || parseFloat(stakeAmount) < 50) return;
+  const availableOptions = useMemo(() => {
+    const rawOptions = Array.isArray(activeMarket?.options) ? activeMarket.options : [];
+    const normalized = rawOptions
+      .map((option: any, index: number) => {
+        const text = typeof option === "string" ? option : option?.optionText || option?.text || "";
+        if (!text) return null;
+        const total = Number(activeMarket?.totalPool || 0);
+        const equalShare = rawOptions.length > 0 ? Math.round(100 / rawOptions.length) : 0;
+        const percentage = total > 0 ? equalShare : equalShare;
+        return {
+          id: `opt${index + 1}`,
+          text,
+          percentage,
+          image:
+            "https://images.unsplash.com/photo-1610237736387-991eb8151475?auto=format&fit=crop&q=80&w=400",
+        };
+      })
+      .filter(Boolean);
+
+    if (normalized.length >= 2) return normalized;
+    return [
+      {
+        id: "opt1",
+        text: "Option A",
+        percentage: 50,
+        image: "https://images.unsplash.com/photo-1624880357913-a8539238245b?w=400&auto=format&fit=crop",
+      },
+      {
+        id: "opt2",
+        text: "Option B",
+        percentage: 50,
+        image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop",
+      },
+    ];
+  }, [activeMarket]);
+
+  const selectedOptionData = availableOptions.find((option: any) => option.id === selectedOption);
+
+  const handlePlaceForecast = useCallback(async () => {
+    if (!selectedOptionData || !stakeAmount || parseFloat(stakeAmount) < 50 || !activeMarket?.id) return;
 
     // Check balance
-    if (mockUser.balance < parseFloat(stakeAmount)) {
+    if (user.balance < parseFloat(stakeAmount)) {
       toast.error(
         "Insufficient Balance",
         "Please top up your wallet to place this forecast."
@@ -269,39 +216,51 @@ const PlaceForecastSlip = ({
     }
 
     setIsSubmittingForecast(true);
-    setTimeout(() => {
-      try {
-        setForecastSuccess(true);
-        toast.success("Forecast Submitted!", "Redirecting to your forecast slip..."); // Updated message
-
-        // Create new forecast object
-        const newForecast = {
-             id: `pos_${Date.now()}`,
-             title: activeMarket?.title || "Unknown Market",
-             amount: parseFloat(stakeAmount),
-             potentialWin: parseFloat(stakeAmount) * 1.95, // Mock odds
-             status: "active",
-             outcome: selectedOption === "opt1" ? "Man United Win" : selectedOption === "opt2" ? "Draw" : "Liverpool Win",
-             date: new Date().toISOString(),
-             marketId: activeMarket?.id || "market_01"
-        };
-
-        // Redirect after short delay
-        setTimeout(() => {
-          setForecastSuccess(false);
-          setStakeAmount("");
-          setSelectedOption(null);
-          if (onForecastPlaced) {
-             onForecastPlaced(newForecast);
-          }
-        }, 1500);
-      } catch (error) {
-        toast.error("Error", "Failed to place forecast");
-      } finally {
-        setIsSubmittingForecast(false);
+    try {
+      const response = await fetch(`/api/groups/${group.id}/markets/${activeMarket.id}/join`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          selectedOption: selectedOptionData.text,
+          amount: Number(stakeAmount),
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || "Failed to place forecast");
       }
-    }, 1500);
-  }, [selectedOption, stakeAmount, toast, setForecastSuccess, setSelectedOption, activeMarket, onForecastPlaced]);
+
+      setForecastSuccess(true);
+      toast.success("Forecast Submitted!", "Your group position was created.");
+
+      setTimeout(() => {
+        setForecastSuccess(false);
+        setStakeAmount("");
+        setSelectedOption(null);
+        if (onForecastPlaced) {
+          onForecastPlaced(payload || {
+            id: `${activeMarket.id}-${Date.now()}`,
+            marketId: activeMarket.id,
+          });
+        }
+      }, 1200);
+    } catch (error: any) {
+      toast.error("Error", error?.message || "Failed to place forecast");
+    } finally {
+      setIsSubmittingForecast(false);
+    }
+  }, [
+    selectedOptionData,
+    stakeAmount,
+    user.balance,
+    toast,
+    router,
+    activeMarket?.id,
+    group.id,
+    onForecastPlaced,
+    setForecastSuccess,
+    setSelectedOption,
+  ]);
 
   return (
     <AnimatePresence mode="wait">
@@ -365,18 +324,10 @@ const PlaceForecastSlip = ({
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-lg font-semibold text-black">
-                      {selectedOption === "opt1"
-                        ? "Man United Win"
-                        : selectedOption === "opt2"
-                          ? "Draw"
-                          : "Liverpool Win"}
+                      {selectedOptionData?.text || "Selection"}
                     </p>
                     <p className="text-xs text-black/50 mt-1">
-                      {selectedOption === "opt1"
-                        ? "45%"
-                        : selectedOption === "opt2"
-                          ? "25%"
-                          : "30%"}{" "}
+                      {selectedOptionData?.percentage || 0}%{" "}
                       consensus
                     </p>
                   </div>
@@ -745,6 +696,7 @@ export default function GroupPage() {
   const groupId = params.id as string;
   const router = useRouter();
   const toast = useToast();
+  const { user, isLoading: isUserLoading } = useLiveUser();
 
   // State
   const [activeTab, setActiveTab] = useState("feed");
@@ -761,36 +713,22 @@ export default function GroupPage() {
   // NEW: Separate state for Featured Market trading
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [forecastSuccess, setForecastSuccess] = useState(false);
-  const [activeMarket, setActiveMarket] = useState<any>(mockMarkets[0]);
+  const [activeMarket, setActiveMarket] = useState<any>(null);
   const [forecasts, setForecasts] = useState<any[]>([]);
+  const [group, setGroup] = useState<UnifiedGroup>({
+    ...defaultGroupDetails,
+    id: groupId,
+  });
+  const [groupMarkets, setGroupMarkets] = useState<any[]>([]);
+  const [userBets, setUserBets] = useState<any[]>([]);
 
   // NEW: State for managing existing positions from Activity/Positions tab
   const [selectedBetToManage, setSelectedBetToManage] = useState<any | null>(
     null,
   );
 
-    // Memoized group data
-  const group = useMemo((): UnifiedGroup => {
-    const details = { ...mockGroupDetails };
-    if (!details.activePositions || details.activePositions.length === 0) {
-      details.activePositions = [
-        {
-          id: "pos_001",
-          type: "winner_takes_all",
-          title: "Who wins Man United vs Liverpool?",
-          creator: "MatchGuru",
-          pool: "45,600 KSH",
-          participants: 23,
-          endsAt: "2026-02-05T15:00:00",
-          status: "active",
-        },
-      ];
-    }
-    return details as UnifiedGroup;
-  }, [mockGroupDetails]);
-
-  const isPlatformAdmin = mockUser.role === "admin";
-  const isGroupAdmin = group.creatorId === mockUser.id;
+  const isPlatformAdmin = user.role === "admin";
+  const isGroupAdmin = group.creatorId === user.id;
   const canManageMembers = isPlatformAdmin || isGroupAdmin;
 
   const [isMember, setIsMember] = useState(() => isGroupMember(groupId));
@@ -800,6 +738,116 @@ export default function GroupPage() {
       setIsMember(isGroupMember(groupId));
     }
   }, [groupId, isJoining]);
+
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
+      const [groupPayload, marketsPayload, positionsPayload] = await Promise.all([
+        fetchJsonOrNull<any>(`/api/groups/${groupId}`),
+        fetchJsonOrNull<any>(`/api/groups/${groupId}/markets`),
+        fetchJsonOrNull<any>("/api/markets/my/positions?limit=200&offset=0"),
+      ]);
+
+      if (groupPayload) {
+        const normalized = normalizeGroup(groupPayload);
+        setGroup({
+          id: normalized.id,
+          name: normalized.name,
+          description: normalized.description,
+          category: normalized.category,
+          isPublic: normalized.isPublic,
+          memberCount: normalized.memberCount,
+          activePositionsCount: normalized.activePositionsCount,
+          createdAt: normalized.createdAt,
+          creatorId: normalized.creatorId,
+          image: normalized.image,
+          members: normalized.members,
+          activePositions: [],
+          activityFeed: [],
+        });
+      }
+
+      const rawMarkets = Array.isArray(marketsPayload)
+        ? marketsPayload
+        : Array.isArray(marketsPayload?.data)
+          ? marketsPayload.data
+          : [];
+
+      const mappedMarkets = rawMarkets.map((market: any) => ({
+        id: market._id || market.id,
+        title: market.title || "Untitled Forecast",
+        description: market.description || "",
+        image:
+          market.imageUrl ||
+          "https://images.unsplash.com/photo-1610237736387-991eb8151475?auto=format&fit=crop&q=80&w=800",
+        type:
+          market.marketType === "winner_takes_all"
+            ? "winner_takes_all"
+            : "odd_one_out",
+        pool: `${Number(market.totalPool || 0).toLocaleString()} KSH`,
+        participants: Array.isArray(market.participants)
+          ? market.participants.length
+          : 0,
+        participantsRaw: Array.isArray(market.participants)
+          ? market.participants
+          : [],
+        buyInAmount: Number(market.buyInAmount || 0),
+        totalPool: Number(market.totalPool || 0),
+        options: Array.isArray(market.options)
+          ? market.options
+          : Array.isArray(market.outcomes)
+            ? market.outcomes.map((outcome: any) => outcome?.optionText).filter(Boolean)
+            : [],
+        endsAt: market.createdAt || new Date().toISOString(),
+        status: market.status || "active",
+      }));
+      setGroupMarkets(mappedMarkets);
+      setActiveMarket(mappedMarkets[0] || null);
+      setGroup((prev) => ({
+        ...prev,
+        activePositions: mappedMarkets,
+        activePositionsCount: mappedMarkets.filter((market: any) => market.status === "active").length || mappedMarkets.length,
+      }));
+
+      const normalizedPositions = normalizePositions(positionsPayload).filter((position) =>
+        mappedMarkets.some((market: any) => market.id === position.marketId),
+      );
+
+      const resolveUserId = (value: any) => {
+        if (!value) return "";
+        if (typeof value === "string") return value;
+        if (typeof value === "object") return String(value._id || value.id || "");
+        return "";
+      };
+
+      const groupParticipantBets = mappedMarkets.flatMap((market: any) => {
+        return (market.participantsRaw || [])
+          .filter((participant: any) => resolveUserId(participant?.userId) === user.id)
+          .map((participant: any, index: number) => ({
+            id: `${market.id}-${resolveUserId(participant?.userId)}-${index}`,
+            marketId: market.id,
+            title: market.title,
+            outcome: participant?.selectedOption || "Selection",
+            stakeAmount: market.buyInAmount || 0,
+            currentValue: Number(participant?.payoutAmount || market.buyInAmount || 0),
+            status: market.status === "settled" ? "settled" : "active",
+            pnl:
+              market.status === "settled"
+                ? Number(participant?.payoutAmount || 0) - Number(market.buyInAmount || 0)
+                : undefined,
+            openedAt: participant?.joinedAt || market.endsAt || new Date().toISOString(),
+          }));
+      });
+
+      const combined = [...groupParticipantBets, ...normalizedPositions].filter(
+        (bet, index, allBets) => allBets.findIndex((item) => item.id === bet.id) === index,
+      );
+      setUserBets(combined);
+      setForecasts(combined);
+      setIsLoading(false);
+    };
+    void load();
+  }, [groupId, user.id]);
 
   const leaderboard = useMemo(() => {
     const members = (group.members || [])
@@ -835,6 +883,39 @@ export default function GroupPage() {
     return `${days}d ago`;
   }, []);
 
+  const activeMarketOptions = useMemo(() => {
+    const rawOptions = Array.isArray(activeMarket?.options) ? activeMarket.options : [];
+    const normalized = rawOptions
+      .map((option: any, index: number) => {
+        const text = typeof option === "string" ? option : option?.optionText || option?.text || "";
+        if (!text) return null;
+        return {
+          id: `opt${index + 1}`,
+          text,
+          percentage: rawOptions.length > 0 ? Math.round(100 / rawOptions.length) : 0,
+          image:
+            "https://images.unsplash.com/photo-1610237736387-991eb8151475?auto=format&fit=crop&q=80&w=400",
+        };
+      })
+      .filter(Boolean);
+
+    if (normalized.length >= 2) return normalized;
+    return [
+      {
+        id: "opt1",
+        text: "Option A",
+        percentage: 50,
+        image: "https://images.unsplash.com/photo-1624880357913-a8539238245b?w=400&auto=format&fit=crop",
+      },
+      {
+        id: "opt2",
+        text: "Option B",
+        percentage: 50,
+        image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop",
+      },
+    ];
+  }, [activeMarket]);
+
   // Handlers
   const handleToggleNotifications = useCallback(() => {
     setIsActionLoading(true);
@@ -857,38 +938,46 @@ export default function GroupPage() {
     }, 800);
   }, [isNotificationsOn, toast]);
 
-  const handleJoinGroup = useCallback(() => {
+  const handleJoinGroup = useCallback(async () => {
     setIsJoining(true);
-    setTimeout(() => {
-      try {
-        joinGroup(groupId);
-        setIsMember(true);
-        toast.success("Joined Group Successfully", `Welcome to ${group.name}!`);
-      } catch (error) {
-        toast.error("Error", "Failed to join group");
-      } finally {
-        setIsJoining(false);
+    try {
+      const response = await fetch(`/api/groups/${groupId}/join`, {
+        method: "POST",
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || "Failed to join group");
       }
-    }, 1200);
+      joinGroup(groupId);
+      setIsMember(true);
+      toast.success("Joined Group Successfully", `Welcome to ${group.name}!`);
+    } catch (error) {
+      toast.error("Error", "Failed to join group");
+    } finally {
+      setIsJoining(false);
+    }
   }, [groupId, group.name, toast]);
 
-  const userBets = mockMyBets;
-
-  const handleLeaveGroup = useCallback(() => {
+  const handleLeaveGroup = useCallback(async () => {
     setIsActionLoading(true);
-    setTimeout(() => {
-      try {
-        leaveGroup(groupId);
-        setIsMember(false);
-        setShowSettingsMenu(false);
-        toast.info("Group Left", "You are no longer a member of this group.");
-        router.push("/dashboard/groups");
-      } catch (error) {
-        toast.error("Error", "Failed to leave group");
-      } finally {
-        setIsActionLoading(false);
+    try {
+      const response = await fetch(`/api/groups/${groupId}/leave`, {
+        method: "POST",
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || "Failed to leave group");
       }
-    }, 1000);
+      leaveGroup(groupId);
+      setIsMember(false);
+      setShowSettingsMenu(false);
+      toast.info("Group Left", "You are no longer a member of this group.");
+      router.push("/dashboard/groups");
+    } catch (error) {
+      toast.error("Error", "Failed to leave group");
+    } finally {
+      setIsActionLoading(false);
+    }
   }, [groupId, toast, router]);
 
   const handleInvite = useCallback(async () => {
@@ -914,57 +1003,100 @@ export default function GroupPage() {
   }, [group, toast]);
 
   const handleRemoveMember = useCallback(
-    (memberId: string) => {
+    async (memberId: string) => {
       setIsActionLoading(true);
-      setTimeout(() => {
-        try {
-          setShowMemberActions(null);
-          toast.success(
-            "Member Removed",
-            "User has been removed from the group",
-          );
-        } catch (error) {
-          toast.error("Error", "Failed to remove member");
-        } finally {
-          setIsActionLoading(false);
+      try {
+        const response = await fetch(`/api/groups/${groupId}/members/${memberId}/remove`, {
+          method: "POST",
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(payload?.message || payload?.error || "Failed to remove member");
         }
-      }, 800);
+
+        setGroup((prev) => ({
+          ...prev,
+          members: (prev.members || []).filter((memberItem) => {
+            if (typeof memberItem === "string") return memberItem !== memberId;
+            return memberItem.id !== memberId;
+          }),
+          memberCount: Math.max(0, prev.memberCount - 1),
+        }));
+        setShowMemberActions(null);
+        toast.success("Member Removed", "User has been removed from the group");
+      } catch (error: any) {
+        toast.error("Error", error?.message || "Failed to remove member");
+      } finally {
+        setIsActionLoading(false);
+      }
     },
-    [toast],
+    [groupId, toast],
   );
 
   const handlePromoteMember = useCallback(
-    (memberId: string) => {
+    async (memberId: string) => {
       setIsActionLoading(true);
-      setTimeout(() => {
-        try {
-          setShowMemberActions(null);
-          toast.success("Member Promoted", "User is now a group admin");
-        } catch (error) {
-          toast.error("Error", "Failed to promote member");
-        } finally {
-          setIsActionLoading(false);
+      try {
+        const response = await fetch(`/api/groups/${groupId}/members/${memberId}/role`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ role: "admin" }),
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(payload?.message || payload?.error || "Failed to promote member");
         }
-      }, 800);
+
+        setGroup((prev) => ({
+          ...prev,
+          members: (prev.members || []).map((memberItem) => {
+            if (typeof memberItem === "string") return memberItem;
+            if (memberItem.id === memberId) return { ...memberItem, role: "admin" };
+            return memberItem;
+          }),
+        }));
+        setShowMemberActions(null);
+        toast.success("Member Promoted", "User is now a group admin");
+      } catch (error: any) {
+        toast.error("Error", error?.message || "Failed to promote member");
+      } finally {
+        setIsActionLoading(false);
+      }
     },
-    [toast],
+    [groupId, toast],
   );
 
   const handleDemoteMember = useCallback(
-    (memberId: string) => {
+    async (memberId: string) => {
       setIsActionLoading(true);
-      setTimeout(() => {
-        try {
-          setShowMemberActions(null);
-          toast.success("Member Demoted", "User is now a regular member");
-        } catch (error) {
-          toast.error("Error", "Failed to demote member");
-        } finally {
-          setIsActionLoading(false);
+      try {
+        const response = await fetch(`/api/groups/${groupId}/members/${memberId}/role`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ role: "member" }),
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(payload?.message || payload?.error || "Failed to demote member");
         }
-      }, 800);
+
+        setGroup((prev) => ({
+          ...prev,
+          members: (prev.members || []).map((memberItem) => {
+            if (typeof memberItem === "string") return memberItem;
+            if (memberItem.id === memberId) return { ...memberItem, role: "member" };
+            return memberItem;
+          }),
+        }));
+        setShowMemberActions(null);
+        toast.success("Member Demoted", "User is now a regular member");
+      } catch (error: any) {
+        toast.error("Error", error?.message || "Failed to demote member");
+      } finally {
+        setIsActionLoading(false);
+      }
     },
-    [toast],
+    [groupId, toast],
   );
 
   const handleTabChange = useCallback(
@@ -979,19 +1111,14 @@ export default function GroupPage() {
     [activeTab],
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
+  if (isUserLoading || isLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full px-2">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Discover communities and join the conversation"
       />
 
@@ -1242,29 +1369,7 @@ export default function GroupPage() {
 
                   <div className="flex flex-col gap-8">
                     <div className="grid grid-cols-1 gap-4">
-                      {[
-                        {
-                          id: "opt1",
-                          text: "Man United Win",
-                          percentage: 45,
-                          image:
-                            "https://images.unsplash.com/photo-1624880357913-a8539238245b?w=400&auto=format&fit=crop",
-                        },
-                        {
-                          id: "opt2",
-                          text: "Draw",
-                          percentage: 25,
-                          image:
-                            "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&auto=format&fit=crop",
-                        },
-                        {
-                          id: "opt3",
-                          text: "Liverpool Win",
-                          percentage: 30,
-                          image:
-                            "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&auto=format&fit=crop",
-                        },
-                      ].map((option, index) => {
+                      {activeMarketOptions.map((option: any, index: number) => {
                         const isSelected = selectedOption === option.id;
 
                         return (
@@ -1338,9 +1443,9 @@ export default function GroupPage() {
                 setSelectedOption={setSelectedOption}
                 forecastSuccess={forecastSuccess}
                 setForecastSuccess={setForecastSuccess}
-                onForecastPlaced={(newForecast: any) => {
+                onForecastPlaced={(_newForecast: any) => {
                   toast.success("Position confirmed!");
-                  router.push(`/dashboard/markets/my-forecasts/${newForecast.id}`);
+                  setActiveTab("bets");
                 }}
               />
             </div>
@@ -1382,7 +1487,7 @@ export default function GroupPage() {
                 id: "bets",
                 label: "Active Forecasts",
                 icon: IconAward,
-                count: mockMyBets.length,
+                count: userBets.length,
               },
               {
                 id: "members",
@@ -1569,7 +1674,7 @@ export default function GroupPage() {
                  {/* Bets List */}
                  <div className="lg:col-span-8 space-y-4">
                     {userBets.map((forecast, index) => {
-                      const market = mockMarkets.find(m => m.id === forecast.marketId);
+                      const market = groupMarkets.find((m) => m.id === forecast.marketId);
                       const isWon = forecast.status === 'settled' && (forecast.pnl || 0) > 0;
                       const isLost = forecast.status === 'settled' && (forecast.pnl || 0) <= 0;
                       
@@ -1757,7 +1862,7 @@ export default function GroupPage() {
                                   </p>
                                 </div>
 
-                                {canManageMembers && member.id !== mockUser.id && (
+                                {canManageMembers && member.id !== user.id && (
                                   <div className="relative">
                                     <button
                                       onClick={() =>

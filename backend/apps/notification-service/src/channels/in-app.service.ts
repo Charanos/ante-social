@@ -17,7 +17,7 @@ export class InAppService {
       title,
       message,
       type,
-      read: false,
+      isRead: false,
     });
     await notification.save();
     this.logger.log(`Created in-app notification for ${userId}: ${title}`);
@@ -33,7 +33,7 @@ export class InAppService {
       .exec();
 
     const total = await this.notificationModel.countDocuments({ userId });
-    const unreadCount = await this.notificationModel.countDocuments({ userId, read: false });
+    const unreadCount = await this.notificationModel.countDocuments({ userId, isRead: false });
 
     return { data: notifications, meta: { total, unreadCount, limit, offset } };
   }
@@ -41,7 +41,7 @@ export class InAppService {
   async markAsRead(userId: string, notificationId: string) {
     const notification = await this.notificationModel.findOneAndUpdate(
       { _id: notificationId, userId },
-      { read: true },
+      { isRead: true },
       { new: true },
     );
     return notification;
@@ -49,9 +49,20 @@ export class InAppService {
 
   async markAllAsRead(userId: string) {
     const result = await this.notificationModel.updateMany(
-      { userId, read: false },
-      { read: true },
+      { userId, isRead: false },
+      { isRead: true },
     );
     return { success: true, modifiedCount: result.modifiedCount };
+  }
+
+  async deleteNotification(userId: string, notificationId: string) {
+    if (!Types.ObjectId.isValid(notificationId)) {
+      return { success: false };
+    }
+    const deleted = await this.notificationModel.findOneAndDelete({
+      _id: new Types.ObjectId(notificationId),
+      userId: new Types.ObjectId(userId),
+    });
+    return { success: Boolean(deleted) };
   }
 }

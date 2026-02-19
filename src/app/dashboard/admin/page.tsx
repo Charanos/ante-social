@@ -29,17 +29,29 @@ import {
   IconCheck,
   IconLoader3
 } from "@tabler/icons-react"
-import { mockAdminStats, mockMarkets } from "@/lib/mockData"
 import Link from "next/link"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import RecurringMarketModal from "@/components/admin/RecurringMarketModal"
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
+import { fetchJsonOrNull, useMarketList } from "@/lib/live-data"
 
 export default function AdminPage() {
   const toast = useToast()
+  const { markets: marketList, isLoading: isMarketsLoading } = useMarketList()
+  const [adminStats, setAdminStats] = useState({
+    totalUsers: 0,
+    totalRevenue: 0,
+    activeMarkets: 0,
+    totalVolume: 0,
+    participants: 0,
+    pendingPayouts: 0,
+    pendingSettlements: 0,
+    pendingWithdrawals: 0,
+    flaggedMarkets: 0,
+  })
   
   // Loading states
-  const [isPageLoading, setIsPageLoading] = useState(true)
+  const [isStatsLoading, setIsStatsLoading] = useState(true)
   const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false)
   
   // Filters and search
@@ -52,12 +64,26 @@ export default function AdminPage() {
   const [showTypeMenu, setShowTypeMenu] = useState(false)
   const [showSortMenu, setShowSortMenu] = useState(false)
 
-  // Page load simulation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false)
-    }, 800)
-    return () => clearTimeout(timer)
+    const loadStats = async () => {
+      setIsStatsLoading(true)
+      const stats = await fetchJsonOrNull<any>("/api/admin/stats")
+      if (stats) {
+        setAdminStats({
+          totalUsers: Number(stats.totalUsers || 0),
+          totalRevenue: Number(stats.totalRevenue || 0),
+          activeMarkets: Number(stats.activeMarkets || 0),
+          totalVolume: Number(stats.totalVolume || 0),
+          participants: Number(stats.participants || 0),
+          pendingPayouts: Number(stats.pendingPayouts || 0),
+          pendingSettlements: Number(stats.pendingSettlements || 0),
+          pendingWithdrawals: Number(stats.pendingWithdrawals || 0),
+          flaggedMarkets: Number(stats.flaggedMarkets || 0),
+        })
+      }
+      setIsStatsLoading(false)
+    }
+    void loadStats()
   }, [])
 
   // Close dropdowns on click outside
@@ -87,7 +113,7 @@ export default function AdminPage() {
 
   // Filter markets
   const filteredMarkets = useMemo(() => {
-    let filtered = mockMarkets
+    let filtered = [...marketList]
 
     // Search filter
     if (searchQuery) {
@@ -97,18 +123,37 @@ export default function AdminPage() {
       )
     }
 
-    // Status filter (mock - assuming all are active for now)
-    // if (statusFilter !== "all") {
-    //   filtered = filtered.filter(m => m.status === statusFilter)
-    // }
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((market) => {
+        if (statusFilter === "pending") return market.status === "suspended"
+        return market.status === statusFilter
+      })
+    }
 
-    // Flagged filter
-    // if (showFlaggedOnly) {
-    //   filtered = filtered.filter(m => m.is_flagged)
-    // }
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((market) => market.type === typeFilter)
+    }
+
+    if (showFlaggedOnly) {
+      filtered = filtered.filter((market) => market.status === "disputed")
+    }
+
+    if (sortBy === "oldest") {
+      filtered.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+    } else if (sortBy === "volume") {
+      filtered.sort((a, b) => (b.poolAmount || 0) - (a.poolAmount || 0))
+    } else {
+      filtered.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+    }
 
     return filtered
-  }, [mockMarkets, searchQuery, statusFilter, showFlaggedOnly])
+  }, [marketList, searchQuery, showFlaggedOnly, sortBy, statusFilter, typeFilter])
 
   const quickActions = [
     {
@@ -186,7 +231,7 @@ export default function AdminPage() {
 
   const hasActiveFilters = searchQuery || statusFilter !== "all" || typeFilter !== "all" || sortBy !== "newest" || showFlaggedOnly
 
-  if (isPageLoading) {
+  if (isStatsLoading || isMarketsLoading) {
     return <LoadingLogo fullScreen size="lg" />
   }
 
@@ -243,7 +288,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-900/60">Active Markets</p>
-                  <p className="mt-2 text-3xl font-medium font-mono text-blue-900">{mockAdminStats.activeMarkets}</p>
+                  <p className="mt-2 text-3xl font-medium font-mono text-blue-900">{adminStats.activeMarkets}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm group-hover:scale-110 transition-transform">
                   <IconTrendingUp className="h-6 w-6 text-blue-600" />
@@ -264,7 +309,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-900/60">Total Users</p>
-                  <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{mockAdminStats.totalUsers}</p>
+                  <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{adminStats.totalUsers}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm group-hover:scale-110 transition-transform">
                   <IconUsers className="h-6 w-6 text-purple-600" />
@@ -285,7 +330,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-900/60">Total Volume</p>
-                  <p className="mt-2 text-3xl font-medium font-mono text-green-900">${mockAdminStats.totalVolume.toLocaleString()}</p>
+                  <p className="mt-2 text-3xl font-medium font-mono text-green-900">${adminStats.totalVolume.toLocaleString()}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm group-hover:scale-110 transition-transform">
                   <IconCurrencyDollar className="h-6 w-6 text-green-600" />
@@ -307,19 +352,19 @@ export default function AdminPage() {
                 <div>
                   <p className="text-sm font-medium text-red-900/60">Flagged Markets</p>
                   <div className="flex items-baseline gap-2">
-                    <p className="mt-2 text-3xl font-medium font-mono text-red-900">{mockAdminStats.flaggedMarkets}</p>
-                    {mockAdminStats.flaggedMarkets === 0 && (
+                    <p className="mt-2 text-3xl font-medium font-mono text-red-900">{adminStats.flaggedMarkets}</p>
+                    {adminStats.flaggedMarkets === 0 && (
                       <span className="text-xs text-red-500/60 font-medium">All clear</span>
                     )}
                   </div>
                 </div>
                 <div className={cn(
                   "rounded-xl p-3 shadow-sm backdrop-blur-sm group-hover:scale-110 transition-transform",
-                  mockAdminStats.flaggedMarkets > 0 ? "bg-white/80" : "bg-white/60"
+                  adminStats.flaggedMarkets > 0 ? "bg-white/80" : "bg-white/60"
                 )}>
                   <IconShield className={cn(
                     "h-6 w-6",
-                    mockAdminStats.flaggedMarkets > 0 ? "text-red-600" : "text-red-400"
+                    adminStats.flaggedMarkets > 0 ? "text-red-600" : "text-red-400"
                   )} />
                 </div>
               </div>
@@ -552,7 +597,7 @@ export default function AdminPage() {
                         exit={{ opacity: 0, y: -10 }}
                         className="absolute top-full mt-2 left-0 w-48 bg-white border border-black/10 rounded-xl shadow-xl overflow-hidden z-50"
                       >
-                        {["all", "poll-style", "betrayal-game"].map((type) => (
+                        {["all", "consensus", "reflex", "ladder", "prisoner_dilemma", "syndicate"].map((type) => (
                           <button
                             key={type}
                             onClick={() => {

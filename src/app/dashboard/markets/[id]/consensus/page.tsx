@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import {
@@ -18,216 +18,54 @@ import {
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
-import { mockUser } from "@/lib/mockData";
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import { MarketChart } from "@/components/markets/MarketChart";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import Image from "next/image";
-
-// Mock poll market data
-const getMockPollMarket = (id: string) => {
-  const markets: Record<string, any> = {
-    "poll-001": {
-      id: "poll-001",
-      title: "Best Nairobi Matatu Route",
-      description:
-        "Vote for the most reliable, comfortable, and safest matatu route in Nairobi. Consider factors like speed, music, conductor vibes, and overall passenger experience.",
-      image:
-        "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&auto=format&fit=crop",
-      category: "Poll",
-      market_type: "poll",
-      buy_in_amount: 500,
-      total_pool: 245000,
-      participant_count: 47,
-      status: "active",
-      close_date: new Date(Date.now() + 7920000), // ~2h 15m
-      options: [
-        {
-          id: "opt1",
-          option_text: "Route 111 (Ngong Road)",
-          votes: 15,
-          percentage: 32,
-          image:
-            "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt2",
-          option_text: "Route 125/126 (Rongai)",
-          votes: 18,
-          percentage: 38,
-          image:
-            "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt3",
-          option_text: "Route 23 (Westlands)",
-          votes: 8,
-          percentage: 17,
-          image:
-            "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt4",
-          option_text: "Route 58 (Buruburu)",
-          votes: 6,
-          percentage: 13,
-          image:
-            "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&auto=format&fit=crop",
-        },
-      ],
-      participants: [
-        {
-          username: "@matatu_king",
-          total_stake: 5000,
-          timestamp: new Date(Date.now() - 7200000),
-        },
-        {
-          username: "@nai_guy",
-          total_stake: 1500,
-          timestamp: new Date(Date.now() - 3600000),
-        },
-        {
-          username: "@city_hopper",
-          total_stake: 1000,
-          timestamp: new Date(Date.now() - 1800000),
-        },
-        {
-          username: "@route_master",
-          total_stake: 2500,
-          timestamp: new Date(Date.now() - 900000),
-        },
-      ],
-    },
-    "poll-002": {
-      id: "poll-002",
-      title: "Who Wins the Derby?",
-      description:
-        "AFC Leopards vs Gor Mahia - predict the winner of Kenya's biggest football rivalry",
-      image:
-        "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&auto=format&fit=crop",
-      category: "Poll",
-      market_type: "poll",
-      buy_in_amount: 1000,
-      total_pool: 182500,
-      participant_count: 93,
-      status: "active",
-      close_date: new Date(Date.now() + 19800000), // ~5h 30m
-      options: [
-        {
-          id: "opt1",
-          option_text: "AFC Leopards Win",
-          votes: 35,
-          percentage: 38,
-          image:
-            "https://images.unsplash.com/photo-1606925797300-0b35e9d1794e?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt2",
-          option_text: "Gor Mahia Win",
-          votes: 48,
-          percentage: 52,
-          image:
-            "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt3",
-          option_text: "Draw",
-          votes: 10,
-          percentage: 10,
-          image:
-            "https://images.unsplash.com/photo-1529993654-293d0c6e4b84?w=800&auto=format&fit=crop",
-        },
-      ],
-      participants: [
-        {
-          username: "@leopards_fan",
-          total_stake: 3000,
-          timestamp: new Date(Date.now() - 10800000),
-        },
-        {
-          username: "@kogalo",
-          total_stake: 5000,
-          timestamp: new Date(Date.now() - 5400000),
-        },
-        {
-          username: "@neutral_better",
-          total_stake: 1000,
-          timestamp: new Date(Date.now() - 2700000),
-        },
-      ],
-    },
-    "poll-003": {
-      id: "poll-003",
-      title: "Nairobi Traffic Chaos",
-      description: "Which time of day has the worst traffic in Nairobi CBD?",
-      image:
-        "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&auto=format&fit=crop",
-      category: "Poll",
-      market_type: "poll",
-      buy_in_amount: 300,
-      total_pool: 67800,
-      participant_count: 34,
-      status: "active",
-      close_date: new Date(Date.now() + 30000000), // ~8h 20m
-      options: [
-        {
-          id: "opt1",
-          option_text: "7-9 AM (Morning Rush)",
-          votes: 12,
-          percentage: 35,
-          image:
-            "https://images.unsplash.com/photo-1508146544796-045a7653611a?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt2",
-          option_text: "5-7 PM (Evening Rush)",
-          votes: 18,
-          percentage: 53,
-          image:
-            "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
-        },
-        {
-          id: "opt3",
-          option_text: "12-2 PM (Lunch Hour)",
-          votes: 4,
-          percentage: 12,
-          image:
-            "https://images.unsplash.com/photo-1502905172761-5b55a56d33f2?w=800&auto=format&fit=crop",
-        },
-      ],
-      participants: [
-        {
-          username: "@commuter_daily",
-          total_stake: 500,
-          timestamp: new Date(Date.now() - 14400000),
-        },
-        {
-          username: "@traffic_master",
-          total_stake: 1200,
-          timestamp: new Date(Date.now() - 7200000),
-        },
-      ],
-    },
-  };
-
-  return markets[id] || markets["poll-001"];
-};
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import {
+  mapMarketToDetailView,
+  parseApiError,
+} from "@/lib/market-detail-view";
 
 export default function PollMarketPage() {
   const params = useParams();
   const toast = useToast();
+  const { user } = useLiveUser();
   const marketId = params.id as string;
-
-  const market = getMockPollMarket(marketId);
+  const [market, setMarket] = useState<any>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handlePlaceBet = () => {
+  useEffect(() => {
+    if (!marketId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setIsPageLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
+      if (cancelled) return;
+      setMarket(payload ? mapMarketToDetailView(payload) : null);
+      setIsPageLoading(false);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [marketId]);
+
+  const handlePlaceBet = async () => {
+    if (!market) return;
+    const stakeValue = Number.parseFloat(stakeAmount);
     if (
       !selectedOption ||
       !stakeAmount ||
-      parseFloat(stakeAmount) < market.buy_in_amount
+      !Number.isFinite(stakeValue) ||
+      stakeValue < market.buy_in_amount
     ) {
       toast.error(
         "Invalid Bet",
@@ -235,9 +73,26 @@ export default function PollMarketPage() {
       );
       return;
     }
+    if (user.balance < stakeValue) {
+      toast.error("Insufficient Balance", "Please top up your wallet to continue.");
+      return;
+    }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          outcomeId: selectedOption,
+          amount: stakeValue,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(parseApiError(payload, "Failed to place vote."));
+      }
+
       const selectedOptionText = market.options.find(
         (o: any) => o.id === selectedOption,
       )?.option_text;
@@ -245,8 +100,11 @@ export default function PollMarketPage() {
         "Vote Placed!",
         `You voted ${stakeAmount} KSH on "${selectedOptionText}"`,
       );
+    } catch (error: any) {
+      toast.error("Vote Failed", error?.message || "Unable to place vote.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const getTimeRemaining = () => {
@@ -259,9 +117,16 @@ export default function PollMarketPage() {
   const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
+  if (isPageLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+  if (!market) {
+    return <div className="p-8 text-sm text-black/50">Market not found.</div>;
+  }
+
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader user={user} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
           {/* Main Content */}

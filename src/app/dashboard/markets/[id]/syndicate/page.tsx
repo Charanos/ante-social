@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import {
@@ -18,80 +18,67 @@ import {
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
-import { mockUser } from "@/lib/mockData";
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import { MarketChart } from "@/components/markets/MarketChart";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import Image from "next/image";
-
-// Mock syndicate market data
-const getMockSyndicateMarket = (id: string) => ({
-  id,
-  title: "Venture Syndicate: Web3 Gaming Initiative",
-  description:
-    "Join a collective of forecasters investing in the future of decentralized gaming. This syndicate focuses on identifying high-growth potential in the Web3 space through crowd-vetted analysis.",
-  image:
-    "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=1200&auto=format&fit=crop",
-  category: "Syndicate",
-  market_type: "syndicate",
-  min_contribution: 5000,
-  target_cap: 1000000,
-  current_funding: 475000,
-  participant_count: 24,
-  status: "active",
-  close_date: new Date(Date.now() + 432000000), // 5 days
-  allocation_options: [
-    {
-      id: "opt1",
-      option_text: "Core Infrastructure",
-      votes: 12,
-      percentage: 45,
-    },
-    {
-      id: "opt2",
-      option_text: "Gaming Content",
-      votes: 8,
-      percentage: 35,
-    },
-    {
-      id: "opt3",
-      option_text: "User Acquisition",
-      votes: 4,
-      percentage: 20,
-    },
-  ],
-  participants: [
-    {
-      username: "@whale_trader",
-      total_stake: 50000,
-      timestamp: new Date(Date.now() - 86400000),
-    },
-    {
-      username: "@vc_scout",
-      total_stake: 25000,
-      timestamp: new Date(Date.now() - 43200000),
-    },
-    {
-      username: "@alpha_investor",
-      total_stake: 15000,
-      timestamp: new Date(Date.now() - 21600000),
-    },
-  ],
-});
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
 
 export default function SyndicateMarketPage() {
   const params = useParams();
   const toast = useToast();
+  const { user } = useLiveUser();
   const marketId = params.id as string;
-
-  const market = getMockSyndicateMarket(marketId);
+  const [market, setMarket] = useState<any>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleJoinSyndicate = () => {
+  useEffect(() => {
+    if (!marketId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setIsPageLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
+      if (cancelled) return;
+      if (!payload) {
+        setMarket(null);
+        setIsPageLoading(false);
+        return;
+      }
+
+      const detail = mapMarketToDetailView(payload);
+      const targetCap = Math.max(
+        detail.total_pool * 2,
+        detail.buy_in_amount * Math.max(10, detail.participant_count || 10),
+      );
+      setMarket({
+        ...detail,
+        min_contribution: detail.buy_in_amount,
+        current_funding: detail.total_pool,
+        target_cap: targetCap,
+      });
+      setIsPageLoading(false);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [marketId]);
+
+  const defaultOutcomeId = useMemo(() => market?.options?.[0]?.id ?? null, [market]);
+
+  const handleJoinSyndicate = async () => {
+    if (!market) return;
+    const contribution = Number.parseFloat(stakeAmount);
     if (
       !stakeAmount ||
-      parseFloat(stakeAmount) < market.min_contribution
+      !Number.isFinite(contribution) ||
+      contribution < market.min_contribution
     ) {
       toast.error(
         "Invalid Contribution",
@@ -99,15 +86,38 @@ export default function SyndicateMarketPage() {
       );
       return;
     }
+    if (!defaultOutcomeId) {
+      toast.error("Unavailable Market", "No allocation options are available yet.");
+      return;
+    }
+    if (user.balance < contribution) {
+      toast.error("Insufficient Balance", "Please top up your wallet to continue.");
+      return;
+    }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          outcomeId: defaultOutcomeId,
+          amount: contribution,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(parseApiError(payload, "Failed to join syndicate."));
+      }
       toast.success(
         "Syndicate Joined!",
         `You contributed ${stakeAmount} KSH to the initiative.`,
       );
+    } catch (error: any) {
+      toast.error("Join Failed", error?.message || "Unable to join syndicate.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const getTimeRemaining = () => {
@@ -121,10 +131,17 @@ export default function SyndicateMarketPage() {
   const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
+  if (isPageLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+  if (!market) {
+    return <div className="p-8 text-sm text-black/50">Market not found.</div>;
+  }
+
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-2 space-y-8">
-        <DashboardHeader user={mockUser} />
+        <DashboardHeader user={user} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
           {/* Main Content */}

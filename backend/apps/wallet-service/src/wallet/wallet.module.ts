@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { WalletController } from './wallet.controller';
+import { WalletRpcController } from './wallet.rpc.controller';
 import { DatabaseModule } from '@app/database';
 import { KafkaModule } from '@app/kafka';
 import { DarajaService } from '../payment-providers/daraja/daraja.service';
@@ -10,7 +11,7 @@ import { NowPaymentsController } from '../payment-providers/nowpayments/nowpayme
 
 @Module({
   imports: [DatabaseModule, KafkaModule],
-  controllers: [WalletController, DarajaController, NowPaymentsController],
+  controllers: [WalletController, WalletRpcController, DarajaController, NowPaymentsController],
   providers: [WalletService, DarajaService, NowPaymentsService],
   exports: [WalletService],
 })

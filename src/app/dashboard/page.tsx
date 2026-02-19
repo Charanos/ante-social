@@ -20,12 +20,12 @@ import {
 import Image from "next/image";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
-import { mockUser } from "@/lib/mockData";
 import { MarketCard } from "@/components/markets/MarketCard";
 import Marquee from "react-fast-marquee";
 import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { useLiveUser, useMarketList } from "@/lib/live-data";
 
 const liveWins = [
   {
@@ -108,10 +108,9 @@ function LiveWinCard({ win }: any) {
 }
 
 export default function DashboardPage() {
-  const user = mockUser;
+  const { user } = useLiveUser();
+  const { markets, isLoading } = useMarketList();
   const [isReadMeOpen, setIsReadMeOpen] = useState(false);
-  const [markets, setMarkets] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All Markets");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -121,117 +120,8 @@ export default function DashboardPage() {
 
   const ITEMS_PER_PAGE = 6;
 
-  // Live wins data from constants
-
-  useEffect(() => {
-    // Mock data for demo
-    const mockMarkets = [
-      {
-        id: "poll-001",
-        type: "poll",
-        title: "Best Nairobi Matatu Route",
-        description: "Vote for the most reliable and comfortable matatu route in Nairobi",
-        image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
-        poolAmount: 245000,
-        participantCount: 47,
-        minStake: 100,
-        endsAt: "2024-12-31T23:59:59Z",
-        category: "poll",
-        status: "active",
-        signalStrength: 82,
-        probability: 65,
-        priceHistory: [40, 45, 55, 60, 65],
-      },
-      {
-        id: "poll-002",
-        type: "poll",
-        title: "Who Wins the Derby?",
-        description: "AFC Leopards vs Gor Mahia - predict the winner of Kenya's biggest rivalry",
-        image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
-        poolAmount: 182500,
-        participantCount: 93,
-        minStake: 200,
-        endsAt: "2024-12-31T23:59:59Z",
-        category: "poll",
-        status: "active",
-        signalStrength: 88,
-        probability: 52,
-        priceHistory: [50, 52, 55, 56, 52],
-      },
-      {
-        id: "reflex-001",
-        type: "reflex",
-        title: "Reflex Test: First Instinct",
-        description: "When suddenly added to a group chat, what would you do? 5 seconds to decide",
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
-        poolAmount: 98750,
-        participantCount: 156,
-        minStake: 50,
-        endsAt: "2024-12-31T23:59:59Z",
-        category: "reflex",
-        status: "active",
-        signalStrength: 94,
-        probability: 82,
-        priceHistory: [70, 75, 78, 80, 82],
-      },
-      {
-        id: "ladder-001",
-        type: "ladder",
-        title: "Top Kenyan Musician 2024",
-        description: "Rank the top 5 Kenyan musicians based on what the crowd thinks",
-        image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
-        poolAmount: 156200,
-        participantCount: 78,
-        minStake: 150,
-        endsAt: "2025-01-31T23:59:59Z",
-        category: "ladder",
-        status: "active",
-        signalStrength: 76,
-        probability: 44,
-        priceHistory: [50, 48, 46, 45, 44],
-      },
-      {
-        id: "poll-003",
-        type: "poll",
-        title: "Nairobi Traffic Chaos",
-        description: "Which time of day has the worst traffic in Nairobi CBD?",
-        image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
-        poolAmount: 67800,
-        participantCount: 34,
-        minStake: 50,
-        endsAt: "2024-12-30T23:59:59Z",
-        category: "poll",
-        status: "active",
-        signalStrength: 64,
-        probability: 38,
-        priceHistory: [45, 42, 40, 39, 38],
-      },
-      {
-        id: "betrayal-001",
-        type: "betrayal",
-        title: "Betrayal Game: Trust or Cash",
-        description: "Cooperate for small win or betray for jackpot - what will you choose?",
-        image: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=800&auto=format&fit=crop",
-        poolAmount: 324100,
-        participantCount: 121,
-        minStake: 250,
-        endsAt: "2024-12-25T23:59:59Z",
-        category: "betrayal",
-        status: "active",
-        signalStrength: 91,
-        probability: 48,
-        priceHistory: [55, 52, 50, 49, 48],
-      },
-    ];
-
-    setTimeout(() => {
-      setMarkets(mockMarkets);
-      setIsLoading(false);
-    }, 800);
-  }, []);
-
   const activeMarkets = markets;
-  const totalPages = Math.ceil(activeMarkets.length / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(activeMarkets.length / ITEMS_PER_PAGE));
   const currentMarkets = activeMarkets.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,

@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
 import { MarketCard } from "./MarketCard"
+import { useMarketList } from "@/lib/live-data"
 
 const tabs = [
   { id: "all", label: "All Markets" },
@@ -10,85 +11,53 @@ const tabs = [
   { id: "onetime", label: "One-Time Markets" },
 ]
 
-const mockMarkets = [
-  {
-    id: 1,
-    title: "Will Bitcoin break $100k before 2026?",
-    category: "Crypto",
-    volume: "$1.2M",
-    participants: 4230,
-    endingAt: "24h",
-    isLive: true,
-    imageGradient: "bg-linear-to-br from-orange-500 via-yellow-500 to-transparent",
-    type: "onetime",
-    odds: "2.5x",
-    poolProgress: 78,
-    tags: ["BTC", "Price Action"]
-  },
-  {
-    id: 2,
-    title: "Premier League: Man City vs Liverpool Winner",
-    category: "Sports",
-    volume: "$450k",
-    participants: 1205,
-    endingAt: "4h",
-    isLive: true,
-    imageGradient: "bg-linear-to-br from-blue-600 via-purple-600 to-transparent",
-    type: "recurring",
-    odds: "1.8x",
-    poolProgress: 92,
-    tags: ["Football", "UK"]
-  },
-  {
-    id: 3,
-    title: "Next James Bond Actor Announcement",
-    category: "Pop Culture",
-    volume: "$89k",
-    participants: 560,
-    endingAt: "3d",
-    isLive: false,
-    imageGradient: "bg-linear-to-br from-gray-800 via-gray-600 to-transparent",
-    type: "onetime",
-    odds: "5.0x",
-    poolProgress: 45,
-    tags: ["Movies", "Casting"]
-  },
-  {
-    id: 4,
-    title: "Weekly Tech Stock Rally: NVDA > $150",
-    category: "Finance",
-    volume: "$2.1M",
-    participants: 8900,
-    endingAt: "12h",
-    isLive: true,
-    imageGradient: "bg-linear-to-br from-green-500 via-emerald-500 to-transparent",
-    type: "recurring",
-    odds: "1.2x",
-    poolProgress: 88,
-    tags: ["Stocks", "Tech"]
-  },
-  {
-    id: 5,
-    title: "Global Temperature Rise > 1.5°C in 2025",
-    category: "Science",
-    volume: "$120k",
-    participants: 340,
-    endingAt: "6d",
-    isLive: false,
-    imageGradient: "bg-linear-to-br from-red-500 via-orange-500 to-transparent",
-    type: "onetime",
-    odds: "3.1x",
-    poolProgress: 25,
-    tags: ["Climate", "Data"]
-  }
-]
+function toEndingLabel(endsAt: string) {
+  const ends = new Date(endsAt)
+  const diffMs = ends.getTime() - Date.now()
+  const diffHours = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60)))
+  if (diffHours >= 24) return `${Math.floor(diffHours / 24)}d`
+  return `${diffHours}h`
+}
 
 export function MarketsFeed() {
+  const { markets } = useMarketList()
   const [activeTab, setActiveTab] = useState("all")
 
-  const filteredMarkets = activeTab === "all"
-    ? mockMarkets
-    : mockMarkets.filter(m => m.type === activeTab)
+  const cardMarkets = useMemo(() => {
+    return markets.map((market) => {
+      const endingAt = toEndingLabel(market.endsAt)
+      const mappedType =
+        new Date(market.endsAt).getTime() - Date.now() > 7 * 24 * 60 * 60 * 1000
+          ? "recurring"
+          : "onetime"
+      const impliedOdds = Number(
+        (100 / Math.max(1, market.probability || 50)).toFixed(1),
+      )
+
+      return {
+        id: market.id,
+        title: market.title,
+        category: market.category || "General",
+        volume: `$${(market.poolAmount || 0).toLocaleString()}`,
+        participants: market.participantCount || 0,
+        endingAt,
+        isLive: market.status === "active",
+        imageGradient:
+          mappedType === "recurring"
+            ? "bg-linear-to-br from-blue-600 via-purple-600 to-transparent"
+            : "bg-linear-to-br from-orange-500 via-yellow-500 to-transparent",
+        type: mappedType,
+        odds: `${Math.max(1, impliedOdds)}x`,
+        poolProgress: market.signalStrength || 0,
+        tags: market.tags || [],
+      }
+    })
+  }, [markets])
+
+  const filteredMarkets =
+    activeTab === "all"
+      ? cardMarkets
+      : cardMarkets.filter((market) => market.type === activeTab)
 
   return (
     <div className="space-y-6">
@@ -102,9 +71,9 @@ export function MarketsFeed() {
                 "cursor-pointer whitespace-nowrap border-b-2 py-3 px-3 text-sm font-medium transition-all rounded-t-md focus:outline-none",
                 activeTab === tab.id
                   ? "border-amber-400 text-zinc-900 bg-white/60 shadow-sm"
-                  : "border-transparent text-neutral-600 hover:border-neutral-200 hover:text-zinc-900"
+                  : "border-transparent text-neutral-600 hover:border-neutral-200 hover:text-zinc-900",
               )}
-              aria-current={activeTab === tab.id ? 'page' : undefined}
+              aria-current={activeTab === tab.id ? "page" : undefined}
             >
               <span className="select-none">{tab.label}</span>
             </button>

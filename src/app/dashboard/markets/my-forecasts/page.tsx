@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   IconArrowRight,
   IconAward,
-  IconLoader3,
   IconShieldCheck,
   IconShieldDollar,
   IconShieldX,
@@ -15,36 +14,45 @@ import {
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { cn } from "@/lib/utils";
-import { mockMyBets, mockUser, mockMarkets } from "@/lib/mockData";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { useEffect } from "react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 import { IoWalletOutline } from "react-icons/io5";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Position, Market } from "@/types/market";
+import { Position } from "@/types/market";
+import { fetchJsonOrNull, normalizePositions, useLiveUser } from "@/lib/live-data";
+
+type EnrichedPosition = Position & {
+  marketTitle: string;
+  marketType: string;
+};
 
 export default function MyBetsPage() {
+  const { user, isLoading: isUserLoading } = useLiveUser();
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [positions, setPositions] = useState<EnrichedPosition[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
+    const load = async () => {
+      setIsLoading(true);
+      const payload = await fetchJsonOrNull<any>(
+        "/api/markets/my/positions?limit=200&offset=0",
+      );
+      const normalized = normalizePositions(payload).map((position) => ({
+        ...position,
+        marketTitle: position.title || "Unknown Market",
+        marketType: position.type || "unknown",
+      }));
+      setPositions(normalized);
+      setIsLoading(false);
+    };
+    void load();
   }, []);
 
-  // Enrich positions with market data
-  const enrichedPositions = (mockMyBets as Position[]).map(position => {
-      const market = (mockMarkets as Market[]).find(m => m.id === position.marketId);
-      return {
-          ...position,
-          marketTitle: market?.title || "Unknown Market",
-          marketType: market?.type || "unknown"
-      };
-  });
+  const enrichedPositions = useMemo(() => positions, [positions]);
 
   // Calculate stats
   const totalVolume = enrichedPositions.reduce((acc, position) => acc + position.stakeAmount, 0);
@@ -75,7 +83,7 @@ export default function MyBetsPage() {
     return matchesFilter && matchesSearch;
   });
 
-  if (isLoading) {
+  if (isUserLoading || isLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
@@ -83,7 +91,7 @@ export default function MyBetsPage() {
     <div className="min-h-screen pb-20">
       <div className="max-w-full mx-auto pl-0 md:pl-8 pb-8 space-y-8">
         <DashboardHeader
-          user={mockUser}
+          user={user}
           subtitle="Track your active positions and market history"
         />
 

@@ -16,7 +16,7 @@ import { MobileHeader } from "./MobileHeader";
 import { UserAvatar } from "../ui/UserAvatar";
 
 import { UserProfile } from "@/types/user";
-import { mockUser } from "@/lib/mockData";
+import { EMPTY_USER, useLiveUser, useUnreadNotificationsCount } from "@/lib/live-data";
 
 interface DashboardHeaderProps {
   user?: UserProfile;
@@ -29,7 +29,9 @@ export default function DashboardHeader({
 }: DashboardHeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const user = initialUser || mockUser;
+  const { user: liveUser } = useLiveUser();
+  const unreadCount = useUnreadNotificationsCount();
+  const user = initialUser || liveUser || EMPTY_USER;
   
   // Back button logic: go up one level if possible
   const handleBack = () => {
@@ -122,14 +124,16 @@ export default function DashboardHeader({
             whileTap={{ scale: 0.95 }}
           >
             <IconBell className="w-4 h-4 text-neutral-700" />
-            <motion.span
-            className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-linear-to-br from-red-500 to-red-600 text-white text-[10px] font-semibold font-mono rounded-full border-2 border-white shadow-sm"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 15 }}
-            >
-            2
-            </motion.span>
+            {unreadCount > 0 && (
+              <motion.span
+                className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-linear-to-br from-red-500 to-red-600 text-white text-[10px] font-semibold font-mono rounded-full border-2 border-white shadow-sm"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              >
+                {unreadCount}
+              </motion.span>
+            )}
           </motion.button>
 
           {/* Profile Avatar */}

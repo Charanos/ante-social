@@ -3,17 +3,16 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconDeviceFloppy } from '@tabler/icons-react';;
 
 import Link from "next/link";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { mockUser, mockMyBets, mockMarkets } from "@/lib/mockData";
-import { Position, Market } from "@/types/market";
+import { Position } from "@/types/market";
 import { cn } from "@/lib/utils";
-import confetti from "canvas-confetti";
-import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
-import { IoAlertCircleOutline, IoArrowForwardOutline, IoCheckmarkCircleOutline, IoCloseOutline, IoSaveOutline, IoShareSocialOutline, IoRefresh, IoTimeOutline, IoTrendingUpOutline, IoTrophyOutline } from 'react-icons/io5';
+import { IoArrowForwardOutline, IoCheckmarkCircleOutline, IoCloseOutline, IoSaveOutline, IoShareSocialOutline, IoRefresh, IoTimeOutline, IoTrendingUpOutline, IoTrophyOutline } from 'react-icons/io5';
+import {
+  fetchJsonOrNull,
+  normalizePosition,
+} from "@/lib/live-data";
 
 export default function ForecastTicketPage() {
   const params = useParams();
@@ -24,126 +23,58 @@ export default function ForecastTicketPage() {
 
   const [loading, setLoading] = useState(true);
   const [position, setPosition] = useState<Position | null>(null);
-  const [market, setMarket] = useState<Market | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [newAmount, setNewAmount] = useState<number>(0);
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
-    // Simulate fetching
-    setTimeout(() => {
-      let foundPosition = (mockMyBets as Position[]).find((p) => p.id === positionId);
-
-      // If not found in mock data, try to construct from URL params (New Position Scenario)
-      if (!foundPosition && searchParams.get("new") === "true") {
-        foundPosition = {
-          id: positionId,
-          marketId: searchParams.get("marketId") || "",
-          userId: mockUser.id,
-          title: searchParams.get("title") || "Unknown Market",
-          stakeAmount: parseFloat(searchParams.get("amount") || "0"),
-          entryPrice: 0.5,
-          currentValue: parseFloat(searchParams.get("amount") || "0"),
-          status: (searchParams.get("status") as any) || "active",
-          potentialWin:
-            parseFloat(searchParams.get("amount") || "0") *
-            (Math.random() * 2 + 1.2),
-          type: "poll",
-          openedAt: searchParams.get("date") || new Date().toISOString(),
-          outcome: searchParams.get("outcome") || "Unknown",
-        };
-        setShowSuccess(true);
-
-        // Trigger Confetti
-        const duration = 3000;
-        const animationEnd = Date.now() + duration;
-        const defaults = {
-          startVelocity: 30,
-          spread: 360,
-          ticks: 60,
-          zIndex: 50,
-        };
-
-        const randomInRange = (min: number, max: number) =>
-          Math.random() * (max - min) + min;
-
-        const interval: any = setInterval(function () {
-          const timeLeft = animationEnd - Date.now();
-
-          if (timeLeft <= 0) {
-            return clearInterval(interval);
-          }
-
-          const particleCount = 50 * (timeLeft / duration);
-          confetti({
-            ...defaults,
-            particleCount,
-            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-          });
-          confetti({
-            ...defaults,
-            particleCount,
-            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-          });
-        }, 250);
-      }
+    const load = async () => {
+      setLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/my/positions/${positionId}`);
+      const foundPosition = payload ? normalizePosition(payload) : null;
 
       if (foundPosition) {
         setPosition(foundPosition);
-        setNewAmount((foundPosition as any).stakeAmount || (foundPosition as any).amount);
-
-        const foundMarket = (mockMarkets as Market[]).find(
-          (m) => m.id === foundPosition!.marketId,
-        ) || ({
-          id: foundPosition!.marketId,
-          title: foundPosition!.title || "Unknown Market",
-          description: "",
-          image: "",
-          type: "consensus",
-          category: "general",
-          poolAmount: 0,
-          volume: 0,
-          minStake: 0,
-          createdAt: new Date().toISOString(),
-          endsAt: new Date().toISOString(),
-          status: foundPosition!.status === "active" ? "active" : "resolved",
-          oracleType: "manual",
-          resolutionCriteria: "",
-          probability: 50,
-          signalStrength: 0,
-          priceHistory: [],
-          participantCount: 0,
-          commentCount: 0,
-          shareCount: 0,
-          tags: [],
-        } as Market);
-        setMarket(foundMarket);
+        setNewAmount(foundPosition.stakeAmount);
       }
+      setShowSuccess(searchParams.get("new") === "true" && Boolean(foundPosition));
       setLoading(false);
-    }, 1000);
+    };
+    void load();
   }, [positionId, searchParams]);
 
   const handleUpdatePosition = () => {
     if (!position) return;
     setIsEditing(false);
-    setPosition({
-      ...position,
-      stakeAmount: newAmount,
-      potentialWin: newAmount * (Math.random() * 2 + 1.2),
-    } as Position);
-    toast.success("Stake Updated", `New stake amount: $${newAmount}`);
+    setNewAmount(position.stakeAmount);
+    toast.info(
+      "Update Unavailable",
+      "Stake changes are not supported after submission.",
+    );
   };
 
-  const handleCancelPosition = () => {
-    if (confirm("Are you sure you want to cancel this forecast?")) {
-      toast.info(
-        "Position Cancelled",
-        "Your funds have been returned to your wallet.",
+  const handleCancelPosition = async () => {
+    if (!position) return;
+    if (!confirm("Are you sure you want to cancel this forecast?")) return;
+
+    const response = await fetch(`/api/markets/my/positions/${position.id}`, {
+      method: "DELETE",
+    });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      toast.error(
+        "Cancel Failed",
+        payload?.message || payload?.error || "Unable to cancel position.",
       );
-      setTimeout(() => {
-        router.back();
-      }, 1500);
+      return;
     }
+
+    toast.success(
+      "Position Cancelled",
+      "Your funds have been returned to your wallet.",
+    );
+    router.push("/dashboard/markets/my-forecasts");
   };
 
   const handleClose = () => {

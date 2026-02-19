@@ -88,6 +88,50 @@ export class PredictionService {
     return bet;
   }
 
+  async getUserPredictions(userId: string, limit = 100, offset = 0) {
+    const safeLimit = Math.min(Math.max(Number(limit) || 100, 1), 200);
+    const safeOffset = Math.max(Number(offset) || 0, 0);
+
+    const query = {
+      userId: new Types.ObjectId(userId),
+      isCancelled: { $ne: true },
+    };
+
+    const [bets, total] = await Promise.all([
+      this.betModel
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(safeOffset)
+        .limit(safeLimit)
+        .exec(),
+      this.betModel.countDocuments(query),
+    ]);
+
+    const marketIds = Array.from(
+      new Set(bets.map((bet) => bet.marketId.toString())),
+    );
+    const markets = await this.marketModel
+      .find({ _id: { $in: marketIds.map((id) => new Types.ObjectId(id)) } })
+      .exec();
+    const marketById = new Map(markets.map((market) => [market._id.toString(), market]));
+
+    const data = bets.map((bet) => this.enrichBetWithMarket(bet, marketById.get(bet.marketId.toString())));
+    return { data, meta: { total, limit: safeLimit, offset: safeOffset } };
+  }
+
+  async getUserPrediction(userId: string, predictionId: string) {
+    const bet = await this.betModel.findOne({
+      _id: predictionId,
+      userId: new Types.ObjectId(userId),
+      isCancelled: { $ne: true },
+    });
+
+    if (!bet) throw new NotFoundException('Prediction not found');
+
+    const market = await this.marketModel.findById(bet.marketId);
+    return this.enrichBetWithMarket(bet, market || undefined);
+  }
+
   // ─── Edit Prediction (5-min window) ────────────────
   async editPrediction(userId: string, predictionId: string, newOutcomeId: string) {
     const bet = await this.betModel.findById(predictionId);
@@ -191,5 +235,25 @@ export class PredictionService {
     }));
 
     return { success: true, refundAmount: bet.amountContributed };
+  }
+
+  private enrichBetWithMarket(bet: MarketBetDocument, market?: MarketDocument) {
+    const betJson = bet.toObject();
+    if (!market) return betJson;
+
+    const selectedOutcome = market.outcomes.find(
+      (outcome) => outcome._id.toString() === bet.selectedOutcomeId.toString(),
+    );
+
+    return {
+      ...betJson,
+      market,
+      selectedOutcome: selectedOutcome
+        ? {
+            _id: selectedOutcome._id,
+            optionText: selectedOutcome.optionText,
+          }
+        : undefined,
+    };
   }
 }

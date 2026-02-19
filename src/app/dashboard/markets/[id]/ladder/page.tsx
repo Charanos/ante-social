@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import {
@@ -23,7 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
-import { mockUser } from "@/lib/mockData";
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { MarketChart } from "@/components/markets/MarketChart";
 import Image from "next/image";
@@ -43,12 +43,22 @@ import {
   IconTrendingUp,
   IconUsers,
 } from "@tabler/icons-react";
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
 
 interface RankItem {
   id: string;
   text: string;
   icon: any;
 }
+
+const LADDER_ICONS = [
+  IconMicrophone,
+  IconMusic,
+  IconPlayerPlay,
+  IconAccessPoint,
+  IconMusic,
+];
 
 // Sortable Item Component
 function SortableItem({ item, index }: { item: RankItem; index: number }) {
@@ -98,60 +108,14 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
   );
 }
 
-// Mock ladder market data
-const getMockLadderMarket = (id: string) => ({
-  id,
-  title: "Top Kenyan Musician 2024",
-  description:
-    "Rank the top 5 Kenyan musicians based on what the crowd thinks. Match the majority consensus to win!",
-  image:
-    "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200&auto=format&fit=crop",
-  category: "Ladder",
-  market_type: "ladder",
-  buy_in_amount: 1000,
-  total_pool: 156200,
-  participant_count: 78,
-  status: "active",
-  close_date: new Date(Date.now() + 97200000), // 1d 3h
-  items: [
-    { id: "item1", text: "Sauti Sol", icon: IconMicrophone },
-    { id: "item2", text: "Nyashinski", icon: IconMusic },
-    { id: "item3", text: "Khaligraph Jones", icon: IconMusic },
-    { id: "item4", text: "Nadia Mukami", icon: IconMusic },
-    { id: "item5", text: "Otile Brown", icon: IconMusic },
-  ],
-  participants: [
-    {
-      username: "@music_fan",
-      total_stake: 2500,
-      timestamp: new Date(Date.now() - 21600000),
-    },
-    {
-      username: "@kenyan_vibes",
-      total_stake: 5000,
-      timestamp: new Date(Date.now() - 14400000),
-    },
-    {
-      username: "@gengetone_king",
-      total_stake: 1500,
-      timestamp: new Date(Date.now() - 7200000),
-    },
-    {
-      username: "@afrobeat_lover",
-      total_stake: 3000,
-      timestamp: new Date(Date.now() - 3600000),
-    },
-  ],
-});
-
 export default function LadderMarketPage() {
   const params = useParams();
   const toast = useToast();
+  const { user } = useLiveUser();
   const marketId = params.id as string;
-
-  const market = getMockLadderMarket(marketId);
-
-  const [rankedItems, setRankedItems] = useState<RankItem[]>(market.items);
+  const [market, setMarket] = useState<any>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [rankedItems, setRankedItems] = useState<RankItem[]>([]);
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -161,6 +125,39 @@ export default function LadderMarketPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  useEffect(() => {
+    if (!marketId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setIsPageLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
+      if (cancelled) return;
+      if (!payload) {
+        setMarket(null);
+        setRankedItems([]);
+        setIsPageLoading(false);
+        return;
+      }
+
+      const detail = mapMarketToDetailView(payload);
+      const items: RankItem[] = detail.options.map((option, index) => ({
+        id: option.id,
+        text: option.option_text,
+        icon: LADDER_ICONS[index % LADDER_ICONS.length],
+      }));
+
+      setMarket({ ...detail, items });
+      setRankedItems(items);
+      setIsPageLoading(false);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [marketId]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -174,22 +171,51 @@ export default function LadderMarketPage() {
     }
   };
 
-  const handleSubmitRanking = async () => {
-    if (!stakeAmount || parseFloat(stakeAmount) < market.buy_in_amount) {
+  const handleSubmitRankingLive = async () => {
+    if (!market) return;
+    const stakeValue = Number.parseFloat(stakeAmount);
+    if (
+      !stakeAmount ||
+      !Number.isFinite(stakeValue) ||
+      stakeValue < market.buy_in_amount
+    ) {
       toast.error(
         "Invalid Stake",
         `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`,
       );
       return;
     }
+    if (user.balance < stakeValue) {
+      toast.error("Insufficient Balance", "Please top up your wallet to continue.");
+      return;
+    }
+    if (!rankedItems[0]) {
+      toast.error("Ranking Required", "Add at least one ranked option.");
+      return;
+    }
 
     setIsSubmitting(true);
+    try {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          outcomeId: rankedItems[0].id,
+          amount: stakeValue,
+          ranking: rankedItems.map((item) => item.id),
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(parseApiError(payload, "Failed to submit ranking."));
+      }
 
-    setTimeout(() => {
-      const chain = rankedItems.map((item) => item.text).join(" → ");
-      toast.success("Ranking Submitted!", `Your ranking has been saved`);
+      toast.success("Ranking Submitted!", "Your ranking has been saved");
+    } catch (error: any) {
+      toast.error("Submit Failed", error?.message || "Unable to submit ranking.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const getTimeRemaining = () => {
@@ -202,9 +228,16 @@ export default function LadderMarketPage() {
   const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
+  if (isPageLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+  if (!market) {
+    return <div className="p-8 text-sm text-black/50">Market not found.</div>;
+  }
+
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader user={user} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
           {/* Main Content */}
@@ -542,7 +575,7 @@ export default function LadderMarketPage() {
 
                   {/* CTA Button */}
                   <motion.button
-                    onClick={handleSubmitRanking}
+                    onClick={handleSubmitRankingLive}
                     disabled={isSubmitting || !stakeAmount}
                     className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
                       isSubmitting || !stakeAmount
@@ -598,3 +631,4 @@ export default function LadderMarketPage() {
     </div>
   );
 }
+

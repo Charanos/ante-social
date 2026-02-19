@@ -1,125 +1,194 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { IconChevronDown, IconCircleCheckFilled, IconClock, IconDatabase, IconDownload, IconEye, IconHash, IconLayoutGrid, IconRefresh, IconSearch, IconShield, IconUser } from '@tabler/icons-react';
-import { IoWalletOutline } from 'react-icons/io5';
-
-import { useRouter } from "next/navigation";
+import {
+  IconChevronDown,
+  IconCircleCheckFilled,
+  IconClock,
+  IconDatabase,
+  IconDownload,
+  IconEye,
+  IconRefresh,
+  IconSearch,
+  IconShield,
+  IconUser,
+} from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/components/ui/toast-notification";
 
-// Mock Data
-const mockAuditLogs = [
-  {
-    id: 4,
-    eventType: "REFUND",
-    actor: "USER",
-    timestamp: "Dec 2, 2025 1:04:33 PM",
-    description: "Received refund of $20.00 from What's your vibe right now?",
-    userId: "68c4f5b78b8c01840e69f208",
-    wallet: "58ee625f...",
-    amount: "$20.00",
-    previousHash: "514e45d153db8b97...",
-    currentHash: "0d83bc864b659284...",
-  },
-  {
-    id: 3,
-    eventType: "BET PLACEMENT",
-    actor: "USER",
-    timestamp: "Oct 3, 2025 2:05:12 PM",
-    description: "Placed 3 bet(s) of $100.00 each",
-    userId: "68d4f1b8210f5449ad003ed8a",
-    participant: "68dfdad4...",
-    amount: "$300.00",
-    previousHash: "858eea78a8928b4d...",
-    currentHash: "514e45d153db8b97...",
-  },
-  {
-    id: 2,
-    eventType: "DEPOSIT",
-    actor: "USER",
-    timestamp: "Oct 3, 2025 2:02:41 PM",
-    description: "deposit of $1000.00",
-    userId: "68c4f14802506f442...",
-    transaction: "65dcff61...",
-    amount: "$1000.00",
-    previousHash: "a7b2c8d9e3f4g5h6...",
-    currentHash: "858eea78a8928b4d...",
-  },
-  {
-    id: 1,
-    eventType: "USER REGISTRATION",
-    actor: "SYSTEM",
-    timestamp: "Oct 1, 2025 9:15:00 AM",
-    description: "New user registered",
-    userId: "68c4f14802506f442",
-    email: "user@example.com",
-    amount: null,
-    previousHash: "0000000000000000...",
-    currentHash: "a7b2c8d9e3f4g5h6...",
-  },
-];
+type AuditLog = {
+  _id?: string;
+  sequenceNumber?: number;
+  eventType?: string;
+  actorType?: string;
+  actorId?: string;
+  action?: string;
+  timestamp?: string;
+  entityType?: string;
+  entityId?: string;
+  metadata?: Record<string, unknown>;
+  amountCents?: number;
+  previousHash?: string;
+  currentHash?: string;
+  verificationStatus?: string;
+};
+
+type AuditLogResponse = {
+  data?: AuditLog[];
+  meta?: { total?: number };
+};
+
+function formatTime(value?: string) {
+  if (!value) return "N/A";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "N/A";
+  return date.toLocaleString();
+}
+
+function shortValue(value: unknown) {
+  if (value === undefined || value === null) return "-";
+  const text = String(value);
+  if (text.length <= 24) return text;
+  return `${text.slice(0, 20)}...`;
+}
+
+function amountLabel(log: AuditLog) {
+  if (typeof log.amountCents === "number") {
+    return `$${(log.amountCents / 100).toFixed(2)}`;
+  }
+  const amount = log.metadata?.amount;
+  if (typeof amount === "number") return `$${amount.toFixed(2)}`;
+  if (typeof amount === "string") return amount;
+  return null;
+}
 
 export default function AuditLogsPage() {
-  const router = useRouter();
+  const toast = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
   const [actorFilter, setActorFilter] = useState("all");
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const getEventBadgeStyles = (eventType: string) => {
-    switch (eventType) {
-      case "REFUND":
-        return "bg-amber-50 text-amber-700 border-amber-200";
-      case "BET PLACEMENT":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "DEPOSIT":
-        return "bg-green-50 text-green-700 border-green-200";
-      case "USER REGISTRATION":
-        return "bg-purple-50 text-purple-700 border-purple-200";
-      default:
-        return "bg-neutral-100 text-neutral-700 border-neutral-200";
-    }
-  };
+  const { data, isLoading, refetch, isFetching } = useQuery<AuditLogResponse>({
+    queryKey: ["admin-audit-logs"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/audit-logs?limit=200&offset=0", { cache: "no-store" });
+      if (!response.ok) throw new Error("Failed to load audit logs");
+      return response.json();
+    },
+  });
 
-  const getActorBadgeStyles = (actor: string) => {
-    return actor === "USER"
-      ? "bg-blue-50 text-blue-700 border-blue-200"
-      : "bg-neutral-100 text-neutral-700 border-neutral-200";
-  };
+  const logs = useMemo(() => {
+    const raw = data?.data || [];
+    return raw.filter((log) => {
+      const event = String(log.action || log.eventType || "");
+      const actor = String(log.actorType || "");
+      const searchTarget = `${event} ${actor} ${log.entityType || ""} ${log.entityId || ""}`.toLowerCase();
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1000);
+      const searchMatch = !searchQuery || searchTarget.includes(searchQuery.toLowerCase());
+      const eventMatch = eventFilter === "all" || event.toLowerCase().includes(eventFilter.toLowerCase());
+      const actorMatch = actorFilter === "all" || actor.toLowerCase() === actorFilter.toLowerCase();
+      return searchMatch && eventMatch && actorMatch;
+    });
+  }, [actorFilter, data?.data, eventFilter, searchQuery]);
+
+  const totalLogs = data?.meta?.total ?? data?.data?.length ?? 0;
+  const verifiedLogs = (data?.data || []).filter((log) => log.verificationStatus === "verified").length;
+  const lastSync = logs[0]?.timestamp ? formatTime(logs[0].timestamp) : "N/A";
+
+  const eventOptions = useMemo(() => {
+    const set = new Set<string>();
+    (data?.data || []).forEach((log) => {
+      const action = String(log.action || log.eventType || "").trim();
+      if (action) set.add(action);
+    });
+    return Array.from(set).slice(0, 12);
+  }, [data?.data]);
+
+  const handleRefresh = async () => {
+    await refetch();
+    toast.success("Refreshed", "Audit logs reloaded");
   };
 
   const handleExportCSV = () => {
-    console.log("Exporting CSV...");
+    const rows = logs.map((log) => [
+      log.sequenceNumber ?? "",
+      log.action || log.eventType || "",
+      log.actorType || "",
+      log.entityType || "",
+      log.entityId || "",
+      log.timestamp || "",
+      amountLabel(log) || "",
+      log.verificationStatus || "",
+    ]);
+
+    const csv = [
+      ["sequence", "action", "actor", "entity_type", "entity_id", "timestamp", "amount", "verification_status"].join(","),
+      ...rows.map((row) =>
+        row
+          .map((cell) => {
+            const safe = String(cell).replaceAll('"', '""');
+            return `"${safe}"`;
+          })
+          .join(","),
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `audit-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Exported", "CSV export started");
   };
 
   const handleVerifyIntegrity = () => {
-    console.log("Verifying blockchain integrity...");
+    const tamperedCount = (data?.data || []).filter((log) => log.verificationStatus === "tampered").length;
+    if (tamperedCount > 0) {
+      toast.info("Integrity warning", `${tamperedCount} log(s) marked tampered`);
+      return;
+    }
+    toast.success("Integrity check", "No tampered logs found in current window");
   };
 
-  const totalLogs = mockAuditLogs.length;
-  const verifiedLogs = mockAuditLogs.length;
-  const lastSync = "2 minutes ago";
+  const getEventBadgeStyles = (eventType: string) => {
+    const normalized = eventType.toLowerCase();
+    if (normalized.includes("withdrawal") || normalized.includes("reject")) {
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    }
+    if (normalized.includes("approve") || normalized.includes("create")) {
+      return "bg-green-50 text-green-700 border-green-200";
+    }
+    if (normalized.includes("ban") || normalized.includes("freeze")) {
+      return "bg-red-50 text-red-700 border-red-200";
+    }
+    return "bg-blue-50 text-blue-700 border-blue-200";
+  };
+
+  const getActorBadgeStyles = (actor: string) => {
+    return actor.toLowerCase() === "admin"
+      ? "bg-purple-50 text-purple-700 border-purple-200"
+      : actor.toLowerCase() === "system"
+        ? "bg-neutral-100 text-neutral-700 border-neutral-200"
+        : "bg-blue-50 text-blue-700 border-blue-200";
+  };
 
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        {/* Header */}
         <DashboardHeader subtitle="Cryptographically secured audit trail" />
 
         <div className="flex items-center justify-end gap-3 -mt-6 mb-8">
           <button
-            onClick={handleRefresh}
+            onClick={() => void handleRefresh()}
             className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 flex items-center gap-2 cursor-pointer transition-all"
           >
-            <IconRefresh               className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
-            />
+            <IconRefresh className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
             Refresh
           </button>
           <button
@@ -138,34 +207,25 @@ export default function AuditLogsPage() {
           </button>
         </div>
 
-        {/* Visual Separator - Overview */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
-            Overview
-          </h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Overview</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
-        {/* Stats Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
         >
-          {/* Total Logs Card */}
           <Card className="relative overflow-hidden border-none bg-linear-to-br from-blue-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-100/50 blur-2xl transition-all group-hover:bg-blue-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-900/60">
-                    Total Logs
-                  </p>
-                  <p className="mt-2 text-2xl font-medium font-mono text-blue-900">
-                    {totalLogs}
-                  </p>
+                  <p className="text-sm font-medium text-blue-900/60">Total Logs</p>
+                  <p className="mt-2 text-2xl font-medium font-mono text-blue-900">{totalLogs}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
                   <IconDatabase className="h-6 w-6 text-blue-600" />
@@ -174,18 +234,13 @@ export default function AuditLogsPage() {
             </CardContent>
           </Card>
 
-          {/* Verified Logs Card */}
           <Card className="relative overflow-hidden border-none bg-linear-to-br from-green-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-green-100/50 blur-2xl transition-all group-hover:bg-green-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-900/60">
-                    Verified
-                  </p>
-                  <p className="mt-2 text-2xl font-medium font-mono text-green-900">
-                    {verifiedLogs}
-                  </p>
+                  <p className="text-sm font-medium text-green-900/60">Verified</p>
+                  <p className="mt-2 text-2xl font-medium font-mono text-green-900">{verifiedLogs}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
                   <IconCircleCheckFilled className="h-6 w-6 text-green-600" />
@@ -194,18 +249,13 @@ export default function AuditLogsPage() {
             </CardContent>
           </Card>
 
-          {/* Last Sync Card */}
           <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-900/60">
-                    Last Sync
-                  </p>
-                  <p className="mt-2 text-xl font-medium font-mono text-purple-900">
-                    {lastSync}
-                  </p>
+                  <p className="text-sm font-medium text-purple-900/60">Last Sync</p>
+                  <p className="mt-2 text-sm font-medium font-mono text-purple-900">{lastSync}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
                   <IconClock className="h-6 w-6 text-purple-600" />
@@ -215,21 +265,13 @@ export default function AuditLogsPage() {
           </Card>
         </motion.div>
 
-        {/* Visual Separator - Filters */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
-            Filters
-          </h2>
+          <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">Filters</h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
-        {/* Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <DashboardCard className="p-5 mb-10">
             <div className="flex gap-3">
               <div className="relative flex-1">
@@ -250,10 +292,11 @@ export default function AuditLogsPage() {
                   className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 appearance-none cursor-pointer pr-10 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 >
                   <option value="all">All Events</option>
-                  <option value="refund">Refund</option>
-                  <option value="bet">Bet Placement</option>
-                  <option value="deposit">Deposit</option>
-                  <option value="registration">IconUser Registration</option>
+                  {eventOptions.map((event) => (
+                    <option key={event} value={event.toLowerCase()}>
+                      {event}
+                    </option>
+                  ))}
                 </select>
                 <IconChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
@@ -265,9 +308,9 @@ export default function AuditLogsPage() {
                   className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 appearance-none cursor-pointer pr-10 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 >
                   <option value="all">All Actors</option>
-                  <option value="user">User</option>
-                  <option value="system">System</option>
                   <option value="admin">Admin</option>
+                  <option value="system">System</option>
+                  <option value="user">User</option>
                 </select>
                 <IconChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
@@ -275,148 +318,126 @@ export default function AuditLogsPage() {
           </DashboardCard>
         </motion.div>
 
-        {/* Visual Separator - Audit Logs */}
         <div className="flex items-center gap-4 mb-10">
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
           <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-wider">
-            Audit Logs ({mockAuditLogs.length})
+            Audit Logs ({logs.length})
           </h2>
           <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         </div>
 
-        {/* Audit Logs */}
-        <div className="space-y-8">
-          {mockAuditLogs.map((log, index) => (
-            <motion.div
-              key={log.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 + index * 0.05 }}
-            >
-              <DashboardCard className="p-0 hover:shadow-md transition-shadow">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-mono text-neutral-500">
-                      #{log.id}
-                    </span>
-                    <span
-                      className={`px-2.5 py-1 text-xs font-medium rounded-full border uppercase tracking-wide ${getEventBadgeStyles(log.eventType)}`}
-                    >
-                      {log.eventType}
-                    </span>
-                    <span
-                      className={`px-2.5 py-1 text-xs font-medium rounded-full border uppercase tracking-wide ${getActorBadgeStyles(log.actor)}`}
-                    >
-                      {log.actor}
-                    </span>
-                  </div>
-                  <span className="text-xs text-neutral-600 font-mono flex items-center gap-1.5">
-                    <IconClock className="w-3.5 h-3.5" />
-                    {log.timestamp}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="px-6 py-5">
-                  <p className="text-sm text-neutral-900 font-medium mb-4">
-                    {log.description}
-                  </p>
-
-                  {/* Details Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
-                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                      <IconUser className="w-4 h-4 text-neutral-600 shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs text-neutral-600 font-medium">
-                          IconUser ID
-                        </p>
-                        <p className="text-xs font-mono text-neutral-900 truncate">
-                          {log.userId}
-                        </p>
+        {isLoading ? (
+          <DashboardCard className="p-8 text-sm text-neutral-500">Loading audit logs...</DashboardCard>
+        ) : (
+          <div className="space-y-8">
+            {logs.map((log, index) => {
+              const event = String(log.action || log.eventType || "EVENT");
+              const actor = String(log.actorType || "system");
+              const amount = amountLabel(log);
+              return (
+                <motion.div
+                  key={log._id || `${log.sequenceNumber}-${index}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 + index * 0.03 }}
+                >
+                  <DashboardCard className="p-0 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-mono text-neutral-500">#{log.sequenceNumber || index + 1}</span>
+                        <span
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full border uppercase tracking-wide ${getEventBadgeStyles(event)}`}
+                        >
+                          {event}
+                        </span>
+                        <span
+                          className={`px-2.5 py-1 text-xs font-medium rounded-full border uppercase tracking-wide ${getActorBadgeStyles(actor)}`}
+                        >
+                          {actor}
+                        </span>
                       </div>
+                      <span className="text-xs text-neutral-600 font-mono flex items-center gap-1.5">
+                        <IconClock className="w-3.5 h-3.5" />
+                        {formatTime(log.timestamp)}
+                      </span>
                     </div>
 
-                    {log.wallet && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
-                        <IoWalletOutline className="w-4 h-4 text-neutral-600 shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs text-neutral-600 font-medium">
-                            IconWallet
-                          </p>
-                          <p className="text-xs font-mono text-neutral-900 truncate">
-                            {log.wallet}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    <div className="px-6 py-5">
+                      <p className="text-sm text-neutral-900 font-medium mb-4">
+                        {event} on {log.entityType || "entity"}
+                      </p>
 
-                    {log.amount && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green-50 border border-green-100">
-                        <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                          <span className="text-green-600 font-medium text-xs">
-                            $
-                          </span>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
+                          <IconUser className="w-4 h-4 text-neutral-600 shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-neutral-600 font-medium">Actor</p>
+                            <p className="text-xs font-mono text-neutral-900 truncate">{shortValue(log.actorId)}</p>
+                          </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs text-green-600 font-medium">
-                            Amount
-                          </p>
-                          <p className="text-xs font-mono text-green-700 font-medium">
-                            {log.amount}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Hash Information */}
-                  <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4 mb-4">
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <span className="text-xs text-neutral-600 font-medium w-20 shrink-0 pt-0.5">
-                          Previous:
-                        </span>
-                        <span className="text-xs font-mono text-neutral-700 break-all">
-                          {log.previousHash}
-                        </span>
+                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
+                          <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                            <span className="text-neutral-600 font-medium text-xs">#</span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs text-neutral-600 font-medium">Entity</p>
+                            <p className="text-xs font-mono text-neutral-900 truncate">{shortValue(log.entityId)}</p>
+                          </div>
+                        </div>
+
+                        {amount && (
+                          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green-50 border border-green-100">
+                            <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                              <span className="text-green-600 font-medium text-xs">$</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs text-green-600 font-medium">Amount</p>
+                              <p className="text-xs font-mono text-green-700 font-medium">{amount}</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-start gap-3">
-                        <span className="text-xs text-neutral-600 font-medium w-20 shrink-0 pt-0.5">
-                          Current:
-                        </span>
-                        <span className="text-xs font-mono text-neutral-700 break-all">
-                          {log.currentHash}
-                        </span>
+
+                      <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4 mb-4">
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <span className="text-xs text-neutral-600 font-medium w-20 shrink-0 pt-0.5">Previous:</span>
+                            <span className="text-xs font-mono text-neutral-700 break-all">
+                              {log.previousHash || "-"}
+                            </span>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <span className="text-xs text-neutral-600 font-medium w-20 shrink-0 pt-0.5">Current:</span>
+                            <span className="text-xs font-mono text-neutral-700 break-all">
+                              {log.currentHash || "-"}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+
+                      <button className="flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer">
+                        <IconEye className="w-4 h-4" />
+                        View Details
+                      </button>
                     </div>
+                  </DashboardCard>
+                </motion.div>
+              );
+            })}
+
+            {logs.length === 0 && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <DashboardCard className="p-12 text-center">
+                  <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
+                    <IconShield className="w-8 h-8 text-neutral-500" />
                   </div>
-
-                  <button className="flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer">
-                    <IconEye className="w-4 h-4" />
-                    View Details
-                  </button>
-                </div>
-              </DashboardCard>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {mockAuditLogs.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <DashboardCard className="p-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
-                <IconShield className="w-8 h-8 text-neutral-500" />
-              </div>
-              <h3 className="text-lg font-medium text-neutral-900 mb-2">
-                No audit logs found
-              </h3>
-              <p className="text-sm text-neutral-600">
-                Audit logs will appear here as events occur in the system
-              </p>
-            </DashboardCard>
-          </motion.div>
+                  <h3 className="text-lg font-medium text-neutral-900 mb-2">No audit logs found</h3>
+                  <p className="text-sm text-neutral-600">Audit logs will appear here as events occur in the system</p>
+                </DashboardCard>
+              </motion.div>
+            )}
+          </div>
         )}
       </div>
     </div>

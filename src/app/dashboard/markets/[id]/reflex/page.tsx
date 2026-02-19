@@ -24,93 +24,26 @@ import {
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
-import { mockUser } from "@/lib/mockData";
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import Image from "next/image";
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
 
-// Mock reflex market data
-const getMockReflexMarket = (id: string) => ({
-  id,
-  title: "First Reaction: Group Chat Dilemma",
-  description:
-    "When suddenly added to a new group chat, what will the majority do in the first 5 seconds? Predict the crowd's instinct!",
-  image:
-    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&auto=format&fit=crop",
-  category: "Reflex",
-  scenario:
-    "You're suddenly added to a group chat with 50 unknown people. What's your FIRST reaction?",
-  market_type: "reflex",
-  buy_in_amount: 500,
-  total_pool: 98750,
-  participant_count: 156,
-  status: "active",
-  close_date: new Date(Date.now() + 2700000), // 45 min
-  options: [
-    {
-      id: "opt1",
-      option_text: "Leave immediately",
-      icon: IconLogout,
-      votes: 45,
-      percentage: 29,
-    },
-    {
-      id: "opt2",
-      option_text: "Mute notifications",
-      icon: IconBell,
-      votes: 52,
-      percentage: 33,
-    },
-    {
-      id: "opt3",
-      option_text: 'Ask "who\'s this?"',
-      icon: IconHelpCircle,
-      votes: 38,
-      percentage: 24,
-    },
-    {
-      id: "opt4",
-      option_text: "Pretend not seeing it",
-      icon: IconEyeOff,
-      votes: 15,
-      percentage: 10,
-    },
-    {
-      id: "opt5",
-      option_text: "Participate for fun",
-      icon: IconMoodSmile,
-      votes: 6,
-      percentage: 4,
-    },
-  ],
-  participants: [
-    {
-      username: "@quick_exit",
-      total_stake: 1000,
-      timestamp: new Date(Date.now() - 1200000),
-    },
-    {
-      username: "@social_master",
-      total_stake: 2500,
-      timestamp: new Date(Date.now() - 900000),
-    },
-    {
-      username: "@mute_gang",
-      total_stake: 1500,
-      timestamp: new Date(Date.now() - 600000),
-    },
-    {
-      username: "@shy_one",
-      total_stake: 500,
-      timestamp: new Date(Date.now() - 300000),
-    },
-  ],
-});
+const REFLEX_ICONS = [
+  IconLogout,
+  IconBell,
+  IconHelpCircle,
+  IconEyeOff,
+  IconMoodSmile,
+];
 
 export default function ReflexMarketPage() {
   const params = useParams();
   const toast = useToast();
+  const { user } = useLiveUser();
   const marketId = params.id as string;
-
-  const market = getMockReflexMarket(marketId);
+  const [market, setMarket] = useState<any>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [stakeAmount, setStakeAmount] = useState("");
@@ -128,11 +61,43 @@ export default function ReflexMarketPage() {
     }
   }, [countdown, isCountingDown]);
 
-  const handlePlaceBet = () => {
+  useEffect(() => {
+    if (!marketId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setIsPageLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
+      if (cancelled) return;
+      if (!payload) {
+        setMarket(null);
+        setIsPageLoading(false);
+        return;
+      }
+
+      const detail = mapMarketToDetailView(payload);
+      detail.options = detail.options.map((option, index) => ({
+        ...option,
+        icon: REFLEX_ICONS[index % REFLEX_ICONS.length],
+      }));
+      setMarket(detail);
+      setIsPageLoading(false);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [marketId]);
+
+  const handlePlaceBet = async () => {
+    if (!market) return;
+    const stakeValue = Number.parseFloat(stakeAmount);
     if (
       !selectedOption ||
       !stakeAmount ||
-      parseFloat(stakeAmount) < market.buy_in_amount
+      !Number.isFinite(stakeValue) ||
+      stakeValue < market.buy_in_amount
     ) {
       toast.error(
         "Invalid Bet",
@@ -140,9 +105,26 @@ export default function ReflexMarketPage() {
       );
       return;
     }
+    if (user.balance < stakeValue) {
+      toast.error("Insufficient Balance", "Please top up your wallet to continue.");
+      return;
+    }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          outcomeId: selectedOption,
+          amount: stakeValue,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(parseApiError(payload, "Failed to place prediction."));
+      }
+
       const selectedOptionText = market.options.find(
         (o: any) => o.id === selectedOption,
       )?.option_text;
@@ -150,8 +132,11 @@ export default function ReflexMarketPage() {
         "Prediction Locked!",
         `You predicted "${selectedOptionText}"`,
       );
+    } catch (error: any) {
+      toast.error("Prediction Failed", error?.message || "Unable to place prediction.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const getTimeRemaining = () => {
@@ -164,9 +149,16 @@ export default function ReflexMarketPage() {
   const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
+  if (isPageLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+  if (!market) {
+    return <div className="p-8 text-sm text-black/50">Market not found.</div>;
+  }
+
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader user={user} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
           {/* Main Content */}

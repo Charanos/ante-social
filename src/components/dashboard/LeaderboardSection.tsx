@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { leaderboardData } from "@/lib/mockData";
 import { IconAward, IconStar, IconTrendingUp } from '@tabler/icons-react';
 import { UserAvatar } from "../ui/UserAvatar";
 
@@ -93,7 +92,23 @@ export default function LeaderboardSection({
   icon,
   data,
 }: LeaderboardSectionProps) {
-  const displayData = data || leaderboardData;
+  const displayData = data || [];
+
+  if (displayData.length < 3) {
+    return (
+      <div className="space-y-6 my-12 md:my-16">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            {icon || <IconAward className="w-5 h-5 text-amber-500" />}
+            <h2 className="text-lg font-semibold text-black/90">{title}</h2>
+          </div>
+        </div>
+        <div className="relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-sm border border-black/5 shadow-lg p-8 text-center">
+          <p className="text-sm font-medium text-black/50">Leaderboard data is not available yet.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 my-12 md:my-16">

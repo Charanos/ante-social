@@ -7,7 +7,7 @@ import { IconAccessPoint, IconAward, IconChevronLeft, IconChevronRight, IconCurr
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-notification";
 import { useRouter, useSearchParams } from "next/navigation";
-import { marketCategories, mockUser, mockGroups } from "@/lib/mockData";
+import { useGroupList, useLiveUser } from "@/lib/live-data";
 
 type MarketType = "poll" | "betrayal" | "reflex" | "ladder";
 
@@ -32,6 +32,17 @@ interface MarketFormData {
   ladderItems?: string[];
 }
 
+const marketCategories = [
+  "Sports",
+  "Memes",
+  "Social",
+  "Crypto",
+  "Gaming",
+  "Politics",
+  "Technology",
+  "Entertainment",
+];
+
 const steps = [
   { id: 0, title: "Group Info" }, // Only for createGroup mode
   { id: 1, title: "Market Type" },
@@ -43,12 +54,14 @@ const steps = [
 export function MarketCreationWizard() {
   const searchParams = useSearchParams();
   const isCreatingGroup = searchParams.get("createGroup") === "true";
+  const { user } = useLiveUser();
+  const { groups } = useGroupList();
 
   const [step, setStep] = useState(isCreatingGroup ? 0 : 1);
   const [formData, setFormData] = useState<MarketFormData>({
     groupName: "",
     groupDescription: "",
-    isPublic: mockUser.role === "admin" ? true : false,
+    isPublic: true,
     title: "",
     description: "",
     type: "poll",
@@ -68,6 +81,14 @@ export function MarketCreationWizard() {
   const toast = useToast();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!isCreatingGroup) return;
+    setFormData((prev) => ({
+      ...prev,
+      isPublic: user.role === "admin",
+    }));
+  }, [isCreatingGroup, user.role]);
+
   const handleNext = () => {
     if (step < 4) setStep(step + 1);
   };
@@ -84,18 +105,84 @@ export function MarketCreationWizard() {
       : "Creating Market...";
     toast.loading(label, "Broadcasting to the network");
 
-    // Simulate API
-    setTimeout(() => {
+    try {
+      let targetGroupId = formData.targetGroup;
+
+      if (isCreatingGroup) {
+        const groupResponse = await fetch("/api/groups", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: formData.groupName,
+            description: formData.groupDescription,
+            isPublic: formData.isPublic,
+          }),
+        });
+
+        if (!groupResponse.ok) {
+          throw new Error("Failed to create group");
+        }
+
+        const groupPayload = await groupResponse.json();
+        targetGroupId = groupPayload?._id || groupPayload?.id || targetGroupId;
+      }
+
+      if (targetGroupId && targetGroupId !== "global" && targetGroupId !== "new_group") {
+        const groupMarketResponse = await fetch(`/api/groups/${targetGroupId}/markets`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            title: formData.title,
+            description: formData.description,
+            marketType: "winner_takes_all",
+            buyInAmount: Number(formData.buyIn),
+            options: (formData.options || []).map((option) => option.text).filter(Boolean),
+            selectedOption: (formData.options || [])[0]?.text,
+          }),
+        });
+
+        if (!groupMarketResponse.ok) {
+          throw new Error("Failed to create group market");
+        }
+      } else {
+        const closeTime = formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        const settlementTime = new Date(new Date(closeTime).getTime() + 60 * 60 * 1000).toISOString();
+
+        const marketResponse = await fetch("/api/markets", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            type: formData.type,
+            title: formData.title,
+            description: formData.description,
+            buyInAmount: Number(formData.buyIn),
+            closeTime,
+            settlementTime,
+            tags: [formData.category.toLowerCase()],
+            outcomes: (formData.options || []).map((option) => ({
+              optionText: option.text,
+            })),
+            mediaUrl: formData.image || undefined,
+          }),
+        });
+
+        if (!marketResponse.ok) {
+          throw new Error("Failed to create market");
+        }
+      }
+
       setIsSubmitting(false);
       const successMsg = isCreatingGroup
         ? "Group & Market Launched!"
         : "Market Launched!";
-      toast.success(successMsg, "Redirecting to your new group...");
-      const redirectPath = isCreatingGroup
-        ? "/dashboard/groups/group1"
-        : "/dashboard/markets/market1";
-      router.push(redirectPath);
-    }, 2000);
+      toast.success(successMsg, "Redirecting...");
+      router.push(isCreatingGroup ? "/dashboard/groups" : "/dashboard/markets");
+    } catch (error: any) {
+      setIsSubmitting(false);
+      toast.error("Launch Failed", error?.message || "Could not create market");
+    }
   };
 
   const updateForm = (data: Partial<MarketFormData>) => {
@@ -237,7 +324,7 @@ export function MarketCreationWizard() {
                         </p>
                       </div>
                     </div>
-                    {mockUser.role === "admin" && (
+                    {user.role === "admin" && (
                       <button
                         type="button"
                         onClick={() =>
@@ -397,7 +484,7 @@ export function MarketCreationWizard() {
                       </select>
                     </div>
 
-                    {!isCreatingGroup && mockUser.role === "group_admin" && (
+                    {!isCreatingGroup && user.role === "group_admin" && (
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-900 ml-1">
                           Post To
@@ -412,9 +499,9 @@ export function MarketCreationWizard() {
                             }
                           >
                             <option value="global">Public (Global)</option>
-                            {mockGroups
-                              .filter((g) =>
-                                mockUser.managed_groups?.includes(g.id),
+                            {groups
+                              .filter((group) =>
+                                user.managed_groups?.includes(group.id),
                               )
                               .map((group) => (
                                 <option key={group.id} value={group.id}>

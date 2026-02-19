@@ -31,3 +31,33 @@ export async function PUT(req: Request) {
     jsonBody: { tier: body.tier || body.user_level },
   })
 }
+
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions)
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
+
+  const body = await req.json().catch(() => ({}))
+  if (!body.userId || !body.action) {
+    return Response.json({ error: "Missing userId or action" }, { status: 400 })
+  }
+
+  if (body.action === "ban") {
+    return proxyBackendRequest({
+      path: `/api/v1/admin/users/${body.userId}/ban`,
+      method: "POST",
+      token,
+      jsonBody: { reason: body.reason },
+    })
+  }
+
+  if (body.action === "unban") {
+    return proxyBackendRequest({
+      path: `/api/v1/admin/users/${body.userId}/unban`,
+      method: "POST",
+      token,
+    })
+  }
+
+  return Response.json({ error: "Invalid action" }, { status: 400 })
+}

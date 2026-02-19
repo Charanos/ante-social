@@ -38,19 +38,21 @@ import {
 } from "@tabler/icons-react";
 
 import { cn } from "@/lib/utils";
-import { mockGroups, mockUser } from "@/lib/mockData";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
+import { fetchJsonOrNull, normalizeGroup, useLiveUser } from "@/lib/live-data";
+import { useToast } from "@/hooks/useToast";
 
 // IconSettings Sections
 type SettingsSection = "general" | "privacy" | "roles" | "markets";
 
 export default function GroupSettingsPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params.id as string;
+  const { user, isLoading: isUserLoading } = useLiveUser();
+  const toast = useToast();
   const [activeSection, setActiveSection] =
     useState<SettingsSection>("general");
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,12 +67,78 @@ export default function GroupSettingsPage() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [group, setGroup] = useState<any>({
+    id,
+    name: "Group",
+    description: "",
+    category: "Sports",
+    isPublic: true,
+    memberCount: 0,
+    creatorId: "",
+    image: "",
+  });
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
-  // Find group data
-  const group = mockGroups.find((g) => g.id === id) || mockGroups[0];
-  const isPlatformAdmin = mockUser.role === "admin";
-  const isGroupAdmin = group.creatorId === mockUser.id;
+  const isPlatformAdmin = user.role === "admin";
+  const isGroupAdmin = group.creatorId === user.id;
   const canEdit = isPlatformAdmin || isGroupAdmin;
+
+  useEffect(() => {
+    const load = async () => {
+      setIsPageLoading(true);
+      const [groupPayload, marketsPayload] = await Promise.all([
+        fetchJsonOrNull<any>(`/api/groups/${id}`),
+        fetchJsonOrNull<any>(`/api/groups/${id}/markets`),
+      ]);
+
+      if (groupPayload) {
+        const normalizedGroup = normalizeGroup(groupPayload);
+        setGroup({
+          id: normalizedGroup.id,
+          name: normalizedGroup.name,
+          description: normalizedGroup.description,
+          category: normalizedGroup.category,
+          isPublic: normalizedGroup.isPublic,
+          memberCount: normalizedGroup.memberCount,
+          creatorId: normalizedGroup.creatorId,
+          image: normalizedGroup.image,
+          members: normalizedGroup.members,
+        });
+      }
+
+      const marketList = Array.isArray(marketsPayload)
+        ? marketsPayload
+        : Array.isArray(marketsPayload?.data)
+          ? marketsPayload.data
+          : [];
+      setMarkets(
+        marketList.map((market: any) => ({
+          id: market._id || market.id,
+          title: market.title || "Untitled Market",
+          description: market.description || "",
+          image:
+            market.imageUrl ||
+            "https://images.unsplash.com/photo-1610237736387-991eb8151475?auto=format&fit=crop&q=80&w=800",
+          type:
+            market.marketType === "winner_takes_all"
+              ? "poll"
+              : market.marketType === "odd_one_out"
+                ? "ladder"
+                : "poll",
+          timeLeft: "Live",
+          status: market.status || "active",
+          pool: `${Number(market.totalPool || 0).toLocaleString()} KSH`,
+          participants: Array.isArray(market.participants)
+            ? market.participants.length
+            : 0,
+          correctOption: null as string | null,
+        })),
+      );
+
+      setIsPageLoading(false);
+    };
+    void load();
+  }, [id]);
 
   // Initialize state from group
   useEffect(() => {
@@ -90,14 +158,42 @@ export default function GroupSettingsPage() {
     setHasUnsavedChanges(changed);
   }, [groupName, groupDescription, groupCategory, isPublic, group]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!canEdit || isSaving) return;
     setIsSaving(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false);
+
+    try {
+      const response = await fetch(`/api/groups/${id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: groupName,
+          description: groupDescription,
+          category: groupCategory,
+          isPublic,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || "Failed to save group settings.");
+      }
+
+      const normalized = normalizeGroup(payload || {});
+      setGroup((prev: any) => ({
+        ...prev,
+        name: normalized.name || groupName,
+        description: normalized.description || groupDescription,
+        category: normalized.category || groupCategory,
+        isPublic: normalized.isPublic,
+        image: normalized.image || prev.image,
+      }));
       setHasUnsavedChanges(false);
-      // Show success toast
-    }, 1500);
+      toast.success("Changes Saved", "Group settings updated successfully.");
+    } catch (error: any) {
+      toast.error("Save Failed", error?.message || "Unable to save group settings.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleImageUpload = () => {
@@ -141,47 +237,7 @@ export default function GroupSettingsPage() {
     },
   ];
 
-  const [markets, setMarkets] = useState([
-    {
-      id: "m1",
-      title: "Man United vs Liverpool",
-      description: "Premier League Clash - Who will win?",
-      image:
-        "https://images.unsplash.com/photo-1610237736387-991eb8151475?auto=format&fit=crop&q=80&w=800",
-      type: "poll",
-      timeLeft: "2h 30m",
-      status: "active",
-      pool: "45,200 KSH",
-      participants: 128,
-      correctOption: null as string | null,
-    },
-    {
-      id: "m2",
-      title: "Next Bitcoin ATH",
-      description: "Will BTC likely break 100k before 2025?",
-      image:
-        "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&q=80&w=800",
-      type: "ladder",
-      timeLeft: "5d 12h",
-      status: "pending_confirmation",
-      pool: "125,000 KSH",
-      participants: 342,
-      correctOption: null as string | null,
-    },
-    {
-      id: "m3",
-      title: "Best Tech Stack 2024",
-      description: "Vote for the most popular frontend framework",
-      image:
-        "https://images.unsplash.com/photo-1607799275518-d750cc0613db?auto=format&fit=crop&q=80&w=800",
-      type: "priority",
-      timeLeft: "Ended",
-      status: "settled",
-      pool: "8,500 KSH",
-      participants: 45,
-      correctOption: "React",
-    },
-  ]);
+  const [markets, setMarkets] = useState<any[]>([]);
 
   const filteredMarkets = markets.filter((market) => {
     const matchesSearch = market.title
@@ -211,10 +267,14 @@ export default function GroupSettingsPage() {
     }
   };
 
+  if (isUserLoading || isPageLoading) {
+    return <div className="p-8 text-sm text-black/50">Loading group settings...</div>;
+  }
+
   return (
     <div className="min-h-screen pl-0 md:pl-8 pb-20">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle={`Manage configuration and permissions for ${group.name}`}
       />
 

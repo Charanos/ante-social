@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import {
@@ -23,54 +23,18 @@ import {
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
-import { mockUser } from "@/lib/mockData";
+import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import Image from "next/image";
-
-// Mock betrayal market data
-const getMockBetrayalMarket = (id: string) => ({
-  id,
-  title: "Betrayal Game: Trust or Cash",
-  description:
-    "Will you cooperate for a small win, or betray for the chance at it all? Choose wisely — the crowd's decision determines your fate.",
-  image:
-    "https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=1200&auto=format&fit=crop",
-  category: "Betrayal",
-  market_type: "betrayal",
-  buy_in_amount: 2000,
-  total_pool: 324100,
-  participant_count: 121,
-  status: "active",
-  close_date: new Date(Date.now() + 13500000), // 3h 45m
-  participants: [
-    {
-      username: "@trust_builder",
-      total_stake: 5000,
-      timestamp: new Date(Date.now() - 10800000),
-    },
-    {
-      username: "@betrayer_001",
-      total_stake: 8000,
-      timestamp: new Date(Date.now() - 7200000),
-    },
-    {
-      username: "@gambler_pro",
-      total_stake: 3000,
-      timestamp: new Date(Date.now() - 3600000),
-    },
-    {
-      username: "@risk_taker",
-      total_stake: 6000,
-      timestamp: new Date(Date.now() - 1800000),
-    },
-  ],
-});
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
+import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
 
 export default function BetrayalMarketPage() {
   const params = useParams();
   const toast = useToast();
+  const { user } = useLiveUser();
   const marketId = params.id as string;
-
-  const market = getMockBetrayalMarket(marketId);
+  const [market, setMarket] = useState<any>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   const [selectedChoice, setSelectedChoice] = useState<
     "cooperate" | "betray" | null
@@ -79,11 +43,39 @@ export default function BetrayalMarketPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOutcomes, setShowOutcomes] = useState(false);
 
+  useEffect(() => {
+    if (!marketId) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setIsPageLoading(true);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
+      if (cancelled) return;
+      setMarket(payload ? mapMarketToDetailView(payload) : null);
+      setIsPageLoading(false);
+    };
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [marketId]);
+
   const handlePlaceBet = async () => {
+    if (!market) return;
+    const stakeValue = Number.parseFloat(stakeAmount);
+    const outcomeId =
+      selectedChoice === "cooperate"
+        ? market.options?.[0]?.id
+        : selectedChoice === "betray"
+          ? market.options?.[1]?.id
+          : null;
+
     if (
       !selectedChoice ||
       !stakeAmount ||
-      parseFloat(stakeAmount) < market.buy_in_amount
+      !Number.isFinite(stakeValue) ||
+      stakeValue < market.buy_in_amount
     ) {
       toast.error(
         "Invalid Bet",
@@ -91,13 +83,35 @@ export default function BetrayalMarketPage() {
       );
       return;
     }
+    if (!outcomeId) {
+      toast.error("Unavailable Option", "This market does not have a valid choice mapping.");
+      return;
+    }
+    if (user.balance < stakeValue) {
+      toast.error("Insufficient Balance", "Please top up your wallet to continue.");
+      return;
+    }
 
     setIsSubmitting(true);
-
-    setTimeout(() => {
+    try {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          outcomeId,
+          amount: stakeValue,
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(parseApiError(payload, "Failed to place choice."));
+      }
       toast.success("Choice Locked In!", `You chose to ${selectedChoice}`);
+    } catch (error: any) {
+      toast.error("Submit Failed", error?.message || "Unable to place choice.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   const getTimeRemaining = () => {
@@ -110,9 +124,16 @@ export default function BetrayalMarketPage() {
   const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
   const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
 
+  if (isPageLoading) {
+    return <LoadingLogo fullScreen size="lg" />;
+  }
+  if (!market) {
+    return <div className="p-8 text-sm text-black/50">Market not found.</div>;
+  }
+
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader user={user} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
           {/* Main Content */}
@@ -601,3 +622,4 @@ export default function BetrayalMarketPage() {
     </div>
   );
 }
+

@@ -3,12 +3,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { mockUser } from "@/lib/mockData";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useLiveUser } from "@/lib/live-data";
 import {
   IconUser,
   IconLock,
@@ -63,8 +63,19 @@ const NOTIFICATION_TYPES = [
   },
 ];
 
+const DEFAULT_PHONE = "+254712345678";
+const DEFAULT_LOCATION = "Nairobi, Kenya";
+const DEFAULT_BIO = "Passionate prediction market enthusiast";
+const DEFAULT_PREFS = {
+  bets: true,
+  groups: true,
+  social: false,
+  marketing: false,
+};
+
 export default function SettingsPage() {
   const toast = useToast();
+  const { user, isLoading: isUserLoading, refresh } = useLiveUser();
   const [activeSection, setActiveSection] =
     useState<SettingsSection>("profile");
   const [isSaving, setIsSaving] = useState(false);
@@ -73,13 +84,21 @@ export default function SettingsPage() {
   const [isUploadingProfile, setIsUploadingProfile] = useState(false);
   const [isTwoFactorLoading, setIsTwoFactorLoading] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [hasHydratedProfile, setHasHydratedProfile] = useState(false);
+  const [initialProfile, setInitialProfile] = useState({
+    username: "",
+    email: "",
+    phone: DEFAULT_PHONE,
+    location: DEFAULT_LOCATION,
+    bio: DEFAULT_BIO,
+  });
 
   // Profile states
-  const [username, setUsername] = useState(mockUser.username);
-  const [email, setEmail] = useState(mockUser.email);
-  const [phone, setPhone] = useState("+254712345678");
-  const [location, setLocation] = useState("Nairobi, Kenya");
-  const [bio, setBio] = useState("Passionate prediction market enthusiast");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState(DEFAULT_PHONE);
+  const [location, setLocation] = useState(DEFAULT_LOCATION);
+  const [bio, setBio] = useState(DEFAULT_BIO);
 
   // Security states
   const [currentPassword, setCurrentPassword] = useState("");
@@ -90,22 +109,31 @@ export default function SettingsPage() {
   // Notification states
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
-  const [notificationPrefs, setNotificationPrefs] = useState({
-    bets: true,
-    groups: true,
-    social: false,
-    marketing: false,
-  });
+  const [notificationPrefs, setNotificationPrefs] = useState(DEFAULT_PREFS);
 
   // Language state
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
+    if (isUserLoading || hasHydratedProfile) return;
+
+    const profileState = {
+      username: user.username || "",
+      email: user.email || "",
+      phone: DEFAULT_PHONE,
+      location: DEFAULT_LOCATION,
+      bio: DEFAULT_BIO,
+    };
+
+    setInitialProfile(profileState);
+    setUsername(profileState.username);
+    setEmail(profileState.email);
+    setPhone(profileState.phone);
+    setLocation(profileState.location);
+    setBio(profileState.bio);
+    setHasHydratedProfile(true);
+    setIsPageLoading(false);
+  }, [hasHydratedProfile, isUserLoading, user.email, user.username]);
 
   const [dailyLimit, setDailyLimit] = useState(500);
   const [autoWithdraw, setAutoWithdraw] = useState(true);
@@ -113,19 +141,31 @@ export default function SettingsPage() {
   // Track unsaved changes
   useEffect(() => {
     const changed =
-      username !== mockUser.username ||
-      email !== mockUser.email ||
-      phone !== "+254712345678" ||
-      location !== "Nairobi, Kenya" ||
-      bio !== "Passionate prediction market enthusiast" ||
+      username !== initialProfile.username ||
+      email !== initialProfile.email ||
+      phone !== initialProfile.phone ||
+      location !== initialProfile.location ||
+      bio !== initialProfile.bio ||
       currentPassword !== "" ||
       newPassword !== "" ||
       confirmPassword !== "" ||
       twoFactorEnabled !== false ||
       dailyLimit !== 500 ||
-      autoWithdraw !== true;
+      autoWithdraw !== true ||
+      emailNotifications !== true ||
+      pushNotifications !== true ||
+      notificationPrefs.bets !== DEFAULT_PREFS.bets ||
+      notificationPrefs.groups !== DEFAULT_PREFS.groups ||
+      notificationPrefs.social !== DEFAULT_PREFS.social ||
+      notificationPrefs.marketing !== DEFAULT_PREFS.marketing ||
+      language !== "en";
     setHasUnsavedChanges(changed);
   }, [
+    initialProfile.bio,
+    initialProfile.email,
+    initialProfile.location,
+    initialProfile.phone,
+    initialProfile.username,
     username,
     email,
     phone,
@@ -139,17 +179,40 @@ export default function SettingsPage() {
     autoWithdraw,
     emailNotifications,
     pushNotifications,
-    notificationPrefs,
+    notificationPrefs.bets,
+    notificationPrefs.groups,
+    notificationPrefs.marketing,
+    notificationPrefs.social,
     language,
   ]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
-    setTimeout(() => {
+
+    const response = await fetch("/api/user/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        email,
+        phone,
+        location,
+        bio,
+      }),
+    });
+
+    if (!response.ok) {
       setIsSaving(false);
-      toast.success("Settings Saved", "Your changes have been updated");
-    }, 1000);
-  }, [toast]);
+      toast.error("Save Failed", "Unable to update settings");
+      return;
+    }
+
+    setInitialProfile({ username, email, phone, location, bio });
+    setHasUnsavedChanges(false);
+    await refresh();
+    setIsSaving(false);
+    toast.success("Settings Saved", "Your changes have been updated");
+  }, [bio, email, location, phone, refresh, toast, username]);
 
   const handlePasswordChange = useCallback(() => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -241,7 +304,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 pb-20 pl-0 md:pl-8 w-full">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Manage your account preferences and settings"
       />
 
@@ -331,7 +394,9 @@ export default function SettingsPage() {
                     >
                       <div className="flex items-center gap-6">
                         <div className="w-24 h-24 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-semibold text-white shadow-lg">
-                          {mockUser.username.charAt(0).toUpperCase()}
+                          {(user.username || username || "U")
+                            .charAt(0)
+                            .toUpperCase()}
                         </div>
                         <div className="flex-1">
                           <h3 className="text-base font-semibold text-black/90 mb-1">
@@ -983,7 +1048,7 @@ export default function SettingsPage() {
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="text-2xl font-semibold text-amber-900">
-                            {mockUser.tier === "whale" || mockUser.tier === "oracle"
+                            {user.tier === "whale" || user.tier === "oracle"
                               ? "Platinum VIP"
                               : "Standard Member"}
                           </h3>
@@ -998,11 +1063,11 @@ export default function SettingsPage() {
                       </div>
                       <p className="text-xs text-amber-700 mb-4">
                         Daily limits: $
-                        {mockUser.tier === "whale" || mockUser.tier === "oracle"
+                        {user.tier === "whale" || user.tier === "oracle"
                           ? "5,000"
                           : "500"}{" "}
                         deposits • $
-                        {mockUser.tier === "whale" || mockUser.tier === "oracle"
+                        {user.tier === "whale" || user.tier === "oracle"
                           ? "1,000"
                           : "250"}{" "}
                         withdrawals
@@ -1208,23 +1273,18 @@ export default function SettingsPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
-                    setUsername(mockUser.username);
-                    setEmail(mockUser.email);
-                    setPhone("+254712345678");
-                    setLocation("Nairobi, Kenya");
-                    setBio("Passionate prediction market enthusiast");
+                    setUsername(initialProfile.username);
+                    setEmail(initialProfile.email);
+                    setPhone(initialProfile.phone);
+                    setLocation(initialProfile.location);
+                    setBio(initialProfile.bio);
                     setCurrentPassword("");
                     setNewPassword("");
                     setConfirmPassword("");
                     setTwoFactorEnabled(false);
                     setEmailNotifications(true);
                     setPushNotifications(true);
-                    setNotificationPrefs({
-                      bets: true,
-                      groups: true,
-                      social: false,
-                      marketing: false,
-                    });
+                    setNotificationPrefs(DEFAULT_PREFS);
                     setLanguage("en");
                     setHasUnsavedChanges(false);
                   }}

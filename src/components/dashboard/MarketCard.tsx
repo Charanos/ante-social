@@ -7,7 +7,7 @@ import { ProbabilityTrend } from "@/components/ui/ProbabilityTrend";
 import { cn } from "@/lib/utils";
 
 interface MarketCardProps {
-  id: number;
+  id: string | number;
   title: string;
   category: string;
   volume: string;

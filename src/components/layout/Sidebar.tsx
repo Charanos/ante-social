@@ -29,8 +29,8 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { mockNotifications } from "@/lib/mockData";
 import { useState, useEffect } from "react";
+import { useUnreadNotificationsCount } from "@/lib/live-data";
 import {
   Accordion,
   AccordionContent,
@@ -90,6 +90,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const unreadNotifications = useUnreadNotificationsCount();
   const [defaultValue, setDefaultValue] = useState<string | undefined>(undefined);
 
   // Auto-expand the section if the current path is within it
@@ -180,7 +181,7 @@ export function Sidebar({
                 item.children?.some((child) => pathname === child.url);
               const isNotifications = item.title === "Notifications";
               const unreadCount = isNotifications
-                ? mockNotifications.filter((n) => !n.is_read).length
+                ? unreadNotifications
                 : 0;
               const hasChildren =
                 item.children && item.children.length > 0 && !collapsed;

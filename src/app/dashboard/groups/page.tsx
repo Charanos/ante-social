@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { IconAccessPoint, IconLoader3, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
-import { mockGroups, mockUser } from "@/lib/mockData";
-import { getJoinedGroups, isGroupMember } from "@/lib/membership";
+import { getJoinedGroups } from "@/lib/membership";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -17,20 +15,16 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useGroupList, useLiveUser } from "@/lib/live-data";
 
 
 export default function GroupsPage() {
   const router = useRouter();
+  const { user, isLoading: isUserLoading } = useLiveUser();
+  const { groups, isLoading: isGroupsLoading } = useGroupList();
   // Keep the filtering logic for role-based visibility
-  const [groups, setGroups] = useState(mockGroups);
-  const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const toast = useToast();
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
 
   const [joinedGroupIds, setJoinedGroupIds] = useState<string[]>([]);
 
@@ -38,9 +32,10 @@ export default function GroupsPage() {
     setJoinedGroupIds(getJoinedGroups());
   }, []);
 
-  const filteredGroups = groups.filter((group) => {
-    return joinedGroupIds.includes(group.id.toString());
-  });
+  const filteredGroups = groups.filter((group) =>
+    joinedGroupIds.includes(group.id.toString()) ||
+    group.members.some((member) => member.id === user.id)
+  );
 
   // Redirect to dedicated group creation page
   const handleCreateGroup = () => {
@@ -66,14 +61,14 @@ export default function GroupsPage() {
     show: { y: 0, opacity: 1 },
   };
 
-  if (isLoading) {
+  if (isUserLoading || isGroupsLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
   return (
     <div className="space-y-8 pl-0 md:pl-8 w-full">
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Join communities and create private prediction markets"
       />
 

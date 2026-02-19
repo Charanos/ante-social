@@ -41,3 +41,20 @@ export async function PUT(req: Request) {
     token,
   })
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  const token = getSessionToken(session)
+  if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
+
+  const id = req.nextUrl.searchParams.get("id")
+  if (!id) {
+    return Response.json({ error: "Missing notification id" }, { status: 400 })
+  }
+
+  return proxyBackendRequest({
+    path: `/api/v1/notifications/${id}`,
+    method: "DELETE",
+    token,
+  })
+}

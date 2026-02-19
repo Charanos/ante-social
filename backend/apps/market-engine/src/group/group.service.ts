@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Group, GroupDocument, GroupBet, GroupBetDocument, User, UserDocument } from '@app/database';
 import { ClientProxy, ClientKafka } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { KAFKA_TOPICS, PLATFORM_FEE_RATE } from '@app/common';
+import { PLATFORM_FEE_RATE } from '@app/common';
 
 @Injectable()
 export class GroupService {
@@ -18,7 +18,7 @@ export class GroupService {
     @Inject('KAFKA_SERVICE') private kafkaClient: ClientKafka,
   ) {}
 
-  // ─── Group Management ─────────────────────────────
+  // Group management
   async createGroup(data: { name: string; description?: string; isPublic?: boolean }, userId: string) {
     const group = new this.groupModel({
       ...data,
@@ -27,10 +27,8 @@ export class GroupService {
       memberCount: 1,
     });
     await group.save();
-    
-    // Update user group count
+
     await this.userModel.findByIdAndUpdate(userId, { $inc: { groupMemberships: 1 } });
-    
     this.logger.log(`Group created: ${group.name} by ${userId}`);
     return group;
   }
@@ -40,14 +38,13 @@ export class GroupService {
     if (search) {
       filter.name = { $regex: search, $options: 'i' };
     }
-    
-    const groups = await this.groupModel.find(filter)
+
+    return this.groupModel
+      .find(filter)
       .skip(offset)
       .limit(limit)
       .sort({ memberCount: -1 })
       .exec();
-      
-    return groups;
   }
 
   async getGroup(id: string) {
@@ -60,10 +57,14 @@ export class GroupService {
     const group = await this.groupModel.findById(groupId);
     if (!group) throw new NotFoundException('Group not found');
 
-    const isMember = group.members.some(m => m.userId.toString() === userId);
+    const isMember = group.members.some((member) => member.userId.toString() === userId);
     if (isMember) throw new BadRequestException('Already a member');
 
-    group.members.push({ userId: new Types.ObjectId(userId) as any, role: 'member', joinedAt: new Date() });
+    group.members.push({
+      userId: new Types.ObjectId(userId) as any,
+      role: 'member',
+      joinedAt: new Date(),
+    });
     group.memberCount += 1;
     await group.save();
 
@@ -75,7 +76,7 @@ export class GroupService {
     const group = await this.groupModel.findById(groupId);
     if (!group) throw new NotFoundException('Group not found');
 
-    group.members = group.members.filter(m => m.userId.toString() !== userId);
+    group.members = group.members.filter((member) => member.userId.toString() !== userId);
     group.memberCount = Math.max(0, group.memberCount - 1);
     await group.save();
 
@@ -83,28 +84,125 @@ export class GroupService {
     return group;
   }
 
-  // ─── Group Bets ───────────────────────────────────
+  async updateGroup(
+    groupId: string,
+    updates: {
+      name?: string;
+      description?: string;
+      category?: string;
+      isPublic?: boolean;
+      imageUrl?: string;
+    },
+    actorId: string,
+  ) {
+    const group = await this.groupModel.findById(groupId);
+    if (!group) throw new NotFoundException('Group not found');
+
+    const actorMember = group.members.find((member) => member.userId.toString() === actorId);
+    const isOwner = group.createdBy.toString() === actorId;
+    const canEdit = isOwner || actorMember?.role === 'admin' || actorMember?.role === 'moderator';
+    if (!canEdit) {
+      throw new BadRequestException('Not authorized to update this group');
+    }
+
+    if (updates.name !== undefined) {
+      const trimmed = String(updates.name || '').trim();
+      if (!trimmed) throw new BadRequestException('Group name cannot be empty');
+      group.name = trimmed;
+    }
+    if (updates.description !== undefined) {
+      const nextDescription = String(updates.description || '').trim();
+      group.description = nextDescription || undefined;
+    }
+    if (updates.category !== undefined) {
+      const nextCategory = String(updates.category || '').trim();
+      group.category = nextCategory || undefined;
+    }
+    if (updates.isPublic !== undefined) {
+      group.isPublic = Boolean(updates.isPublic);
+    }
+    if (updates.imageUrl !== undefined) {
+      const nextImage = String(updates.imageUrl || '').trim();
+      group.imageUrl = nextImage || undefined;
+    }
+
+    await group.save();
+    return group;
+  }
+
+  async updateMemberRole(groupId: string, memberId: string, role: string, actorId: string) {
+    const group = await this.groupModel.findById(groupId);
+    if (!group) throw new NotFoundException('Group not found');
+
+    const normalizedRole = String(role || '').toLowerCase();
+    if (!['admin', 'moderator', 'member'].includes(normalizedRole)) {
+      throw new BadRequestException('Invalid role');
+    }
+
+    const actorMember = group.members.find((member) => member.userId.toString() === actorId);
+    const isOwner = group.createdBy.toString() === actorId;
+    const canManage = isOwner || actorMember?.role === 'admin' || actorMember?.role === 'moderator';
+    if (!canManage) {
+      throw new BadRequestException('Not authorized to manage members');
+    }
+
+    const target = group.members.find((member) => member.userId.toString() === memberId);
+    if (!target) throw new NotFoundException('Member not found');
+
+    if (group.createdBy.toString() === memberId && normalizedRole !== 'admin') {
+      throw new BadRequestException('Cannot demote group creator');
+    }
+
+    target.role = normalizedRole;
+    await group.save();
+    return group;
+  }
+
+  async removeMember(groupId: string, memberId: string, actorId: string) {
+    const group = await this.groupModel.findById(groupId);
+    if (!group) throw new NotFoundException('Group not found');
+
+    const actorMember = group.members.find((member) => member.userId.toString() === actorId);
+    const isOwner = group.createdBy.toString() === actorId;
+    const canManage = isOwner || actorMember?.role === 'admin' || actorMember?.role === 'moderator';
+    if (!canManage) {
+      throw new BadRequestException('Not authorized to manage members');
+    }
+
+    if (group.createdBy.toString() === memberId) {
+      throw new BadRequestException('Cannot remove group creator');
+    }
+
+    const beforeCount = group.members.length;
+    group.members = group.members.filter((member) => member.userId.toString() !== memberId);
+    if (group.members.length === beforeCount) {
+      throw new NotFoundException('Member not found');
+    }
+
+    group.memberCount = Math.max(0, group.memberCount - 1);
+    await group.save();
+    await this.userModel.findByIdAndUpdate(memberId, { $inc: { groupMemberships: -1 } });
+    return group;
+  }
+
+  // Group bets
   async createGroupBet(groupId: string, data: any, userId: string) {
     const group = await this.groupModel.findById(groupId);
     if (!group) throw new NotFoundException('Group not found');
 
-    // Create bet
     const bet = new this.groupBetModel({
       groupId,
       createdBy: userId,
       title: data.title,
       description: data.description,
-      marketType: data.marketType, // 'winner_takes_all' or 'odd_one_out'
+      marketType: data.marketType,
       buyInAmount: data.buyInAmount,
       options: data.options || [],
-      participants: [], 
+      participants: [],
       status: 'active',
     });
 
-    // Creator auto-joins
     await this.joinBetInternal(bet, userId, data.selectedOption);
-    
-    // Debit creator wallet
     await this.debitWallet(userId, data.buyInAmount, `Group Bet: ${data.title}`);
 
     group.activeBetsCount += 1;
@@ -115,7 +213,10 @@ export class GroupService {
   }
 
   async getGroupBets(groupId: string) {
-    return this.groupBetModel.find({ groupId }).sort({ createdAt: -1 }).populate('participants.userId', 'username avatarUrl');
+    return this.groupBetModel
+      .find({ groupId })
+      .sort({ createdAt: -1 })
+      .populate('participants.userId', 'username avatarUrl');
   }
 
   async joinBet(betId: string, selectedOption: string, userId: string) {
@@ -124,17 +225,12 @@ export class GroupService {
     if (bet.status !== 'active') throw new BadRequestException('Bet is not active');
 
     const amount = bet.buyInAmount;
-    
-    // Debit wallet first
     await this.debitWallet(userId, amount, `Join Group Bet: ${bet.title}`);
-
-    // Add to participants
     await this.joinBetInternal(bet, userId, selectedOption);
-    
     return bet;
   }
 
-  // ─── Settlement Logic ─────────────────────────────
+  // Settlement
   async declareWinner(betId: string, winnerId: string, userId: string) {
     const bet = await this.groupBetModel.findById(betId);
     if (!bet) throw new NotFoundException('Bet not found');
@@ -143,24 +239,21 @@ export class GroupService {
 
     bet.status = 'pending_confirmation';
     bet.declaredWinnerId = new Types.ObjectId(winnerId);
-    bet.confirmationDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h to dispute
+    bet.confirmationDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await bet.save();
 
     return bet;
   }
 
   async confirmResult(betId: string, userId: string) {
-    // In a real app, we'd track who confirmed to avoid duplicates.
-    // For MVP, simplistic counter.
     const bet = await this.groupBetModel.findOneAndUpdate(
       { _id: betId, status: 'pending_confirmation' },
       { $inc: { confirmations: 1 }, $set: { ['participants.$[elem].hasConfirmed']: true } },
-      { arrayFilters: [{ 'elem.userId': userId }], new: true }
+      { arrayFilters: [{ 'elem.userId': userId }], new: true },
     );
-    
+
     if (!bet) throw new NotFoundException('Bet not found or not in pending state');
 
-    // If enough confirmations (e.g. > 50% of participants), settle
     if (bet.confirmations >= bet.participants.length / 2) {
       await this.settleGroupBet(bet);
     }
@@ -172,22 +265,20 @@ export class GroupService {
     const bet = await this.groupBetModel.findOneAndUpdate(
       { _id: betId, status: 'pending_confirmation' },
       { $inc: { disagreements: 1 }, $set: { ['participants.$[elem].hasDisagreed']: true } },
-      { arrayFilters: [{ 'elem.userId': userId }], new: true }
+      { arrayFilters: [{ 'elem.userId': userId }], new: true },
     );
 
     if (!bet) throw new NotFoundException('Bet not found');
 
-    // If dispute threshold reached (e.g. > 30%), mark as disputed
     if (bet.disagreements >= bet.participants.length * 0.3) {
       bet.status = 'disputed';
       await bet.save();
-      // Notify admins via Kafka?
     }
 
     return bet;
   }
 
-  // ─── Internal Helpers ─────────────────────────────
+  // Internal helpers
   private async joinBetInternal(bet: GroupBetDocument, userId: string, selectedOption?: string) {
     bet.participants.push({
       userId: new Types.ObjectId(userId) as any,
@@ -213,7 +304,7 @@ export class GroupService {
           currency: 'USD',
           description,
           type: 'bet_placed',
-        })
+        }),
       );
     } catch (e: any) {
       this.logger.error(`Wallet debit failed for ${userId}: ${e.message}`);
@@ -223,18 +314,16 @@ export class GroupService {
 
   private async settleGroupBet(bet: GroupBetDocument) {
     bet.status = 'settled';
-    
+
     if (bet.marketType === 'winner_takes_all' && bet.declaredWinnerId) {
       const winnerId = bet.declaredWinnerId.toString();
       const prize = bet.prizePoolAfterFees || 0;
 
-      // Update winner status
-      const participant = bet.participants.find(p => p.userId.toString() === winnerId);
+      const participant = bet.participants.find((entry) => entry.userId.toString() === winnerId);
       if (participant) {
         participant.isWinner = true;
         participant.payoutAmount = prize;
-        
-        // Credit wallet
+
         await lastValueFrom(
           this.walletClient.send('credit_balance', {
             userId: winnerId,
@@ -242,12 +331,11 @@ export class GroupService {
             currency: 'USD',
             description: `Group Bet Win: ${bet.title}`,
             type: 'bet_payout',
-          })
+          }),
         );
       }
     }
-    // TODO: Handle 'odd_one_out' settlement logic if needed
-    
+
     bet.payoutProcessed = true;
     await bet.save();
   }

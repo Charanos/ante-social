@@ -8,158 +8,19 @@ import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { mockUser } from "@/lib/mockData";
 import { MarketCard } from "@/components/markets/MarketCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useEffect } from "react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
-
-// Mock markets data with Kenyan context
-const mockMarkets: any[] = [
-  {
-    id: "1",
-    title: "Best Nairobi Matatu Route",
-    description: "Vote for the most reliable and comfortable matatu route",
-    image:
-      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop",
-    type: "consensus",
-    category: "poll",
-    buyIn: "500 KSH",
-    pool: "145,600 KSH",
-    poolAmount: 145600,
-    participantCount: 42,
-    minStake: 50,
-    endsAt: "2024-12-31T23:59:59Z",
-    status: "active",
-    signalStrength: 85,
-    probability: 65,
-    priceHistory: [40, 45, 55, 60, 65],
-  },
-  {
-    id: "2",
-    title: "Trust or Betray: Social Experiment",
-    description:
-      "Cooperate for small win or betray for jackpot - choose wisely",
-    image:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
-    type: "prisoner_dilemma",
-    category: "betrayal",
-    buyIn: "1,000 KSH",
-    pool: "66,250 KSH",
-    poolAmount: 66250,
-    participantCount: 50,
-    minStake: 100,
-    endsAt: "2024-12-31T23:59:59Z",
-    status: "active",
-    signalStrength: 72,
-    probability: 45,
-    priceHistory: [60, 55, 50, 48, 45],
-  },
-  {
-    id: "3",
-    title: "First Reaction: Group Chat Added",
-    description: "5 seconds to predict the crowd's instinct - pure reflex",
-    image:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop",
-    type: "reflex",
-    category: "reflex",
-    buyIn: "750 KSH",
-    pool: "33,125 KSH",
-    poolAmount: 33125,
-    participantCount: 50,
-    minStake: 75,
-    endsAt: "2024-12-31T23:59:59Z",
-    status: "active",
-    signalStrength: 91,
-    probability: 82,
-    priceHistory: [70, 75, 78, 80, 82],
-  },
-  {
-    id: "4",
-    title: "Rank These Nairobi Inconveniences",
-    description: "Order items by what you think the majority will choose",
-    image:
-      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&auto=format&fit=crop",
-    type: "ladder",
-    category: "ladder",
-    buyIn: "500 KSH",
-    pool: "46,375 KSH",
-    poolAmount: 46375,
-    participantCount: 70,
-    minStake: 50,
-    endsAt: "2024-12-31T23:59:59Z",
-    status: "active",
-    signalStrength: 64,
-    probability: 52,
-    priceHistory: [50, 51, 50, 53, 52],
-  },
-  {
-    id: "5",
-    title: "Who Wins the Derby?",
-    description: "AFC Leopards vs Gor Mahia - predict Kenya's biggest rivalry",
-    image:
-      "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop",
-    type: "consensus",
-    category: "poll",
-    buyIn: "1,200 KSH",
-    pool: "98,750 KSH",
-    poolAmount: 98750,
-    participantCount: 93,
-    minStake: 120,
-    endsAt: "2024-12-31T23:59:59Z",
-    status: "active",
-    signalStrength: 88,
-    probability: 58,
-    priceHistory: [50, 52, 55, 56, 58],
-  },
-  {
-    id: "6",
-    title: "Top Kenyan Musician 2024",
-    description: "Rank the top 5 based on majority consensus",
-    image:
-      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
-    type: "ladder",
-    category: "ladder",
-    buyIn: "600 KSH",
-    pool: "52,100 KSH",
-    poolAmount: 52100,
-    participantCount: 78,
-    minStake: 60,
-    endsAt: "2024-12-31T23:59:59Z",
-    status: "active",
-    signalStrength: 76,
-    probability: 44,
-    priceHistory: [50, 48, 46, 45, 44],
-  },
-];
-
-const getTypeStyles = (type: string) => {
-  switch (type) {
-    case "poll":
-      return { label: "Poll" };
-    case "betrayal":
-      return { label: "Betrayal" };
-    case "reflex":
-      return { label: "Reflex" };
-    case "ladder":
-      return { label: "Ladder" };
-    default:
-      return { label: type };
-  }
-};
+import { useLiveUser, useMarketList } from "@/lib/live-data";
 export default function MarketsPage() {
+  const { user } = useLiveUser();
+  const { markets, isLoading } = useMarketList();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
   const [isFiltering, setIsFiltering] = useState(false);
-
-  useEffect(() => {
-    // Simulate initial loading
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     setIsFiltering(true);
@@ -167,20 +28,20 @@ export default function MarketsPage() {
     return () => clearTimeout(timer);
   }, [searchQuery, filterType]);
 
-  const totalParticipants = mockMarkets.reduce(
+  const totalParticipants = markets.reduce(
     (sum, m) => sum + m.participantCount,
     0,
   );
-  const totalPool = mockMarkets.reduce((sum, m) => {
-    const poolValue = parseFloat(m.pool.replace(/[^0-9.]/g, ""));
-    return sum + poolValue;
-  }, 0);
+  const totalPool = markets.reduce((sum, market) => sum + market.poolAmount, 0);
 
-  const filteredMarkets = mockMarkets.filter((market) => {
+  const filteredMarkets = markets.filter((market) => {
     const matchesSearch = market.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesFilter = filterType === "all" || market.category === filterType;
+    const matchesFilter =
+      filterType === "all" ||
+      market.category.toLowerCase() === filterType ||
+      market.type.toLowerCase() === filterType;
     return matchesSearch && matchesFilter;
   });
 
@@ -192,7 +53,7 @@ export default function MarketsPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto md:pl-8 pl-0 pb-8 space-y-2">
         <DashboardHeader
-          user={mockUser}
+          user={user}
           subtitle="Explore active betting markets and join the action"
         />
 
@@ -213,7 +74,7 @@ export default function MarketsPage() {
                     Active
                   </p>
                   <p className="mt-2 text-2xl md:text-3xl font-medium numeric text-blue-900">
-                    {mockMarkets.length}
+                    {markets.length}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -252,8 +113,8 @@ export default function MarketsPage() {
           placeholder="Search markets, tags, or pools..."
           tabs={[
             { id: "all", label: "All Markets" },
-            { id: "poll", label: "Poll" },
-            { id: "betrayal", label: "Betrayal" },
+            { id: "consensus", label: "Poll" },
+            { id: "prisoner_dilemma", label: "Betrayal" },
             { id: "reflex", label: "Reflex" },
             { id: "ladder", label: "Ladder" },
           ]}

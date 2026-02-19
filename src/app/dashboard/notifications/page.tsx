@@ -6,6 +6,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
 import { cn } from "@/lib/utils"
+import { fetchJsonOrNull, normalizeNotifications } from "@/lib/live-data"
 import {
   IconBell,
   IconCheck,
@@ -21,7 +22,6 @@ import {
   IconMail,
   IconX
 } from "@tabler/icons-react"
-import { mockUser } from "@/lib/mockData"
 
 type NotificationType = "bet" | "group" | "social" | "system"
 type NotificationFilter = "all" | "unread" | "bet" | "group" | "social" | "system"
@@ -35,57 +35,15 @@ interface Notification {
   created_date: string
 }
 
-// Mock notifications data (same as before)
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "1",
-    type: "bet",
-    title: "Bet Settled",
-    message: "Your bet on 'Will Bitcoin reach $100k?' has been settled. You won $250!",
-    is_read: false,
-    created_date: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-  },
-  {
-    id: "2",
-    type: "group",
-    title: "New Group Post",
-    message: "John posted in Premier League Fanatics: 'What are your predictions for the weekend?'",
-    is_read: false,
-    created_date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
-  },
-  {
-    id: "3",
-    type: "social",
-    title: "New Follower",
-    message: "Sarah started following you",
-    is_read: true,
-    created_date: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
-  },
-  {
-    id: "4",
-    type: "bet",
-    title: "Bet Expiring Soon",
-    message: "Your bet 'NBA Finals Winner' closes in 2 hours",
-    is_read: false,
-    created_date: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString()
-  },
-  {
-    id: "5",
-    type: "system",
-    title: "Account Upgraded",
-    message: "Congratulations! You've been upgraded to High Roller tier",
-    is_read: true,
-    created_date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
-  },
-  {
-    id: "6",
-    type: "group",
-    title: "Group Invitation",
-    message: "Mike invited you to join 'Crypto Traders'",
-    is_read: false,
-    created_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString()
+function mapNotificationType(type: string): NotificationType {
+  const value = type.toLowerCase()
+  if (value.includes("bet") || value.includes("market")) return "bet"
+  if (value.includes("group")) return "group"
+  if (value.includes("social") || value.includes("follow") || value.includes("message")) {
+    return "social"
   }
-]
+  return "system"
+}
 
 const FILTER_OPTIONS: { value: NotificationFilter; label: string; icon: any }[] = [
   { value: "all", label: "All", icon: IconBell },
@@ -111,14 +69,24 @@ export default function NotificationsPage() {
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
   const [bulkActionLoading, setBulkActionLoading] = useState(false)
 
-  // Load notifications
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setNotifications(MOCK_NOTIFICATIONS)
-      setIsPageLoading(false)
-    }, 800)
-    return () => clearTimeout(timer)
+  const loadNotifications = useCallback(async () => {
+    setIsPageLoading(true)
+    const payload = await fetchJsonOrNull<any>("/api/notifications?limit=200&offset=0")
+    const normalized = normalizeNotifications(payload).map((notification) => ({
+      id: notification.id,
+      type: mapNotificationType(notification.type),
+      title: notification.title,
+      message: notification.message,
+      is_read: notification.is_read,
+      created_date: notification.created_date,
+    }))
+    setNotifications(normalized)
+    setIsPageLoading(false)
   }, [])
+
+  useEffect(() => {
+    void loadNotifications()
+  }, [loadNotifications])
 
   // Filter notifications
   const filteredNotifications = useMemo(() => {
@@ -147,49 +115,76 @@ export default function NotificationsPage() {
   // Mark as read
   const handleMarkAsRead = useCallback(async (id: string, silent = false) => {
     if (!silent) setIsMarkingRead(id)
-    
-    // Optimistic update for silent reads (click to view)
-    if (silent) {
-        setNotifications(prev =>
-            prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-        )
-        return;
+
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+    )
+
+    const response = await fetch("/api/notifications", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    })
+
+    if (!response.ok) {
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, is_read: false } : n)
+      )
+      if (!silent) {
+        toast.error("Update Failed", "Unable to mark notification as read")
+      }
+    } else if (!silent) {
+      toast.success("Marked as Read", "Notification marked as read")
     }
 
-    setTimeout(() => {
-      setNotifications(prev =>
-        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
-      )
-      setIsMarkingRead(null)
-      toast.success("Marked as Read", "Notification marked as read")
-    }, 500)
+    setIsMarkingRead(null)
   }, [toast])
 
   // Mark all as read
   const handleMarkAllAsRead = useCallback(async () => {
     setBulkActionLoading(true)
-    
-    setTimeout(() => {
-      setNotifications(prev =>
-        prev.map(n => ({ ...n, is_read: true }))
-      )
-      setBulkActionLoading(false)
+
+    const previous = notifications
+    setNotifications(prev =>
+      prev.map(n => ({ ...n, is_read: true }))
+    )
+
+    const response = await fetch("/api/notifications", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: "all" }),
+    })
+
+    if (!response.ok) {
+      setNotifications(previous)
+      toast.error("Update Failed", "Unable to mark all as read")
+    } else {
       toast.success("All Read", "All notifications marked as read")
-    }, 1000)
-  }, [toast])
+    }
+
+    setBulkActionLoading(false)
+  }, [notifications, toast])
 
   // Delete notification
   const handleDelete = useCallback(async (id: string) => {
     setIsDeletingNotif(id)
-    
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id))
+
+    const response = await fetch(`/api/notifications?id=${id}`, {
+      method: "DELETE",
+    })
+
+    if (!response.ok) {
+      toast.error("Delete Failed", "Unable to delete notification")
       setIsDeletingNotif(null)
-      if (selectedNotification?.id === id) {
-          setSelectedNotification(null);
-      }
-      toast.success("Deleted", "Notification removed")
-    }, 500)
+      return
+    }
+
+    setNotifications(prev => prev.filter(n => n.id !== id))
+    setIsDeletingNotif(null)
+    if (selectedNotification?.id === id) {
+      setSelectedNotification(null)
+    }
+    toast.success("Deleted", "Notification removed")
   }, [toast, selectedNotification])
 
   // Handle notification click
@@ -254,10 +249,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8 pb-20 pl-0 md:pl-8">
-      <DashboardHeader
-        user={mockUser}
-        subtitle="Stay updated with your latest activity"
-      />
+      <DashboardHeader subtitle="Stay updated with your latest activity" />
 
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Main Content */}

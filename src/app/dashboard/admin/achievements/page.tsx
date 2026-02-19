@@ -1,119 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import {
+  IconAccessPoint,
+  IconArrowRight,
+  IconAward,
+  IconCheck,
+  IconCurrencyDollar,
+  IconGift,
+  IconStar,
+  IconTarget,
+  IconUsers,
+  IconX,
+} from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { mockUser } from "@/lib/mockData";
-import { IconAccessPoint, IconArrowRight, IconAward, IconCheck, IconClock, IconCurrencyDollar, IconGift, IconStar, IconTarget, IconUsers, IconX } from '@tabler/icons-react';;
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { useLiveUser } from "@/lib/live-data";
+import { useToast } from "@/components/ui/toast-notification";
 
-const mockAchievements = {
-  stats: {
-    balance: 2450,
-    unlocked: 12,
-    total: 28,
-    earned: 3800,
-    streak: 7,
-  },
-  dailyBonus: [
-    { day: 1, reward: 100, claimed: false },
-    { day: 2, reward: 150, claimed: false },
-    { day: 3, reward: 200, claimed: false },
-    { day: 4, reward: 300, claimed: false },
-    { day: 5, reward: 400, claimed: false },
-    { day: 6, reward: 600, claimed: false },
-    { day: 7, reward: 1000, claimed: false },
-  ],
-  inProgress: [
-    {
-      title: "Win 10 Markets",
-      description: "Win 10 different betting markets",
-      progress: 60,
-      reward: 500,
-    },
-    {
-      title: "7-Day Streak",
-      description: "Login for 7 consecutive days",
-      progress: 85,
-      reward: 300,
-    },
-  ],
-  unlocked: [
-    {
-      title: "First Win",
-      description: "Won your first market",
-      category: "Beginner",
-      reward: 100,
-      date: "2 days ago",
-    },
-    {
-      title: "Early Bird",
-      description: "Placed bet within first hour",
-      category: "Time Based",
-      reward: 150,
-      date: "1 week ago",
-    },
-    {
-      title: "Lucky Day",
-      description: "Won 3 markets in one day",
-      category: "Performance",
-      reward: 200,
-      date: "3 days ago",
-    },
-    {
-      title: "High Roller",
-      description: "Reached High Roller tier",
-      category: "Prestige",
-      reward: 500,
-      date: "1 month ago",
-    },
-  ],
-  locked: [
-    {
-      title: "10-Win Streak",
-      description: "Win 10 markets in a row",
-      category: "Performance",
-      reward: 1000,
-    },
-    {
-      title: "Big Spender",
-      description: "Deposit over 100,000 KSH",
-      category: "Risk",
-      reward: 750,
-    },
-    {
-      title: "Social Butterfly",
-      description: "Refer 5 friends",
-      category: "Social",
-      reward: 500,
-    },
-    {
-      title: "Perfect Week",
-      description: "Win every bet for 7 days",
-      category: "Performance",
-      reward: 2000,
-    },
-    {
-      title: "Market Master",
-      description: "Win 50 different markets",
-      category: "Prestige",
-      reward: 1500,
-    },
-    {
-      title: "Night Owl",
-      description: "Place bet after midnight",
-      category: "Time Based",
-      reward: 100,
-    },
-  ],
+type AdminStats = {
+  totalUsers?: number;
+  totalRevenue?: number;
+  activeMarkets?: number;
+  totalVolume?: number;
+  pendingWithdrawals?: number;
 };
 
-const getCategoryIcon = (category: string) => {
+type UserRow = {
+  _id: string;
+  reputationScore?: number;
+  isVerified?: boolean;
+  isFlagged?: boolean;
+  totalPositions?: number;
+};
+
+type UsersResponse = {
+  data?: UserRow[];
+};
+
+function getCategoryIcon(category: string) {
   switch (category.toLowerCase()) {
     case "beginner":
       return <IconStar className="w-4 h-4" />;
-    case "time based":
-      return <IconClock className="w-4 h-4" />;
     case "performance":
       return <IconAward className="w-4 h-4" />;
     case "prestige":
@@ -125,38 +55,156 @@ const getCategoryIcon = (category: string) => {
     default:
       return <IconTarget className="w-4 h-4" />;
   }
-};
+}
 
 export default function AchievementsPage() {
+  const { user } = useLiveUser();
+  const toast = useToast();
   const [showBonusModal, setShowBonusModal] = useState(false);
 
+  const { data: stats } = useQuery<AdminStats>({
+    queryKey: ["admin-achievements-stats"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/stats", { cache: "no-store" });
+      if (!response.ok) throw new Error("Failed to load stats");
+      return response.json();
+    },
+  });
+
+  const { data: usersResponse } = useQuery<UsersResponse>({
+    queryKey: ["admin-achievements-users"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/users?limit=500&offset=0", { cache: "no-store" });
+      if (!response.ok) throw new Error("Failed to load users");
+      return response.json();
+    },
+  });
+
+  const users = usersResponse?.data || [];
+
+  const achievementData = useMemo(() => {
+    const totalUsers = Number(stats?.totalUsers || users.length);
+    const totalRevenue = Number(stats?.totalRevenue || 0);
+    const activeMarkets = Number(stats?.activeMarkets || 0);
+    const totalVolume = Number(stats?.totalVolume || 0);
+
+    const verifiedUsers = users.filter((u) => u.isVerified).length;
+    const flaggedUsers = users.filter((u) => u.isFlagged).length;
+    const highRepUsers = users.filter((u) => Number(u.reputationScore || 0) >= 500).length;
+
+    const unlocked = [
+      {
+        title: "Platform Launch",
+        description: "Core market and wallet flows are active",
+        category: "Beginner",
+        reward: 1000,
+        date: "Live",
+      },
+      {
+        title: "User Growth",
+        description: `${totalUsers} users onboarded`,
+        category: "Social",
+        reward: 1500,
+        date: "Current",
+      },
+      {
+        title: "Revenue Milestone",
+        description: `${totalRevenue.toFixed(2)} total platform revenue`,
+        category: "Performance",
+        reward: 1200,
+        date: "Current",
+      },
+    ];
+
+    const inProgress = [
+      {
+        title: "High Reputation Cohort",
+        description: "Grow users with reputation >= 500",
+        progress: Math.min(100, totalUsers > 0 ? Math.round((highRepUsers / totalUsers) * 100) : 0),
+        reward: 1800,
+        category: "Performance",
+      },
+      {
+        title: "Verification Coverage",
+        description: "Increase verified user percentage",
+        progress: Math.min(100, totalUsers > 0 ? Math.round((verifiedUsers / totalUsers) * 100) : 0),
+        reward: 1400,
+        category: "Prestige",
+      },
+      {
+        title: "Risk Control",
+        description: "Reduce flagged users below 2%",
+        progress: Math.min(100, totalUsers > 0 ? Math.max(0, 100 - Math.round((flaggedUsers / totalUsers) * 100)) : 0),
+        reward: 1100,
+        category: "Risk",
+      },
+    ];
+
+    const locked = [
+      {
+        title: "1M Volume Club",
+        description: "Reach cumulative volume of 1,000,000",
+        category: "Performance",
+        reward: 5000,
+      },
+      {
+        title: "500 Active Markets",
+        description: "Maintain 500 active markets concurrently",
+        category: "Prestige",
+        reward: 3500,
+      },
+      {
+        title: "Zero Pending Withdrawals",
+        description: "Keep pending withdrawal queue at 0",
+        category: "Risk",
+        reward: 2200,
+      },
+    ];
+
+    return {
+      stats: {
+        balance: Math.round(totalRevenue),
+        unlocked: unlocked.length,
+        total: unlocked.length + inProgress.length + locked.length,
+        earned: unlocked.reduce((sum, item) => sum + item.reward, 0),
+        streak: activeMarkets,
+      },
+      dailyBonus: [100, 150, 200, 300, 400, 600, 1000].map((reward, index) => ({
+        day: index + 1,
+        reward,
+        claimed: index < 2,
+      })),
+      inProgress,
+      unlocked,
+      locked,
+      metrics: {
+        totalVolume,
+        pendingWithdrawals: Number(stats?.pendingWithdrawals || 0),
+      },
+    };
+  }, [stats, users]);
+
   const handleClaimBonus = () => {
-    // Handle claim logic here
+    toast.info("Admin action", "Bonus simulation completed for monitoring");
     setTimeout(() => {
       setShowBonusModal(false);
-    }, 1500);
+    }, 800);
   };
 
   return (
     <div className="space-y-6 md:space-y-8 pb-16">
-      {/* Header */}
       <DashboardHeader
-        user={mockUser}
+        user={user}
         subtitle="Track your progress and unlock exclusive rewards"
       />
 
-      {/* Visual Separator */}
       <div className="hidden md:flex items-center gap-4 my-8 md:my-18">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-          Overview
-        </h2>
+        <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Overview</h2>
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
       </div>
 
-      {/* Stats Cards - Keep Original Design */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-4 md:mt-0">
-        {/* Cash Balance - Green */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -167,11 +215,9 @@ export default function AchievementsPage() {
           <div className="p-4 md:p-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div>
-                <p className="text-xs md:text-sm font-medium text-green-900/60">
-                  Cash Earned
-                </p>
+                <p className="text-xs md:text-sm font-medium text-green-900/60">Cash Earned</p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-green-900">
-                  {mockAchievements.stats.balance} KSH
+                  {achievementData.stats.balance} KSH
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -181,7 +227,6 @@ export default function AchievementsPage() {
           </div>
         </motion.div>
 
-        {/* Unlocked - Amber */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -192,12 +237,9 @@ export default function AchievementsPage() {
           <div className="p-4 md:p-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div>
-                <p className="text-xs md:text-sm font-medium text-amber-900/60">
-                  Unlocked
-                </p>
+                <p className="text-xs md:text-sm font-medium text-amber-900/60">Unlocked</p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-amber-900">
-                  {mockAchievements.stats.unlocked}/
-                  {mockAchievements.stats.total}
+                  {achievementData.stats.unlocked}/{achievementData.stats.total}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -207,7 +249,6 @@ export default function AchievementsPage() {
           </div>
         </motion.div>
 
-        {/* Total Rewards - Blue */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -218,11 +259,9 @@ export default function AchievementsPage() {
           <div className="p-4 md:p-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div>
-                <p className="text-xs md:text-sm font-medium text-blue-900/60">
-                  Total Rewards
-                </p>
+                <p className="text-xs md:text-sm font-medium text-blue-900/60">Total Rewards</p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-blue-900">
-                  {mockAchievements.stats.earned} KSH
+                  {achievementData.stats.earned} KSH
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -232,7 +271,6 @@ export default function AchievementsPage() {
           </div>
         </motion.div>
 
-        {/* Day Streak - Purple */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -243,11 +281,9 @@ export default function AchievementsPage() {
           <div className="p-4 md:p-6 relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div>
-                <p className="text-xs md:text-sm font-medium text-purple-900/60">
-                  Day Streak
-                </p>
+                <p className="text-xs md:text-sm font-medium text-purple-900/60">Active Markets</p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-purple-900">
-                  {mockAchievements.stats.streak}
+                  {achievementData.stats.streak}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -258,7 +294,6 @@ export default function AchievementsPage() {
         </motion.div>
       </div>
 
-      {/* Daily Bonus */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -269,7 +304,7 @@ export default function AchievementsPage() {
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex-1 w-full grid grid-cols-7 gap-2 md:gap-4">
-            {mockAchievements.dailyBonus.map((day, index) => (
+            {achievementData.dailyBonus.map((day, index) => (
               <motion.div
                 key={day.day}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -281,16 +316,14 @@ export default function AchievementsPage() {
                   className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all ${
                     day.claimed
                       ? "bg-amber-100 border-amber-200 text-amber-700"
-                      : day.day === 1
+                      : day.day === 3
                         ? "bg-amber-500 border-amber-500 text-white shadow-lg scale-110"
                         : "bg-white/40 backdrop-blur-sm border-black/10 text-black/40"
                   }`}
                 >
                   {day.claimed ? <IconCheck className="w-4 h-4" /> : day.day}
                 </div>
-                <span
-                  className={`text-xs font-mono font-semibold ${day.claimed || day.day === 1 ? "text-amber-600" : "text-black/40"}`}
-                >
+                <span className={`text-xs font-mono font-semibold ${day.claimed || day.day === 3 ? "text-amber-600" : "text-black/40"}`}>
                   {day.reward} KSH
                 </span>
               </motion.div>
@@ -309,19 +342,10 @@ export default function AchievementsPage() {
         </div>
       </motion.div>
 
-      {/* In Progress */}
       <div className="space-y-6">
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-            In Progress
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
-
+        <SectionHeading title="In Progress" className="my-18" />
         <div className="grid gap-4">
-          {mockAchievements.inProgress.map((item, index) => (
+          {achievementData.inProgress.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
@@ -329,39 +353,24 @@ export default function AchievementsPage() {
               transition={{ delay: 0.45 + index * 0.05 }}
               className="relative overflow-hidden p-6 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:bg-white/60 hover:border-black/10 transition-all cursor-pointer"
             >
-              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-black/20 to-transparent" />
-
               <div className="space-y-4">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-black/90 text-base">
-                      {item.title}
-                    </h4>
-                    <p className="text-sm text-black/80 font-medium mt-1">
-                      {item.description}
-                    </p>
+                    <h4 className="font-semibold text-black/90 text-base">{item.title}</h4>
+                    <p className="text-sm text-black/80 font-medium mt-1">{item.description}</p>
                   </div>
-                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">
-                    +{item.reward} KSH
-                  </span>
+                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">+{item.reward} KSH</span>
                 </div>
-
                 <div className="space-y-2">
                   <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${item.progress}%` }}
-                      transition={{
-                        duration: 1,
-                        ease: "easeOut",
-                        delay: 0.5 + index * 0.05,
-                      }}
+                      transition={{ duration: 1, ease: "easeOut", delay: 0.5 + index * 0.05 }}
                       className="h-full bg-black/80 rounded-full"
                     />
                   </div>
-                  <div className="text-xs font-mono font-semibold text-black/50">
-                    {item.progress}%
-                  </div>
+                  <div className="text-xs font-mono font-semibold text-black/50">{item.progress}%</div>
                 </div>
               </div>
             </motion.div>
@@ -369,19 +378,10 @@ export default function AchievementsPage() {
         </div>
       </div>
 
-      {/* Unlocked */}
       <div className="space-y-6">
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-            Unlocked
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
-
+        <SectionHeading title="Unlocked" className="my-18" />
         <div className="grid md:grid-cols-2 gap-4">
-          {mockAchievements.unlocked.map((item, index) => (
+          {achievementData.unlocked.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
@@ -394,43 +394,24 @@ export default function AchievementsPage() {
                   {getCategoryIcon(item.category)}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-black/90 text-base">
-                    {item.title}
-                  </h4>
-                  <p className="text-xs text-black/80 font-medium mt-1">
-                    {item.description}
-                  </p>
+                  <h4 className="font-semibold text-black/90 text-base">{item.title}</h4>
+                  <p className="text-xs text-black/80 font-medium mt-1">{item.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">
-                    +{item.reward} KSH
-                  </span>
-                  <span className="text-xs font-semibold text-black/50">
-                    {item.category}
-                  </span>
+                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">+{item.reward} KSH</span>
+                  <span className="text-xs font-semibold text-black/50">{item.category}</span>
                 </div>
-                <span className="text-xs text-black/40 font-medium">
-                  Unlocked {item.date}
-                </span>
+                <span className="text-xs text-black/40 font-medium">Unlocked {item.date}</span>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* Locked */}
       <div className="space-y-6">
-        {/* Visual Separator */}
-        <div className="flex items-center gap-4 my-18">
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-          <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-            Locked
-          </h2>
-          <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-        </div>
-
+        <SectionHeading title="Locked" className="my-18" />
         <div className="grid md:grid-cols-3 gap-4">
-          {mockAchievements.locked.map((item, index) => (
+          {achievementData.locked.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
@@ -443,20 +424,12 @@ export default function AchievementsPage() {
                   {getCategoryIcon(item.category)}
                 </div>
                 <div className="mb-4">
-                  <h4 className="font-semibold text-black/80 text-base">
-                    {item.title}
-                  </h4>
-                  <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">
-                    {item.description}
-                  </p>
+                  <h4 className="font-semibold text-black/80 text-base">{item.title}</h4>
+                  <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">{item.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">
-                    +{item.reward} KSH
-                  </span>
-                  <span className="text-xs font-semibold text-black/30">
-                    {item.category}
-                  </span>
+                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">+{item.reward} KSH</span>
+                  <span className="text-xs font-semibold text-black/30">{item.category}</span>
                 </div>
               </div>
             </motion.div>
@@ -464,7 +437,6 @@ export default function AchievementsPage() {
         </div>
       </div>
 
-      {/* Bonus Claim Modal */}
       <AnimatePresence>
         {showBonusModal && (
           <motion.div
@@ -499,20 +471,15 @@ export default function AchievementsPage() {
                 </motion.div>
 
                 <div>
-                  <h3 className="text-2xl font-semibold text-black/90 mb-2">
-                    Daily Bonus
-                  </h3>
-                  <p className="text-base text-black/80 font-medium">
-                    Claim your reward for today
-                  </p>
+                  <h3 className="text-2xl font-semibold text-black/90 mb-2">Daily Bonus</h3>
+                  <p className="text-base text-black/80 font-medium">Claim your reward for today</p>
                 </div>
 
                 <div className="p-6 rounded-2xl bg-linear-to-br from-amber-50 to-yellow-50 border border-amber-200">
-                  <p className="text-sm font-semibold text-amber-900/60 mb-2">
-                    Today's Reward
-                  </p>
+                  <p className="text-sm font-semibold text-amber-900/60 mb-2">Today's Reward</p>
                   <p className="text-4xl font-semibold font-mono text-amber-900">
-                    100 <span className="text-2xl">KSH</span>
+                    {achievementData.dailyBonus.find((day) => !day.claimed)?.reward || 100}{" "}
+                    <span className="text-2xl">KSH</span>
                   </p>
                 </div>
 
@@ -525,10 +492,6 @@ export default function AchievementsPage() {
                   Claim Reward
                   <IconArrowRight className="w-5 h-5" />
                 </motion.button>
-
-                <p className="text-xs text-black/40 font-medium">
-                  Come back tomorrow for 150 KSH
-                </p>
               </div>
             </motion.div>
           </motion.div>
@@ -537,3 +500,4 @@ export default function AchievementsPage() {
     </div>
   );
 }
+

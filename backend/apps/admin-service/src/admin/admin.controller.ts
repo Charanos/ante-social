@@ -20,13 +20,24 @@ export class AdminController {
   }
 
   @Get('users')
-  async getUsers(@Query('limit') limit: number, @Query('offset') offset: number) {
-    return this.adminService.getUsers(limit, offset);
+  async getUsers(
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('search') search?: string,
+    @Query('role') role?: string,
+    @Query('tier') tier?: string,
+  ) {
+    return this.adminService.getUsers(limit, offset, search, role, tier);
   }
 
   @Post('users/:id/ban')
   async banUser(@Param('id') id: string, @Body('reason') reason?: string) {
     return this.adminService.banUser(id, reason);
+  }
+
+  @Post('users/:id/unban')
+  async unbanUser(@Param('id') id: string) {
+    return this.adminService.unbanUser(id);
   }
 
   @Patch('users/:userId/tier')
@@ -85,5 +96,14 @@ export class AdminController {
     @CurrentUser() admin: UserDocument,
   ) {
     return this.adminService.rejectWithdrawal(id, reason, admin._id.toString());
+  }
+
+  @Get('audit-logs')
+  async getAuditLogs(
+    @Query('limit') limit = 20,
+    @Query('offset') offset = 0,
+    @Query('action') action?: string,
+  ) {
+    return this.adminService.getAuditLogs(Number(limit), Number(offset), action);
   }
 }
