@@ -2,55 +2,26 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconAccessPoint, IconCalendar, IconCheck, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers } from '@tabler/icons-react';;
-
+import { IconAccessPoint, IconCalendar, IconCheck, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers, IconLoader3 } from '@tabler/icons-react';
 import { useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/toast-notification";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { format } from "date-fns";
 
-// Mock Data
-const mockUsers = [
-  {
-    id: 1,
-    name: "Gaby Rusli",
-    email: "gabyprusli@gmail.com",
-    joinedDate: "November 29th, 2025",
-    level: "Novice",
-    avatar: null,
-  },
-  {
-    id: 2,
-    name: "Ryan Goodwin",
-    email: "wingoodfool@gmail.com",
-    joinedDate: "November 26th, 2025",
-    level: "High Roller",
-    avatar: null,
-  },
-  {
-    id: 3,
-    name: "Dennis Munge",
-    email: "dennismunge960@gmail.com",
-    joinedDate: "November 5th, 2025",
-    level: "Novice",
-    avatar: null,
-  },
-  {
-    id: 4,
-    name: "Livia Rusli",
-    email: "livia@mycounsely.com",
-    joinedDate: "October 15th, 2025",
-    level: "High Roller",
-    avatar: null,
-  },
-  {
-    id: 5,
-    name: "Gaby Rusli",
-    email: "gaby.rusli.label@gmail.com",
-    joinedDate: "October 15th, 2025",
-    level: "Novice",
-    avatar: null,
-  },
-];
+// Types
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  role: string;
+  tier: string;
+  createdAt: string;
+  isVerified: boolean;
+  active: boolean;
+  avatarUrl?: string;
+}
 
 const tabs = [
   { id: "lookup", label: "User Lookup", icon: IconSearch },
@@ -61,35 +32,75 @@ const tabs = [
 
 export default function UserManagementPage() {
   const router = useRouter();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  
   const [activeTab, setActiveTab] = useState("levels");
   const [searchQuery, setSearchQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState("all");
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const filteredUsers =
-    levelFilter === "all"
-      ? mockUsers
-      : mockUsers.filter((user) => user.level === levelFilter);
+  // Fetch Users
+  const { data: users = [], isLoading } = useQuery<User[]>({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/users');
+      if (!res.ok) throw new Error('Failed to fetch users');
+      return res.json();
+    }
+  });
 
-  const handleLevelChange = (userId: number, newLevel: string) => {
-    console.log(`Changing user ${userId} to ${newLevel}`);
-    setOpenDropdown(null);
+  // Update Tier Mutation
+  const updateTierMutation = useMutation({
+    mutationFn: async ({ userId, tier }: { userId: string, tier: string }) => {
+      const res = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, tier: tier.toLowerCase() })
+      });
+      if (!res.ok) throw new Error('Failed to update tier');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      toast.success("Tier Updated", "User level has been changed.");
+      setOpenDropdown(null);
+    },
+    onError: () => {
+      toast.error("Update Failed", "Could not change user level.");
+    }
+  });
+
+  const filteredUsers = users.filter(user => {
+    // Filter by Level
+    if (levelFilter !== "all" && user.tier.toLowerCase() !== levelFilter.toLowerCase()) return false;
+    
+    // Filter by Search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        user.username.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        user._id.includes(query)
+      );
+    }
+    
+    return true;
+  });
+
+  const handleLevelChange = (userId: string, newLevel: string) => {
+    updateTierMutation.mutate({ userId, tier: newLevel });
   };
 
-  const totalUsers = mockUsers.length;
-  const noviceUsers = mockUsers.filter((u) => u.level === "Novice").length;
-  const highRollerUsers = mockUsers.filter(
-    (u) => u.level === "High Roller",
-  ).length;
+  const totalUsers = users.length;
+  const noviceUsers = users.filter((u) => u.tier === "novice").length;
+  const highRollerUsers = users.filter((u) => u.tier === "high_roller").length;
 
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        {/* Header */}
-        {/* Header */}
         <DashboardHeader subtitle="User lookup, tier management, KYC review, and fraud detection" />
 
-        {/* Main Content Card */}
         <DashboardCard className="overflow-hidden p-0">
           {/* Tabs */}
           <div className="flex items-center border-b border-neutral-100 overflow-x-auto">
@@ -134,25 +145,33 @@ export default function UserManagementPage() {
                 >
                   <div className="max-w-3xl">
                     <h3 className="text-sm font-medium text-neutral-900 mb-4">
-                      IconSearch for a user
+                      Search for a user
                     </h3>
                     <div className="flex gap-3">
                       <div className="relative flex-1">
                         <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
                         <input
                           type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Enter user ID, email, or username..."
                           className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                         />
                       </div>
-                      <button className="px-6 py-2.5 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg transition-all cursor-pointer">
-                        IconSearch
-                      </button>
                     </div>
-                    <p className="text-xs text-neutral-600 mt-2">
-                      IconSearch by user ID, email address, or username to view
-                      detailed information
-                    </p>
+                    
+                    {/* Results for Lookup */}
+                    <div className="mt-8 space-y-3">
+                      {searchQuery && filteredUsers.map(user => (
+                         <div key={user._id} className="p-4 border rounded-lg bg-white flex justify-between items-center">
+                            <div>
+                               <p className="font-medium">{user.username}</p>
+                               <p className="text-sm text-gray-500">{user.email}</p>
+                            </div>
+                            <span className="px-2 py-1 bg-gray-100 rounded text-xs uppercase">{user.tier}</span>
+                         </div>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -169,44 +188,32 @@ export default function UserManagementPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-neutral-600">
-                          Total IconUsers
-                        </span>
+                        <span className="text-sm font-medium text-neutral-600">Total Users</span>
                         <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
                           <IconUsers className="w-4 h-4 text-neutral-600" />
                         </div>
                       </div>
-                      <p className="text-2xl font-medium text-neutral-900 font-mono">
-                        {totalUsers}
-                      </p>
+                      <p className="text-2xl font-medium text-neutral-900 font-mono">{totalUsers}</p>
                     </div>
 
                     <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-neutral-600">
-                          Novice
-                        </span>
+                        <span className="text-sm font-medium text-neutral-600">Novice</span>
                         <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
                           <IconUserCheck className="w-4 h-4 text-blue-600" />
                         </div>
                       </div>
-                      <p className="text-2xl font-medium text-neutral-900 font-mono">
-                        {noviceUsers}
-                      </p>
+                      <p className="text-2xl font-medium text-neutral-900 font-mono">{noviceUsers}</p>
                     </div>
 
                     <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-neutral-600">
-                          High Roller
-                        </span>
+                        <span className="text-sm font-medium text-neutral-600">High Roller</span>
                         <div className="w-8 h-8 rounded-lg bg-white border border-neutral-200 flex items-center justify-center">
                           <IconCrown className="w-4 h-4 text-amber-600" />
                         </div>
                       </div>
-                      <p className="text-2xl font-medium text-neutral-900 font-mono">
-                        {highRollerUsers}
-                      </p>
+                      <p className="text-2xl font-medium text-neutral-900 font-mono">{highRollerUsers}</p>
                     </div>
                   </div>
 
@@ -219,8 +226,8 @@ export default function UserManagementPage() {
                         className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 appearance-none cursor-pointer pr-10 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                       >
                         <option value="all">All Levels</option>
-                        <option value="Novice">Novice</option>
-                        <option value="High Roller">High Roller</option>
+                        <option value="novice">Novice</option>
+                        <option value="high_roller">High Roller</option>
                       </select>
                       <IconChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
@@ -229,62 +236,78 @@ export default function UserManagementPage() {
                     </span>
                   </div>
 
-                  {/* IconUsers List */}
-                  <div className="space-y-3">
-                    {filteredUsers.map((user) => (
-                      <div
-                        key={user.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all group"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-600 shrink-0">
-                            <IconUser className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h3 className="text-sm font-medium text-neutral-900">
-                              {user.name}
-                            </h3>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="text-xs text-neutral-600 flex items-center gap-1.5">
-                                <IconMail className="w-3 h-3" />
-                                {user.email}
-                              </span>
-                              <span className="text-xs text-neutral-300">
-                                •
-                              </span>
-                              <span className="text-xs text-neutral-600 flex items-center gap-1.5">
-                                <IconCalendar className="w-3 h-3" />
-                                Joined {user.joinedDate}
-                              </span>
+                  {isLoading ? (
+                    <div className="flex justify-center py-12">
+                      <IconLoader3 className="w-8 h-8 animate-spin text-neutral-400" />
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {filteredUsers.map((user) => (
+                        <div
+                          key={user._id}
+                          className="flex items-center justify-between p-4 rounded-lg border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-sm transition-all group"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-neutral-100 to-neutral-200 flex items-center justify-center text-neutral-600 shrink-0">
+                              <IconUser className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-medium text-neutral-900">
+                                {user.username}
+                              </h3>
+                              <div className="flex items-center gap-3 mt-1">
+                                <span className="text-xs text-neutral-600 flex items-center gap-1.5">
+                                  <IconMail className="w-3 h-3" />
+                                  {user.email}
+                                </span>
+                                <span className="text-xs text-neutral-300">•</span>
+                                <span className="text-xs text-neutral-600 flex items-center gap-1.5">
+                                  <IconCalendar className="w-3 h-3" />
+                                  Joined {user.createdAt ? format(new Date(user.createdAt), 'MMM do, yyyy') : 'N/A'}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white cursor-pointer hover:bg-neutral-50 transition-all">
-                          <span className="text-xs font-medium text-neutral-600">
-                            {user.level.toLowerCase()}
-                          </span>
-                          <div className="h-4 w-px bg-neutral-200"></div>
-                          <span className="text-sm font-medium text-neutral-900">
-                            {user.level}
-                          </span>
-                          <IconChevronDown className="w-3.5 h-3.5 text-neutral-500 ml-1" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                          <div className="relative">
+                            <button 
+                                onClick={() => setOpenDropdown(openDropdown === user._id ? null : user._id)}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white cursor-pointer hover:bg-neutral-50 transition-all"
+                            >
+                                <span className="text-xs font-medium text-neutral-600 uppercase">{user.tier}</span>
+                                <div className="h-4 w-px bg-neutral-200"></div>
+                                <IconChevronDown className="w-3.5 h-3.5 text-neutral-500 ml-1" />
+                            </button>
 
-                  {filteredUsers.length === 0 && (
+                            {openDropdown === user._id && (
+                                <div className="absolute right-0 top-full mt-2 w-40 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                                    <button 
+                                        onClick={() => handleLevelChange(user._id, 'novice')}
+                                        className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50"
+                                    >
+                                        Novice
+                                    </button>
+                                    <button 
+                                        onClick={() => handleLevelChange(user._id, 'high_roller')}
+                                        className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50"
+                                    >
+                                        High Roller
+                                    </button>
+                                </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {!isLoading && filteredUsers.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4">
                         <IconUsers className="w-8 h-8 text-neutral-300" />
                       </div>
-                      <h3 className="text-base font-medium text-neutral-900 mb-2">
-                        No users found
-                      </h3>
-                      <p className="text-sm text-neutral-600">
-                        Try adjusting your filters
-                      </p>
+                      <h3 className="text-base font-medium text-neutral-900 mb-2">No users found</h3>
+                      <p className="text-sm text-neutral-600">Try adjusting your filters</p>
                     </div>
                   )}
                 </motion.div>
@@ -310,8 +333,7 @@ export default function UserManagementPage() {
                     {activeTab === "kyc" ? "KYC Review" : "AML & Clusters"}
                   </h3>
                   <p className="text-sm text-neutral-600 max-w-sm">
-                    This module is currently under development. IconCheck back later
-                    for updates.
+                    This module is currently under development. Check back later for updates.
                   </p>
                 </motion.div>
               )}

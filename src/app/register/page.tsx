@@ -53,7 +53,7 @@ export default function RegisterPage() {
           email: formData.email,
           phone: formData.phone,
           password: formData.password,
-          dob: formData.dob,
+          dateOfBirth: formData.dob,
           currency: formData.currency,
         }),
       });
