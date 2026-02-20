@@ -43,6 +43,26 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+function coerceToastText(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value instanceof Error) return value.message || "Unexpected error";
+  if (value && typeof value === "object") {
+    const maybeMessage = (value as { message?: unknown }).message;
+    const maybeCode = (value as { code?: unknown }).code;
+    if (typeof maybeMessage === "string" && typeof maybeCode === "string") {
+      return `${maybeCode}: ${maybeMessage}`;
+    }
+    if (typeof maybeMessage === "string") return maybeMessage;
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "Unexpected error";
+    }
+  }
+  if (value == null) return "";
+  return String(value);
+}
+
 export function useToast() {
   const context = useContext(ToastContext);
   if (!context) {
@@ -61,7 +81,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const addToast = useCallback(
     ({ type, message, description, duration = 3000 }: Omit<Toast, "id">) => {
       const id = Math.random().toString(36).substring(2, 9);
-      const newToast = { id, type, message, description, duration };
+      const safeMessage = coerceToastText(message) || "Notification";
+      const safeDescription = description === undefined ? undefined : coerceToastText(description);
+      const newToast = { id, type, message: safeMessage, description: safeDescription, duration };
 
       setToasts((prev) => [...prev, newToast]);
 
@@ -142,6 +164,9 @@ function ToastItem({
   description,
   onClose,
 }: Toast & { onClose: () => void }) {
+  const safeMessage = coerceToastText(message) || "Notification";
+  const safeDescription = description === undefined ? undefined : coerceToastText(description);
+
   const getIcon = () => {
     switch (type) {
       case "success":
@@ -191,11 +216,11 @@ function ToastItem({
       </div>
       <div className="flex-1 min-w-0 pt-0.5">
         <p className="text-sm font-semibold text-neutral-900 leading-none mb-1">
-          {message}
+          {safeMessage}
         </p>
-        {description && (
+        {safeDescription && (
           <p className="text-xs font-medium text-neutral-500 leading-snug">
-            {description}
+            {safeDescription}
           </p>
         )}
       </div>

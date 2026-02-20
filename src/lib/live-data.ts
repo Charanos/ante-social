@@ -5,6 +5,9 @@ import { useSession } from "next-auth/react";
 import type { Market, MarketStatus, Position } from "@/types/market";
 import type { UserProfile, UserTier } from "@/types/user";
 
+const LIVE_USER_REFRESH_EVENT = "ante-social:live-user-refresh";
+const LIVE_USER_REFRESH_STORAGE_KEY = "ante-social:live-user-refresh-ts";
+
 type SessionUser = {
   id?: string;
   email?: string | null;
@@ -86,6 +89,68 @@ export const EMPTY_USER: LiveUser = {
   role: "user",
   managed_groups: [],
 };
+
+let liveUserCache: LiveUser = EMPTY_USER;
+let liveUserCacheAt = 0;
+let liveUserFetchPromise: Promise<LiveUser> | null = null;
+
+export function emitLiveUserRefresh() {
+  if (typeof window === "undefined") return;
+  liveUserCacheAt = 0;
+  window.dispatchEvent(new Event(LIVE_USER_REFRESH_EVENT));
+  try {
+    window.localStorage.setItem(
+      LIVE_USER_REFRESH_STORAGE_KEY,
+      Date.now().toString(),
+    );
+  } catch {
+    // Ignore storage write errors in restricted environments.
+  }
+}
+
+async function resolveLiveUser(
+  sessionUser: SessionUser,
+  force = false,
+): Promise<LiveUser> {
+  const now = Date.now();
+  const isCacheFresh = now - liveUserCacheAt < 15_000;
+
+  if (!force && isCacheFresh) {
+    return liveUserCache;
+  }
+
+  if (!force && liveUserFetchPromise) {
+    return liveUserFetchPromise;
+  }
+
+  liveUserFetchPromise = (async () => {
+    const [profile, wallet] = await Promise.all([
+      fetchJsonOrNull<any>("/api/user/profile"),
+      fetchJsonOrNull<any>("/api/wallet/balance"),
+    ]);
+
+    const profileSource =
+      profile || (liveUserCacheAt > 0 ? (liveUserCache as unknown as Record<string, unknown>) : {});
+    const nextUser = normalizeUser(profileSource, wallet || {}, sessionUser);
+
+    if (!wallet && liveUserCacheAt > 0) {
+      nextUser.balance = liveUserCache.balance;
+      nextUser.totalWinnings = liveUserCache.totalWinnings;
+      nextUser.totalLosses = liveUserCache.totalLosses;
+      nextUser.totalPnl = liveUserCache.totalPnl;
+    }
+
+    liveUserCache = nextUser;
+    liveUserCacheAt = Date.now();
+    return liveUserCache;
+  })();
+
+  try {
+    return await liveUserFetchPromise;
+  } finally {
+    liveUserFetchPromise = null;
+  }
+}
 
 function toArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
@@ -351,25 +416,43 @@ export function normalizePositions(payload: any): Position[] {
 
 export function useLiveUser() {
   const { data: session, status } = useSession();
-  const [user, setUser] = useState<LiveUser>(EMPTY_USER);
+  const [user, setUser] = useState<LiveUser>(liveUserCache);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (force = false) => {
     if (status === "loading") return;
-    setIsLoading(true);
+    if (force || liveUserCacheAt === 0) {
+      setIsLoading(true);
+    }
 
     const sessionUser = (session?.user || {}) as SessionUser;
-    const [profile, wallet] = await Promise.all([
-      fetchJsonOrNull<any>("/api/user/profile"),
-      fetchJsonOrNull<any>("/api/wallet/balance"),
-    ]);
-
-    setUser(normalizeUser(profile || {}, wallet || {}, sessionUser));
+    const nextUser = await resolveLiveUser(sessionUser, force);
+    setUser(nextUser);
     setIsLoading(false);
   }, [session, status]);
 
   useEffect(() => {
-    void refresh();
+    void refresh(false);
+  }, [refresh]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleRefreshEvent = () => {
+      void refresh(true);
+    };
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== LIVE_USER_REFRESH_STORAGE_KEY) return;
+      void refresh(true);
+    };
+
+    window.addEventListener(LIVE_USER_REFRESH_EVENT, handleRefreshEvent);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener(LIVE_USER_REFRESH_EVENT, handleRefreshEvent);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, [refresh]);
 
   return { user, isLoading, refresh };

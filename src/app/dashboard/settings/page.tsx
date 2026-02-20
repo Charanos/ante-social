@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { useLiveUser } from "@/lib/live-data";
+import { emitLiveUserRefresh, useLiveUser } from "@/lib/live-data";
+import { useSession } from "next-auth/react";
 import {
   IconUser,
   IconLock,
@@ -73,9 +74,18 @@ const DEFAULT_PREFS = {
   marketing: false,
 };
 
+type SettingsProfilePayload = {
+  username?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  bio?: string;
+};
+
 export default function SettingsPage() {
   const toast = useToast();
   const { user, isLoading: isUserLoading, refresh } = useLiveUser();
+  const { update: updateSession } = useSession();
   const [activeSection, setActiveSection] =
     useState<SettingsSection>("profile");
   const [isSaving, setIsSaving] = useState(false);
@@ -117,22 +127,31 @@ export default function SettingsPage() {
   useEffect(() => {
     if (isUserLoading || hasHydratedProfile) return;
 
-    const profileState = {
-      username: user.username || "",
-      email: user.email || "",
-      phone: DEFAULT_PHONE,
-      location: DEFAULT_LOCATION,
-      bio: DEFAULT_BIO,
+    const hydrateProfile = async () => {
+      const response = await fetch("/api/user/profile", { cache: "no-store" }).catch(() => null);
+      const payload = response?.ok
+        ? await response.json().catch(() => null as SettingsProfilePayload | null)
+        : null;
+
+      const profileState = {
+        username: payload?.username || user.username || "",
+        email: payload?.email || user.email || "",
+        phone: payload?.phone || DEFAULT_PHONE,
+        location: payload?.location || DEFAULT_LOCATION,
+        bio: payload?.bio || DEFAULT_BIO,
+      };
+
+      setInitialProfile(profileState);
+      setUsername(profileState.username);
+      setEmail(profileState.email);
+      setPhone(profileState.phone);
+      setLocation(profileState.location);
+      setBio(profileState.bio);
+      setHasHydratedProfile(true);
+      setIsPageLoading(false);
     };
 
-    setInitialProfile(profileState);
-    setUsername(profileState.username);
-    setEmail(profileState.email);
-    setPhone(profileState.phone);
-    setLocation(profileState.location);
-    setBio(profileState.bio);
-    setHasHydratedProfile(true);
-    setIsPageLoading(false);
+    void hydrateProfile();
   }, [hasHydratedProfile, isUserLoading, user.email, user.username]);
 
   const [dailyLimit, setDailyLimit] = useState(500);
@@ -201,18 +220,46 @@ export default function SettingsPage() {
       }),
     });
 
+    const payload = await response.json().catch(() => null);
+
     if (!response.ok) {
       setIsSaving(false);
-      toast.error("Save Failed", "Unable to update settings");
+      toast.error(
+        "Save Failed",
+        payload?.message || payload?.error || "Unable to update settings",
+      );
       return;
     }
 
-    setInitialProfile({ username, email, phone, location, bio });
+    const savedUsername = String(payload?.username || username || "").trim();
+    const savedEmail = String(payload?.email || email || "").trim();
+    const savedPhone = String(payload?.phone || phone || "").trim();
+    const savedLocation = String(payload?.location || location || "").trim();
+    const savedBio = String(payload?.bio || bio || "").trim();
+
+    setInitialProfile({
+      username: savedUsername,
+      email: savedEmail,
+      phone: savedPhone,
+      location: savedLocation,
+      bio: savedBio,
+    });
+    setUsername(savedUsername);
+    setEmail(savedEmail);
+    setPhone(savedPhone);
+    setLocation(savedLocation);
+    setBio(savedBio);
     setHasUnsavedChanges(false);
+    await updateSession({
+      user: {
+        username: savedUsername || null,
+      },
+    }).catch(() => null);
     await refresh();
+    emitLiveUserRefresh();
     setIsSaving(false);
     toast.success("Settings Saved", "Your changes have been updated");
-  }, [bio, email, location, phone, refresh, toast, username]);
+  }, [bio, email, location, phone, refresh, toast, updateSession, username]);
 
   const handlePasswordChange = useCallback(() => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -253,19 +300,80 @@ export default function SettingsPage() {
   }, [twoFactorEnabled, toast]);
 
   const handleProfilePictureUpload = useCallback(() => {
-    setIsUploadingProfile(true);
-    setTimeout(() => {
+    const currentAvatar = user.avatarUrl || "";
+    const nextAvatarUrl = window.prompt("Paste a profile image URL", currentAvatar)?.trim();
+    if (!nextAvatarUrl || nextAvatarUrl === currentAvatar) return;
+
+    const run = async () => {
+      setIsUploadingProfile(true);
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: nextAvatarUrl }),
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        setIsUploadingProfile(false);
+        toast.error(
+          "Profile Update Failed",
+          payload?.message || payload?.error || "Unable to update profile picture",
+        );
+        return;
+      }
+
+      const savedAvatarUrl = String(payload?.avatarUrl || nextAvatarUrl || "");
+      await updateSession({
+        user: {
+          username: user.username || null,
+          image: savedAvatarUrl || null,
+        },
+      }).catch(() => null);
+      await refresh();
+      emitLiveUserRefresh();
       setIsUploadingProfile(false);
       toast.success(
         "Profile Updated",
         "Your profile picture has been uploaded",
       );
-    }, 1500);
-  }, [toast]);
+    };
+
+    void run();
+  }, [refresh, toast, updateSession, user.avatarUrl, user.username]);
 
   const handleRemoveProfilePicture = useCallback(() => {
-    toast.info("Profile Picture Removed", "Your avatar has been reset");
-  }, [toast]);
+    const run = async () => {
+      setIsUploadingProfile(true);
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: "" }),
+      });
+
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        setIsUploadingProfile(false);
+        toast.error(
+          "Profile Update Failed",
+          payload?.message || payload?.error || "Unable to remove profile picture",
+        );
+        return;
+      }
+
+      await updateSession({
+        user: {
+          username: user.username || null,
+          image: null,
+        },
+      }).catch(() => null);
+      await refresh();
+      emitLiveUserRefresh();
+      setIsUploadingProfile(false);
+      toast.info("Profile Picture Removed", "Your avatar has been reset");
+    };
+
+    void run();
+  }, [refresh, toast, updateSession, user.username]);
 
   const handleDeleteAccount = useCallback(() => {
     setIsSaving(true);

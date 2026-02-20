@@ -20,9 +20,13 @@ export class TwoFactorService {
     }
   }
 
-  async generateSecret(user: UserDocument) {
+  async generateSecret(userId: string) {
     if (!authenticator) {
       throw new BadRequestException('2FA provider is not configured');
+    }
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
 
     const secret = authenticator.generateSecret();
@@ -42,9 +46,13 @@ export class TwoFactorService {
     };
   }
 
-  async verifyAndEnable(user: UserDocument, code: string) {
+  async verifyAndEnable(userId: string, code: string) {
     if (!authenticator) {
       throw new BadRequestException('2FA provider is not configured');
+    }
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
 
     if (!user.twoFactorSecret) {

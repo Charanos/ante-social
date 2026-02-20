@@ -3,6 +3,21 @@ import { ConfigModule } from '@nestjs/config';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { RequestLoggingMiddleware } from './middleware/request-logging.middleware';
 
+function handleProxyError(_err: unknown, _req: unknown, res: any) {
+  if (res?.headersSent) return;
+  res.statusCode = 502;
+  res.setHeader('content-type', 'application/json');
+  res.end(
+    JSON.stringify({
+      success: false,
+      error: {
+        code: 'UPSTREAM_UNAVAILABLE',
+        message: 'Backend service unavailable',
+      },
+    }),
+  );
+}
+
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true })],
   providers: [RequestLoggingMiddleware],
@@ -20,9 +35,11 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: process.env.AUTH_SERVICE_URL || 'http://127.0.0.1:3002',
           changeOrigin: true,
-          proxyTimeout: 10000,
+          timeout: 5000,
+          proxyTimeout: 5000,
           on: {
-            proxyReq: fixRequestBody,
+            proxyReq: fixRequestBody as any,
+            error: handleProxyError as any,
           },
           pathRewrite: {
             '^/api/v1/auth': '/auth',
@@ -43,9 +60,11 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: process.env.MARKET_SERVICE_URL || 'http://127.0.0.1:3003',
           changeOrigin: true,
-          proxyTimeout: 10000,
+          timeout: 5000,
+          proxyTimeout: 5000,
           on: {
-            proxyReq: fixRequestBody,
+            proxyReq: fixRequestBody as any,
+            error: handleProxyError as any,
           },
           pathRewrite: {
             '^/api/v1/markets': '/markets',
@@ -66,9 +85,11 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: process.env.WALLET_SERVICE_URL || 'http://127.0.0.1:3004',
           changeOrigin: true,
-          proxyTimeout: 10000,
+          timeout: 5000,
+          proxyTimeout: 5000,
           on: {
-            proxyReq: fixRequestBody,
+            proxyReq: fixRequestBody as any,
+            error: handleProxyError as any,
           },
           pathRewrite: { '^/api/v1/wallet': '/wallet' },
         }),
@@ -81,9 +102,11 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: process.env.NOTIFICATION_SERVICE_URL || 'http://127.0.0.1:3005',
           changeOrigin: true,
-          proxyTimeout: 10000,
+          timeout: 5000,
+          proxyTimeout: 5000,
           on: {
-            proxyReq: fixRequestBody,
+            proxyReq: fixRequestBody as any,
+            error: handleProxyError as any,
           },
           pathRewrite: { '^/api/v1/notifications': '/notifications' },
         }),
@@ -96,9 +119,11 @@ export class AppModule implements NestModule {
         createProxyMiddleware({
           target: process.env.ADMIN_SERVICE_URL || 'http://127.0.0.1:3007',
           changeOrigin: true,
-          proxyTimeout: 10000,
+          timeout: 5000,
+          proxyTimeout: 5000,
           on: {
-            proxyReq: fixRequestBody,
+            proxyReq: fixRequestBody as any,
+            error: handleProxyError as any,
           },
           pathRewrite: { '^/api/v1/admin': '/admin' },
         }),

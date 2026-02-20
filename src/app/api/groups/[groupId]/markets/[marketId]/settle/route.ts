@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../../../../auth/[...nextauth]/route"
+﻿import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth-options"
 import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function POST(
@@ -40,3 +40,4 @@ export async function POST(
 
   return Response.json({ error: "Invalid action" }, { status: 400 })
 }
+

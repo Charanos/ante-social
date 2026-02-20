@@ -13,6 +13,22 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...(config.watchOptions || {}),
+        ignored: [
+          "**/backend/**",
+          "**/.nx/**",
+          "**/dist/**",
+          "**/*.log",
+          "**/tsconfig.tsbuildinfo",
+        ],
+      };
+    }
+
+    return config;
+  },
 };
 
 export default nextConfig;

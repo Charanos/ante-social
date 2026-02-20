@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server"
+﻿import { NextRequest } from "next/server"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth-options"
 import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 function toIsoDate(value: unknown, fallback: Date) {
@@ -106,3 +106,4 @@ export async function POST(req: Request) {
     jsonBody: payload,
   })
 }
+

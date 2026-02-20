@@ -17,7 +17,10 @@ import { ConfigService } from '@nestjs/config';
           transport: Transport.TCP,
           options: {
             host: configService.get('WALLET_SERVICE_HOST') || 'localhost',
-            port: configService.get('WALLET_SERVICE_PORT') || 3004,
+            port:
+              configService.get('WALLET_RPC_PORT') ||
+              configService.get('WALLET_SERVICE_PORT') ||
+              4004,
           },
         }),
         inject: [ConfigService],

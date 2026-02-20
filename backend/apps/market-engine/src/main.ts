@@ -9,6 +9,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('MARKET_ENGINE_PORT') || 3003;
+  const rpcPort =
+    configService.get<number>('MARKET_ENGINE_RPC_PORT') || 4003;
   const logger = new Logger('MarketEngine');
 
   // Connect TCP Microservice
@@ -16,7 +18,7 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: '0.0.0.0',
-      port: port,
+      port: rpcPort,
     },
   });
 
@@ -26,6 +28,6 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(port);
-  logger.log(`Market Engine running on port ${port}`);
+  logger.log(`Market Engine running on HTTP ${port}, RPC ${rpcPort}`);
 }
 bootstrap();

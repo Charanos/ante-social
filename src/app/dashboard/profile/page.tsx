@@ -7,7 +7,8 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
-import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import { emitLiveUserRefresh, fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import { useSession } from "next-auth/react";
 import {
   IconAward,
   IconBell,
@@ -145,6 +146,7 @@ function mapActivityToAchievement(activity: ActivityRecord): AchievementCard {
 export default function ProfilePage() {
   const toast = useToast();
   const { user, isLoading: isUserLoading, refresh } = useLiveUser();
+  const { update: updateSession } = useSession();
 
   // Loading states
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -385,8 +387,9 @@ export default function ProfilePage() {
       }),
     });
 
+    const payload = await response.json().catch(() => null);
+
     if (!response.ok) {
-      const payload = await response.json().catch(() => null);
       setIsSaving(false);
       toast.error(
         "Save Failed",
@@ -395,19 +398,52 @@ export default function ProfilePage() {
       return;
     }
 
+    const savedFullName = String(payload?.fullName || fullName || "").trim();
+    const savedUsername = String(payload?.username || username || "").trim();
+    const savedEmail = String(payload?.email || email || "").trim();
+    const savedPhone = String(payload?.phone || phone || "").trim();
+    const savedLocation = String(payload?.location || location || "").trim();
+    const savedBio = String(payload?.bio || bio || "").trim();
+    const savedTimezone = String(payload?.timezone || timezone || "").trim();
+    const savedLanguage = String(payload?.language || language || "").trim();
+    const savedEmailNotif =
+      typeof payload?.notificationEmail === "boolean"
+        ? payload.notificationEmail
+        : emailNotif;
+    const savedPushNotif =
+      typeof payload?.notificationPush === "boolean"
+        ? payload.notificationPush
+        : pushNotif;
+
     setInitialData({
-      fullName,
-      username,
-      email,
-      phone,
-      location,
-      bio,
-      timezone,
-      language,
-      emailNotif,
-      pushNotif,
+      fullName: savedFullName,
+      username: savedUsername,
+      email: savedEmail,
+      phone: savedPhone,
+      location: savedLocation,
+      bio: savedBio,
+      timezone: savedTimezone,
+      language: savedLanguage,
+      emailNotif: savedEmailNotif,
+      pushNotif: savedPushNotif,
     });
+    setFullName(savedFullName);
+    setUsername(savedUsername);
+    setEmail(savedEmail);
+    setPhone(savedPhone);
+    setLocation(savedLocation);
+    setBio(savedBio);
+    setTimezone(savedTimezone);
+    setLanguage(savedLanguage);
+    setEmailNotif(savedEmailNotif);
+    setPushNotif(savedPushNotif);
+    await updateSession({
+      user: {
+        username: savedUsername || null,
+      },
+    }).catch(() => null);
     await refresh();
+    emitLiveUserRefresh();
     setIsSaving(false);
     toast.success(
       "Profile Updated",
@@ -425,6 +461,7 @@ export default function ProfilePage() {
     emailNotif,
     pushNotif,
     refresh,
+    updateSession,
     toast,
   ]);
 
@@ -465,13 +502,22 @@ export default function ProfilePage() {
         return;
       }
 
+      const payload = await response.json().catch(() => null);
+      const savedAvatarUrl = String(payload?.avatarUrl || nextUrl || "");
+      await updateSession({
+        user: {
+          username: user.username || null,
+          image: savedAvatarUrl || null,
+        },
+      }).catch(() => null);
       await refresh();
+      emitLiveUserRefresh();
       setIsUploadingAvatar(false);
       toast.success("Avatar Updated", "Your profile picture has been changed");
     };
 
     void run();
-  }, [refresh, toast, user.avatarUrl]);
+  }, [refresh, toast, updateSession, user.avatarUrl, user.username]);
 
   const handleEmailToggle = useCallback(() => {
     setEmailNotif((prev) => !prev);

@@ -9,6 +9,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const port = configService.get<number>('AUTH_SERVICE_PORT') || 3002;
+  const rpcPort =
+    configService.get<number>('AUTH_SERVICE_RPC_PORT') || 4002;
   const logger = new Logger('AuthService');
 
   // Connect Microservice (TCP)
@@ -16,7 +18,7 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: '0.0.0.0',
-      port: port,
+      port: rpcPort,
     },
   });
 
@@ -26,6 +28,6 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   await app.listen(port);
-  logger.log(`Auth Service running on port ${port}`);
+  logger.log(`Auth Service running on HTTP ${port}, RPC ${rpcPort}`);
 }
 bootstrap();

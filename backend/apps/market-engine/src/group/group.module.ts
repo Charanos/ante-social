@@ -20,8 +20,11 @@ import { ConfigService } from '@nestjs/config';
         useFactory: (configService: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: configService.get('WALLET_SERVICE_HOST'),
-            port: configService.get('WALLET_SERVICE_PORT'),
+            host: configService.get('WALLET_SERVICE_HOST') || '127.0.0.1',
+            port:
+              configService.get('WALLET_RPC_PORT') ||
+              configService.get('WALLET_SERVICE_PORT') ||
+              4004,
           },
         }),
         inject: [ConfigService],

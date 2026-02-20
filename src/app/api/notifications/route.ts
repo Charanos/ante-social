@@ -1,6 +1,6 @@
-import { getServerSession } from "next-auth"
+﻿import { getServerSession } from "next-auth"
 import { NextRequest } from "next/server"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth-options"
 import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function GET(req: NextRequest) {
@@ -8,12 +8,26 @@ export async function GET(req: NextRequest) {
   const token = getSessionToken(session)
   if (!token) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
-  return proxyBackendRequest({
+  const response = await proxyBackendRequest({
     path: "/api/v1/notifications",
     method: "GET",
     token,
     searchParams: req.nextUrl.searchParams,
+    suppressTargetErrors: true,
   })
+
+  if (response.status === 502 || response.status === 503 || response.status === 504) {
+    const limit = Number(req.nextUrl.searchParams.get("limit") || 20)
+    const offset = Number(req.nextUrl.searchParams.get("offset") || 0)
+    return Response.json({
+      data: [],
+      meta: { total: 0, unreadCount: 0, limit, offset },
+      degraded: true,
+      message: "Notification service temporarily unavailable",
+    })
+  }
+
+  return response
 }
 
 export async function PUT(req: Request) {
@@ -58,3 +72,4 @@ export async function DELETE(req: NextRequest) {
     token,
   })
 }
+

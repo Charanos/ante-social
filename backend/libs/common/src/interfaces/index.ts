@@ -31,6 +31,8 @@ export interface JwtPayload {
 }
 
 export interface CurrentUserData {
+  id?: string;
+  _id?: string;
   userId: string;
   email: string;
   username: string;

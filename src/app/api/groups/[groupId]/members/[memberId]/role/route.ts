@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../../../../auth/[...nextauth]/route"
+﻿import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth-options"
 import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function PATCH(
@@ -20,3 +20,4 @@ export async function PATCH(
     jsonBody: { role: body.role },
   })
 }
+

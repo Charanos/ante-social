@@ -1,6 +1,6 @@
-import { getServerSession } from "next-auth"
+﻿import { getServerSession } from "next-auth"
 import { NextRequest } from "next/server"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth-options"
 import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function GET(req: NextRequest) {
@@ -61,3 +61,4 @@ export async function POST(req: Request) {
 
   return Response.json({ error: "Invalid action" }, { status: 400 })
 }
+

@@ -8,6 +8,7 @@ import { KafkaModule } from '@app/kafka';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MarketCloseScheduler } from '../schedulers/market-close.scheduler';
+import { SettlementDispatcher } from '../settlement/settlement.dispatcher';
 
 @Module({
   imports: [
@@ -21,14 +22,22 @@ import { MarketCloseScheduler } from '../schedulers/market-close.scheduler';
         useFactory: (config: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: 'wallet-service', // Docker service name or localhost
-            port: config.get<number>('WALLET_SERVICE_PORT') || 3004,
+            host: config.get<string>('WALLET_SERVICE_HOST') || '127.0.0.1',
+            port:
+              config.get<number>('WALLET_RPC_PORT') ||
+              config.get<number>('WALLET_SERVICE_PORT') ||
+              4004,
           },
         }),
       },
     ]),
   ],
   controllers: [MarketController, PredictionController],
-  providers: [MarketService, PredictionService, MarketCloseScheduler],
+  providers: [
+    MarketService,
+    PredictionService,
+    MarketCloseScheduler,
+    SettlementDispatcher,
+  ],
 })
 export class MarketModule {}

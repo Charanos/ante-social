@@ -1,7 +1,6 @@
-import { Controller, Post, Body, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { TwoFactorService } from './two-factor.service';
 import { JwtAuthGuard, CurrentUser, Verify2FADto } from '@app/common';
-import { UserDocument } from '@app/database';
 
 @Controller('auth/2fa')
 export class TwoFactorController {
@@ -9,14 +8,14 @@ export class TwoFactorController {
 
   @UseGuards(JwtAuthGuard)
   @Post('setup')
-  async setup(@CurrentUser() user: UserDocument) {
-    return this.twoFactorService.generateSecret(user);
+  async setup(@CurrentUser('userId') userId: string) {
+    return this.twoFactorService.generateSecret(userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('enable')
-  async enable(@CurrentUser() user: UserDocument, @Body() body: Verify2FADto) {
-    return this.twoFactorService.verifyAndEnable(user, body.token);
+  async enable(@CurrentUser('userId') userId: string, @Body() body: Verify2FADto) {
+    return this.twoFactorService.verifyAndEnable(userId, body.token);
   }
 
   @Post('verify')

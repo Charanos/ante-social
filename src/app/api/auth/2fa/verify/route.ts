@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../[...nextauth]/route"
+﻿import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth-options"
 import { getSessionToken, proxyBackendRequest } from "@/lib/backend-api"
 
 export async function POST(req: Request) {
@@ -34,3 +34,4 @@ export async function POST(req: Request) {
     jsonBody: { userId: body.userId, token: code },
   })
 }
+

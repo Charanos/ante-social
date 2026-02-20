@@ -2,8 +2,10 @@ import { Controller, Get, Patch, Body, Param, Query, UseGuards } from '@nestjs/c
 import { UserService } from './user.service';
 import { JwtAuthGuard, CurrentUser } from '@app/common';
 import { UserDocument } from '@app/database';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller()
+@SkipThrottle()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

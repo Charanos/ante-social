@@ -28,7 +28,10 @@ export class WalletService {
   }
 
   async getBalance(userId: string) {
-    const wallet = await this.walletModel.findOne({ userId });
+    let wallet = await this.walletModel.findOne({ userId });
+    if (!wallet) {
+      wallet = await this.createWallet(userId);
+    }
     if (!wallet) throw new NotFoundException('Wallet not found');
     return {
       balances: {
@@ -74,7 +77,10 @@ export class WalletService {
 
   // ─── Withdrawal Flow ──────────────────────────────
   async initiateWithdrawal(userId: string, withdrawDto: WithdrawDto) {
-    const wallet = await this.walletModel.findOne({ userId });
+    let wallet = await this.walletModel.findOne({ userId });
+    if (!wallet) {
+      wallet = await this.createWallet(userId);
+    }
     if (!wallet) throw new NotFoundException('Wallet not found');
 
     const balance = withdrawDto.currency === 'USD' ? wallet.balanceUsd : wallet.balanceKsh;
@@ -152,7 +158,10 @@ export class WalletService {
 
   // ─── Internal Balance Operations ────────────────────
   async creditBalance(userId: string, amount: number, currency: string, description: string, type: string) {
-    const wallet = await this.walletModel.findOne({ userId });
+    let wallet = await this.walletModel.findOne({ userId });
+    if (!wallet) {
+      wallet = await this.createWallet(userId);
+    }
     if (!wallet) throw new NotFoundException('Wallet not found');
 
     if (currency === 'USD') {
@@ -189,7 +198,10 @@ export class WalletService {
   }
 
   async debitBalance(userId: string, amount: number, currency: string, description: string, type: string) {
-    const wallet = await this.walletModel.findOne({ userId });
+    let wallet = await this.walletModel.findOne({ userId });
+    if (!wallet) {
+      wallet = await this.createWallet(userId);
+    }
     if (!wallet) throw new NotFoundException('Wallet not found');
 
     if (currency === 'USD') {
