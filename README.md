@@ -50,6 +50,8 @@ Comprehensive social prediction platform for the Kenyan market, supporting real-
 - Deploy backend services separately (Docker host, VM, Render, Railway, Fly.io, Kubernetes, etc.).
 - Expose only the API Gateway publicly (for example `https://api.yourdomain.com`), keep internal services private.
 - The frontend proxy now requires `BACKEND_API_URL` in production. If missing, API routes return `BACKEND_URL_NOT_CONFIGURED` instead of trying localhost.
+- On a single host deployment, run:
+  - `cd backend && npm ci && npm run build && npm run start:all`
 - Set these Vercel environment variables:
   - `BACKEND_API_URL=https://api.yourdomain.com`
   - `NEXT_PUBLIC_BACKEND_API_URL=https://api.yourdomain.com`

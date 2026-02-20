@@ -7,6 +7,7 @@
     "build": "nest build api-gateway && nest build auth-service && nest build market-engine && nest build wallet-service && nest build notification-service && nest build websocket-gateway && nest build admin-service && nest build reputation-engine",
     "dev": "node scripts/dev-stack.js",
     "dev:all": "node scripts/dev-stack.js",
+    "start:all": "node scripts/start-stack.js",
     "dev:gateway": "nest start api-gateway --watch",
     "dev:auth": "nest start auth-service --watch",
     "dev:market": "nest start market-engine --watch",
