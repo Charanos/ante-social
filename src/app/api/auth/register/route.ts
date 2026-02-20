@@ -1,7 +1,10 @@
-const BACKEND_API_URL =
-  process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-  "http://localhost:3001"
+const configuredBackendApiUrl =
+  process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL
+const BACKEND_API_URL = configuredBackendApiUrl
+  ? configuredBackendApiUrl.replace(/\/+$/, "")
+  : process.env.NODE_ENV === "production"
+    ? ""
+    : "http://localhost:3001"
 const isLocalGateway =
   BACKEND_API_URL.includes("localhost") || BACKEND_API_URL.includes("127.0.0.1")
 const AUTH_SERVICE_URL =
@@ -22,13 +25,23 @@ export async function POST(req: Request) {
     currency: body.currency,
   }
 
-  const gatewayCandidate = `${BACKEND_API_URL}/api/v1/auth/register`
+  const gatewayCandidate = BACKEND_API_URL ? `${BACKEND_API_URL}/api/v1/auth/register` : null
   const authCandidate = AUTH_SERVICE_URL
     ? `${AUTH_SERVICE_URL}/auth/register`
     : null
   const candidates = isLocalGateway
     ? [authCandidate, gatewayCandidate].filter(Boolean) as string[]
     : [gatewayCandidate, authCandidate].filter(Boolean) as string[]
+
+  if (candidates.length === 0) {
+    return Response.json(
+      {
+        success: false,
+        error: { code: "BACKEND_URL_NOT_CONFIGURED", message: "Set BACKEND_API_URL for this environment" },
+      },
+      { status: 503 },
+    )
+  }
 
   let lastError: string | null = null
   const startedAt = Date.now()

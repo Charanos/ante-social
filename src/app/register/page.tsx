@@ -102,7 +102,7 @@ export default function RegisterPage() {
         if (message.toLowerCase().includes("service unavailable")) {
           toast.error(
             "Service Unavailable",
-            "Registration service is offline. Start backend services and try again.",
+            "Registration backend is unavailable or not configured for this environment.",
           );
           return;
         }

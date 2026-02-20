@@ -3,10 +3,13 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import type { Session } from "next-auth"
 import type { JWT } from "next-auth/jwt"
 
-const BACKEND_API_URL =
-  process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
-  "http://localhost:3001"
+const configuredBackendApiUrl =
+  process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL
+const BACKEND_API_URL = configuredBackendApiUrl
+  ? configuredBackendApiUrl.replace(/\/+$/, "")
+  : process.env.NODE_ENV === "production"
+    ? ""
+    : "http://localhost:3001"
 const isLocalGateway =
   BACKEND_API_URL.includes("localhost") || BACKEND_API_URL.includes("127.0.0.1")
 const AUTH_SERVICE_URL =
@@ -87,13 +90,17 @@ async function postToBackend(
   body: Record<string, unknown>,
   authServicePath: string,
 ) {
-  const gatewayCandidate = `${BACKEND_API_URL}${gatewayPath}`
+  const gatewayCandidate = BACKEND_API_URL ? `${BACKEND_API_URL}${gatewayPath}` : null
   const authCandidate = AUTH_SERVICE_URL
     ? `${AUTH_SERVICE_URL}${authServicePath}`
     : null
   const candidates = isLocalGateway
     ? [authCandidate, gatewayCandidate].filter(Boolean) as string[]
     : [gatewayCandidate, authCandidate].filter(Boolean) as string[]
+
+  if (candidates.length === 0) {
+    throw new Error("AUTH_BACKEND_NOT_CONFIGURED")
+  }
 
   let fallbackError: string | null = null
   let sawNetworkFailure = false

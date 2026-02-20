@@ -33,12 +33,14 @@ export default function LoginPage() {
     }
 
     if (
+      errorMessage.includes("AUTH_BACKEND_NOT_CONFIGURED") ||
+      errorMessage.includes("BACKEND_URL_NOT_CONFIGURED") ||
       errorMessage.includes("AUTH_SERVICE_UNAVAILABLE") ||
       errorMessage.toLowerCase().includes("service unavailable")
     ) {
       toast.error(
         "Service Unavailable",
-        "Authentication service is offline. Start backend services and try again.",
+        "Authentication backend is unavailable or not configured for this environment.",
       );
       return;
     }
