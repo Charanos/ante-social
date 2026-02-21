@@ -2,6 +2,7 @@ import { Injectable, ConflictException, UnauthorizedException, BadRequestExcepti
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import { User, UserDocument, Wallet, WalletDocument } from '@app/database';
@@ -16,6 +17,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Wallet.name) private walletModel: Model<WalletDocument>,
     private jwtService: JwtService,
+    private configService: ConfigService,
     @Inject('KAFKA_SERVICE') private readonly kafkaClient: ClientKafka,
   ) {}
 
@@ -67,7 +69,10 @@ export class AuthService {
       balanceUsd: 0,
       balanceKsh: 0,
     });
-    await wallet.save();
+    const savedWallet = await wallet.save();
+
+    savedUser.walletId = savedWallet._id;
+    await savedUser.save();
 
     // Emit Kafka Event
     this.kafkaClient.emit(
@@ -81,7 +86,7 @@ export class AuthService {
       }),
     );
 
-    return this.generateToken(savedUser);
+    return this.issueAuthTokens(savedUser);
   }
 
   async validateUser(email: string, pass: string): Promise<UserDocument | null> {
@@ -115,7 +120,68 @@ export class AuthService {
     user.lastLoginAt = new Date();
     await user.save();
 
-    return this.generateToken(user);
+    return this.issueAuthTokens(user);
+  }
+
+  async refreshTokens(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Missing refresh token');
+    }
+
+    let payload: { sub?: string };
+    try {
+      payload = await this.jwtService.verifyAsync<{ sub?: string }>(refreshToken, {
+        secret: this.getRefreshSecret(),
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const userId = payload.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Invalid refresh token payload');
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user || !user.refreshTokenHash) {
+      throw new UnauthorizedException('Refresh token is revoked');
+    }
+
+    if (user.refreshTokenExpiresAt && user.refreshTokenExpiresAt <= new Date()) {
+      await this.clearRefreshToken(user);
+      throw new UnauthorizedException('Refresh token has expired');
+    }
+
+    const isValid = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+    if (!isValid) {
+      await this.clearRefreshToken(user);
+      throw new UnauthorizedException('Refresh token is invalid');
+    }
+
+    return this.issueAuthTokens(user);
+  }
+
+  async revokeRefreshToken(rawRefreshToken?: string) {
+    if (!rawRefreshToken) {
+      return { success: true };
+    }
+
+    try {
+      const payload = await this.jwtService.verifyAsync<{ sub?: string }>(rawRefreshToken, {
+        secret: this.getRefreshSecret(),
+      });
+
+      if (payload?.sub) {
+        const user = await this.userModel.findById(payload.sub);
+        if (user) {
+          await this.clearRefreshToken(user);
+        }
+      }
+    } catch {
+      // Token may be invalid/expired; we still clear cookies client-side.
+    }
+
+    return { success: true };
   }
 
   // ─── Email Verification ────────────────────────────
@@ -181,7 +247,7 @@ export class AuthService {
   }
 
   // ─── Token Generation ─────────────────────────────
-  private generateToken(user: UserDocument) {
+  private async issueAuthTokens(user: UserDocument) {
     const payload: JwtPayload = {
       sub: user._id.toString(),
       email: user.email,
@@ -189,8 +255,20 @@ export class AuthService {
       role: user.role,
       tier: user.tier,
     };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(
+      { sub: user._id.toString() },
+      {
+        secret: this.getRefreshSecret(),
+        expiresIn: this.getRefreshExpiration(),
+      },
+    );
+
+    await this.persistRefreshToken(user, refreshToken);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
       user: {
         id: user._id,
         username: user.username,
@@ -201,5 +279,43 @@ export class AuthService {
         twoFactorEnabled: user.twoFactorEnabled,
       },
     };
+  }
+
+  private async persistRefreshToken(user: UserDocument, refreshToken: string) {
+    user.refreshTokenHash = await bcrypt.hash(refreshToken, 12);
+    user.refreshTokenExpiresAt = this.calculateExpiryDate(this.getRefreshExpiration());
+    await user.save();
+  }
+
+  private async clearRefreshToken(user: UserDocument) {
+    user.refreshTokenHash = undefined;
+    user.refreshTokenExpiresAt = undefined;
+    await user.save();
+  }
+
+  private getRefreshSecret() {
+    return this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET') || 'refresh-secret';
+  }
+
+  private getRefreshExpiration() {
+    return this.configService.get<string>('JWT_REFRESH_EXPIRATION') || '7d';
+  }
+
+  private calculateExpiryDate(duration: string) {
+    const now = Date.now();
+    const match = /^(\d+)([smhd])$/i.exec(duration);
+    if (!match) {
+      return new Date(now + 7 * 24 * 60 * 60 * 1000);
+    }
+
+    const value = Number(match[1]);
+    const unit = match[2].toLowerCase();
+    const unitMs: Record<string, number> = {
+      s: 1000,
+      m: 60 * 1000,
+      h: 60 * 60 * 1000,
+      d: 24 * 60 * 60 * 1000,
+    };
+    return new Date(now + value * unitMs[unit]);
   }
 }

@@ -4,7 +4,7 @@ export enum MarketType {
   REFLEX = 'reflex',
   LADDER = 'ladder',
   PRISONER_DILEMMA = 'prisoner_dilemma',
-  SYNDICATE = 'syndicate',
+  BETRAYAL = 'betrayal',
 }
 
 export enum MarketStatus {

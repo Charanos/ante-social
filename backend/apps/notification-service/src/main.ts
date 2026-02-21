@@ -1,13 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { NotificationModule } from './notification.module';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
+import {
+  GlobalExceptionFilter,
+  JsonLogger,
+  initSentry,
+  sanitizeRequestMiddleware,
+  registerHealthAndMetrics,
+} from '@app/common';
+import helmet from 'helmet';
+import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(NotificationModule);
   const configService = app.get(ConfigService);
+  app.useLogger(new JsonLogger('notification-service'));
   const logger = new Logger('NotificationService');
+  initSentry('notification-service', configService.get<string>('SENTRY_DSN'));
 
   const httpPort = configService.get<number>('NOTIFICATION_SERVICE_PORT') || 3005;
   const rpcPort =
@@ -39,6 +50,19 @@ async function bootstrap() {
       'Kafka consumer disabled for local development (ENABLE_NOTIFICATION_KAFKA=false).',
     );
   }
+
+  app.use(helmet());
+  app.use(compression());
+  app.use(sanitizeRequestMiddleware);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  registerHealthAndMetrics(app, 'notification-service');
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,

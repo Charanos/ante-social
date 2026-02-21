@@ -14,6 +14,8 @@ import { DailyLimit, DailyLimitSchema } from './schemas/daily-limit.schema';
 import { ComplianceFlag, ComplianceFlagSchema } from './schemas/compliance-flag.schema';
 import { ExchangeRate, ExchangeRateSchema } from './schemas/exchange-rate.schema';
 import { ActivityLog, ActivityLogSchema } from './schemas/activity-log.schema';
+import { UserRepository } from './repositories/user.repository';
+import { WalletRepository } from './repositories/wallet.repository';
 
 const schemas = [
   { name: User.name, schema: UserSchema },
@@ -53,6 +55,7 @@ const schemas = [
     }),
     MongooseModule.forFeature(schemas),
   ],
-  exports: [MongooseModule],
+  providers: [UserRepository, WalletRepository],
+  exports: [MongooseModule, UserRepository, WalletRepository],
 })
 export class DatabaseModule {}

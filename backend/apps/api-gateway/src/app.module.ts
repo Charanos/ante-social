@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { ConfigModule } from '@nestjs/config';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { RequestLoggingMiddleware } from './middleware/request-logging.middleware';
+import { validateEnv } from '@app/common';
 
 function handleProxyError(_err: unknown, _req: unknown, res: any) {
   if (res?.headersSent) return;
@@ -19,7 +20,7 @@ function handleProxyError(_err: unknown, _req: unknown, res: any) {
 }
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true })],
+  imports: [ConfigModule.forRoot({ isGlobal: true, validate: validateEnv })],
   providers: [RequestLoggingMiddleware],
 })
 export class AppModule implements NestModule {

@@ -20,8 +20,14 @@ export class MarketService {
       throw new BadRequestException('At least two outcomes are required');
     }
 
+    const normalizedBetType =
+      (createMarketDto.betType as string) === 'syndicate'
+        ? 'betrayal'
+        : createMarketDto.betType;
+
     const market = new this.marketModel({
       ...createMarketDto,
+      betType: normalizedBetType,
       createdBy: new Types.ObjectId(userId),
       status: createMarketDto.scheduledPublishTime ? MarketStatus.SCHEDULED : MarketStatus.ACTIVE,
     });
@@ -100,7 +106,9 @@ export class MarketService {
 
     if (updates.title !== undefined) updateDoc.title = updates.title;
     if (updates.description !== undefined) updateDoc.description = updates.description;
-    if (updates.betType !== undefined) updateDoc.betType = updates.betType;
+    if (updates.betType !== undefined) {
+      updateDoc.betType = (updates.betType as string) === 'syndicate' ? 'betrayal' : updates.betType;
+    }
     if (updates.buyInAmount !== undefined) updateDoc.buyInAmount = updates.buyInAmount;
     if (updates.marketDuration !== undefined) updateDoc.marketDuration = updates.marketDuration;
     if (updates.minParticipants !== undefined) updateDoc.minParticipants = updates.minParticipants;
@@ -162,6 +170,14 @@ export class MarketService {
     const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
     if (!market) throw new NotFoundException('Market not found');
 
+    if (
+      market.status === MarketStatus.CLOSED ||
+      market.status === MarketStatus.SETTLING ||
+      market.status === MarketStatus.SETTLED
+    ) {
+      return market;
+    }
+
     if (market.status !== MarketStatus.ACTIVE) {
       throw new BadRequestException('Market is not active');
     }
@@ -188,22 +204,51 @@ export class MarketService {
     const market = await this.marketModel.findOne({ _id: id, isDeleted: { $ne: true } });
     if (!market) throw new NotFoundException('Market not found');
 
-    if (market.status !== MarketStatus.CLOSED) {
+    if (market.status === MarketStatus.SETTLED) {
+      return market;
+    }
+
+    if (market.status !== MarketStatus.CLOSED && market.status !== MarketStatus.SETTLING) {
       throw new BadRequestException('Market must be closed before settlement');
     }
 
-    market.status = MarketStatus.SETTLING;
-    if (winningOptionId) {
-      market.winningOutcomeId = new Types.ObjectId(winningOptionId);
+    const settlingMarket =
+      market.status === MarketStatus.SETTLING
+        ? market
+        : await this.marketModel.findOneAndUpdate(
+            {
+              _id: market._id,
+              status: MarketStatus.CLOSED,
+              isDeleted: { $ne: true },
+            },
+            { $set: { status: MarketStatus.SETTLING } },
+            { new: true },
+          );
+
+    if (!settlingMarket) {
+      const latest = await this.marketModel.findById(id);
+      if (latest?.status === MarketStatus.SETTLED) {
+        return latest;
+      }
+      throw new BadRequestException('Market settlement is already in progress');
     }
-    await market.save();
 
-    await this.settlementDispatcher.dispatch(market);
+    if (winningOptionId) {
+      settlingMarket.winningOutcomeId = new Types.ObjectId(winningOptionId);
+      await settlingMarket.save();
+    }
 
-    market.status = MarketStatus.SETTLED;
-    market.settlementTime = new Date();
-    await market.save();
+    try {
+      await this.settlementDispatcher.dispatch(settlingMarket);
+    } catch (error) {
+      await this.marketModel.findByIdAndUpdate(settlingMarket._id, { status: MarketStatus.CLOSED });
+      throw error;
+    }
 
-    return market;
+    settlingMarket.status = MarketStatus.SETTLED;
+    settlingMarket.settlementTime = new Date();
+    await settlingMarket.save();
+
+    return settlingMarket;
   }
 }

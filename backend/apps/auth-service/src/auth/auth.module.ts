@@ -10,7 +10,7 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
 import { LocalStrategy } from '../strategies/local.strategy';
 import { DatabaseModule } from '@app/database';
 import { KafkaModule } from '@app/kafka';
-import { RATE_LIMITS } from '@app/common';
+import { RATE_LIMITS, RateLimitGuard } from '@app/common';
 
 @Module({
   imports: [
@@ -35,6 +35,10 @@ import { RATE_LIMITS } from '@app/common';
     AuthService, 
     LocalStrategy, 
     JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

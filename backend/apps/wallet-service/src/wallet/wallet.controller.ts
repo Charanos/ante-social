@@ -3,6 +3,7 @@ import { WalletService } from './wallet.service';
 import { JwtAuthGuard, CurrentUser, UserRole, Roles, RolesGuard, DepositDto, WithdrawDto } from '@app/common';
 import { UserDocument } from '@app/database';
 import { DarajaService } from '../payment-providers/daraja/daraja.service';
+import { NowPaymentsService } from '../payment-providers/nowpayments/nowpayments.service';
 
 @Controller('wallet')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -10,6 +11,7 @@ export class WalletController {
   constructor(
     private readonly walletService: WalletService,
     private readonly darajaService: DarajaService,
+    private readonly nowPaymentsService: NowPaymentsService,
   ) {}
 
   @Get('balance')
@@ -37,7 +39,11 @@ export class WalletController {
         depositDto.amount,
       );
     }
-    // For USD/crypto, can be extended later
+
+    if (depositDto.currency === 'USD') {
+      return this.nowPaymentsService.createPayment(user._id.toString(), depositDto.amount, 'USD');
+    }
+
     return this.walletService.initiateDeposit(user._id.toString(), depositDto);
   }
 

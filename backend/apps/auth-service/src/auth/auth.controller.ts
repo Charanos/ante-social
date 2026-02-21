@@ -1,9 +1,10 @@
-import { Controller, Post, Body, UseGuards, Res, Param } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Res, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, CurrentUser } from '@app/common';
+import { RegisterDto, LoginDto, CurrentUser, RefreshTokenDto } from '@app/common';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { UserDocument } from '@app/database';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -12,14 +13,7 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response) {
     const result = await this.authService.register(registerDto);
-    
-    // Set HTTP-only cookie
-    response.cookie('access_token', result.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, // 24h
-    });
+    this.setAuthCookies(response, result.access_token, result.refresh_token);
 
     return result;
   }
@@ -34,21 +28,35 @@ export class AuthController {
       return result;
     }
 
-    // Set HTTP-only cookie
-    response.cookie('access_token', result.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    this.setAuthCookies(response, result.access_token, result.refresh_token);
 
     return result;
   }
 
   @Post('logout')
-  async logout(@Res({ passthrough: true }) response: Response) {
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+    @Body() body?: Partial<RefreshTokenDto>,
+  ) {
+    const refreshToken = request.cookies?.refresh_token || body?.refreshToken;
+    await this.authService.revokeRefreshToken(refreshToken);
+
     response.clearCookie('access_token');
+    response.clearCookie('refresh_token');
     return { success: true };
+  }
+
+  @Post('refresh')
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+    @Body() body?: Partial<RefreshTokenDto>,
+  ) {
+    const refreshToken = request.cookies?.refresh_token || body?.refreshToken;
+    const result = await this.authService.refreshTokens(refreshToken || '');
+    this.setAuthCookies(response, result.access_token, result.refresh_token);
+    return result;
   }
 
   @Post('verify-email')
@@ -64,5 +72,24 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(@Body() body: { token: string; newPassword: string }) {
     return this.authService.resetPassword(body.token, body.newPassword);
+  }
+
+  private setAuthCookies(response: Response, accessToken: string, refreshToken: string) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    response.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    response.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
   }
 }

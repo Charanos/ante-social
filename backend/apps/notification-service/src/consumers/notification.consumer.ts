@@ -1,8 +1,11 @@
 import { Controller, Logger } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { EmailService } from '../channels/email.service';
 import { InAppService } from '../channels/in-app.service';
 import { FcmService } from '../channels/fcm.service';
+import { User, UserDocument } from '@app/database';
 import { UserCreatedEvent, BetPlacedEvent, MarketSettledEvent, WalletTransactionEvent, NotificationDispatchEvent } from '@app/kafka';
 
 @Controller()
@@ -10,6 +13,7 @@ export class NotificationConsumer {
   private readonly logger = new Logger(NotificationConsumer.name);
 
   constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly emailService: EmailService,
     private readonly inAppService: InAppService,
     private readonly fcmService: FcmService,
@@ -82,6 +86,13 @@ export class NotificationConsumer {
     this.logger.log(`Processing notification dispatch for ${payload.userId}`);
 
     const channels: string[] = payload.channels || ['in_app'];
+    const user = payload.userId
+      ? await this.userModel
+          .findById(payload.userId)
+          .select('email notificationEmail notificationPush fcmTokens')
+          .lean()
+          .exec()
+      : null;
 
     if (channels.includes('in_app')) {
       await this.inAppService.create(
@@ -92,15 +103,18 @@ export class NotificationConsumer {
       );
     }
 
-    if (channels.includes('email') && payload.email) {
-      // Route to email service
-      this.logger.log(`Sending email notification to ${payload.email}`);
+    if (channels.includes('email') && payload.email && user?.notificationEmail !== false) {
+      await this.emailService.sendNotificationEmail(
+        payload.email,
+        payload.title || 'Notification',
+        payload.message || '',
+      );
     }
 
-    if (channels.includes('push')) {
+    if (channels.includes('push') && user?.notificationPush !== false) {
       // Route to FCM
       await this.fcmService.sendPushNotification(
-        [], // Would look up user's FCM tokens
+        (user?.fcmTokens || []) as string[],
         payload.title,
         payload.message,
         { type: payload.type, actionUrl: payload.actionUrl || '' }

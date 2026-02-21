@@ -16,3 +16,6 @@ export { DailyLimit, DailyLimitSchema, DailyLimitDocument } from './schemas/dail
 export { ComplianceFlag, ComplianceFlagSchema, ComplianceFlagDocument, FlagStatus, FlagReason } from './schemas/compliance-flag.schema';
 export { ExchangeRate, ExchangeRateSchema, ExchangeRateDocument } from './schemas/exchange-rate.schema';
 export { ActivityLog, ActivityLogSchema, ActivityLogDocument, ActivityType } from './schemas/activity-log.schema';
+
+// Repositories
+export * from './repositories';

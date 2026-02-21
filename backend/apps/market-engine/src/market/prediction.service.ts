@@ -5,9 +5,11 @@ import { ClientProxy, ClientKafka } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { 
   Market, MarketDocument, 
-  MarketBet, MarketBetDocument 
+  MarketBet, MarketBetDocument,
+  User,
+  UserDocument,
 } from '@app/database';
-import { MarketStatus, PlacePredictionDto, KAFKA_TOPICS } from '@app/common';
+import { DAILY_LIMITS, KAFKA_TOPICS, MarketStatus, MarketType, PlacePredictionDto, UserTier } from '@app/common';
 import { BetPlacedEvent, BetEditedEvent, BetCancelledEvent } from '@app/kafka';
 
 @Injectable()
@@ -15,6 +17,7 @@ export class PredictionService {
   constructor(
     @InjectModel(Market.name) private marketModel: Model<MarketDocument>,
     @InjectModel(MarketBet.name) private betModel: Model<MarketBetDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     @Inject('WALLET_SERVICE') private walletClient: ClientProxy,
     @Inject('KAFKA_SERVICE') private kafkaClient: ClientKafka,
   ) {}
@@ -30,6 +33,38 @@ export class PredictionService {
     
     if (new Date() > market.closeTime) {
       throw new BadRequestException('Market is closed');
+    }
+
+    const selectedOutcomeId = dto.outcomeId || dto.rankedOutcomeIds?.[0];
+    if (!selectedOutcomeId) {
+      throw new BadRequestException('Outcome selection is required');
+    }
+
+    if (market.betType === MarketType.LADDER) {
+      if (!dto.rankedOutcomeIds?.length) {
+        throw new BadRequestException('Ladder markets require rankedOutcomeIds');
+      }
+
+      const uniqueRanking = new Set(dto.rankedOutcomeIds);
+      if (uniqueRanking.size !== dto.rankedOutcomeIds.length) {
+        throw new BadRequestException('Duplicate outcomes are not allowed in ladder ranking');
+      }
+
+      const validOutcomeIds = new Set((market.outcomes || []).map((outcome) => outcome._id.toString()));
+      if (dto.rankedOutcomeIds.some((outcomeId) => !validOutcomeIds.has(outcomeId))) {
+        throw new BadRequestException('Ranking includes invalid market outcomes');
+      }
+    }
+
+    await this.enforceDailyBetLimit(userId, dto.amount);
+
+    const existingActiveBet = await this.betModel.findOne({
+      marketId: new Types.ObjectId(dto.marketId),
+      userId: new Types.ObjectId(userId),
+      isCancelled: { $ne: true },
+    });
+    if (existingActiveBet) {
+      throw new BadRequestException('You already have an active prediction in this market');
     }
 
     // 2. Debit Wallet (Synchronous TCP call)
@@ -55,11 +90,21 @@ export class PredictionService {
     const bet = new this.betModel({
       marketId: new Types.ObjectId(dto.marketId),
       userId: new Types.ObjectId(userId),
-      selectedOutcomeId: new Types.ObjectId(dto.outcomeId),
+      selectedOutcomeId: new Types.ObjectId(selectedOutcomeId),
+      rankedOutcomeIds: (dto.rankedOutcomeIds || []).map((outcomeId) => new Types.ObjectId(outcomeId)),
       amountContributed: dto.amount,
       editableUntil: new Date(Date.now() + 5 * 60 * 1000), // 5 min 
     });
-    await bet.save();
+
+    try {
+      await bet.save();
+    } catch (error: any) {
+      if (error?.code === 11000) {
+        await this.refundFailedPlacement(userId, dto.amount, market.title);
+        throw new BadRequestException('Duplicate prediction request');
+      }
+      throw error;
+    }
 
     // 4. Update Market Stats
     await this.marketModel.findByIdAndUpdate(dto.marketId, {
@@ -70,7 +115,7 @@ export class PredictionService {
         'outcomes.$[elem].participantCount': 1
       }
     }, {
-      arrayFilters: [{ 'elem._id': new Types.ObjectId(dto.outcomeId) }]
+      arrayFilters: [{ 'elem._id': new Types.ObjectId(selectedOutcomeId) }]
     });
 
     // 5. Emit Event
@@ -81,7 +126,7 @@ export class PredictionService {
         marketId: dto.marketId,
         userId,
         amount: dto.amount,
-        outcomeId: dto.outcomeId,
+        outcomeId: selectedOutcomeId,
       }),
     );
 
@@ -255,5 +300,57 @@ export class PredictionService {
           }
         : undefined,
     };
+  }
+
+  private async enforceDailyBetLimit(userId: string, requestedAmount: number) {
+    const user = await this.userModel
+      .findById(userId)
+      .select('tier')
+      .lean()
+      .exec();
+
+    const tier = (user?.tier as UserTier | undefined) || UserTier.NOVICE;
+    const dailyBetLimit = DAILY_LIMITS[tier]?.deposit || DAILY_LIMITS[UserTier.NOVICE].deposit;
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const result = await this.betModel.aggregate<{ total: number }>([
+      {
+        $match: {
+          userId: new Types.ObjectId(userId),
+          createdAt: { $gte: startOfDay },
+          isCancelled: { $ne: true },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$amountContributed' },
+        },
+      },
+    ]);
+
+    const usedToday = result[0]?.total || 0;
+    if (usedToday + requestedAmount > dailyBetLimit) {
+      throw new BadRequestException(
+        `Daily bet volume limit exceeded. Used: ${usedToday}, Limit: ${dailyBetLimit}`,
+      );
+    }
+  }
+
+  private async refundFailedPlacement(userId: string, amount: number, marketTitle: string) {
+    try {
+      await lastValueFrom(
+        this.walletClient.send('credit_balance', {
+          userId,
+          amount,
+          currency: 'USD',
+          description: `Refund for duplicate placement on ${marketTitle}`,
+          type: 'refund',
+        }),
+      );
+    } catch {
+      // Best-effort refund path for duplicate placement race conditions.
+    }
   }
 }

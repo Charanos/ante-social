@@ -20,8 +20,10 @@ export class FcmService {
 
     const projectId = this.configService.get<string>('FIREBASE_PROJECT_ID');
     const serviceAccountKey = this.configService.get<string>('FIREBASE_SERVICE_ACCOUNT_KEY');
+    const clientEmail = this.configService.get<string>('FIREBASE_CLIENT_EMAIL');
+    const privateKey = this.configService.get<string>('FIREBASE_PRIVATE_KEY');
 
-    if (!projectId || !serviceAccountKey) {
+    if (!projectId || (!serviceAccountKey && (!clientEmail || !privateKey))) {
       this.logger.warn('Firebase not configured, skipping push notification');
       return;
     }

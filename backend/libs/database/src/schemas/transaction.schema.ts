@@ -8,6 +8,9 @@ export class Transaction {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   userId!: Types.ObjectId;
 
+  @Prop({ required: true, type: Types.ObjectId, ref: 'Wallet' })
+  walletId!: Types.ObjectId;
+
   @Prop({
     required: true,
     enum: ['deposit', 'withdrawal', 'bet_placed', 'bet_payout', 'refund', 'platform_fee'],
@@ -62,6 +65,7 @@ export const TransactionSchema = SchemaFactory.createForClass(Transaction);
 
 // Indexes
 TransactionSchema.index({ userId: 1, createdAt: -1 });
+TransactionSchema.index({ userId: 1, type: 1, status: 1, createdAt: -1 });
 TransactionSchema.index({ type: 1, status: 1 });
 TransactionSchema.index({ marketId: 1 });
 TransactionSchema.index({ externalTransactionId: 1 }, { sparse: true });

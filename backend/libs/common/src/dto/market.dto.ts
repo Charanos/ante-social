@@ -12,6 +12,7 @@ import {
   IsInt,
   ArrayMinSize,
   IsUrl,
+  IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MarketType, SettlementMethod, OddsType } from '../constants';
@@ -43,8 +44,9 @@ export class CreateMarketDto {
   @IsNotEmpty()
   description!: string;
 
-  @IsEnum(MarketType)
-  betType!: MarketType;
+  @IsString()
+  @IsIn([...Object.values(MarketType), 'syndicate'])
+  betType!: MarketType | 'syndicate';
 
   @IsNumber()
   @Min(0.01)
@@ -131,6 +133,12 @@ export class PlacePredictionDto {
   @IsNumber()
   @Min(0.01)
   amount!: number;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(2)
+  @IsString({ each: true })
+  rankedOutcomeIds?: string[];
 }
 
 export class EditPredictionDto {

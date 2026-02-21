@@ -6,13 +6,23 @@ import { NotificationController } from './notification.controller';
 import { EmailService } from './channels/email.service';
 import { InAppService } from './channels/in-app.service';
 import { FcmService } from './channels/fcm.service';
+import { APP_GUARD } from '@nestjs/core';
+import { RateLimitGuard, validateEnv } from '@app/common';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     DatabaseModule,
   ],
   controllers: [NotificationConsumer, NotificationController],
-  providers: [EmailService, InAppService, FcmService],
+  providers: [
+    EmailService,
+    InAppService,
+    FcmService,
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
+    },
+  ],
 })
 export class NotificationModule {}

@@ -1,8 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, Logger, Inject } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RATE_LIMIT_KEY, RateLimitOptions } from '../decorators/rate-limit.decorator';
 import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
+import { RATE_LIMITS } from '../constants';
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
@@ -42,20 +43,31 @@ export class RateLimitGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const rateLimit = this.reflector.getAllAndOverride<RateLimitOptions>(RATE_LIMIT_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    if (!rateLimit) {
+    if (context.getType<string>() !== 'http') {
       return true;
     }
 
+    const configuredRateLimit = this.reflector.getAllAndOverride<RateLimitOptions>(RATE_LIMIT_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    const rateLimit: RateLimitOptions = configuredRateLimit ?? {
+      ttl: this.configService.get<number>('DEFAULT_RATE_LIMIT_TTL') || RATE_LIMITS.api.ttl,
+      limit: this.configService.get<number>('DEFAULT_RATE_LIMIT_LIMIT') || RATE_LIMITS.api.limit,
+    };
+
     const request = context.switchToHttp().getRequest();
-    const ip = request.ip || request.connection.remoteAddress;
-    const key = `ratelimit:${ip}:${context.getClass().name}:${context.getHandler().name}`;
+    const forwardedIp = request.headers?.['x-forwarded-for'] as string | undefined;
+    const ip = forwardedIp?.split(',')?.[0]?.trim() || request.ip || request.connection.remoteAddress;
+    const userId = request.user?.userId || request.user?.id || request.user?._id;
+    const subject = userId ? `user:${userId}` : `ip:${ip}`;
+    const key = `ratelimit:${subject}:${context.getClass().name}:${context.getHandler().name}`;
 
     try {
+      if (this.redis.status !== 'ready') {
+        await this.redis.connect();
+      }
+
       const current = await this.redis.incr(key);
       
       if (current === 1) {
@@ -63,7 +75,7 @@ export class RateLimitGuard implements CanActivate {
       }
 
       if (current > rateLimit.limit) {
-        this.logger.warn(`Rate limit exceeded for IP ${ip} on ${key}`);
+        this.logger.warn(`Rate limit exceeded for ${subject} on ${key}`);
         throw new HttpException(
           {
             statusCode: HttpStatus.TOO_MANY_REQUESTS,

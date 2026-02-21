@@ -49,8 +49,11 @@ export class Market {
   @Prop({ type: [String], default: [] })
   tags!: string[];
 
+  @Prop()
+  category?: string;
+
   // ─── Betting Configuration ────────────────────
-  @Prop({ required: true, enum: ['consensus', 'reflex', 'ladder', 'prisoner_dilemma', 'syndicate'] })
+  @Prop({ required: true, enum: ['consensus', 'reflex', 'ladder', 'prisoner_dilemma', 'betrayal'] })
   betType!: string;
 
   @Prop({ default: 'daily', enum: ['daily', 'weekly'] })
@@ -199,6 +202,7 @@ export const MarketSchema = SchemaFactory.createForClass(Market);
 // Indexes
 MarketSchema.index({ status: 1, closeTime: 1 });
 MarketSchema.index({ betType: 1 });
+MarketSchema.index({ category: 1, closeTime: 1 });
 MarketSchema.index({ createdBy: 1 });
 MarketSchema.index({ tags: 1 });
 MarketSchema.index({ isDeleted: 1, status: 1 });

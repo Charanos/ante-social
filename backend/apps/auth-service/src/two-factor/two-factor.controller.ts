@@ -1,6 +1,7 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Res } from '@nestjs/common';
 import { TwoFactorService } from './two-factor.service';
 import { JwtAuthGuard, CurrentUser, Verify2FADto } from '@app/common';
+import { Response } from 'express';
 
 @Controller('auth/2fa')
 export class TwoFactorController {
@@ -19,8 +20,25 @@ export class TwoFactorController {
   }
 
   @Post('verify')
-  async verify(@Body() body: { userId: string; token: string }) {
+  async verify(@Body() body: { userId: string; token: string }, @Res({ passthrough: true }) response: Response) {
     // This endpoint handles the 2nd step of login
-    return this.twoFactorService.validateForLogin(body.userId, body.token);
+    const result = await this.twoFactorService.validateForLogin(body.userId, body.token);
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    response.cookie('access_token', result.access_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    response.cookie('refresh_token', result.refresh_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    return result;
   }
 }

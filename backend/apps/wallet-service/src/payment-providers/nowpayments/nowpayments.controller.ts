@@ -7,6 +7,7 @@ export class NowPaymentsController {
 
   // IPN callback (public — no auth guard, called by NOWPayments)
   @Post('ipn')
+  @Post('callback')
   async handleIpn(
     @Body() body: any,
     @Headers('x-nowpayments-sig') signature: string,

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -34,6 +34,9 @@ export class User {
 
   @Prop()
   avatarUrl?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Wallet' })
+  walletId?: Types.ObjectId;
 
   // ─── Identity & Trust ───────────────────────────
   @Prop({ default: 'novice', enum: ['novice', 'high_roller'] })
@@ -136,6 +139,12 @@ export class User {
   @Prop()
   passwordResetExpires?: Date;
 
+  @Prop()
+  refreshTokenHash?: string;
+
+  @Prop()
+  refreshTokenExpiresAt?: Date;
+
   @Prop({ default: false })
   isBanned!: boolean;
 
@@ -151,3 +160,4 @@ UserSchema.index({ username: 1 }, { unique: true });
 UserSchema.index({ role: 1 });
 UserSchema.index({ reputationScore: -1 });
 UserSchema.index({ tier: 1 });
+UserSchema.index({ walletId: 1 }, { unique: true, sparse: true });

@@ -11,7 +11,11 @@ export class UserService {
   ) {}
 
   async getProfile(userId: string) {
-    const user = await this.userModel.findById(userId).select('-passwordHash -twoFactorSecret -backupCodes -emailVerificationToken -passwordResetToken -passwordResetExpires');
+    const user = await this.userModel
+      .findById(userId)
+      .select(
+        '-passwordHash -twoFactorSecret -backupCodes -emailVerificationToken -passwordResetToken -passwordResetExpires -refreshTokenHash -refreshTokenExpiresAt',
+      );
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -82,8 +86,11 @@ export class UserService {
       }
     }
 
-    const user = await this.userModel.findByIdAndUpdate(userId, allowed, { new: true })
-      .select('-passwordHash -twoFactorSecret -backupCodes -emailVerificationToken -passwordResetToken -passwordResetExpires');
+    const user = await this.userModel
+      .findByIdAndUpdate(userId, allowed, { new: true })
+      .select(
+        '-passwordHash -twoFactorSecret -backupCodes -emailVerificationToken -passwordResetToken -passwordResetExpires -refreshTokenHash -refreshTokenExpiresAt',
+      );
     if (!user) throw new NotFoundException('User not found');
     return user;
   }

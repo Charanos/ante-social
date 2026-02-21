@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { ClientProxy, ClientKafka } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { MarketDocument, MarketBet, MarketBetDocument } from '@app/database';
+import { MarketDocument, MarketBet, MarketBetDocument, User, UserDocument } from '@app/database';
 import { MarketType, MarketStatus, PLATFORM_FEE_RATE, REFLEX_MULTIPLIER_TIERS, KAFKA_TOPICS } from '@app/common';
 import { MarketSettledEvent } from '@app/kafka';
 
@@ -13,6 +13,7 @@ export class SettlementDispatcher {
 
   constructor(
     @InjectModel(MarketBet.name) private betModel: Model<MarketBetDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     @Inject('WALLET_SERVICE') private walletClient: ClientProxy,
     @Inject('KAFKA_SERVICE') private kafkaClient: ClientKafka,
   ) {}
@@ -29,6 +30,8 @@ export class SettlementDispatcher {
         return this.handleLadder(market);
       case MarketType.PRISONER_DILEMMA:
         return this.handlePrisonerDilemma(market);
+      case MarketType.BETRAYAL:
+        return this.handleBetrayal(market);
       default:
         this.logger.warn(`No handler for market type ${market.betType}`);
     }
@@ -51,10 +54,16 @@ export class SettlementDispatcher {
 
     const winners = bets.filter(b => b.selectedOutcomeId.toString() === winningOutcomeId.toString());
     const losers = bets.filter(b => b.selectedOutcomeId.toString() !== winningOutcomeId.toString());
-    const winnerPool = winners.reduce((sum, b) => sum + b.amountContributed, 0);
+    const integrityMap = await this.getIntegrityMap(winners.map((winner) => winner.userId.toString()));
+    const winnerPool = winners.reduce((sum, b) => {
+      const integrityWeight = integrityMap.get(b.userId.toString()) ?? b.integrityWeight ?? 1;
+      return sum + b.amountContributed * integrityWeight;
+    }, 0);
 
     for (const winner of winners) {
-      const share = (winner.amountContributed / winnerPool) * prizePool;
+      const integrityWeight = integrityMap.get(winner.userId.toString()) ?? winner.integrityWeight ?? 1;
+      const weightedContribution = winner.amountContributed * integrityWeight;
+      const share = winnerPool > 0 ? (weightedContribution / winnerPool) * prizePool : 0;
       winner.actualPayout = share;
       winner.isWinner = true;
       winner.payoutProcessed = true;
@@ -121,34 +130,72 @@ export class SettlementDispatcher {
     const bets = await this.betModel.find({ marketId: market._id }).exec();
     if (bets.length === 0) return;
 
-    const winningOutcomeId = market.winningOutcomeId;
-    if (!winningOutcomeId) return;
+    const totalPool = bets.reduce((sum, b) => sum + b.amountContributed, 0);
+    const platformFee = totalPool * PLATFORM_FEE_RATE;
+    const prizePool = totalPool - platformFee;
+
+    const canonicalRanking = (market.outcomes || []).map((outcome) => outcome._id.toString());
+    const winners = bets.filter((bet) => {
+      if (!bet.rankedOutcomeIds?.length || bet.rankedOutcomeIds.length !== canonicalRanking.length) {
+        return false;
+      }
+
+      return canonicalRanking.every(
+        (outcomeId, index) => bet.rankedOutcomeIds[index]?.toString() === outcomeId,
+      );
+    });
+
+    const losers = bets.filter((bet) => !winners.some((winner) => winner._id.equals(bet._id)));
+    const winnerTotalStake = winners.reduce((sum, winner) => sum + winner.amountContributed, 0);
+
+    for (const winner of winners) {
+      const payout = winnerTotalStake > 0 ? (winner.amountContributed / winnerTotalStake) * prizePool : 0;
+      winner.actualPayout = payout;
+      winner.isWinner = true;
+      winner.payoutProcessed = true;
+      await winner.save();
+      await this.creditWinner(winner.userId.toString(), payout, market.title);
+    }
+
+    for (const loser of losers) {
+      loser.actualPayout = 0;
+      loser.isWinner = false;
+      loser.payoutProcessed = true;
+      await loser.save();
+    }
+
+    this.emitSettledEvent(market, prizePool, platformFee, winners.length);
+  }
+
+  // â”€â”€â”€ Betrayal ("Trust vs Betray") â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  private async handleBetrayal(market: MarketDocument) {
+    const bets = await this.betModel.find({ marketId: market._id }).exec();
+    if (bets.length === 0) return;
 
     const totalPool = bets.reduce((sum, b) => sum + b.amountContributed, 0);
     const platformFee = totalPool * PLATFORM_FEE_RATE;
     const prizePool = totalPool - platformFee;
 
-    const winners = bets.filter(b => b.selectedOutcomeId.toString() === winningOutcomeId.toString());
-    const losers = bets.filter(b => b.selectedOutcomeId.toString() !== winningOutcomeId.toString());
+    const betrayalOutcomeId =
+      market.winningOutcomeId?.toString() ||
+      market.outcomes.find((outcome) => outcome.optionText.toLowerCase().includes('betray'))?._id?.toString();
 
-    winners.sort((a, b) => b.amountContributed - a.amountContributed);
+    if (!betrayalOutcomeId) {
+      this.logger.warn(`No betrayal outcome resolved for market ${market._id.toString()}`);
+      return;
+    }
 
-    const ladderMultipliers = [1.5, 1.3, 1.1, 1.0];
-    const winnerTotalStake = winners.reduce((s, w) => s + w.amountContributed, 0);
-    
-    for (let i = 0; i < winners.length; i++) {
-      const percentile = i / winners.length;
-      const multiplierIdx = Math.min(Math.floor(percentile * ladderMultipliers.length), ladderMultipliers.length - 1);
-      const multiplier = ladderMultipliers[multiplierIdx];
-      
-      const basePayout = (winners[i].amountContributed / winnerTotalStake) * prizePool;
-      const payout = basePayout * multiplier;
+    const winners = bets.filter((bet) => bet.selectedOutcomeId.toString() === betrayalOutcomeId);
+    const losers = bets.filter((bet) => bet.selectedOutcomeId.toString() !== betrayalOutcomeId);
+    const winnerStake = winners.reduce((sum, winner) => sum + winner.amountContributed, 0);
 
-      winners[i].actualPayout = payout;
-      winners[i].isWinner = true;
-      winners[i].payoutProcessed = true;
-      await winners[i].save();
-      await this.creditWinner(winners[i].userId.toString(), payout, market.title);
+    for (const winner of winners) {
+      const payout = winnerStake > 0 ? (winner.amountContributed / winnerStake) * prizePool : 0;
+      winner.actualPayout = payout;
+      winner.isWinner = true;
+      winner.payoutProcessed = true;
+      await winner.save();
+      await this.creditWinner(winner.userId.toString(), payout, market.title);
     }
 
     for (const loser of losers) {
@@ -248,5 +295,22 @@ export class SettlementDispatcher {
       winnerCount,
       settledAt: new Date().toISOString(),
     }));
+  }
+
+  private async getIntegrityMap(userIds: string[]) {
+    const uniqueIds = Array.from(new Set(userIds)).filter((id) => Types.ObjectId.isValid(id));
+    if (!uniqueIds.length) {
+      return new Map<string, number>();
+    }
+
+    const users = await this.userModel
+      .find({
+        _id: { $in: uniqueIds.map((id) => new Types.ObjectId(id)) },
+      })
+      .select('_id integrityWeight')
+      .lean()
+      .exec();
+
+    return new Map(users.map((user) => [user._id.toString(), user.integrityWeight ?? 1]));
   }
 }

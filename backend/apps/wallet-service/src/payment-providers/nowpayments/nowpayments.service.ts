@@ -1,39 +1,62 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import * as crypto from 'crypto';
+import { Types } from 'mongoose';
+import { WalletService } from '../../wallet/wallet.service';
 
 @Injectable()
 export class NowPaymentsService {
   private readonly logger = new Logger(NowPaymentsService.name);
   private readonly baseUrl = 'https://api.nowpayments.io/v1';
 
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly walletService: WalletService,
+  ) {}
 
   private get apiKey(): string {
     return this.configService.get<string>('NOWPAYMENTS_API_KEY', '');
   }
 
   private get ipnSecret(): string {
-    return this.configService.get<string>('NOWPAYMENTS_IPN_SECRET', '');
+    return (
+      this.configService.get<string>('NOWPAYMENTS_IPN_SECRET', '') ||
+      this.configService.get<string>('NOWPAYMENTS_IPN_KEY', '')
+    );
   }
 
-  // ─── Create Payment (Deposit) ──────────────────────
-  async createPayment(userId: string, amount: number, currency: string = 'usd') {
+  async createPayment(userId: string, amount: number, currency: string = 'USD') {
     if (!this.apiKey) {
       this.logger.warn('NOWPayments API key not configured');
       throw new BadRequestException('Crypto payments not configured');
     }
 
+    const normalizedCurrency = currency.toUpperCase();
+    const pendingTx = await this.walletService.createProviderDepositTransaction({
+      userId,
+      amount,
+      currency: normalizedCurrency,
+      provider: 'nowpayments',
+      description: `USDT TRC20 deposit (${normalizedCurrency})`,
+      paymentMetadata: {
+        requestedPayCurrency: 'usdttrc20',
+      },
+    });
+
     try {
+      const orderId = `ANTE-${pendingTx._id.toString()}-${Date.now()}`;
       const { data } = await axios.post(
         `${this.baseUrl}/payment`,
         {
           price_amount: amount,
-          price_currency: currency,
-          pay_currency: 'btc', // Default to BTC, can be parameterized
-          order_id: `ANTE-${userId}-${Date.now()}`,
-          order_description: `Ante Social deposit for ${userId}`,
-          ipn_callback_url: this.configService.get('NOWPAYMENTS_IPN_URL'),
+          price_currency: normalizedCurrency.toLowerCase(),
+          pay_currency: 'usdttrc20',
+          order_id: orderId,
+          order_description: `Ante Social deposit ${pendingTx._id.toString()}`,
+          ipn_callback_url:
+            this.configService.get('NOWPAYMENTS_IPN_URL') ||
+            this.configService.get('NOWPAYMENTS_CALLBACK_URL'),
           success_url: this.configService.get('NOWPAYMENTS_SUCCESS_URL'),
           cancel_url: this.configService.get('NOWPAYMENTS_CANCEL_URL'),
         },
@@ -45,8 +68,20 @@ export class NowPaymentsService {
         },
       );
 
-      this.logger.log(`Crypto payment created for user ${userId}: ${data.payment_id}`);
+      await this.walletService.markTransactionProcessing(pendingTx._id.toString(), {
+        externalTransactionId: data.payment_id,
+        paymentMetadata: {
+          orderId,
+          payAddress: data.pay_address,
+          payAmount: data.pay_amount,
+          payCurrency: data.pay_currency,
+          invoiceId: data.purchase_id,
+        },
+      });
+
+      this.logger.log(`NOWPayments invoice created for user ${userId}: ${data.payment_id}`);
       return {
+        transactionId: pendingTx._id.toString(),
         paymentId: data.payment_id,
         payAddress: data.pay_address,
         payCurrency: data.pay_currency,
@@ -55,12 +90,18 @@ export class NowPaymentsService {
         status: data.payment_status,
       };
     } catch (error: any) {
-      this.logger.error('Failed to create crypto payment', error.response?.data || error.message);
+      await this.walletService.failPendingTransaction(
+        pendingTx._id.toString(),
+        'nowpayments_invoice_creation_failed',
+      );
+      this.logger.error(
+        'Failed to create NOWPayments invoice',
+        error.response?.data || error.message,
+      );
       throw new BadRequestException('Failed to create crypto payment');
     }
   }
 
-  // ─── Check Payment Status ──────────────────────────
   async getPaymentStatus(paymentId: string) {
     try {
       const { data } = await axios.get(`${this.baseUrl}/payment/${paymentId}`, {
@@ -78,43 +119,79 @@ export class NowPaymentsService {
     }
   }
 
-  // ─── IPN Callback Handler ──────────────────────────
   async handleIpnCallback(body: any, signature: string) {
-    // Verify HMAC signature
-    const crypto = await import('crypto');
-    const hmac = crypto.createHmac('sha512', this.ipnSecret);
-    const sortedBody = JSON.stringify(this.sortObject(body));
-    const expectedSignature = hmac.update(sortedBody).digest('hex');
+    this.verifySignature(body, signature);
 
-    if (signature !== expectedSignature) {
-      this.logger.warn('Invalid IPN signature');
-      throw new BadRequestException('Invalid signature');
+    const paymentId = String(body.payment_id || '');
+    const paymentStatus = String(body.payment_status || '').toLowerCase();
+    const orderId = String(body.order_id || '');
+    const parsedTransactionId = this.extractTransactionId(orderId);
+
+    const transaction =
+      (paymentId
+        ? await this.walletService.findProviderTransaction('nowpayments', paymentId)
+        : null) ||
+      (parsedTransactionId
+        ? await this.walletService.getTransactionById(parsedTransactionId)
+        : null);
+
+    if (!transaction) {
+      this.logger.warn(`NOWPayments IPN could not map transaction. paymentId=${paymentId}`);
+      return { success: true, ignored: true };
     }
 
-    this.logger.log(`IPN received: payment ${body.payment_id} status ${body.payment_status}`);
+    if (paymentStatus === 'finished' || paymentStatus === 'confirmed') {
+      const completed = await this.walletService.completePendingDeposit(transaction._id.toString(), {
+        externalTransactionId: paymentId || transaction.externalTransactionId,
+        paymentMetadata: {
+          ipnStatus: paymentStatus,
+          actuallyPaid: body.actually_paid,
+          actuallyPaidAtFiat: body.actually_paid_at_fiat,
+          payCurrency: body.pay_currency,
+          orderId,
+          confirmedAt: new Date().toISOString(),
+        },
+      });
 
-    if (body.payment_status === 'finished' || body.payment_status === 'confirmed') {
-      // Payment confirmed — credit user wallet
-      // Parse userId from order_id: "ANTE-{userId}-{timestamp}"
-      const orderId = body.order_id || '';
-      const parts = orderId.split('-');
-      const userId = parts.length >= 2 ? parts[1] : null;
-
-      if (userId) {
-        return {
-          success: true,
-          userId,
-          amount: body.actually_paid,
-          currency: body.pay_currency,
-          paymentId: body.payment_id,
-        };
-      }
+      return {
+        success: true,
+        transactionId: completed._id.toString(),
+        userId: completed.userId.toString(),
+        status: completed.status,
+      };
     }
 
-    return { success: true, status: body.payment_status };
+    if (['failed', 'expired', 'refunded'].includes(paymentStatus)) {
+      const failed = await this.walletService.failPendingTransaction(
+        transaction._id.toString(),
+        `nowpayments_${paymentStatus}`,
+        {
+          externalTransactionId: paymentId || transaction.externalTransactionId,
+          paymentMetadata: {
+            ipnStatus: paymentStatus,
+            orderId,
+          },
+        },
+      );
+
+      return {
+        success: true,
+        transactionId: failed._id.toString(),
+        status: failed.status,
+      };
+    }
+
+    await this.walletService.markTransactionProcessing(transaction._id.toString(), {
+      externalTransactionId: paymentId || transaction.externalTransactionId,
+      paymentMetadata: {
+        ipnStatus: paymentStatus,
+        orderId,
+      },
+    });
+
+    return { success: true, status: paymentStatus };
   }
 
-  // ─── Available Currencies ──────────────────────────
   async getAvailableCurrencies() {
     try {
       const { data } = await axios.get(`${this.baseUrl}/currencies`, {
@@ -127,14 +204,45 @@ export class NowPaymentsService {
     }
   }
 
-  private sortObject(obj: any): any {
-    return Object.keys(obj)
+  private verifySignature(body: Record<string, unknown>, signature: string) {
+    if (!signature) {
+      throw new BadRequestException('Missing NOWPayments signature');
+    }
+    if (!this.ipnSecret) {
+      throw new BadRequestException('NOWPayments IPN secret is not configured');
+    }
+
+    const sortedBody = JSON.stringify(this.sortObject(body));
+    const expectedSignature = crypto
+      .createHmac('sha512', this.ipnSecret)
+      .update(sortedBody)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      throw new BadRequestException('Invalid NOWPayments signature');
+    }
+  }
+
+  private extractTransactionId(orderId: string) {
+    const parts = orderId.split('-');
+    if (parts.length < 2) {
+      return undefined;
+    }
+    const candidate = parts[1];
+    return Types.ObjectId.isValid(candidate) ? candidate : undefined;
+  }
+
+  private sortObject(obj: unknown): unknown {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+      return obj;
+    }
+
+    return Object.keys(obj as Record<string, unknown>)
       .sort()
-      .reduce((result: any, key: string) => {
-        result[key] = obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])
-          ? this.sortObject(obj[key])
-          : obj[key];
-        return result;
+      .reduce((acc: Record<string, unknown>, key: string) => {
+        const value = (obj as Record<string, unknown>)[key];
+        acc[key] = this.sortObject(value);
+        return acc;
       }, {});
   }
 }

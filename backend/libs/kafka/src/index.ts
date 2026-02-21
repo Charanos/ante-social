@@ -1,5 +1,6 @@
 // ─── Kafka Library Barrel Export ────────────────────────────
 export * from './kafka.module';
+export * from './topic-bootstrap.service';
 
 // Events
 export * from './events/base.event';

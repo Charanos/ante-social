@@ -54,3 +54,9 @@ export class Verify2FADto {
   @IsNotEmpty()
   token!: string;
 }
+
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken!: string;
+}

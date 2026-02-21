@@ -23,3 +23,16 @@ export { RateLimit, RATE_LIMIT_KEY } from './decorators/rate-limit.decorator';
 
 // Filters
 export { GlobalExceptionFilter } from './filters/global-exception.filter';
+
+// Middleware
+export { sanitizeRequestMiddleware } from './middleware/sanitize.middleware';
+
+// Config validation
+export { validateEnv } from './config/env.validation';
+
+// Bootstrap helpers
+export { registerHealthAndMetrics } from './bootstrap/health-metrics';
+
+// Logging / observability
+export { JsonLogger } from './logging/json-logger';
+export { initSentry } from './observability/sentry';

@@ -1,7 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { ReputationModule } from './reputation.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  GlobalExceptionFilter,
+  JsonLogger,
+  initSentry,
+  sanitizeRequestMiddleware,
+  registerHealthAndMetrics,
+} from '@app/common';
+import helmet from 'helmet';
+import compression from 'compression';
 
 async function bootstrap() {
   const logger = new Logger('ReputationEngine');
@@ -15,6 +25,22 @@ async function bootstrap() {
       : process.env.NODE_ENV === 'production';
 
   const app = await NestFactory.create(ReputationModule);
+  const configService = app.get(ConfigService);
+  app.useLogger(new JsonLogger('reputation-engine'));
+  initSentry('reputation-engine', configService.get<string>('SENTRY_DSN'));
+
+  app.use(helmet());
+  app.use(compression());
+  app.use(sanitizeRequestMiddleware);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  registerHealthAndMetrics(app, 'reputation-engine');
 
   if (enableKafkaConsumer) {
     app.connectMicroservice<MicroserviceOptions>({
