@@ -17,6 +17,9 @@ const AUTH_SERVICE_URL =
   (isLocalGateway ? "http://localhost:3002" : "")
 const AUTH_REQUEST_TIMEOUT_MS = Number(process.env.AUTH_REQUEST_TIMEOUT_MS || 3000)
 const AUTH_TOTAL_TIMEOUT_MS = Number(process.env.AUTH_TOTAL_TIMEOUT_MS || 7000)
+const ACCESS_TOKEN_REFRESH_BUFFER_MS = Number(
+  process.env.ACCESS_TOKEN_REFRESH_BUFFER_MS || 60_000,
+)
 
 type AuthUser = {
   id: string
@@ -26,10 +29,16 @@ type AuthUser = {
   user_level: string
   email_verified: boolean
   access_token?: string
+  refresh_token?: string
+  access_token_expires_at?: number
 }
 
 type AuthToken = JWT & Partial<AuthUser>
-type AuthSession = Session & { access_token?: string }
+type AuthSession = Session & {
+  access_token?: string
+  accessToken?: string
+  error?: string
+}
 type AuthCredentials = {
   email?: string
   password?: string
@@ -63,8 +72,28 @@ type BackendAuthPayload = {
   }
   userId?: string
   access_token?: string
+  refresh_token?: string
   requires_2fa?: boolean
   session_token?: string
+}
+
+function getJwtExpiryMs(token?: string): number | undefined {
+  if (!token) return undefined
+  const parts = token.split(".")
+  if (parts.length < 2) return undefined
+
+  try {
+    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8")) as {
+      exp?: unknown
+    }
+    if (typeof payload.exp === "number" && Number.isFinite(payload.exp)) {
+      return payload.exp * 1000
+    }
+  } catch {
+    return undefined
+  }
+
+  return undefined
 }
 
 function mapAuthUser(payload: BackendAuthPayload, fallbackEmail?: string): AuthUser {
@@ -82,6 +111,9 @@ function mapAuthUser(payload: BackendAuthPayload, fallbackEmail?: string): AuthU
     user_level: payload?.user?.tier || payload?.user?.user_level || "novice",
     email_verified: Boolean(payload?.user?.emailVerified || payload?.user?.email_verified),
     access_token: payload?.access_token,
+    refresh_token: payload?.refresh_token,
+    access_token_expires_at:
+      getJwtExpiryMs(payload?.access_token) || Date.now() + 10 * 60 * 1000,
   }
 }
 
@@ -165,6 +197,58 @@ async function postToBackend(
   throw new Error(fallbackError || "Authentication failed")
 }
 
+async function refreshAccessToken(authToken: AuthToken): Promise<AuthToken> {
+  if (!authToken.refresh_token) {
+    return {
+      ...authToken,
+      error: "MISSING_REFRESH_TOKEN",
+    }
+  }
+
+  try {
+    const payload = await postToBackend(
+      "/api/v1/auth/refresh",
+      { refreshToken: authToken.refresh_token },
+      "/auth/refresh",
+    )
+
+    const mapped = mapAuthUser(
+      {
+        ...payload,
+        user: {
+          ...payload.user,
+          id: payload.user?.id || payload.user?._id || authToken.id,
+          email:
+            payload.user?.email ||
+            (typeof authToken.email === "string" ? authToken.email : undefined),
+          username:
+            payload.user?.username !== undefined
+              ? payload.user.username
+              : authToken.username || null,
+          role: payload.user?.role || authToken.role || "user",
+          tier: payload.user?.tier || authToken.user_level || "novice",
+          emailVerified:
+            payload.user?.emailVerified !== undefined
+              ? payload.user.emailVerified
+              : Boolean(authToken.email_verified),
+        },
+      },
+      typeof authToken.email === "string" ? authToken.email : undefined,
+    )
+
+    return {
+      ...authToken,
+      ...mapped,
+      error: undefined,
+    }
+  } catch {
+    return {
+      ...authToken,
+      error: "REFRESH_ACCESS_TOKEN_ERROR",
+    }
+  }
+}
+
 export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt" as const,
@@ -233,6 +317,9 @@ export const authOptions: AuthOptions = {
         authToken.user_level = authUser.user_level
         authToken.email_verified = authUser.email_verified
         authToken.access_token = authUser.access_token
+        authToken.refresh_token = authUser.refresh_token
+        authToken.access_token_expires_at = authUser.access_token_expires_at
+        authToken.error = undefined
       }
 
       if (trigger === "update" && session && typeof session === "object") {
@@ -255,7 +342,20 @@ export const authOptions: AuthOptions = {
           authToken.email_verified = nextVerified
         }
       }
-      return authToken
+
+      if (!authToken.access_token) {
+        return authToken
+      }
+
+      const expiresAt = Number(authToken.access_token_expires_at || 0)
+      const needsRefresh =
+        !expiresAt || Date.now() >= expiresAt - ACCESS_TOKEN_REFRESH_BUFFER_MS
+
+      if (!needsRefresh) {
+        return authToken
+      }
+
+      return refreshAccessToken(authToken)
     },
     async session({ session, token }) {
       const authToken = token as AuthToken
@@ -269,6 +369,10 @@ export const authOptions: AuthOptions = {
         authSession.user.email_verified = Boolean(authToken.email_verified)
       }
       authSession.access_token = authToken.access_token
+      authSession.accessToken = authToken.access_token
+      if (typeof authToken.error === "string" && authToken.error) {
+        authSession.error = authToken.error
+      }
       return authSession
     },
   },

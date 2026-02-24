@@ -19,6 +19,12 @@ export class TwoFactorController {
     return this.twoFactorService.verifyAndEnable(userId, body.token);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('disable')
+  async disable(@CurrentUser('userId') userId: string, @Body() body: Verify2FADto) {
+    return this.twoFactorService.disable(userId, body.token);
+  }
+
   @Post('verify')
   async verify(@Body() body: { userId: string; token: string }, @Res({ passthrough: true }) response: Response) {
     // This endpoint handles the 2nd step of login

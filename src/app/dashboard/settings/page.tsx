@@ -9,7 +9,9 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { emitLiveUserRefresh, useLiveUser } from "@/lib/live-data";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { authApi } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api/client";
 import {
   IconUser,
   IconLock,
@@ -80,6 +82,7 @@ type SettingsProfilePayload = {
   phone?: string;
   location?: string;
   bio?: string;
+  twoFactorEnabled?: boolean;
 };
 
 export default function SettingsPage() {
@@ -102,6 +105,7 @@ export default function SettingsPage() {
     location: DEFAULT_LOCATION,
     bio: DEFAULT_BIO,
   });
+  const [initialTwoFactorEnabled, setInitialTwoFactorEnabled] = useState(false);
 
   // Profile states
   const [username, setUsername] = useState("");
@@ -140,13 +144,16 @@ export default function SettingsPage() {
         location: payload?.location || DEFAULT_LOCATION,
         bio: payload?.bio || DEFAULT_BIO,
       };
+      const twoFactorState = Boolean(payload?.twoFactorEnabled);
 
       setInitialProfile(profileState);
+      setInitialTwoFactorEnabled(twoFactorState);
       setUsername(profileState.username);
       setEmail(profileState.email);
       setPhone(profileState.phone);
       setLocation(profileState.location);
       setBio(profileState.bio);
+      setTwoFactorEnabled(twoFactorState);
       setHasHydratedProfile(true);
       setIsPageLoading(false);
     };
@@ -168,7 +175,7 @@ export default function SettingsPage() {
       currentPassword !== "" ||
       newPassword !== "" ||
       confirmPassword !== "" ||
-      twoFactorEnabled !== false ||
+      twoFactorEnabled !== initialTwoFactorEnabled ||
       dailyLimit !== 500 ||
       autoWithdraw !== true ||
       emailNotifications !== true ||
@@ -194,6 +201,7 @@ export default function SettingsPage() {
     newPassword,
     confirmPassword,
     twoFactorEnabled,
+    initialTwoFactorEnabled,
     dailyLimit,
     autoWithdraw,
     emailNotifications,
@@ -261,7 +269,7 @@ export default function SettingsPage() {
     toast.success("Settings Saved", "Your changes have been updated");
   }, [bio, email, location, phone, refresh, toast, updateSession, username]);
 
-  const handlePasswordChange = useCallback(() => {
+  const handlePasswordChange = useCallback(async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       toast.error("Missing Fields", "Please fill in all password fields");
       return;
@@ -276,28 +284,102 @@ export default function SettingsPage() {
     }
 
     setIsSaving(true);
-    setTimeout(() => {
+    try {
+      await authApi.changePassword({
+        currentPassword,
+        newPassword,
+      });
       setIsSaving(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       toast.success("Password Updated", "Your password has been changed");
-    }, 1000);
-  }, [currentPassword, newPassword, confirmPassword, toast]);
+    } catch (error) {
+      setIsSaving(false);
+      toast.error(
+        "Password Update Failed",
+        getApiErrorMessage(error, "Unable to change password"),
+      );
+    }
+  }, [confirmPassword, currentPassword, newPassword, toast]);
 
-  const handleTwoFactorToggle = useCallback(() => {
+  const handleTwoFactorToggle = useCallback(async () => {
     setIsTwoFactorLoading(true);
-    setTimeout(() => {
-      setIsTwoFactorLoading(false);
-      const isEnabled = !twoFactorEnabled;
-      setTwoFactorEnabled(isEnabled);
-      if (isEnabled) {
-        toast.success("Two-Factor Enabled", "Your account is now more secure");
-      } else {
-        toast.error("Two-Factor Disabled", "Your account is less secure");
+    try {
+      if (!twoFactorEnabled) {
+        const setupPayload = (await authApi.setupTwoFactor()) as {
+          qrCodeDataUrl?: string;
+          secret?: string;
+        };
+
+        if (setupPayload?.qrCodeDataUrl) {
+          const qrWindow = window.open(
+            setupPayload.qrCodeDataUrl,
+            "_blank",
+            "noopener,noreferrer,width=460,height=520",
+          );
+          if (!qrWindow) {
+            toast.info(
+              "Popup Blocked",
+              "Allow popups or copy the secret into your authenticator app.",
+            );
+          }
+        }
+
+        const verificationCode = window
+          .prompt("Enter the 6-digit authenticator code to enable 2FA")
+          ?.trim();
+
+        if (!verificationCode) {
+          toast.info("Setup Cancelled", "2FA was not enabled.");
+          setIsTwoFactorLoading(false);
+          return;
+        }
+
+        const verifyPayload = (await authApi.verifyTwoFactorSetup(verificationCode)) as {
+          backupCodes?: string[];
+        };
+
+        setTwoFactorEnabled(true);
+        setInitialTwoFactorEnabled(true);
+        const backupCodes = Array.isArray(verifyPayload?.backupCodes)
+          ? verifyPayload.backupCodes
+          : [];
+
+        if (backupCodes.length > 0) {
+          toast.success(
+            "Two-Factor Enabled",
+            `Save your recovery codes: ${backupCodes.join(", ")}`,
+          );
+        } else {
+          toast.success("Two-Factor Enabled", "Your account is now more secure.");
+        }
+        return;
       }
-    }, 1000);
-  }, [twoFactorEnabled, toast]);
+
+      const disableCode = window
+        .prompt("Enter your current 2FA code to disable two-factor authentication")
+        ?.trim();
+
+      if (!disableCode) {
+        toast.info("Action Cancelled", "2FA remains enabled.");
+        setIsTwoFactorLoading(false);
+        return;
+      }
+
+      await authApi.disableTwoFactor(disableCode);
+      setTwoFactorEnabled(false);
+      setInitialTwoFactorEnabled(false);
+      toast.info("Two-Factor Disabled", "Two-factor authentication is now disabled.");
+    } catch (error) {
+      toast.error(
+        "2FA Update Failed",
+        getApiErrorMessage(error, "Unable to update two-factor settings"),
+      );
+    } finally {
+      setIsTwoFactorLoading(false);
+    }
+  }, [toast, twoFactorEnabled]);
 
   const handleProfilePictureUpload = useCallback(() => {
     const currentAvatar = user.avatarUrl || "";
@@ -375,18 +457,32 @@ export default function SettingsPage() {
     void run();
   }, [refresh, toast, updateSession, user.username]);
 
-  const handleDeleteAccount = useCallback(() => {
+  const handleDeleteAccount = useCallback(async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      toast.error(
-        "Account Deleted",
-        "Your account has been permanently deleted",
-      );
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        toast.error(
+          "Deletion Unavailable",
+          "Self-service account deletion is not enabled. Contact support.",
+        );
+        setIsSaving(false);
+        return;
+      }
+
+      toast.success("Account Deleted", "Your account has been deleted.");
       setIsSaving(false);
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-    }, 1000);
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      setIsSaving(false);
+      toast.error(
+        "Delete Failed",
+        getApiErrorMessage(error, "Unable to delete account"),
+      );
+    }
   }, [toast]);
 
   const sections = [
@@ -462,7 +558,7 @@ export default function SettingsPage() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => toast.info("Logging out", "See you soon!")}
+                onClick={() => void signOut({ callbackUrl: "/" })}
                 className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all cursor-pointer bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
               >
                 <IconLogout className="w-4 h-4" />
@@ -1389,7 +1485,7 @@ export default function SettingsPage() {
                     setCurrentPassword("");
                     setNewPassword("");
                     setConfirmPassword("");
-                    setTwoFactorEnabled(false);
+                    setTwoFactorEnabled(initialTwoFactorEnabled);
                     setEmailNotifications(true);
                     setPushNotifications(true);
                     setNotificationPrefs(DEFAULT_PREFS);

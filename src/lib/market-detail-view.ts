@@ -162,7 +162,13 @@ export function mapMarketToDetailView(raw: any): MarketDetailView {
   );
 
   const tags = toArray<string>(raw?.tags);
-  const marketType = toString(raw?.betType || raw?.marketType || raw?.type, "consensus");
+  const marketTypeRaw = toString(raw?.betType || raw?.marketType || raw?.type, "consensus");
+  const marketType =
+    marketTypeRaw === "poll"
+      ? "consensus"
+      : marketTypeRaw === "syndicate" || marketTypeRaw === "prisoner_dilemma"
+        ? "betrayal"
+        : marketTypeRaw;
   const category =
     toString(raw?.category) ||
     toString(tags[0]) ||

@@ -65,6 +65,3 @@ export class Wallet {
 }
 
 export const WalletSchema = SchemaFactory.createForClass(Wallet);
-
-// Indexes
-WalletSchema.index({ userId: 1 }, { unique: true });

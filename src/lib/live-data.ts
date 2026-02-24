@@ -2,11 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import type { Method } from "axios";
 import type { Market, MarketStatus, Position } from "@/types/market";
 import type { UserProfile, UserTier } from "@/types/user";
+import { apiClient } from "@/lib/api/client";
 
 const LIVE_USER_REFRESH_EVENT = "ante-social:live-user-refresh";
 const LIVE_USER_REFRESH_STORAGE_KEY = "ante-social:live-user-refresh-ts";
+const REALTIME_NOTIFICATION_EVENT = "ante-social:notification";
+const REALTIME_MARKET_EVENT = "ante-social:market-update";
 
 type SessionUser = {
   id?: string;
@@ -199,19 +203,38 @@ function mapMarketStatus(value: unknown): MarketStatus {
   return "suspended";
 }
 
-async function safeJson<T>(response: Response): Promise<T | null> {
-  try {
-    return (await response.json()) as T;
-  } catch {
-    return null;
-  }
+function normalizeMarketType(value: unknown): Market["type"] {
+  const raw = toString(value).toLowerCase();
+  if (raw === "poll") return "consensus";
+  if (raw === "prisoner_dilemma" || raw === "syndicate") return "betrayal";
+  if (raw === "betrayal") return "betrayal";
+  if (raw === "reflex" || raw === "ladder" || raw === "consensus") return raw;
+  return "consensus";
 }
 
 export async function fetchJsonOrNull<T>(url: string, init?: RequestInit): Promise<T | null> {
   try {
-    const response = await fetch(url, { cache: "no-store", ...init });
-    if (!response.ok) return null;
-    return await safeJson<T>(response);
+    const method = (init?.method || "GET").toUpperCase() as Method;
+    const headers = init?.headers as Record<string, string> | undefined;
+    const body = init?.body;
+    const data =
+      typeof body === "string"
+        ? body
+        : body instanceof FormData
+          ? body
+          : body instanceof URLSearchParams
+            ? body
+            : body || undefined;
+
+    const response = await apiClient.request<T>({
+      url,
+      method,
+      data,
+      headers,
+      signal: init?.signal || undefined,
+      withCredentials: false,
+    });
+    return response.data;
   } catch {
     return null;
   }
@@ -271,7 +294,7 @@ export function normalizeMarket(raw: any): Market {
     title: toString(raw?.title || "Untitled Market"),
     description: toString(raw?.description || ""),
     image: toString(raw?.mediaUrl || DEFAULT_MARKET_IMAGE),
-    type: (toString(raw?.betType || raw?.type || "consensus") as Market["type"]) || "consensus",
+    type: normalizeMarketType(raw?.betType || raw?.type || "consensus"),
     category: toString(toArray<string>(raw?.tags)[0] || "General"),
     poolAmount: totalPool,
     volume: totalPool,
@@ -397,7 +420,7 @@ export function normalizePosition(raw: any): Position {
     marketId: toString(raw?.marketId?._id || raw?.marketId || raw?.market?._id),
     userId: toString(raw?.userId?._id || raw?.userId || ""),
     title: toString(market?.title || raw?.title || ""),
-    type: toString(market?.betType || raw?.type || "consensus"),
+    type: normalizeMarketType(market?.betType || raw?.type || "consensus"),
     outcome: toString(selectedOutcome?.optionText || raw?.outcome || "Unknown"),
     stakeAmount: amount,
     entryPrice: toNumber(raw?.entryPrice, 0.5),
@@ -462,6 +485,7 @@ export function useUnreadNotificationsCount() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     let cancelled = false;
 
     const load = async () => {
@@ -472,9 +496,15 @@ export function useUnreadNotificationsCount() {
     };
 
     void load();
+    const handleRealtimeNotification = () => {
+      void load();
+    };
+
+    window.addEventListener(REALTIME_NOTIFICATION_EVENT, handleRealtimeNotification);
     const interval = window.setInterval(load, 30000);
     return () => {
       cancelled = true;
+      window.removeEventListener(REALTIME_NOTIFICATION_EVENT, handleRealtimeNotification);
       window.clearInterval(interval);
     };
   }, []);
@@ -494,7 +524,19 @@ export function useMarketList() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     void refresh();
+    const handleRealtimeMarketUpdate = () => {
+      void refresh();
+    };
+    window.addEventListener(REALTIME_MARKET_EVENT, handleRealtimeMarketUpdate);
+    const interval = window.setInterval(() => {
+      void refresh();
+    }, 30_000);
+    return () => {
+      window.removeEventListener(REALTIME_MARKET_EVENT, handleRealtimeMarketUpdate);
+      window.clearInterval(interval);
+    };
   }, [refresh]);
 
   return { markets, isLoading, refresh };
@@ -512,7 +554,14 @@ export function useGroupList() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     void refresh();
+    const interval = window.setInterval(() => {
+      void refresh();
+    }, 60_000);
+    return () => {
+      window.clearInterval(interval);
+    };
   }, [refresh]);
 
   return { groups, isLoading, refresh };
@@ -531,7 +580,18 @@ export function useMarketById(marketId: string | undefined) {
   }, [marketId]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     void refresh();
+    const handleRealtimeMarketUpdate = (event: Event) => {
+      const detail = (event as CustomEvent<{ marketId?: string }>).detail;
+      if (!detail?.marketId || !marketId || detail.marketId === marketId) {
+        void refresh();
+      }
+    };
+    window.addEventListener(REALTIME_MARKET_EVENT, handleRealtimeMarketUpdate);
+    return () => {
+      window.removeEventListener(REALTIME_MARKET_EVENT, handleRealtimeMarketUpdate);
+    };
   }, [refresh]);
 
   return { market, isLoading, refresh };

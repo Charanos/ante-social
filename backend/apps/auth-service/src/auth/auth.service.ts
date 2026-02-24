@@ -116,10 +116,12 @@ export class AuthService {
       };
     }
 
-    // Update last login
+    return this.completeLogin(user);
+  }
+
+  async completeLogin(user: UserDocument) {
     user.lastLoginAt = new Date();
     await user.save();
-
     return this.issueAuthTokens(user);
   }
 
@@ -247,6 +249,28 @@ export class AuthService {
   }
 
   // ─── Token Generation ─────────────────────────────
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+      throw new BadRequestException('New password must be at least 8 characters');
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.clearRefreshToken(user);
+    await user.save();
+
+    return { success: true, message: 'Password changed successfully' };
+  }
+
   private async issueAuthTokens(user: UserDocument) {
     const payload: JwtPayload = {
       sub: user._id.toString(),

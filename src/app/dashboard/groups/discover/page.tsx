@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { cn } from "@/lib/utils";
-import { getJoinedGroups } from "@/lib/membership";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 import { GroupCard } from "@/components/groups/GroupCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
-import { useEffect } from "react";
 import { useGroupList, useLiveUser } from "@/lib/live-data";
 import {
   IoPeopleOutline,
@@ -36,7 +34,6 @@ export default function DiscoverGroupsPage() {
   const [sortBy, setSortBy] = useState("trending");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
-  const [joinedGroupIds, setJoinedGroupIds] = useState<string[]>([]);
   const categories = useMemo(() => {
     const counts = allGroups.reduce<Record<string, number>>((acc, group) => {
       const category = group.category || "Community";
@@ -49,10 +46,6 @@ export default function DiscoverGroupsPage() {
       .map((name) => ({ name, count: counts[name] }));
     return [{ name: "All", count: allGroups.length }, ...dynamic];
   }, [allGroups]);
-
-  useEffect(() => {
-    setJoinedGroupIds(getJoinedGroups());
-  }, []);
 
   useEffect(() => {
     setIsFiltering(true);
@@ -214,7 +207,7 @@ export default function DiscoverGroupsPage() {
                     }}
                     featured={true}
                     index={index}
-                    isJoined={joinedGroupIds.includes(group.id.toString())}
+                    isJoined={group.members.some((member) => member.id === user.id)}
                   />
                 ))}
           </div>
@@ -277,7 +270,7 @@ export default function DiscoverGroupsPage() {
                       category: group.category || "Community",
                     }}
                     index={index}
-                    isJoined={joinedGroupIds.includes(group.id.toString())}
+                    isJoined={group.members.some((member) => member.id === user.id)}
                   />
                 ))}
           </div>

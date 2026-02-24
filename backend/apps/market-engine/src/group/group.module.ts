@@ -36,7 +36,11 @@ import { ConfigService } from '@nestjs/config';
           options: {
             client: {
               clientId: 'group-service',
-              brokers: [configService.get('KAFKA_BROKER') || 'localhost:9092'],
+              brokers:
+                (configService.get<string>('KAFKA_BROKERS') || configService.get<string>('KAFKA_BROKER') || 'localhost:9092')
+                  .split(',')
+                  .map((broker) => broker.trim())
+                  .filter(Boolean),
             },
             consumer: {
               groupId: 'group-consumer',

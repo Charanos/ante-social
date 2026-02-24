@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { IconAccessPoint, IconLoader3, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
-import { getJoinedGroups } from "@/lib/membership";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -26,14 +25,7 @@ export default function GroupsPage() {
   const [isCreating, setIsCreating] = useState(false);
   const toast = useToast();
 
-  const [joinedGroupIds, setJoinedGroupIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    setJoinedGroupIds(getJoinedGroups());
-  }, []);
-
   const filteredGroups = groups.filter((group) =>
-    joinedGroupIds.includes(group.id.toString()) ||
     group.members.some((member) => member.id === user.id)
   );
 

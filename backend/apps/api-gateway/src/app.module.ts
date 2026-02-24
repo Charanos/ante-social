@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { ConfigModule } from '@nestjs/config';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { RequestLoggingMiddleware } from './middleware/request-logging.middleware';
+import { RateLimitMiddleware } from './middleware/rate-limit.middleware';
 import { validateEnv } from '@app/common';
 
 function handleProxyError(_err: unknown, _req: unknown, res: any) {
@@ -21,13 +22,18 @@ function handleProxyError(_err: unknown, _req: unknown, res: any) {
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true, validate: validateEnv })],
-  providers: [RequestLoggingMiddleware],
+  providers: [RequestLoggingMiddleware, RateLimitMiddleware],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // Request Logging (applies to all routes)
     consumer
       .apply(RequestLoggingMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+
+    // Gateway-level flood control before proxying upstream.
+    consumer
+      .apply(RateLimitMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });
 
     // Auth Service Proxy

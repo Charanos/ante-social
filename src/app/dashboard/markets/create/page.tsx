@@ -48,10 +48,11 @@ export default function CreateMarketPage() {
     try {
       const typeMap: Record<string, string> = {
         poll: "consensus",
-        betrayal: "prisoner_dilemma",
+        betrayal: "betrayal",
         reflex: "reflex",
         ladder: "ladder",
-        syndicate: "syndicate",
+        prisoner_dilemma: "betrayal",
+        syndicate: "betrayal",
       };
 
       const outcomesSource = data.type === "ladder" ? data.ladderItems : data.options;

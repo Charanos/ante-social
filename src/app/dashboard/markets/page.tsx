@@ -114,7 +114,7 @@ export default function MarketsPage() {
           tabs={[
             { id: "all", label: "All Markets" },
             { id: "consensus", label: "Poll" },
-            { id: "prisoner_dilemma", label: "Betrayal" },
+            { id: "betrayal", label: "Betrayal" },
             { id: "reflex", label: "Reflex" },
             { id: "ladder", label: "Ladder" },
           ]}

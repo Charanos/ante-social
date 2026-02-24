@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards, Res, Req } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, CurrentUser, RefreshTokenDto } from '@app/common';
+import { RegisterDto, CurrentUser, RefreshTokenDto, JwtAuthGuard } from '@app/common';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { UserDocument } from '@app/database';
 import { Request } from 'express';
@@ -72,6 +72,19 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(@Body() body: { token: string; newPassword: string }) {
     return this.authService.resetPassword(body.token, body.newPassword);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('password')
+  async changePassword(
+    @CurrentUser() user: UserDocument,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    return this.authService.changePassword(
+      user._id.toString(),
+      body.currentPassword,
+      body.newPassword,
+    );
   }
 
   private setAuthCookies(response: Response, accessToken: string, refreshToken: string) {

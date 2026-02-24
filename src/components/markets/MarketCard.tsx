@@ -8,7 +8,6 @@ import {
   IconAlertCircle,
   IconArrowRight,
   IconAward,
-  IconBriefcase,
   IconClipboard,
   IconClock,
   IconCurrencyDollar,
@@ -47,10 +46,11 @@ const getTypeStyles = (type: string) => {
       return { label: "Reflex", color: "amber", icon: IconAccessPoint };
     case "ladder":
       return { label: "Ladder", color: "purple", icon: IconAward };
+    case "betrayal":
     case "prisoner_dilemma":
       return { label: "Dilemma", color: "red", icon: IconTarget };
     case "syndicate":
-      return { label: "Syndicate", color: "blue", icon: IconBriefcase };
+      return { label: "Betrayal", color: "red", icon: IconTarget };
     default:
       return { label: "Market", color: "gray", icon: IconAlertCircle };
   }
@@ -66,12 +66,12 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
   // Mapping type to folder slug
   const typeToSlug: Record<string, string> = {
     'poll': 'consensus',
-    'betrayal': 'prisoner_dilemma',
-    'prisoner_dilemma': 'prisoner_dilemma',
+    'betrayal': 'betrayal',
+    'prisoner_dilemma': 'betrayal',
     'consensus': 'consensus',
     'reflex': 'reflex',
     'ladder': 'ladder',
-    'syndicate': 'syndicate'
+    'syndicate': 'betrayal'
   };
   
   const marketTypeSlug = typeToSlug[market.type.toLowerCase()] || 'consensus';

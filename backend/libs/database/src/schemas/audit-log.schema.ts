@@ -67,7 +67,6 @@ export class AuditLog {
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
 
 // Indexes
-AuditLogSchema.index({ sequenceNumber: 1 }, { unique: true });
 AuditLogSchema.index({ actorId: 1, timestamp: -1 });
 AuditLogSchema.index({ entityType: 1, entityId: 1 });
 AuditLogSchema.index({ eventType: 1, timestamp: -1 });

@@ -36,3 +36,6 @@ export { registerHealthAndMetrics } from './bootstrap/health-metrics';
 // Logging / observability
 export { JsonLogger } from './logging/json-logger';
 export { initSentry } from './observability/sentry';
+
+// Kafka resiliency
+export { KafkaRetryDlqService } from './kafka/kafka-retry-dlq.service';

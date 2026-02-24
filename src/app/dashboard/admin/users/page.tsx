@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconAccessPoint, IconCalendar, IconCheck, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers, IconLoader3 } from '@tabler/icons-react';
-import { useRouter } from "next/navigation";
+import { IconAccessPoint, IconCalendar, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers, IconLoader3 } from '@tabler/icons-react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast-notification";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { format } from "date-fns";
+import { adminApi } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api/client";
 
 // Types
 interface User {
@@ -19,12 +20,39 @@ interface User {
   tier: string;
   createdAt: string;
   isVerified: boolean;
-  active: boolean;
+  isFlagged?: boolean;
+  isBanned?: boolean;
   avatarUrl?: string;
 }
 
 interface UsersResponse {
   data?: User[];
+  meta?: {
+    total?: number;
+    page?: number;
+    limit?: number;
+    offset?: number;
+  };
+}
+
+type FlagUser = {
+  _id?: string;
+  username?: string;
+  email?: string;
+};
+
+interface ComplianceFlag {
+  _id: string;
+  userId: string | FlagUser;
+  reason: string;
+  status: string;
+  description: string;
+  createdAt: string;
+  resolvedAt?: string;
+}
+
+interface ComplianceFlagsResponse {
+  data?: ComplianceFlag[];
 }
 
 const tabs = [
@@ -34,48 +62,232 @@ const tabs = [
   { id: "aml", label: "AML & Clusters", icon: IconAccessPoint },
 ];
 
+function toTitleCase(value: string) {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getFlagStatusClass(status: string) {
+  const normalized = status.toLowerCase();
+  if (normalized === "open") return "bg-red-50 text-red-700 border-red-200";
+  if (normalized === "investigating") return "bg-amber-50 text-amber-700 border-amber-200";
+  if (normalized === "resolved") return "bg-green-50 text-green-700 border-green-200";
+  return "bg-neutral-100 text-neutral-700 border-neutral-200";
+}
+
 export default function UserManagementPage() {
-  const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
   
   const [activeTab, setActiveTab] = useState("levels");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState("all");
+  const [kycFilter, setKycFilter] = useState("all");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 20;
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+      setPage(1);
+    }, 300);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [searchQuery]);
 
   // Fetch Users
   const { data: usersResponse, isLoading } = useQuery<UsersResponse>({
-    queryKey: ['admin-users'],
+    queryKey: ['admin-users', page, limit, debouncedSearchQuery],
     queryFn: async () => {
-      const res = await fetch('/api/admin/users');
-      if (!res.ok) throw new Error('Failed to fetch users');
-      return res.json();
-    }
+      return adminApi.getUsers({
+        page,
+        limit,
+        search: debouncedSearchQuery || undefined,
+      });
+    },
+    placeholderData: (previous) => previous,
+  });
+
+  const { data: complianceResponse, isLoading: isComplianceLoading } = useQuery<ComplianceFlagsResponse>({
+    queryKey: ["admin-compliance-flags"],
+    queryFn: async () => {
+      return (await adminApi.getComplianceFlags({
+        limit: 500,
+        offset: 0,
+      })) as ComplianceFlagsResponse;
+    },
   });
 
   const users = usersResponse?.data || [];
+  const complianceFlags = complianceResponse?.data || [];
 
   // Update Tier Mutation
   const updateTierMutation = useMutation({
     mutationFn: async ({ userId, tier }: { userId: string, tier: string }) => {
-      const res = await fetch('/api/admin/users', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, tier: tier.toLowerCase() })
-      });
-      if (!res.ok) throw new Error('Failed to update tier');
-      return res.json();
+      return adminApi.updateUserTier(userId, tier.toLowerCase());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast.success("Tier Updated", "User level has been changed.");
       setOpenDropdown(null);
     },
-    onError: () => {
-      toast.error("Update Failed", "Could not change user level.");
+    onError: (error) => {
+      toast.error("Update Failed", getApiErrorMessage(error, "Could not change user level."));
     }
   });
+
+  const complianceActionMutation = useMutation({
+    mutationFn: async ({
+      userId,
+      action,
+      reason,
+    }: {
+      userId: string;
+      action: "freeze" | "unfreeze";
+      reason?: string;
+    }) => {
+      return adminApi.applyComplianceAction(userId, action, reason);
+    },
+    onSuccess: (_payload, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-compliance-flags"] });
+      toast.success(
+        variables.action === "freeze" ? "Account Frozen" : "Account Unfrozen",
+        "Compliance action applied successfully.",
+      );
+    },
+    onError: (error: any) => {
+      toast.error("Action Failed", getApiErrorMessage(error, "Could not update compliance state."));
+    },
+  });
+
+  const userById = useMemo(() => {
+    const map = new Map<string, User>();
+    users.forEach((user) => {
+      map.set(user._id, user);
+    });
+    return map;
+  }, [users]);
+
+  const normalizedFlags = useMemo(() => {
+    return complianceFlags.map((flag) => {
+      const embeddedUser =
+        flag.userId && typeof flag.userId === "object"
+          ? (flag.userId as FlagUser)
+          : undefined;
+      const userId = typeof flag.userId === "string" ? flag.userId : embeddedUser?._id || "";
+      const linkedUser = userById.get(userId);
+
+      return {
+        ...flag,
+        normalizedUserId: userId,
+        username: embeddedUser?.username || linkedUser?.username || "Unknown user",
+        email: embeddedUser?.email || linkedUser?.email || "",
+        isUserFlagged: Boolean(linkedUser?.isFlagged),
+      };
+    });
+  }, [complianceFlags, userById]);
+
+  const kycRows = useMemo(() => {
+    return users
+      .map((user) => {
+        const userFlags = normalizedFlags.filter(
+          (flag) => flag.normalizedUserId === user._id,
+        );
+        const latestFlag = userFlags[0];
+        const openFlags = userFlags.filter(
+          (flag) => flag.status === "open" || flag.status === "investigating",
+        ).length;
+
+        return {
+          user,
+          latestFlag,
+          openFlags,
+          needsReview: !user.isVerified || Boolean(user.isFlagged) || openFlags > 0,
+        };
+      })
+      .filter((row) => {
+        if (kycFilter === "pending") return row.needsReview;
+        if (kycFilter === "flagged") return row.openFlags > 0 || Boolean(row.user.isFlagged);
+        if (kycFilter === "verified") return row.user.isVerified && !row.needsReview;
+        return true;
+      })
+      .filter((row) => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          row.user.username.toLowerCase().includes(query) ||
+          row.user.email.toLowerCase().includes(query) ||
+          row.user._id.includes(query)
+        );
+      });
+  }, [kycFilter, normalizedFlags, searchQuery, users]);
+
+  const amlClusters = useMemo(() => {
+    const clusters = new Map<
+      string,
+      {
+        userId: string;
+        username: string;
+        email: string;
+        totalFlags: number;
+        openFlags: number;
+        lastFlagAt: string;
+        lastReason: string;
+        isUserFlagged: boolean;
+      }
+    >();
+
+    normalizedFlags.forEach((flag) => {
+      if (!flag.normalizedUserId) return;
+      const existing = clusters.get(flag.normalizedUserId);
+      if (!existing) {
+        clusters.set(flag.normalizedUserId, {
+          userId: flag.normalizedUserId,
+          username: flag.username,
+          email: flag.email,
+          totalFlags: 1,
+          openFlags:
+            flag.status === "open" || flag.status === "investigating" ? 1 : 0,
+          lastFlagAt: flag.createdAt,
+          lastReason: flag.reason,
+          isUserFlagged: flag.isUserFlagged,
+        });
+        return;
+      }
+
+      existing.totalFlags += 1;
+      if (flag.status === "open" || flag.status === "investigating") {
+        existing.openFlags += 1;
+      }
+      if (new Date(flag.createdAt).getTime() > new Date(existing.lastFlagAt).getTime()) {
+        existing.lastFlagAt = flag.createdAt;
+        existing.lastReason = flag.reason;
+      }
+      existing.isUserFlagged = existing.isUserFlagged || flag.isUserFlagged;
+      clusters.set(flag.normalizedUserId, existing);
+    });
+
+    return Array.from(clusters.values())
+      .filter((cluster) => cluster.totalFlags > 0)
+      .filter((cluster) => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          cluster.username.toLowerCase().includes(query) ||
+          cluster.email.toLowerCase().includes(query) ||
+          cluster.userId.includes(query)
+        );
+      })
+      .sort((a, b) => {
+        if (b.openFlags !== a.openFlags) return b.openFlags - a.openFlags;
+        return b.totalFlags - a.totalFlags;
+      });
+  }, [normalizedFlags, searchQuery]);
 
   const filteredUsers = users.filter(user => {
     // Filter by Level
@@ -95,12 +307,34 @@ export default function UserManagementPage() {
   });
 
   const handleLevelChange = (userId: string, newLevel: string) => {
+    const shouldProceed = window.confirm(
+      `Update this user's tier to ${newLevel.replace("_", " ")}?`,
+    );
+    if (!shouldProceed) return;
     updateTierMutation.mutate({ userId, tier: newLevel });
   };
 
-  const totalUsers = users.length;
+  const handleComplianceAction = (userId: string, action: "freeze" | "unfreeze") => {
+    if (action === "freeze") {
+      const reason = window.prompt(
+        "Provide a freeze reason",
+        "Manual compliance review",
+      );
+      if (!reason || !reason.trim()) return;
+      complianceActionMutation.mutate({ userId, action, reason: reason.trim() });
+      return;
+    }
+    complianceActionMutation.mutate({ userId, action });
+  };
+
+  const totalUsers = Number(usersResponse?.meta?.total || users.length);
+  const totalPages = Math.max(1, Math.ceil(totalUsers / limit));
   const noviceUsers = users.filter((u) => u.tier === "novice").length;
   const highRollerUsers = users.filter((u) => u.tier === "high_roller").length;
+  const pendingKycCount = kycRows.filter((row) => row.needsReview).length;
+  const openComplianceFlags = normalizedFlags.filter(
+    (flag) => flag.status === "open" || flag.status === "investigating",
+  ).length;
 
   return (
     <div className="min-h-screen pb-12">
@@ -238,7 +472,7 @@ export default function UserManagementPage() {
                       <IconChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                     <span className="text-sm text-neutral-600 font-mono">
-                      {filteredUsers.length} users
+                      {totalUsers} users
                     </span>
                   </div>
 
@@ -307,6 +541,30 @@ export default function UserManagementPage() {
                     </div>
                   )}
 
+                  {!isLoading && totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3">
+                      <span className="text-xs font-medium text-neutral-600">
+                        Page {page} of {totalPages}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                          disabled={page <= 1}
+                          className="px-3 py-1.5 text-xs font-medium rounded-md border border-neutral-200 bg-white hover:bg-neutral-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Previous
+                        </button>
+                        <button
+                          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                          disabled={page >= totalPages}
+                          className="px-3 py-1.5 text-xs font-medium rounded-md border border-neutral-200 bg-white hover:bg-neutral-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {!isLoading && filteredUsers.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
                       <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4">
@@ -319,28 +577,237 @@ export default function UserManagementPage() {
                 </motion.div>
               )}
 
-              {(activeTab === "kyc" || activeTab === "aml") && (
+              {activeTab === "kyc" && (
                 <motion.div
-                  key="placeholder"
+                  key="kyc"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="flex flex-col items-center justify-center h-[400px] text-center"
+                  className="space-y-6"
                 >
-                  <div className="w-16 h-16 rounded-full bg-neutral-50 border border-neutral-100 flex items-center justify-center mb-4">
-                    {activeTab === "kyc" ? (
-                      <IconShield className="w-8 h-8 text-neutral-300" />
-                    ) : (
-                      <IconAccessPoint className="w-8 h-8 text-neutral-300" />
-                    )}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
+                      <p className="text-sm text-neutral-600">Pending KYC Review</p>
+                      <p className="text-2xl font-mono text-neutral-900 mt-2">
+                        {pendingKycCount}
+                      </p>
+                    </div>
+                    <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
+                      <p className="text-sm text-neutral-600">Open Compliance Flags</p>
+                      <p className="text-2xl font-mono text-neutral-900 mt-2">
+                        {openComplianceFlags}
+                      </p>
+                    </div>
+                    <div className="bg-neutral-50 rounded-lg border border-neutral-100 p-4">
+                      <p className="text-sm text-neutral-600">Verified Users</p>
+                      <p className="text-2xl font-mono text-neutral-900 mt-2">
+                        {users.filter((user) => user.isVerified).length}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-medium text-neutral-900 mb-2">
-                    {activeTab === "kyc" ? "KYC Review" : "AML & Clusters"}
-                  </h3>
-                  <p className="text-sm text-neutral-600 max-w-sm">
-                    This module is currently under development. Check back later for updates.
-                  </p>
+
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="relative flex-1 max-w-md">
+                      <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Filter KYC queue by user/email..."
+                        className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                      />
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={kycFilter}
+                        onChange={(e) => setKycFilter(e.target.value)}
+                        className="px-4 py-2.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 appearance-none cursor-pointer pr-10 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                      >
+                        <option value="all">All</option>
+                        <option value="pending">Pending Review</option>
+                        <option value="flagged">Flagged</option>
+                        <option value="verified">Fully Verified</option>
+                      </select>
+                      <IconChevronDown className="w-4 h-4 text-neutral-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {isLoading || isComplianceLoading ? (
+                    <div className="flex justify-center py-16">
+                      <IconLoader3 className="w-8 h-8 animate-spin text-neutral-400" />
+                    </div>
+                  ) : kycRows.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <div className="w-16 h-16 rounded-full bg-neutral-50 border border-neutral-100 flex items-center justify-center mb-4">
+                        <IconShield className="w-8 h-8 text-neutral-300" />
+                      </div>
+                      <h3 className="text-base font-medium text-neutral-900 mb-2">
+                        No records in this filter
+                      </h3>
+                      <p className="text-sm text-neutral-600">
+                        Try changing search or review status.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {kycRows.map((row) => (
+                        <div
+                          key={row.user._id}
+                          className="rounded-lg border border-neutral-200 bg-white p-4 flex items-center justify-between gap-4"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-sm font-medium text-neutral-900">
+                                {row.user.username}
+                              </h3>
+                              {!row.user.isVerified && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                                  Unverified
+                                </span>
+                              )}
+                              {row.openFlags > 0 && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider bg-red-50 text-red-700 border border-red-200">
+                                  {row.openFlags} open flags
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-neutral-600">
+                              <span className="flex items-center gap-1">
+                                <IconMail className="w-3 h-3" />
+                                {row.user.email}
+                              </span>
+                              <span className="text-xs text-neutral-300">|</span>
+                              <span>
+                                Joined{" "}
+                                {row.user.createdAt
+                                  ? format(new Date(row.user.createdAt), "MMM do, yyyy")
+                                  : "N/A"}
+                              </span>
+                            </div>
+                            {row.latestFlag && (
+                              <p className="mt-2 text-xs text-neutral-600">
+                                Latest flag:{" "}
+                                <span className="font-medium">
+                                  {toTitleCase(row.latestFlag.reason)}
+                                </span>
+                              </p>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() =>
+                              handleComplianceAction(
+                                row.user._id,
+                                row.user.isFlagged ? "unfreeze" : "freeze",
+                              )
+                            }
+                            disabled={complianceActionMutation.isPending}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all disabled:opacity-50 ${
+                              row.user.isFlagged
+                                ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                            }`}
+                          >
+                            {row.user.isFlagged ? "Unfreeze" : "Freeze"}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === "aml" && (
+                <motion.div
+                  key="aml"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-6"
+                >
+                  <div className="relative max-w-md">
+                    <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search AML clusters by user/email..."
+                      className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                    />
+                  </div>
+
+                  {isComplianceLoading ? (
+                    <div className="flex justify-center py-16">
+                      <IconLoader3 className="w-8 h-8 animate-spin text-neutral-400" />
+                    </div>
+                  ) : amlClusters.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <div className="w-16 h-16 rounded-full bg-neutral-50 border border-neutral-100 flex items-center justify-center mb-4">
+                        <IconAccessPoint className="w-8 h-8 text-neutral-300" />
+                      </div>
+                      <h3 className="text-base font-medium text-neutral-900 mb-2">
+                        No AML clusters found
+                      </h3>
+                      <p className="text-sm text-neutral-600">
+                        No compliance flags available for clustering.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {amlClusters.map((cluster) => (
+                        <div
+                          key={cluster.userId}
+                          className="rounded-lg border border-neutral-200 bg-white p-4 flex items-center justify-between gap-4"
+                        >
+                          <div className="min-w-0">
+                            <h3 className="text-sm font-medium text-neutral-900">
+                              {cluster.username}
+                            </h3>
+                            <p className="text-xs text-neutral-600 mt-1">
+                              {cluster.email || cluster.userId}
+                            </p>
+                            <div className="flex items-center gap-2 mt-2 text-[11px]">
+                              <span className="px-2 py-0.5 rounded-full border bg-neutral-100 text-neutral-700 border-neutral-200">
+                                {cluster.totalFlags} total flags
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded-full border ${getFlagStatusClass(
+                                  cluster.openFlags > 0 ? "open" : "resolved",
+                                )}`}
+                              >
+                                {cluster.openFlags} open
+                              </span>
+                              <span className="px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                                {toTitleCase(cluster.lastReason)}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-neutral-500 mt-2">
+                              Last flag: {format(new Date(cluster.lastFlagAt), "MMM do, yyyy p")}
+                            </p>
+                          </div>
+
+                          <button
+                            onClick={() =>
+                              handleComplianceAction(
+                                cluster.userId,
+                                cluster.isUserFlagged ? "unfreeze" : "freeze",
+                              )
+                            }
+                            disabled={complianceActionMutation.isPending}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all disabled:opacity-50 ${
+                              cluster.isUserFlagged
+                                ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                            }`}
+                          >
+                            {cluster.isUserFlagged ? "Unfreeze" : "Freeze"}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

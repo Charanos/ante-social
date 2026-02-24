@@ -7,6 +7,8 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
 import { cn } from "@/lib/utils"
 import { fetchJsonOrNull, normalizeNotifications } from "@/lib/live-data"
+import { notificationsApi } from "@/lib/api"
+import { getApiErrorMessage } from "@/lib/api/client"
 import {
   IconBell,
   IconCheck,
@@ -71,21 +73,70 @@ export default function NotificationsPage() {
 
   const loadNotifications = useCallback(async () => {
     setIsPageLoading(true)
-    const payload = await fetchJsonOrNull<any>("/api/notifications?limit=200&offset=0")
-    const normalized = normalizeNotifications(payload).map((notification) => ({
-      id: notification.id,
-      type: mapNotificationType(notification.type),
-      title: notification.title,
-      message: notification.message,
-      is_read: notification.is_read,
-      created_date: notification.created_date,
-    }))
-    setNotifications(normalized)
+    try {
+      const payload = await notificationsApi.list({ limit: 200, offset: 0 })
+      const normalized = normalizeNotifications(payload).map((notification) => ({
+        id: notification.id,
+        type: mapNotificationType(notification.type),
+        title: notification.title,
+        message: notification.message,
+        is_read: notification.is_read,
+        created_date: notification.created_date,
+      }))
+      setNotifications(normalized)
+    } catch {
+      const fallbackPayload = await fetchJsonOrNull<any>("/api/notifications?limit=200&offset=0")
+      const normalized = normalizeNotifications(fallbackPayload).map((notification) => ({
+        id: notification.id,
+        type: mapNotificationType(notification.type),
+        title: notification.title,
+        message: notification.message,
+        is_read: notification.is_read,
+        created_date: notification.created_date,
+      }))
+      setNotifications(normalized)
+    }
     setIsPageLoading(false)
   }, [])
 
   useEffect(() => {
     void loadNotifications()
+  }, [loadNotifications])
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      void loadNotifications()
+    }, 10_000)
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [loadNotifications])
+
+  useEffect(() => {
+    const realtimeEventName = "ante-social:notification"
+    const handleRealtimeNotification = (event: Event) => {
+      const payload = (event as CustomEvent<{ title?: string; message?: string; type?: string }>).detail
+      if (payload?.title || payload?.message) {
+        setNotifications((prev) => [
+          {
+            id: `rt-${Date.now()}`,
+            type: mapNotificationType(payload?.type || "system"),
+            title: payload?.title || "Notification",
+            message: payload?.message || "You have a new update.",
+            is_read: false,
+            created_date: new Date().toISOString(),
+          },
+          ...prev,
+        ])
+      } else {
+        void loadNotifications()
+      }
+    }
+
+    window.addEventListener(realtimeEventName, handleRealtimeNotification as EventListener)
+    return () => {
+      window.removeEventListener(realtimeEventName, handleRealtimeNotification as EventListener)
+    }
   }, [loadNotifications])
 
   // Filter notifications
@@ -120,21 +171,21 @@ export default function NotificationsPage() {
       prev.map(n => n.id === id ? { ...n, is_read: true } : n)
     )
 
-    const response = await fetch("/api/notifications", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    })
-
-    if (!response.ok) {
+    try {
+      await notificationsApi.markRead(id)
+      if (!silent) {
+        toast.success("Marked as Read", "Notification marked as read")
+      }
+    } catch (error) {
       setNotifications(prev =>
         prev.map(n => n.id === id ? { ...n, is_read: false } : n)
       )
       if (!silent) {
-        toast.error("Update Failed", "Unable to mark notification as read")
+        toast.error(
+          "Update Failed",
+          getApiErrorMessage(error, "Unable to mark notification as read"),
+        )
       }
-    } else if (!silent) {
-      toast.success("Marked as Read", "Notification marked as read")
     }
 
     setIsMarkingRead(null)
@@ -149,17 +200,15 @@ export default function NotificationsPage() {
       prev.map(n => ({ ...n, is_read: true }))
     )
 
-    const response = await fetch("/api/notifications", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: "all" }),
-    })
-
-    if (!response.ok) {
-      setNotifications(previous)
-      toast.error("Update Failed", "Unable to mark all as read")
-    } else {
+    try {
+      await notificationsApi.markAllRead()
       toast.success("All Read", "All notifications marked as read")
+    } catch (error) {
+      setNotifications(previous)
+      toast.error(
+        "Update Failed",
+        getApiErrorMessage(error, "Unable to mark all as read"),
+      )
     }
 
     setBulkActionLoading(false)
@@ -169,12 +218,13 @@ export default function NotificationsPage() {
   const handleDelete = useCallback(async (id: string) => {
     setIsDeletingNotif(id)
 
-    const response = await fetch(`/api/notifications?id=${id}`, {
-      method: "DELETE",
-    })
-
-    if (!response.ok) {
-      toast.error("Delete Failed", "Unable to delete notification")
+    try {
+      await notificationsApi.remove(id)
+    } catch (error) {
+      toast.error(
+        "Delete Failed",
+        getApiErrorMessage(error, "Unable to delete notification"),
+      )
       setIsDeletingNotif(null)
       return
     }

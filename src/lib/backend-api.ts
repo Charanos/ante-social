@@ -270,6 +270,8 @@ export async function proxyBackendRequest({
 
 export function getSessionToken(session: unknown): string | undefined {
   if (!session || typeof session !== "object") return undefined;
-  const token = (session as { access_token?: unknown }).access_token;
+  const token =
+    (session as { access_token?: unknown }).access_token ||
+    (session as { accessToken?: unknown }).accessToken;
   return typeof token === "string" ? token : undefined;
 }

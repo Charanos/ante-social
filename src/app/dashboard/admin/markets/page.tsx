@@ -23,6 +23,8 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
 import { useMarketList } from "@/lib/live-data";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { marketsApi } from "@/lib/api";
 
 type MarketRow = {
   id: string;
@@ -45,6 +47,9 @@ export default function MarketManagerPage() {
   const [sortBy, setSortBy] = useState("newest");
   const [flaggedOnly, setFlaggedOnly] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [optimisticStatusMap, setOptimisticStatusMap] = useState<
+    Record<string, MarketRow["status"]>
+  >({});
 
   const markets = useMemo<MarketRow[]>(() => {
     return liveMarkets.map((market) => ({
@@ -60,14 +65,15 @@ export default function MarketManagerPage() {
         day: "numeric",
       }),
       status:
-        market.status === "active"
+        optimisticStatusMap[market.id] ||
+        (market.status === "active"
           ? "active"
           : market.status === "disputed"
             ? "cancelled"
-            : "closed",
+            : "closed"),
       isFlagged: market.status === "disputed",
     }));
-  }, [liveMarkets]);
+  }, [liveMarkets, optimisticStatusMap]);
 
   const filteredMarkets = useMemo(() => {
     let result = [...markets];
@@ -102,21 +108,24 @@ export default function MarketManagerPage() {
   const handleCloseMarket = useCallback(
     async (marketId: string) => {
       setActionLoadingId(marketId);
-      const response = await fetch(`/api/markets/${marketId}/close`, {
-        method: "PUT",
-      });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) {
+      setOptimisticStatusMap((prev) => ({ ...prev, [marketId]: "closed" }));
+      try {
+        await marketsApi.close(marketId);
+        await refresh();
+        toast.success("Market Closed", "The market is now closed.");
+      } catch (error) {
+        setOptimisticStatusMap((prev) => {
+          const next = { ...prev };
+          delete next[marketId];
+          return next;
+        });
         toast.error(
           "Action Failed",
-          payload?.message || payload?.error || "Unable to close market",
+          getApiErrorMessage(error, "Unable to close market"),
         );
+      } finally {
         setActionLoadingId(null);
-        return;
       }
-      await refresh();
-      toast.success("Market Closed", "The market is now closed.");
-      setActionLoadingId(null);
     },
     [refresh, toast],
   );

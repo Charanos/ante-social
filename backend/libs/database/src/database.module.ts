@@ -16,6 +16,8 @@ import { ExchangeRate, ExchangeRateSchema } from './schemas/exchange-rate.schema
 import { ActivityLog, ActivityLogSchema } from './schemas/activity-log.schema';
 import { UserRepository } from './repositories/user.repository';
 import { WalletRepository } from './repositories/wallet.repository';
+import { TransactionRepository } from './repositories/transaction.repository';
+import { MarketRepository } from './repositories/market.repository';
 
 const schemas = [
   { name: User.name, schema: UserSchema },
@@ -55,7 +57,13 @@ const schemas = [
     }),
     MongooseModule.forFeature(schemas),
   ],
-  providers: [UserRepository, WalletRepository],
-  exports: [MongooseModule, UserRepository, WalletRepository],
+  providers: [UserRepository, WalletRepository, TransactionRepository, MarketRepository],
+  exports: [
+    MongooseModule,
+    UserRepository,
+    WalletRepository,
+    TransactionRepository,
+    MarketRepository,
+  ],
 })
 export class DatabaseModule {}

@@ -7,7 +7,7 @@ import { EmailService } from './channels/email.service';
 import { InAppService } from './channels/in-app.service';
 import { FcmService } from './channels/fcm.service';
 import { APP_GUARD } from '@nestjs/core';
-import { RateLimitGuard, validateEnv } from '@app/common';
+import { KafkaRetryDlqService, RateLimitGuard, validateEnv } from '@app/common';
 
 @Module({
   imports: [
@@ -19,6 +19,7 @@ import { RateLimitGuard, validateEnv } from '@app/common';
     EmailService,
     InAppService,
     FcmService,
+    KafkaRetryDlqService,
     {
       provide: APP_GUARD,
       useClass: RateLimitGuard,

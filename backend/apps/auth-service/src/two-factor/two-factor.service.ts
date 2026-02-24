@@ -88,6 +88,37 @@ export class TwoFactorService {
     return { success: true, backupCodes: user.backupCodes };
   }
 
+  async disable(userId: string, code: string) {
+    if (!speakeasy && !authenticator) {
+      throw new BadRequestException('2FA provider is not configured');
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!user.twoFactorEnabled || !user.twoFactorSecret) {
+      throw new BadRequestException('2FA is not enabled');
+    }
+
+    const isValid = this.verifyCode(user.twoFactorSecret, code);
+    if (!isValid) {
+      const hasBackupCode = user.backupCodes.includes(code);
+      if (!hasBackupCode) {
+        throw new UnauthorizedException('Invalid 2FA code');
+      }
+      user.backupCodes = user.backupCodes.filter((backupCode) => backupCode !== code);
+    }
+
+    user.twoFactorEnabled = false;
+    user.twoFactorSecret = undefined;
+    user.backupCodes = [];
+    await user.save();
+
+    return { success: true };
+  }
+
   async validateForLogin(userId: string, code: string) {
     if (!speakeasy && !authenticator) {
       throw new UnauthorizedException('2FA provider unavailable');
@@ -106,12 +137,12 @@ export class TwoFactorService {
         // Consume backup code
         user.backupCodes = user.backupCodes.filter((c) => c !== code);
         await user.save();
-        return this.authService.login(user);
+        return this.authService.completeLogin(user);
       }
       throw new UnauthorizedException('Invalid 2FA code');
     }
 
-    return this.authService.login(user); // Issue fresh token
+    return this.authService.completeLogin(user);
   }
 
   private generateBackupCodes() {

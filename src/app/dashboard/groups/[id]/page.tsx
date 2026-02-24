@@ -44,7 +44,6 @@ import { useToast } from "@/components/ui/toast-notification";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { isGroupMember, joinGroup, leaveGroup } from "@/lib/membership";
 import Link from "next/link";
 import Image from "next/image";
 import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
@@ -695,13 +694,7 @@ export default function GroupPage() {
   const isGroupAdmin = group.creatorId === user.id;
   const canManageMembers = isPlatformAdmin || isGroupAdmin;
 
-  const [isMember, setIsMember] = useState(() => isGroupMember(groupId));
-
-  useEffect(() => {
-    if (!isJoining) {
-      setIsMember(isGroupMember(groupId));
-    }
-  }, [groupId, isJoining]);
+  const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -714,6 +707,8 @@ export default function GroupPage() {
 
       if (groupPayload) {
         const normalized = normalizeGroup(groupPayload);
+        const memberMatch = normalized.members.some((member) => member.id === user.id);
+        setIsMember(memberMatch);
         setGroup({
           id: normalized.id,
           name: normalized.name,
@@ -903,7 +898,6 @@ export default function GroupPage() {
       if (!response.ok) {
         throw new Error(payload?.message || payload?.error || "Failed to join group");
       }
-      joinGroup(groupId);
       setIsMember(true);
       toast.success("Joined Group Successfully", `Welcome to ${group.name}!`);
     } catch (error) {
@@ -923,7 +917,6 @@ export default function GroupPage() {
       if (!response.ok) {
         throw new Error(payload?.message || payload?.error || "Failed to leave group");
       }
-      leaveGroup(groupId);
       setIsMember(false);
       setShowSettingsMenu(false);
       toast.info("Group Left", "You are no longer a member of this group.");

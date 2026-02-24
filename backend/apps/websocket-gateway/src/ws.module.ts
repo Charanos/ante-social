@@ -4,14 +4,14 @@ import { WsGateway } from './ws.gateway';
 import { WsBroadcastConsumer } from './consumers/ws-broadcast.consumer';
 import { JwtModule } from '@nestjs/jwt';
 import { WsAuthGuard } from './ws.auth.guard';
-import { validateEnv } from '@app/common';
+import { KafkaRetryDlqService, validateEnv } from '@app/common';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     JwtModule.register({}),
   ],
-  providers: [WsGateway, WsAuthGuard],
+  providers: [WsGateway, WsAuthGuard, KafkaRetryDlqService],
   controllers: [WsBroadcastConsumer],
 })
 export class WsModule {}

@@ -6,6 +6,11 @@ import { lastValueFrom } from 'rxjs';
 import { MarketDocument, MarketBet, MarketBetDocument, User, UserDocument } from '@app/database';
 import { MarketType, MarketStatus, PLATFORM_FEE_RATE, REFLEX_MULTIPLIER_TIERS, KAFKA_TOPICS } from '@app/common';
 import { MarketSettledEvent } from '@app/kafka';
+import {
+  calculateIntegrityWeightedPayouts,
+  calculateProportionalPayouts,
+  isExactLadderSequence,
+} from './settlement.math';
 
 @Injectable()
 export class SettlementDispatcher {
@@ -55,15 +60,17 @@ export class SettlementDispatcher {
     const winners = bets.filter(b => b.selectedOutcomeId.toString() === winningOutcomeId.toString());
     const losers = bets.filter(b => b.selectedOutcomeId.toString() !== winningOutcomeId.toString());
     const integrityMap = await this.getIntegrityMap(winners.map((winner) => winner.userId.toString()));
-    const winnerPool = winners.reduce((sum, b) => {
-      const integrityWeight = integrityMap.get(b.userId.toString()) ?? b.integrityWeight ?? 1;
-      return sum + b.amountContributed * integrityWeight;
-    }, 0);
+    const payouts = calculateIntegrityWeightedPayouts(
+      winners.map((winner) => ({
+        id: winner.userId.toString(),
+        stake: winner.amountContributed,
+        integrityWeight: integrityMap.get(winner.userId.toString()) ?? winner.integrityWeight ?? 1,
+      })),
+      prizePool,
+    );
 
     for (const winner of winners) {
-      const integrityWeight = integrityMap.get(winner.userId.toString()) ?? winner.integrityWeight ?? 1;
-      const weightedContribution = winner.amountContributed * integrityWeight;
-      const share = winnerPool > 0 ? (weightedContribution / winnerPool) * prizePool : 0;
+      const share = payouts.get(winner.userId.toString()) ?? 0;
       winner.actualPayout = share;
       winner.isWinner = true;
       winner.payoutProcessed = true;
@@ -135,21 +142,24 @@ export class SettlementDispatcher {
     const prizePool = totalPool - platformFee;
 
     const canonicalRanking = (market.outcomes || []).map((outcome) => outcome._id.toString());
-    const winners = bets.filter((bet) => {
-      if (!bet.rankedOutcomeIds?.length || bet.rankedOutcomeIds.length !== canonicalRanking.length) {
-        return false;
-      }
-
-      return canonicalRanking.every(
-        (outcomeId, index) => bet.rankedOutcomeIds[index]?.toString() === outcomeId,
-      );
-    });
+    const winners = bets.filter((bet) =>
+      isExactLadderSequence(
+        (bet.rankedOutcomeIds || []).map((outcomeId) => outcomeId.toString()),
+        canonicalRanking,
+      ),
+    );
 
     const losers = bets.filter((bet) => !winners.some((winner) => winner._id.equals(bet._id)));
-    const winnerTotalStake = winners.reduce((sum, winner) => sum + winner.amountContributed, 0);
+    const payouts = calculateProportionalPayouts(
+      winners.map((winner) => ({
+        id: winner.userId.toString(),
+        stake: winner.amountContributed,
+      })),
+      prizePool,
+    );
 
     for (const winner of winners) {
-      const payout = winnerTotalStake > 0 ? (winner.amountContributed / winnerTotalStake) * prizePool : 0;
+      const payout = payouts.get(winner.userId.toString()) ?? 0;
       winner.actualPayout = payout;
       winner.isWinner = true;
       winner.payoutProcessed = true;
@@ -187,10 +197,16 @@ export class SettlementDispatcher {
 
     const winners = bets.filter((bet) => bet.selectedOutcomeId.toString() === betrayalOutcomeId);
     const losers = bets.filter((bet) => bet.selectedOutcomeId.toString() !== betrayalOutcomeId);
-    const winnerStake = winners.reduce((sum, winner) => sum + winner.amountContributed, 0);
+    const payouts = calculateProportionalPayouts(
+      winners.map((winner) => ({
+        id: winner.userId.toString(),
+        stake: winner.amountContributed,
+      })),
+      prizePool,
+    );
 
     for (const winner of winners) {
-      const payout = winnerStake > 0 ? (winner.amountContributed / winnerStake) * prizePool : 0;
+      const payout = payouts.get(winner.userId.toString()) ?? 0;
       winner.actualPayout = payout;
       winner.isWinner = true;
       winner.payoutProcessed = true;

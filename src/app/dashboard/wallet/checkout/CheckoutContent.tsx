@@ -21,7 +21,18 @@ import { useToast } from "@/components/ui/toast-notification";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IoPhonePortraitOutline } from "react-icons/io5";
-import { useLiveUser, useNormalizedLimits } from "@/lib/live-data";
+import {
+  emitLiveUserRefresh,
+  useLiveUser,
+  useNormalizedLimits,
+} from "@/lib/live-data";
+import { walletApi } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api/client";
+import {
+  isTrc20Address,
+  normalizeMpesaPhone,
+  validationRules,
+} from "@/lib/validation/rules";
 
 type TransactionType = "deposit" | "withdrawal";
 type PaymentMethod = "mpesa" | "usdt";
@@ -67,8 +78,27 @@ export default function CheckoutContent() {
   const [cryptoAddress, setCryptoAddress] = useState<string>("");
   const [trxHash, setTrxHash] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeTransactionId, setActiveTransactionId] = useState<string | null>(
+    null,
+  );
+  const [paymentStatus, setPaymentStatus] = useState<string>("idle");
+  const [generatedUsdtAddress, setGeneratedUsdtAddress] = useState("");
+  const [generatedUsdtAmount, setGeneratedUsdtAmount] = useState<number | null>(
+    null,
+  );
+  const [generatedPaymentId, setGeneratedPaymentId] = useState<string>("");
 
   const limits = useNormalizedLimits(user, mode);
+
+  useEffect(() => {
+    if (mode !== "deposit" || method !== "usdt") {
+      setGeneratedUsdtAddress("");
+      setGeneratedUsdtAmount(null);
+      setGeneratedPaymentId("");
+      setActiveTransactionId(null);
+      setPaymentStatus("idle");
+    }
+  }, [method, mode]);
 
   useEffect(() => {
     const typeParam = searchParams.get("type");
@@ -86,23 +116,22 @@ export default function CheckoutContent() {
   }, [amount, limits]);
 
   const isValidPhone = useMemo(() => {
-    const cleaned = phoneNumber.replace(/\s+/g, "");
-    return /^(?:254|\+254|0)?([17]\d{8})$/.test(cleaned);
+    return validationRules.phoneNumber.validate(phoneNumber) === null;
   }, [phoneNumber]);
 
   const isValidCryptoAddress = useMemo(() => {
-    return /^T[A-Za-z1-9]{33}$/.test(cryptoAddress);
+    return isTrc20Address(cryptoAddress);
   }, [cryptoAddress]);
 
   const isValidTrxHash = useMemo(() => {
+    if (!trxHash) return true;
     return trxHash.length === 64 && /^[a-fA-F0-9]+$/.test(trxHash);
   }, [trxHash]);
 
   const canSubmit = useMemo(() => {
     if (!isValidAmount) return false;
     if (method === "mpesa" && !isValidPhone) return false;
-    if (mode === "deposit" && method === "usdt" && !isValidTrxHash)
-      return false;
+    if (mode === "deposit" && method === "usdt" && !isValidTrxHash) return false;
     if (mode === "withdrawal" && method === "usdt" && !isValidCryptoAddress)
       return false;
     return true;
@@ -115,6 +144,87 @@ export default function CheckoutContent() {
     isValidCryptoAddress,
   ]);
 
+  useEffect(() => {
+    if (!activeTransactionId) return;
+
+    let stopped = false;
+    let attempts = 0;
+    const maxAttempts = 60;
+
+    const pollStatus = async () => {
+      if (stopped) return;
+      attempts += 1;
+
+      try {
+        const payload = (await walletApi.getTransactions({
+          limit: 100,
+          offset: 0,
+        })) as { data?: Array<{ _id?: string; id?: string; status?: string }> };
+
+        const transaction = (payload.data || []).find((item) => {
+          const id = String(item._id || item.id || "");
+          return id === activeTransactionId;
+        });
+
+        if (!transaction) {
+          if (attempts >= maxAttempts) {
+            setPaymentStatus("timeout");
+            setActiveTransactionId(null);
+            toast.info(
+              "Status Pending",
+              "We are still waiting for provider confirmation. Check wallet history shortly.",
+            );
+          }
+          return;
+        }
+
+        const status = String(transaction.status || "").toLowerCase();
+        setPaymentStatus(status || "pending");
+
+        if (status === "completed") {
+          stopped = true;
+          setActiveTransactionId(null);
+          emitLiveUserRefresh();
+          toast.success("Payment Confirmed", "Your wallet balance has been updated.");
+          router.push("/dashboard/wallet");
+          return;
+        }
+
+        if (status === "failed" || status === "rejected" || status === "cancelled") {
+          stopped = true;
+          setActiveTransactionId(null);
+          toast.error("Payment Failed", "The transaction did not complete.");
+          return;
+        }
+
+        if (attempts >= maxAttempts) {
+          stopped = true;
+          setActiveTransactionId(null);
+          toast.info(
+            "Still Processing",
+            "The transaction is still pending. We will update your wallet once confirmed.",
+          );
+        }
+      } catch {
+        if (attempts >= maxAttempts) {
+          stopped = true;
+          setActiveTransactionId(null);
+          toast.error("Status Check Failed", "Unable to verify payment status right now.");
+        }
+      }
+    };
+
+    void pollStatus();
+    const interval = window.setInterval(() => {
+      void pollStatus();
+    }, 3_000);
+
+    return () => {
+      stopped = true;
+      window.clearInterval(interval);
+    };
+  }, [activeTransactionId, router, toast]);
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -124,58 +234,126 @@ export default function CheckoutContent() {
       }
 
       setIsProcessing(true);
+      try {
+        const amountNumber = Number(amount);
 
-      const amountNumber = Number(amount);
-      const currency = method === "mpesa" ? "KSH" : "USD";
-      const endpoint =
-        mode === "deposit" ? "/api/wallet/deposit" : "/api/wallet/withdraw";
-      const payload =
-        mode === "deposit"
-          ? {
+        if (mode === "withdrawal") {
+          const withdrawalError = validationRules.withdrawAmount.validate(
+            amountNumber,
+            user.balance,
+            limits.max,
+          );
+          if (withdrawalError) {
+            setIsProcessing(false);
+            toast.error("Invalid Amount", withdrawalError);
+            return;
+          }
+        }
+
+        if (mode === "deposit" && method === "mpesa") {
+          const phoneError = validationRules.phoneNumber.validate(phoneNumber);
+          if (phoneError) {
+            setIsProcessing(false);
+            toast.error("Invalid Phone Number", phoneError);
+            return;
+          }
+        }
+
+        if (mode === "deposit") {
+          if (method === "mpesa") {
+            const result = (await walletApi.deposit({
               amount: amountNumber,
-              currency,
-              phoneNumber: method === "mpesa" ? phoneNumber : undefined,
+              currency: "KSH",
+              phoneNumber: normalizeMpesaPhone(phoneNumber),
+            })) as { transactionId?: string };
+
+            const transactionId = String(result?.transactionId || "");
+            if (transactionId) {
+              setActiveTransactionId(transactionId);
+              setPaymentStatus("pending");
             }
-          : {
+
+            toast.success(
+              "STK Push Sent",
+              "Check your phone and approve the payment request.",
+            );
+          } else {
+            const result = (await walletApi.deposit({
               amount: amountNumber,
-              currency,
-              phoneNumber: method === "mpesa" ? phoneNumber : undefined,
-              cryptoAddress: method === "usdt" ? cryptoAddress : undefined,
+              currency: "USD",
+              transactionHash: trxHash || undefined,
+            })) as {
+              transactionId?: string;
+              paymentId?: string;
+              payAddress?: string;
+              payAmount?: number;
+              status?: string;
             };
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const result = await response.json().catch(() => null);
-      if (!response.ok) {
-        setIsProcessing(false);
+            const transactionId = String(result?.transactionId || "");
+            if (transactionId) {
+              setActiveTransactionId(transactionId);
+            }
+            setGeneratedUsdtAddress(String(result?.payAddress || generatedUsdtAddress));
+            setGeneratedUsdtAmount(
+              Number(result?.payAmount || amountNumber || 0),
+            );
+            setGeneratedPaymentId(String(result?.paymentId || ""));
+            setPaymentStatus(String(result?.status || "pending").toLowerCase());
+
+            toast.success(
+              "USDT Deposit Created",
+              "Send funds to the generated TRC20 address. We will auto-confirm once received.",
+            );
+          }
+        } else {
+          const result = (await walletApi.withdraw({
+            amount: amountNumber,
+            currency: method === "mpesa" ? "KSH" : "USD",
+            phoneNumber: method === "mpesa" ? normalizeMpesaPhone(phoneNumber) : undefined,
+            cryptoAddress: method === "usdt" ? cryptoAddress : undefined,
+          })) as { transactionId?: string };
+
+          if (result?.transactionId) {
+            setActiveTransactionId(String(result.transactionId));
+          }
+          setPaymentStatus("pending");
+          toast.success("Withdrawal Submitted", "Request is pending approval.");
+          router.push("/dashboard/wallet");
+        }
+      } catch (error) {
         toast.error(
           "Request Failed",
-          result?.message || result?.error || "Unable to process request",
+          getApiErrorMessage(error, "Unable to process request"),
         );
-        return;
+      } finally {
+        setIsProcessing(false);
       }
-
-      setIsProcessing(false);
-      if (mode === "deposit") {
-        toast.success(
-          method === "mpesa" ? "STK Push Sent" : "Deposit Submitted",
-          method === "mpesa" ? "Check your phone" : "Deposit is now pending",
-        );
-      } else {
-        toast.success("Withdrawal Submitted", "Processing within 24 hours");
-      }
-      router.push("/dashboard/wallet");
     },
-    [amount, canSubmit, cryptoAddress, method, mode, phoneNumber, router, toast],
+    [
+      amount,
+      canSubmit,
+      cryptoAddress,
+      generatedUsdtAddress,
+      limits.max,
+      method,
+      mode,
+      phoneNumber,
+      router,
+      toast,
+      trxHash,
+      user.balance,
+    ],
   );
 
   const handleCopyAddress = useCallback(() => {
-    navigator.clipboard.writeText("TXhKz9mN2pQrB3vLx8JwYmC5nKdFsEa7Gt");
+    if (!generatedUsdtAddress) {
+      toast.info("No Address", "Create a USDT deposit first to get an address.");
+      return;
+    }
+    navigator.clipboard.writeText(generatedUsdtAddress);
     toast.success("Copied", "Address copied to clipboard");
-  }, [toast]);
+  }, [generatedUsdtAddress, toast]);
 
   return (
     <div className="space-y-6 pb-12 pl-0 md:pl-8 w-full">
@@ -456,7 +634,13 @@ export default function CheckoutContent() {
                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20">
                           <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                           <span className="text-[9px] font-medium text-blue-700 uppercase">
-                            Active
+                            {paymentStatus === "completed"
+                              ? "Confirmed"
+                              : paymentStatus === "failed"
+                                ? "Failed"
+                                : generatedUsdtAddress
+                                  ? "Pending"
+                                  : "Awaiting Create"}
                           </span>
                         </div>
                       </div>
@@ -467,7 +651,7 @@ export default function CheckoutContent() {
                         </p>
                         <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-blue-200 group">
                           <code className="flex-1 text-[13px] font-mono text-blue-900 break-all leading-tight">
-                            TXhKz9mN2pQrB3vLx8JwYmC5nKdFsEa7Gt
+                            {generatedUsdtAddress || "Generate a deposit to receive address"}
                           </code>
                           <button
                             type="button"
@@ -477,13 +661,18 @@ export default function CheckoutContent() {
                             <IconCopy className="w-4 h-4 text-blue-600" />
                           </button>
                         </div>
+                        {generatedPaymentId ? (
+                          <p className="text-[11px] text-blue-900/60 px-1 font-mono">
+                            Invoice: {generatedPaymentId}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
 
                     {/* TRX Hash Input */}
                     <div className="space-y-6">
                       <label className="text-[10px] font-medium text-black/40 uppercase tracking-widest block ml-1">
-                        Transaction ID / Hash
+                        Transaction ID / Hash (optional)
                       </label>
                       <input
                         type="text"
@@ -502,11 +691,13 @@ export default function CheckoutContent() {
                       <div className="flex items-start gap-2 px-3">
                         <IconAlertCircle className="w-3.5 h-3.5 text-blue-600/50 shrink-0 mt-0.5" />
                         <p className="text-[11px] text-black/40 leading-relaxed">
-                          Please send exactly{" "}
-                          <span className="font-medium text-blue-900/60">
-                            ${amount || "0"}
-                          </span>{" "}
-                          to the address above before pasting your hash.
+                          {generatedUsdtAddress
+                            ? `Send exactly ${
+                                generatedUsdtAmount !== null
+                                  ? generatedUsdtAmount.toFixed(6)
+                                  : Number(amount || 0).toFixed(6)
+                              } USDT to the address above. We auto-confirm payment status.`
+                            : "Submit deposit first to generate your unique USDT TRC20 address."}
                         </p>
                       </div>
                     </div>

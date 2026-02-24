@@ -1,4 +1,10 @@
-export type MarketType = 'consensus' | 'reflex' | 'ladder' | 'prisoner_dilemma' | 'syndicate';
+export type MarketType =
+  | 'consensus'
+  | 'reflex'
+  | 'ladder'
+  | 'betrayal'
+  | 'prisoner_dilemma'
+  | 'syndicate';
 
 export type MarketStatus = 'active' | 'suspended' | 'resolved' | 'disputed';
 

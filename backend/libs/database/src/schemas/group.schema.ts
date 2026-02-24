@@ -79,7 +79,6 @@ export const GroupSchema = SchemaFactory.createForClass(Group);
 
 // Indexes
 GroupSchema.index({ createdBy: 1 });
-GroupSchema.index({ inviteCode: 1 }, { unique: true, sparse: true });
 GroupSchema.index({ isPublic: 1 });
 GroupSchema.index({ 'members.userId': 1 });
 GroupSchema.index({ category: 1 });

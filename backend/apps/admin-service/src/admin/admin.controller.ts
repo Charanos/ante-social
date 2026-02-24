@@ -106,4 +106,17 @@ export class AdminController {
   ) {
     return this.adminService.getAuditLogs(Number(limit), Number(offset), action);
   }
+
+  @Get('maintenance/tasks')
+  async getMaintenanceTasks() {
+    return this.adminService.getMaintenanceTasks();
+  }
+
+  @Post('maintenance/:taskId/run')
+  async runMaintenanceTask(
+    @Param('taskId') taskId: string,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.runMaintenanceTask(taskId, admin._id.toString());
+  }
 }

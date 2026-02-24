@@ -597,7 +597,7 @@ export default function AdminPage() {
                         exit={{ opacity: 0, y: -10 }}
                         className="absolute top-full mt-2 left-0 w-48 bg-white border border-black/10 rounded-xl shadow-xl overflow-hidden z-50"
                       >
-                        {["all", "consensus", "reflex", "ladder", "prisoner_dilemma", "syndicate"].map((type) => (
+                        {["all", "consensus", "reflex", "ladder", "betrayal"].map((type) => (
                           <button
                             key={type}
                             onClick={() => {
