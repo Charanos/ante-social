@@ -276,7 +276,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-screen px-4 pt-18 pb-20 overflow-hidden text-center">
+    <section className="relative flex flex-col items-center justify-center min-h-screen px-4 md:pt-18 pt-6 md:pb-20 overflow-hidden text-center">
       {/* Enhanced Wave Background */}
       <WaveBackground />
 

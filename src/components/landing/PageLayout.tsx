@@ -30,7 +30,7 @@ export default function PageLayout({
          <WaveBackground />
       </div>
 
-      <div className="relative z-10 pt-10 md:pt-16">
+      <div className="relative z-10 pt-8 md:pt-16">
         {children}
       </div>
       
