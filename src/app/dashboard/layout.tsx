@@ -27,9 +27,9 @@ export default function DashboardLayout({
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
         <div
-          className={`p-4 pb-24 md:pb-4 transition-all duration-300 ${sidebarCollapsed ? "sm:ml-20" : "sm:ml-64"}`}
+          className={`py-4 px-1 pb-24 md:pb-4 transition-all duration-300 ${sidebarCollapsed ? "sm:ml-15" : "sm:ml-64"}`}
         >
-          <div className="mt-0 rounded-lg p-4 pl-6">{children}</div>
+          <div className="mt-0 rounded-lg pb-6 md:py-3 px-2 md:px-8">{children}</div>
         </div>
         <MobileNav user={null} />
       </div>

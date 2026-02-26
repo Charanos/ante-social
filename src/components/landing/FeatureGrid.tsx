@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { IconAccessPoint, IconArrowRight, IconCurrencyDollar, IconShield, IconTarget, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import { useLandingContent } from "@/lib/live-data";
 
 
 import type { IconType } from "react-icons";
@@ -156,6 +157,16 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
 }
 
 export function FeatureGrid() {
+  const { content } = useLandingContent();
+  const featuresContent = content?.features || {};
+  
+  const displayFeatures = (featuresContent.items as any[])?.length > 0 
+    ? (featuresContent.items as any[]).map(f => ({
+        ...f,
+        icon: (IconTrendingUp as any) // Icons are tricky in JSON, defaulting for now or could map strings
+      }))
+    : features;
+
   return (
     <section
       id="features"
@@ -186,7 +197,7 @@ export function FeatureGrid() {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-6xl font-medium tracking-tight text-black leading-[1.1]"
           >
-            The market for outcomes.
+            {featuresContent.title || "The market for outcomes."}
           </motion.h2>
 
           <motion.p
@@ -196,15 +207,14 @@ export function FeatureGrid() {
             transition={{ delay: 0.2 }}
             className="text-lg text-black/80 font-medium leading-relaxed"
           >
-            Powerful tools designed for the Kenyan market. M-Pesa ready, crypto
-            enabled, socially driven.
+            {featuresContent.description || "Powerful tools designed for the Kenyan market. M-Pesa ready, crypto enabled, socially driven."}
           </motion.p>
         </div>
 
         {/* 12-Column Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {features.map((feature, index) => (
-            <FeatureCard key={feature.title} feature={feature} index={index} />
+          {displayFeatures.map((feature, index) => (
+            <FeatureCard key={feature.title} feature={feature as any} index={index} />
           ))}
         </div>
 

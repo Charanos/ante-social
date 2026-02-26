@@ -7,6 +7,7 @@ import { CurrencySection } from "@/components/landing/CurrencySection";
 import { HallOfFameSection } from "@/components/landing/HallOfFameSection";
 import { PageHeader } from "@/components/landing/PageHeader";
 import { Testimonials } from "@/components/landing/Testimonials";
+import { BlogSection } from "@/components/landing/BlogSection";
 import { Footer } from "@/components/landing/Footer";
 import { WaveBackground } from "@/components/landing/WaveBackground";
 
@@ -64,6 +65,11 @@ export default function LandingPage() {
       <div className="relative">
         <WaveBackground variant="top" className="text-black/5" />
         <Testimonials />
+      </div>
+
+      <div className="relative">
+        <WaveBackground variant="bottom" className="text-black/5" />
+        <BlogSection />
       </div>
 
       <Footer />

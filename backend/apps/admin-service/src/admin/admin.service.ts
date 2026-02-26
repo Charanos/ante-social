@@ -24,6 +24,12 @@ import {
   FlagReason,
   RecurringMarketTemplate,
   RecurringMarketTemplateDocument,
+  Blog,
+  BlogDocument,
+  NewsletterSubscriber,
+  NewsletterSubscriberDocument,
+  LandingPage,
+  LandingPageDocument,
 } from '@app/database';
 import { TransactionType, TransactionStatus, KAFKA_TOPICS } from '@app/common';
 import { ClientKafka, ClientProxy } from '@nestjs/microservices';
@@ -97,6 +103,10 @@ export class AdminService {
     @InjectModel(AuditLog.name) private auditLogModel: Model<AuditLogDocument>,
     @InjectModel(RecurringMarketTemplate.name)
     private recurringMarketTemplateModel: Model<RecurringMarketTemplateDocument>,
+    @InjectModel(Blog.name) private blogModel: Model<BlogDocument>,
+    @InjectModel(NewsletterSubscriber.name)
+    private newsletterSubscriberModel: Model<NewsletterSubscriberDocument>,
+    @InjectModel(LandingPage.name) private landingPageModel: Model<LandingPageDocument>,
     @Inject('KAFKA_SERVICE') private readonly kafkaClient: ClientKafka,
     @Inject('WALLET_SERVICE') private readonly walletClient: ClientProxy,
   ) {}
@@ -1141,5 +1151,205 @@ export class AdminService {
       return undefined;
     }
     return new Types.ObjectId(value);
+  }
+
+  // ─── Blog CRUD ──────────────────────────────────────
+  async getBlogs(limit = 20, offset = 0, status?: string) {
+    const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 200);
+    const safeOffset = Math.max(Number(offset) || 0, 0);
+    const filter: Record<string, any> = {};
+    if (status) filter.status = status;
+
+    const [blogs, total] = await Promise.all([
+      this.blogModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(safeOffset)
+        .limit(safeLimit)
+        .lean()
+        .exec(),
+      this.blogModel.countDocuments(filter),
+    ]);
+
+    return { data: blogs, meta: { total, limit: safeLimit, offset: safeOffset } };
+  }
+
+  async getBlogById(blogId: string) {
+    const blog = await this.blogModel.findById(blogId).lean().exec();
+    if (!blog) throw new NotFoundException('Blog not found');
+    return blog;
+  }
+
+  async getBlogBySlug(slug: string) {
+    const blog = await this.blogModel.findOne({ slug }).lean().exec();
+    if (!blog) throw new NotFoundException('Blog not found');
+    return blog;
+  }
+
+  async createBlog(payload: Record<string, any>, adminId: string) {
+    const title = String(payload.title || '').trim();
+    if (!title) throw new BadRequestException('Title is required');
+
+    const slug = payload.slug
+      ? String(payload.slug).trim().toLowerCase().replace(/[^a-z0-9-]/g, '-')
+      : title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const existing = await this.blogModel.findOne({ slug }).exec();
+    if (existing) throw new BadRequestException('A blog with this slug already exists');
+
+    const status = payload.status || 'draft';
+    const blog = new this.blogModel({
+      title,
+      slug,
+      content: String(payload.content || ''),
+      excerpt: String(payload.excerpt || '').trim(),
+      coverImage: payload.coverImage || undefined,
+      author: String(payload.author || '').trim(),
+      tags: Array.isArray(payload.tags)
+        ? payload.tags.map((t: unknown) => String(t || '').trim()).filter(Boolean)
+        : [],
+      status,
+      publishedAt: status === 'published' ? new Date() : undefined,
+    });
+
+    await blog.save();
+    await this.logAudit('CREATE_BLOG', blog._id.toString(), { adminId, entityType: 'blog' });
+    return blog;
+  }
+
+  async updateBlog(blogId: string, updates: Record<string, any>, adminId: string) {
+    const blog = await this.blogModel.findById(blogId).exec();
+    if (!blog) throw new NotFoundException('Blog not found');
+
+    if (updates.title !== undefined) blog.title = String(updates.title).trim();
+    if (updates.slug !== undefined)
+      blog.slug = String(updates.slug).trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    if (updates.content !== undefined) blog.content = String(updates.content);
+    if (updates.excerpt !== undefined) blog.excerpt = String(updates.excerpt).trim();
+    if (updates.coverImage !== undefined) blog.coverImage = updates.coverImage || undefined;
+    if (updates.author !== undefined) blog.author = String(updates.author).trim();
+    if (updates.tags !== undefined)
+      blog.tags = Array.isArray(updates.tags)
+        ? updates.tags.map((t: unknown) => String(t || '').trim()).filter(Boolean)
+        : [];
+    if (updates.status !== undefined) {
+      blog.status = updates.status;
+      if (updates.status === 'published' && !blog.publishedAt) {
+        blog.publishedAt = new Date();
+      }
+    }
+
+    await blog.save();
+    await this.logAudit('UPDATE_BLOG', blogId, { adminId, entityType: 'blog' });
+    return blog;
+  }
+
+  async deleteBlog(blogId: string, adminId: string) {
+    const deleted = await this.blogModel.findByIdAndDelete(blogId).exec();
+    if (!deleted) throw new NotFoundException('Blog not found');
+
+    await this.logAudit('DELETE_BLOG', blogId, { adminId, entityType: 'blog' });
+    return { success: true, id: blogId };
+  }
+
+  // ─── Newsletter ──────────────────────────────────────
+  async subscribeNewsletter(email: string) {
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      throw new BadRequestException('Valid email is required');
+    }
+
+    const existing = await this.newsletterSubscriberModel.findOne({ email: trimmedEmail }).exec();
+    if (existing) {
+      if (existing.status === 'unsubscribed') {
+        existing.status = 'active';
+        await existing.save();
+        return { success: true, message: 'Re-subscribed successfully' };
+      }
+      return { success: true, message: 'Already subscribed' };
+    }
+
+    const subscriber = new this.newsletterSubscriberModel({
+      email: trimmedEmail,
+      status: 'active',
+      subscribedAt: new Date(),
+    });
+    await subscriber.save();
+    return { success: true, message: 'Subscribed successfully' };
+  }
+
+  async getNewsletterSubscribers(limit = 20, offset = 0) {
+    const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 200);
+    const safeOffset = Math.max(Number(offset) || 0, 0);
+
+    const [subscribers, total] = await Promise.all([
+      this.newsletterSubscriberModel
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(safeOffset)
+        .limit(safeLimit)
+        .lean()
+        .exec(),
+      this.newsletterSubscriberModel.countDocuments(),
+    ]);
+
+    return { data: subscribers, meta: { total, limit: safeLimit, offset: safeOffset } };
+  }
+
+  // ─── Landing Page CMS ────────────────────────────────
+  async getLandingPageSettings() {
+    let settings = await this.landingPageModel.findOne({ key: 'default' }).lean().exec();
+    if (!settings) {
+      // Return sensible defaults
+      return {
+        key: 'default',
+        hero: {},
+        features: {},
+        gameModes: {},
+        testimonials: {},
+        hallOfFame: {},
+        currency: {},
+        socialProofStats: {},
+      };
+    }
+    return settings;
+  }
+
+  async updateLandingPageSettings(updates: Record<string, any>, adminId: string) {
+    const allowed = ['hero', 'features', 'gameModes', 'testimonials', 'hallOfFame', 'currency', 'socialProofStats'];
+    const $set: Record<string, any> = {};
+    for (const key of allowed) {
+      if (updates[key] !== undefined) {
+        $set[key] = updates[key];
+      }
+    }
+
+    const settings = await this.landingPageModel.findOneAndUpdate(
+      { key: 'default' },
+      { $set },
+      { new: true, upsert: true },
+    ).exec();
+
+    await this.logAudit('UPDATE_LANDING_PAGE', 'landing-page', {
+      adminId,
+      entityType: 'content',
+      updatedSections: Object.keys($set),
+    });
+
+    return settings;
+  }
+
+  // ─── Leaderboard ─────────────────────────────────────
+  async getLeaderboard(limit = 10) {
+    const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 50);
+    const users = await this.userModel
+      .find({ isBanned: { $ne: true } })
+      .select('username fullName avatarUrl reputationScore positionsWon positionsLost tier')
+      .sort({ reputationScore: -1 })
+      .limit(safeLimit)
+      .lean()
+      .exec();
+
+    return { data: users };
   }
 }

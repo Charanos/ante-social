@@ -614,3 +614,22 @@ export function useNormalizedLimits(user: LiveUser, mode: "deposit" | "withdrawa
     return { min: 10, max: isHighTier ? 1000 : 250 };
   }, [mode, user.tier]);
 }
+
+export function useLandingContent() {
+  const [content, setContent] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    setIsLoading(true);
+    const payload = await fetchJsonOrNull<any>("/api/public/content/landing-page");
+    setContent(payload);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    void refresh();
+  }, [refresh]);
+
+  return { content, isLoading, refresh };
+}

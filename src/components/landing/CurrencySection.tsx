@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import { IoWalletOutline } from 'react-icons/io5';
-import { IconArrowDownRight, IconArrowUpRight, IconCurrencyDollar } from '@tabler/icons-react';;
-
-
-
+import { IconArrowDownRight, IconArrowUpRight, IconCurrencyDollar } from '@tabler/icons-react';
+import { useLandingContent } from "@/lib/live-data";
 export function CurrencySection() {
+  const { content } = useLandingContent();
+  const currencyContent = content?.currency || {};
+
   return (
     <section className="py-32 px-6 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
@@ -20,18 +21,15 @@ export function CurrencySection() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 border border-neutral-200 text-sm font-medium text-black">
               <IoWalletOutline className="w-4 h-4" />
-              <span>Real Money Markets</span>
+              <span>{currencyContent.badge || "Real Money Markets"}</span>
             </div>
 
             <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-black leading-[1.1]">
-              Predict outcomes. <br />
-              <span className="text-neutral-500">Win real rewards.</span>
+              {currencyContent.title || <>Predict outcomes. <br /><span className="text-neutral-500">Win real rewards.</span></>}
             </h2>
 
             <p className="text-xl text-neutral-600 leading-relaxed max-w-xl font-medium">
-              Ante Social is a social predictive market for the Kenyan market
-              featuring real money markets with USD and KSH. Secure deposits via
-              M-Pesa and crypto, with transparent tier-based limits.
+              {currencyContent.description || "Ante Social is a social predictive market for the Kenyan market featuring real money markets with USD and KSH. Secure deposits via M-Pesa and crypto, with transparent tier-based limits."}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">

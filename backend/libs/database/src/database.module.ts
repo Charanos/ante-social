@@ -18,6 +18,9 @@ import {
   RecurringMarketTemplate,
   RecurringMarketTemplateSchema,
 } from './schemas/recurring-market-template.schema';
+import { Blog, BlogSchema } from './schemas/blog.schema';
+import { NewsletterSubscriber, NewsletterSubscriberSchema } from './schemas/newsletter-subscriber.schema';
+import { LandingPage, LandingPageSchema } from './schemas/landing-page.schema';
 import { UserRepository } from './repositories/user.repository';
 import { WalletRepository } from './repositories/wallet.repository';
 import { TransactionRepository } from './repositories/transaction.repository';
@@ -38,6 +41,9 @@ const schemas = [
   { name: ExchangeRate.name, schema: ExchangeRateSchema },
   { name: ActivityLog.name, schema: ActivityLogSchema },
   { name: RecurringMarketTemplate.name, schema: RecurringMarketTemplateSchema },
+  { name: Blog.name, schema: BlogSchema },
+  { name: NewsletterSubscriber.name, schema: NewsletterSubscriberSchema },
+  { name: LandingPage.name, schema: LandingPageSchema },
 ];
 
 @Global()

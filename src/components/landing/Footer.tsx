@@ -12,7 +12,7 @@ import {
   IconPhoto,
 } from "@tabler/icons-react";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 // Wave Background Component (without particles)
@@ -158,6 +158,34 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterStatus, setNewsletterStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!newsletterEmail.trim() || !newsletterEmail.includes("@")) return;
+    setNewsletterStatus("loading");
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setNewsletterStatus("success");
+        setNewsletterMessage(data.message || "Subscribed!");
+        setNewsletterEmail("");
+      } else {
+        setNewsletterStatus("error");
+        setNewsletterMessage(data.message || "Failed to subscribe");
+      }
+    } catch {
+      setNewsletterStatus("error");
+      setNewsletterMessage("Something went wrong. Try again.");
+    }
+  };
+
   return (
     <footer className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-neutral-50/30 to-white border-t border-black/5 overflow-hidden">
       {/* Wave Background */}
@@ -225,22 +253,34 @@ export function Footer() {
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={newsletterEmail}
+                onChange={(e) => { setNewsletterEmail(e.target.value); setNewsletterStatus("idle"); }}
                 className="flex-1 px-4 py-3 rounded-xl bg-white/40 backdrop-blur-sm border border-black/5 focus:border-black/20 focus:bg-white/60 outline-none transition-all text-sm font-medium text-black/90 placeholder:text-black/40"
               />
               <motion.button
-                className="px-6 py-3 bg-black text-white rounded-xl font-semibold text-sm hover:bg-black/90 transition-colors flex items-center gap-2"
+                onClick={() => void handleSubscribe()}
+                disabled={newsletterStatus === "loading"}
+                className="px-6 py-3 bg-black text-white rounded-xl font-semibold text-sm hover:bg-black/90 transition-colors flex items-center gap-2 disabled:opacity-60"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Subscribe
+                {newsletterStatus === "loading" ? "…" : "Subscribe"}
                 <IconArrowUpRight className="w-4 h-4" />
               </motion.button>
             </div>
 
-            <p className="text-xs text-black/40 font-medium">
-              By subscribing, you agree to our Privacy Policy and consent to
-              receive updates.
-            </p>
+            {newsletterStatus === "success" && (
+              <p className="text-xs text-green-600 font-medium">{newsletterMessage}</p>
+            )}
+            {newsletterStatus === "error" && (
+              <p className="text-xs text-red-500 font-medium">{newsletterMessage}</p>
+            )}
+            {newsletterStatus === "idle" && (
+              <p className="text-xs text-black/40 font-medium">
+                By subscribing, you agree to our Privacy Policy and consent to
+                receive updates.
+              </p>
+            )}
           </div>
         </div>
 

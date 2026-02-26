@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   IconAward,
@@ -25,60 +25,70 @@ import Marquee from "react-fast-marquee";
 import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { UserAvatar } from "@/components/ui/UserAvatar";
-import { useLiveUser, useMarketList } from "@/lib/live-data";
+import { fetchJsonOrNull, useLiveUser, useMarketList } from "@/lib/live-data";
 
-const liveWins = [
-  {
-    id: 1,
-    name: "CryptoKing",
-    game: "Bitcoin Binary",
-    amount: "12,450",
-    currency: "KSH",
-    avatar: "CK",
-  },
-  {
-    id: 2,
-    name: "LuckyStrike",
-    game: "Super Bowl",
-    amount: "9,800",
-    currency: "KSH",
-    avatar: "LS",
-  },
-  {
-    id: 3,
-    name: "VibeCheck",
-    game: "Vibe Poll",
-    amount: "7,500",
-    currency: "KSH",
-    avatar: "VC",
-  },
-  {
-    id: 4,
-    name: "MoonBoy",
-    game: "Solana Pump",
-    amount: "24,000",
-    currency: "KSH",
-    avatar: "MB",
-  },
-  {
-    id: 5,
-    name: "RiskTaker",
-    game: "Ladder Bet",
-    amount: "5,000",
-    currency: "KSH",
-    avatar: "RT",
-  },
-  {
-    id: 6,
-    name: "BetMaster",
-    game: "Reflex Test",
-    amount: "15,200",
-    currency: "KSH",
-    avatar: "BM",
-  },
-];
+const LIVE_WIN_EVENT = "ante-social:bet-settled";
+const MAX_LIVE_WINS = 20;
 
-function LiveWinCard({ win }: any) {
+type LiveWin = {
+  id: string;
+  name: string;
+  game: string;
+  amount: string;
+  currency: string;
+};
+
+function useLiveWins() {
+  const [wins, setWins] = useState<LiveWin[]>([]);
+
+  // Seed with recent settlements from the leaderboard / recent-wins endpoint
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const payload = await fetchJsonOrNull<any>("/api/public/leaderboard?limit=10");
+      if (cancelled) return;
+      const items = Array.isArray(payload?.data) ? payload.data : Array.isArray(payload) ? payload : [];
+      const seeded: LiveWin[] = items
+        .filter((item: any) => item && (item.totalWinnings || item.winnings))
+        .slice(0, MAX_LIVE_WINS)
+        .map((item: any, idx: number) => ({
+          id: String(item._id || item.id || idx),
+          name: String(item.username || item.name || "Player"),
+          game: String(item.marketTitle || item.game || "Market"),
+          amount: Number(item.totalWinnings || item.winnings || 0).toLocaleString(),
+          currency: "KSH",
+        }));
+      if (seeded.length > 0) {
+        setWins(seeded);
+      }
+    };
+    void load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Listen for real-time settlement events from RealtimeBridge
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      if (!detail) return;
+      const win: LiveWin = {
+        id: String(detail.positionId || detail.id || Date.now()),
+        name: String(detail.username || detail.user || "Player"),
+        game: String(detail.marketTitle || detail.title || "Market"),
+        amount: Number(detail.payout || detail.amount || 0).toLocaleString(),
+        currency: "KSH",
+      };
+      setWins((prev) => [win, ...prev].slice(0, MAX_LIVE_WINS));
+    };
+    window.addEventListener(LIVE_WIN_EVENT, handler);
+    return () => window.removeEventListener(LIVE_WIN_EVENT, handler);
+  }, []);
+
+  return wins;
+}
+
+function LiveWinCard({ win }: { win: LiveWin }) {
   return (
     <div className="w-60 shrink-0 px-2">
       <div className="flex items-center gap-3 px-4 py-3 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-md transition-all cursor-pointer group">
@@ -110,6 +120,7 @@ function LiveWinCard({ win }: any) {
 export default function DashboardPage() {
   const { user } = useLiveUser();
   const { markets, isLoading } = useMarketList();
+  const liveWins = useLiveWins();
   const [isReadMeOpen, setIsReadMeOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Markets");
   const [currentPage, setCurrentPage] = useState(1);
@@ -210,27 +221,31 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      <SectionHeading
-        title="Live Wins"
-        className="my-16 md:my-18"
-        icon={<IconEyeDollar className="w-4 h-4 text-orange-500" />}
-      />
+      {liveWins.length > 0 && (
+        <>
+          <SectionHeading
+            title="Live Wins"
+            className="my-16 md:my-18"
+            icon={<IconEyeDollar className="w-4 h-4 text-orange-500" />}
+          />
 
-      <div className="relative w-full overflow-hidden bg-white/30 backdrop-blur-sm border border-black/5 rounded-2xl py-4 -mx-2 md:mx-0 w-[calc(100%+16px)] md:w-full">
-        <div className="absolute left-0 top-0 bottom-0 w-8 md:w-24 bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 md:w-24 bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
+          <div className="relative w-full overflow-hidden bg-white/30 backdrop-blur-sm border border-black/5 rounded-2xl py-4 -mx-2 md:mx-0 w-[calc(100%+16px)] md:w-full">
+            <div className="absolute left-0 top-0 bottom-0 w-8 md:w-24 bg-linear-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 md:w-24 bg-linear-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
 
-        <Marquee
-          gradient={false}
-          speed={40}
-          pauseOnHover={true}
-          autoFill={true}
-        >
-          {liveWins.map((win, index) => (
-            <LiveWinCard key={`${win.id}-${index}`} win={win} />
-          ))}
-        </Marquee>
-      </div>
+            <Marquee
+              gradient={false}
+              speed={40}
+              pauseOnHover={true}
+              autoFill={true}
+            >
+              {liveWins.map((win, index) => (
+                <LiveWinCard key={`${win.id}-${index}`} win={win} />
+              ))}
+            </Marquee>
+          </div>
+        </>
+      )}
 
       <LeaderboardSection />
 

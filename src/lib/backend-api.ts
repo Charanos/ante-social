@@ -104,9 +104,14 @@ function buildTargetCandidates(path: string): Target[] {
   }
 
   if (adminServiceUrl) {
-    const directPath = rewritePath(path, "/api/v1/admin", "/admin");
-    if (directPath !== path) {
-      targets.push({ baseUrl: normalizeBaseUrl(adminServiceUrl), path: directPath });
+    let directPath = path;
+    const adminRewrite = rewritePath(directPath, "/api/v1/admin", "/admin");
+    if (adminRewrite !== directPath) {
+      targets.push({ baseUrl: normalizeBaseUrl(adminServiceUrl), path: adminRewrite });
+    }
+    const publicRewrite = rewritePath(directPath, "/api/v1/public", "/public");
+    if (publicRewrite !== directPath) {
+      targets.push({ baseUrl: normalizeBaseUrl(adminServiceUrl), path: publicRewrite });
     }
   }
 

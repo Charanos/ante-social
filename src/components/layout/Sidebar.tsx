@@ -74,7 +74,19 @@ const navItems: NavItem[] = [
     icon: IconBell,
   },
   { title: "Profile", url: "/dashboard/profile", icon: IconUserCircle },
-  { title: "Admin", url: "/dashboard/admin", icon: IconShieldLock },
+  {
+    title: "Admin",
+    url: "/dashboard/admin",
+    icon: IconShieldLock,
+    children: [
+      { title: "Overview", url: "/dashboard/admin" },
+      { title: "Markets", url: "/dashboard/admin/markets" },
+      { title: "Users", url: "/dashboard/admin/users" },
+      { title: "Blog Posts", url: "/dashboard/admin/blogs" },
+      { title: "Landing Page CMS", url: "/dashboard/admin/content/landing-page" },
+      { title: "Newsletter", url: "/dashboard/admin/newsletter" },
+    ],
+  },
 ];
 
 interface SidebarProps {

@@ -12,6 +12,7 @@ import {
 } from "@tabler/icons-react";
 import router from "next/router";
 import Link from "next/link";
+import { useLandingContent } from "@/lib/live-data";
 
 // Enhanced Wave Background with smoother animations
 function WaveBackground() {
@@ -244,6 +245,9 @@ function FloatingStats() {
 }
 
 export function Hero() {
+  const { content } = useLandingContent();
+  const heroContent = content?.hero || {};
+
   const [mounted, setMounted] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -338,17 +342,23 @@ export function Hero() {
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
         >
-          Monetize your {" "} 
-          <span className="relative inline-block">
-            {" "} conviction
-            <motion.span
-              className="absolute -bottom-2 left-0 right-0 h-1 bg-black/10 rounded-full"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
-              style={{ transformOrigin: "left" }}
-            />
-          </span>
+          {heroContent.title ? (
+            heroContent.title
+          ) : (
+            <>
+              Monetize your {" "} 
+              <span className="relative inline-block">
+                {" "} conviction
+                <motion.span
+                  className="absolute -bottom-2 left-0 right-0 h-1 bg-black/10 rounded-full"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+                  style={{ transformOrigin: "left" }}
+                />
+              </span>
+            </>
+          )}
         </motion.h1>
 
         <motion.p
@@ -357,9 +367,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
         >
-          The first predictive market built on social trust. Turn your instinct
-          into a signal asset. Track your accuracy, climb the leaderboard, and
-          master the signal economy.
+          {heroContent.subtitle || "The first predictive market built on social trust. Turn your instinct into a signal asset. Track your accuracy, climb the leaderboard, and master the signal economy."}
         </motion.p>
 
         <motion.div
@@ -368,7 +376,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
         >
-          <Link href="/register"
+          <Link href={heroContent.ctaLink || "/register"}
             className="group relative inline-flex items-center gap-2 px-8 py-2 text-lg font-normal text-white bg-black cursor-pointer rounded-full overflow-hidden shadow-lg hover:bg-black/80 hover:scale-105 transition-all duration-300"
           >
             <motion.div
@@ -377,15 +385,15 @@ export function Hero() {
               whileHover={{ x: "100%" }}
               transition={{ duration: 0.6 }}
             />
-            <span className="relative z-10">Open Position</span>
+            <span className="relative z-10">{heroContent.ctaText || "Open Position"}</span>
             <IconArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
           </Link>
 
           <Link
-            href="/product/game-modes"
+            href={heroContent.secondaryCtaLink || "/product/game-modes"}
             className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full cursor-pointer hover:bg-black/5 hover:scale-105 transition-all duration-300"
           >
-            Explore Markets
+            {heroContent.secondaryCtaText || "Explore Markets"}
           </Link>
         </motion.div>
 

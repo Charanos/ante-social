@@ -212,4 +212,104 @@ export class AdminController {
   ) {
     return this.adminService.runMaintenanceTask(taskId, admin._id.toString());
   }
+
+  // ─── Blog CRUD ─────────────────────────────────────
+  @Get('blogs')
+  async getBlogs(
+    @Query('limit') limit = 20,
+    @Query('offset') offset = 0,
+    @Query('status') status?: string,
+  ) {
+    return this.adminService.getBlogs(Number(limit), Number(offset), status);
+  }
+
+  @Get('blogs/:id')
+  async getBlogById(@Param('id') id: string) {
+    return this.adminService.getBlogById(id);
+  }
+
+  @Post('blogs')
+  async createBlog(
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.createBlog(body, admin._id.toString());
+  }
+
+  @Patch('blogs/:id')
+  async updateBlog(
+    @Param('id') id: string,
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.updateBlog(id, body, admin._id.toString());
+  }
+
+  @Delete('blogs/:id')
+  async deleteBlog(@Param('id') id: string, @CurrentUser() admin: UserDocument) {
+    return this.adminService.deleteBlog(id, admin._id.toString());
+  }
+
+  // ─── Newsletter ────────────────────────────────────
+  @Get('newsletter/subscribers')
+  async getNewsletterSubscribers(
+    @Query('limit') limit = 20,
+    @Query('offset') offset = 0,
+  ) {
+    return this.adminService.getNewsletterSubscribers(Number(limit), Number(offset));
+  }
+
+  // ─── Landing Page CMS ─────────────────────────────
+  @Get('content/landing-page')
+  async getLandingPageSettings() {
+    return this.adminService.getLandingPageSettings();
+  }
+
+  @Patch('content/landing-page')
+  async updateLandingPageSettings(
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.updateLandingPageSettings(body, admin._id.toString());
+  }
+
+  // ─── Leaderboard (public via admin-service) ────────
+  @Get('leaderboard')
+  async getLeaderboard(@Query('limit') limit = 10) {
+    return this.adminService.getLeaderboard(Number(limit));
+  }
+}
+
+// ─── Public Controller (no auth guards) ──────────────
+@Controller('public')
+export class PublicController {
+  constructor(private readonly adminService: AdminService) {}
+
+  @Post('newsletter/subscribe')
+  async subscribeNewsletter(@Body('email') email: string) {
+    return this.adminService.subscribeNewsletter(email);
+  }
+
+  @Get('content/landing-page')
+  async getLandingPageSettings() {
+    return this.adminService.getLandingPageSettings();
+  }
+
+  @Get('leaderboard')
+  async getLeaderboard(@Query('limit') limit = 10) {
+    return this.adminService.getLeaderboard(Number(limit));
+  }
+
+  @Get('blogs')
+  async getPublishedBlogs(
+    @Query('limit') limit = 20,
+    @Query('offset') offset = 0,
+  ) {
+    return this.adminService.getBlogs(Number(limit), Number(offset), 'published');
+  }
+
+  @Get('blogs/:slug')
+  async getBlogBySlug(@Param('slug') slug: string) {
+    return this.adminService.getBlogBySlug(slug);
+  }
 }

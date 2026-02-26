@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { IconAccessPoint, IconAlertCircle, IconArrowRight, IconAward, IconLayersOff, IconLayoutGrid, IconUsers } from '@tabler/icons-react';
+import { useLandingContent } from "@/lib/live-data";
 
 import { useState } from "react";
 
@@ -81,8 +82,18 @@ const gameModes = [
 ];
 
 export function GameModes() {
+  const { content } = useLandingContent();
+  const gameModesContent = content?.gameModes || {};
+  
+  const displayModes = (gameModesContent.modes as any[])?.length > 0
+    ? (gameModesContent.modes as any[]).map(m => ({
+        ...m,
+        icon: (gameModes.find(gm => gm.id === m.id)?.icon || IconUsers)
+      }))
+    : gameModes;
+
   const [activeMode, setActiveMode] = useState(0);
-  const currentMode = gameModes[activeMode];
+  const currentMode = displayModes[activeMode] || displayModes[0];
 
   return (
     <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-neutral-50/50 via-white to-neutral-50/50 overflow-hidden">
@@ -99,11 +110,10 @@ export function GameModes() {
           className="mb-16 md:mb-20 text-center space-y-4"
         >
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
-            Choose Your Arena
+            {gameModesContent.title || "Choose Your Arena"}
           </h2>
           <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
-            Six unique market types. Each one a different way to outsmart
-            the crowd.
+            {gameModesContent.description || "Six unique market types. Each one a different way to outsmart the crowd."}
           </p>
         </motion.div>
 
@@ -111,7 +121,7 @@ export function GameModes() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Left: Navigation IconMenu */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            {gameModes.map((mode, index) => (
+            {displayModes.map((mode, index) => (
               <motion.button
                 key={mode.id}
                 onClick={() => setActiveMode(index)}
@@ -233,7 +243,7 @@ export function GameModes() {
                     transition={{ delay: 0.3 }}
                     className="flex flex-wrap gap-2"
                   >
-                    {currentMode.mechanics.map((mechanic, idx) => (
+                    {currentMode.mechanics.map((mechanic: string, idx: number) => (
                       <div
                         key={idx}
                         className="flex items-center gap-2 px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-black/5 rounded-full"

@@ -21,6 +21,9 @@ export {
   RecurringMarketTemplateSchema,
   RecurringMarketTemplateDocument,
 } from './schemas/recurring-market-template.schema';
+export { Blog, BlogSchema, BlogDocument } from './schemas/blog.schema';
+export { NewsletterSubscriber, NewsletterSubscriberSchema, NewsletterSubscriberDocument } from './schemas/newsletter-subscriber.schema';
+export { LandingPage, LandingPageSchema, LandingPageDocument } from './schemas/landing-page.schema';
 
 // Repositories
 export * from './repositories';

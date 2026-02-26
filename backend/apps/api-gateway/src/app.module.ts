@@ -132,9 +132,15 @@ export class AppModule implements NestModule {
             proxyReq: fixRequestBody as any,
             error: handleProxyError as any,
           },
-          pathRewrite: { '^/api/v1/admin': '/admin' },
+          pathRewrite: {
+            '^/api/v1/admin': '/admin',
+            '^/api/v1/public': '/public',
+          },
         }),
       )
-      .forRoutes({ path: 'api/v1/admin*', method: RequestMethod.ALL });
+      .forRoutes(
+        { path: 'api/v1/admin*', method: RequestMethod.ALL },
+        { path: 'api/v1/public*', method: RequestMethod.ALL },
+      );
   }
 }

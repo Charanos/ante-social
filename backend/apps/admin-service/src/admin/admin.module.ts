@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { AdminController } from './admin.controller';
+import { AdminController, PublicController } from './admin.controller';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { ComplianceService } from '../compliance/compliance.service';
 import { DatabaseModule } from '@app/database';
@@ -27,7 +27,7 @@ import { ConfigService } from '@nestjs/config';
       },
     ]),
   ],
-  controllers: [AdminController],
+  controllers: [AdminController, PublicController],
   providers: [AdminService, AnalyticsService, ComplianceService],
 })
 export class AdminModule {}

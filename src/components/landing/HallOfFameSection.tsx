@@ -6,8 +6,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
-const leaders = [
+type LeaderboardUser = {
+  _id: string;
+  username?: string;
+  fullName?: string;
+  avatarUrl?: string;
+  reputationScore?: number;
+  positionsWon?: number;
+  positionsLost?: number;
+  tier?: string;
+};
+
+type LeaderboardResponse = {
+  data?: LeaderboardUser[];
+};
+
+const fallbackLeaders = [
   {
     rank: 1,
     name: "CryptoKing_KE",
@@ -50,12 +66,38 @@ const leaders = [
   },
 ];
 
+function toLeaderEntry(user: LeaderboardUser, rank: number) {
+  const totalBets = (user.positionsWon || 0) + (user.positionsLost || 0);
+  const winRate = totalBets > 0 ? Math.round(((user.positionsWon || 0) / totalBets) * 100) : 0;
+  return {
+    rank,
+    name: user.username || user.fullName || "Unknown",
+    winRate: `${winRate}%`,
+    profit: `+${((user.reputationScore || 0) / 1000).toFixed(0)}K AP`,
+    avatar: user.avatarUrl || "",
+  };
+}
+
 interface HallOfFameSectionProps {
   className?: string;
 }
 
 export function HallOfFameSection({ className }: HallOfFameSectionProps) {
   const [timeframe, setTimeframe] = useState<"weekly" | "all-time">("weekly");
+
+  const { data: leaderboardData } = useQuery<LeaderboardResponse>({
+    queryKey: ["landing-leaderboard"],
+    queryFn: async () => {
+      const res = await fetch("/api/public/leaderboard?limit=8", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    staleTime: 60 * 1000,
+  });
+
+  const leaders = leaderboardData?.data && leaderboardData.data.length >= 3
+    ? leaderboardData.data.map((u, i) => toLeaderEntry(u, i + 1))
+    : fallbackLeaders;
 
   return (
     <section className={cn("pb-24 px-6 max-w-5xl mx-auto", className)}>

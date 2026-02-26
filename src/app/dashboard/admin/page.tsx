@@ -199,6 +199,17 @@ export default function AdminPage() {
         { name: "Achievement Manager", icon: IconTarget, href: "/dashboard/admin/achievements" }
       ]
     }
+    ,
+    {
+      category: "Content Management",
+      icon: IconFileText,
+      color: "blue",
+      actions: [
+        { name: "Blog Posts", icon: IconFileText, href: "/dashboard/admin/blogs" },
+        { name: "Landing Page CMS", icon: IconEdit, href: "/dashboard/admin/content/landing-page" },
+        { name: "Newsletter Subscribers", icon: IconUsers, href: "/dashboard/admin/newsletter" }
+      ]
+    }
   ]
 
   const filteredQuickActions = useMemo(() => {

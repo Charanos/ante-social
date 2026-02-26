@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { IconInfoCircle, IconMessageShare, IconStar } from '@tabler/icons-react';
+import { useLandingContent } from "@/lib/live-data";
 
 import Marquee from "react-fast-marquee";
 
@@ -126,6 +127,23 @@ function TestimonialCard({ testimonial, index }: any) {
 }
 
 export function Testimonials() {
+  const { content } = useLandingContent();
+  const testimonialsContent = content?.testimonials || {};
+  const statsContent = content?.socialProofStats || {};
+
+  const displayTestimonials = (testimonialsContent.items as any[])?.length > 0
+    ? testimonialsContent.items
+    : testimonials;
+
+  const displayStats = (statsContent.items as any[])?.length > 0
+    ? statsContent.items
+    : [
+        { label: "Active Players", value: "12.5K+" },
+        { label: "Total Volume", value: "KSH 8.2M" },
+        { label: "Trust Score", value: "98%" },
+        { label: "Markets Live", value: "342" },
+      ];
+
   return (
     <section className="relative py-24 md:py-32 px-4 md:px-6 bg-linear-to-b from-white via-neutral-50/30 to-white overflow-hidden">
       {/* Background Elements */}
@@ -142,11 +160,10 @@ export function Testimonials() {
         >
 
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
-            Players Say What?
+            {testimonialsContent.title || "Players Say What?"}
           </h2>
           <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
-            Join thousands of Kenyan forecasters who've found their new home on Ante
-            Social.
+            {testimonialsContent.description || "Join thousands of Kenyan forecasters who've found their new home on Ante Social."}
           </p>
         </motion.div>
 
@@ -163,7 +180,7 @@ export function Testimonials() {
             pauseOnHover={true}
             autoFill={true}
           >
-            {testimonials.map((testimonial, index) => (
+            {displayTestimonials.map((testimonial: any, index: number) => (
               <TestimonialCard
                 key={`${testimonial.author}-${index}`}
                 testimonial={testimonial}
@@ -182,41 +199,21 @@ export function Testimonials() {
           className="mt-16 md:mt-20"
         >
           <div className="flex flex-wrap justify-center gap-8 md:gap-12 p-8 md:p-10 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
-                12.5K+
+            {displayStats.map((stat: any, i: number) => (
+              <div key={stat.label} className="flex items-center gap-8 md:gap-12">
+                <div className="text-center">
+                  <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
+                    {stat.label}
+                  </div>
+                </div>
+                {i < displayStats.length - 1 && (
+                  <div className="w-px bg-black/5 hidden md:block h-12" />
+                )}
               </div>
-              <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
-                Active Players
-              </div>
-            </div>
-            <div className="w-px bg-black/5 hidden md:block" />
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
-                KSH 8.2M
-              </div>
-              <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
-                Total Volume
-              </div>
-            </div>
-            <div className="w-px bg-black/5 hidden md:block" />
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
-                98%
-              </div>
-              <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
-                Trust Score
-              </div>
-            </div>
-            <div className="w-px bg-black/5 hidden md:block" />
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
-                342
-              </div>
-              <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
-                Markets Live
-              </div>
-            </div>
+            ))}
           </div>
         </motion.div>
       </div>

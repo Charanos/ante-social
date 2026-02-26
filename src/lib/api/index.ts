@@ -259,3 +259,52 @@ export const authApi = {
   verifyTwoFactorSetup: (token: string) => apiPost("/api/auth/2fa/verify", { token }),
   disableTwoFactor: (token: string) => apiPost("/api/auth/2fa/disable", { token }),
 };
+
+export type BlogItem = {
+  _id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  coverImage?: string;
+  author?: string;
+  tags?: string[];
+  status: string;
+  publishedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export const blogsApi = {
+  list: (params?: QueryParams) =>
+    apiGet<PaginatedResponse<BlogItem>>(`/api/admin/blogs${buildQuery(params)}`),
+  getById: (blogId: string) => apiGet<BlogItem>(`/api/admin/blogs/${blogId}`),
+  create: (payload: Record<string, unknown>) =>
+    apiPost<BlogItem>("/api/admin/blogs", payload),
+  update: (blogId: string, payload: Record<string, unknown>) =>
+    apiPatch<BlogItem>(`/api/admin/blogs/${blogId}`, payload),
+  remove: (blogId: string) => apiDelete(`/api/admin/blogs/${blogId}`),
+  // Public endpoints
+  listPublished: (params?: QueryParams) =>
+    apiGet<PaginatedResponse<BlogItem>>(`/api/public/blogs${buildQuery(params)}`),
+  getBySlug: (slug: string) => apiGet<BlogItem>(`/api/public/blogs/${slug}`),
+};
+
+export const newsletterApi = {
+  subscribe: (email: string) =>
+    apiPost("/api/newsletter/subscribe", { email }),
+  getSubscribers: (params?: QueryParams) =>
+    apiGet(`/api/admin/newsletter/subscribers${buildQuery(params)}`),
+};
+
+export const contentApi = {
+  getLandingPage: () => apiGet("/api/public/content/landing-page"),
+  updateLandingPage: (payload: Record<string, unknown>) =>
+    apiPatch("/api/admin/content/landing-page", payload),
+  getAdminLandingPage: () => apiGet("/api/admin/content/landing-page"),
+};
+
+export const leaderboardApi = {
+  getPublic: (params?: QueryParams) =>
+    apiGet(`/api/public/leaderboard${buildQuery(params)}`),
+};
