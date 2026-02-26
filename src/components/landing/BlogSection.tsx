@@ -21,7 +21,7 @@ type BlogsResponse = {
   data?: BlogPost[];
 };
 
-const defaultImg = "https://images.unsplash.com/photo-1620207418302-439b387441b0?q=80&w=1200&auto=format&fit=crop";
+const defaultImg = "https://images.unsplash.com/photo-1611974714851-eb605503936f?q=80&w=1200&auto=format&fit=crop";
 
 const fallbackPosts: BlogPost[] = [
   {
@@ -31,7 +31,7 @@ const fallbackPosts: BlogPost[] = [
     excerpt: "Discover how we are revolutionizing social betting and prediction markets with cutting-edge tech and gamification mechanics.",
     publishedAt: new Date().toISOString(),
     author: "Ante Team",
-    coverImage: "https://images.unsplash.com/photo-1639762681485-074b7f4fc8fd?q=80&w=1200&auto=format&fit=crop",
+    coverImage: "/dashboard-mockup.png",
   },
   {
     _id: "2",
@@ -40,7 +40,7 @@ const fallbackPosts: BlogPost[] = [
     excerpt: "A deep dive into the math and mechanics behind our dynamic odds and seamless liquidity.",
     publishedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
     author: "Protocol Eng",
-    coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop",
+    coverImage: "https://images.unsplash.com/photo-1642790106117-e829e14a795f?q=80&w=1200&auto=format&fit=crop",
   },
   {
     _id: "3",
@@ -49,7 +49,7 @@ const fallbackPosts: BlogPost[] = [
     excerpt: "Empowering our users to curate markets and resolve disputes.",
     publishedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
     author: "Community Lead",
-    coverImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop",
+    coverImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800&auto=format&fit=crop",
   }
 ];
 
@@ -166,20 +166,29 @@ export function BlogSection() {
                 transition={{ duration: 0.7, delay: 0.2 + index * 0.15 }}
                 className="h-full"
               >
-                <Link href={`/blog/${post.slug}`} className="group flex flex-col sm:flex-row xl:flex-col gap-6 p-4 md:p-5 rounded-[2rem] bg-white/40 backdrop-blur-2xl border border-black/5 shadow-[0_8px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:bg-white/80 transition-all duration-500 overflow-hidden h-full ring-1 ring-black/5">
-                  <div className="relative w-full sm:w-2/5 xl:w-full h-56 sm:h-auto xl:h-56 rounded-[1.5rem] overflow-hidden shrink-0">
-                     <Image src={post.coverImage || defaultImg} alt={post.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
+                <Link href={`/blog/${post.slug}`} className="group flex flex-col sm:flex-row xl:flex-col gap-0 p-3 rounded-[2.5rem] bg-white border border-neutral-100 shadow-[0_8px_30px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:bg-neutral-50/50 transition-all duration-500 overflow-hidden h-full ring-1 ring-black/5 hover:ring-black/10">
+                  <div className="relative w-full sm:w-2/5 xl:w-full h-48 sm:h-full xl:h-56 rounded-[2rem] overflow-hidden shrink-0 shadow-inner">
+                     <Image src={post.coverImage || defaultImg} alt={post.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                     <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-80" />
+                     <div className="absolute bottom-4 left-4">
+                       <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
+                         Analysis
+                       </span>
+                     </div>
                   </div>
-                  <div className="flex flex-col flex-1 justify-center py-2 sm:py-4 xl:py-2">
-                     <div className="flex items-center gap-3 mb-3 text-black/50 text-xs font-bold uppercase tracking-widest">
+                  <div className="flex flex-col flex-1 justify-center p-5 sm:p-6 xl:p-5">
+                     <div className="flex items-center gap-2 mb-2.5 text-black/40 text-[11px] font-bold uppercase tracking-widest">
+                       <IconCalendarEvent className="w-3.5 h-3.5" />
                        <span>{formatDate(post.publishedAt)}</span>
                      </div>
-                     <h4 className="text-xl md:text-2xl xl:text-xl font-medium text-black/90 mb-4 leading-snug group-hover:text-blue-600 transition-colors line-clamp-3">
+                     <h4 className="text-xl md:text-xl font-semibold text-black/90 mb-3 leading-[1.3] group-hover:text-amber-600 transition-colors line-clamp-2 md:line-clamp-3">
                        {post.title}
                      </h4>
-                     <div className="mt-auto flex items-center gap-2 text-sm font-bold text-black/50 group-hover:text-blue-600 uppercase tracking-wide transition-colors">
-                        Read full story <IconArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                     <p className="text-sm text-black/60 line-clamp-2 mb-4">
+                       {post.excerpt}
+                     </p>
+                     <div className="mt-auto flex items-center gap-1.5 text-xs font-bold text-black/60 group-hover:text-amber-600 uppercase tracking-widest transition-colors">
+                        Read Story <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                      </div>
                   </div>
                 </Link>

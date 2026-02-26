@@ -433,84 +433,138 @@ export function Hero() {
         initial={{ opacity: 0, y: 100, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 1, duration: 1, type: "spring", stiffness: 100 }}
-        className="relative mt-20 w-full max-w-7xl"
+        className="relative mt-20 w-full max-w-7xl px-4 sm:px-8 md:px-0"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={{ perspective: 2000 }}
+        style={{ perspective: 4000 }}
       >
-        <motion.div
-          className="relative rounded-2xl border border-black/10 bg-white shadow-2xl overflow-hidden group cursor-pointer"
-          style={{
-            rotateX: mounted ? rotateX : 0,
-            rotateY: mounted ? rotateY : 0,
-            transformStyle: "preserve-3d",
-          }}
-          whileHover={{ scale: 1.01 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        >
-          {/* Dashboard Preview */}
-          <div className="relative bg-linear-to-br from-neutral-50 to-white p-4 md:p-6">
-            <div className="relative aspect-video rounded-xl border border-black/5 overflow-hidden shadow-2xl">
-              <Image
-                src="/dashboard-mockup.png"
-                alt="Dashboard Preview"
-                fill
-                className="object-cover object-top"
-                priority
-              />
-              {/* Optional: Add a subtle overlay for depth */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
-            </div>
-          </div>
-
-          {/* Overlay effects */}
-          <div className="absolute inset-0 bg-linear-to-t from-black/5 via-transparent to-transparent pointer-events-none" />
-
-          {/* Shimmer effect on hover */}
+        <div className="relative group mx-auto max-w-5xl">
+          {/* Main Mockup Base */}
           <motion.div
-            className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none"
-            initial={{ x: "-100%" }}
-            whileHover={{ x: "100%" }}
-            transition={{ duration: 0.8 }}
-          />
-        </motion.div>
+            className="relative rounded-[1.5rem] md:rounded-[3rem] border border-black/10 bg-white shadow-2xl overflow-hidden cursor-pointer isolate"
+            style={{
+              rotateX: mounted ? rotateX : 0,
+              rotateY: mounted ? rotateY : 0,
+              transformStyle: "preserve-3d",
+            }}
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className="relative bg-linear-to-br from-neutral-50 to-white/80 p-2 md:p-4">
+              <div className="relative aspect-[16/10] md:aspect-video rounded-[1rem] md:rounded-[2.5rem] border border-black/5 overflow-hidden shadow-2xl">
+                <Image
+                  src="/dashboard-mockup.png"
+                  alt="Dashboard Preview"
+                  fill
+                  className="object-cover object-top opacity-90 transition-opacity group-hover:opacity-100"
+                  priority
+                />
+                {/* Visual texture overlay */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.05)_100%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent pointer-events-none md:hidden" />
+              </div>
+            </div>
 
-        {/* Enhanced Reflection */}
+            {/* Shimmer overlay */}
+            <motion.div
+              className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 pointer-events-none"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "100%" }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
+            />
+          </motion.div>
+
+          {/* Floating Elements - Animated to float continuously on mobile */}
+          
+          {/* Notification / Live Win Card */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ 
+              opacity: 1, 
+              x: 0,
+              y: [-5, 5, -5] 
+            }}
+            transition={{ 
+              opacity: { delay: 1.4, duration: 0.8 },
+              x: { delay: 1.4, duration: 0.8 },
+              y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="absolute -top-4 left-0 md:-top-6 md:-left-12 z-20 w-[160px] md:w-[240px] p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/80 backdrop-blur-2xl border border-white/50 shadow-xl shadow-black/10 origin-top-left transform scale-90 md:scale-100"
+            style={{ 
+              transform: "translateZ(80px)",
+              rotateY: -5
+            }}
+          >
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-600 shrink-0">
+                <IconTrendingUp className="w-4 h-4 md:w-5 md:h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold text-black/40 truncate">New Settlement</p>
+                <p className="text-xs md:text-sm font-semibold text-black truncate">+ $1,240.00</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Wallet / Balance Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ 
+              opacity: 1, 
+              x: 0,
+              y: [5, -5, 5] 
+            }}
+            transition={{ 
+              opacity: { delay: 1.6, duration: 0.8 },
+              x: { delay: 1.6, duration: 0.8 },
+              y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }
+            }}
+            className="absolute top-[40%] md:top-1/2 right-0 md:-right-16 z-20 w-[140px] md:w-[220px] p-3 md:p-5 rounded-2xl md:rounded-3xl bg-black/90 backdrop-blur-xl border border-white/10 shadow-2xl space-y-2 md:space-y-3 origin-right transform scale-90 md:scale-100"
+            style={{ 
+              transform: "translateZ(120px) translateY(-50%)",
+              rotateY: 8
+            }}
+          >
+            <div className="space-y-0.5 md:space-y-1">
+              <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold text-white/40">Portfolio Value</p>
+              <p className="text-lg md:text-2xl font-mono font-bold text-white">$12,450.82</p>
+            </div>
+            <div className="flex items-center gap-1 md:gap-1.5 text-green-400 text-[10px] md:text-xs font-semibold">
+              <IconTrendingUp className="w-3 h-3" />
+              +14.2% (24h)
+            </div>
+          </motion.div>
+
+          {/* User Count / Social Proof Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.8 }}
+            className="absolute -bottom-6 md:-bottom-8 left-1/2 -translate-x-1/2 z-20 px-4 md:px-6 py-2 md:py-3 rounded-full bg-white/80 backdrop-blur-2xl border border-black/10 shadow-lg flex items-center gap-2 md:gap-3 whitespace-nowrap transform scale-90 md:scale-100"
+            style={{ transform: "translateZ(60px) translateX(-50%)" }}
+          >
+            <div className="flex -space-x-2">
+              {[1,2,3].map(i => (
+                <div key={i} className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-white bg-neutral-200 overflow-hidden relative">
+                  <Image src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" fill />
+                </div>
+              ))}
+            </div>
+            <span className="text-[10px] md:text-xs font-bold text-black/60 tracking-tight">Active Analysts: <span className="text-black text-xs md:text-sm">12.5K+</span></span>
+          </motion.div>
+        </div>
+        {/* Enhanced Dynamic Reflection */}
         <motion.div
-          className="absolute -bottom-20 left-0 right-0 h-32 opacity-30 blur-2xl"
+          className="absolute -bottom-24 left-0 right-0 h-40 opacity-20 blur-3xl pointer-events-none transition-all duration-500"
           style={{
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)",
-            transform: "scaleY(-1)",
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.1), transparent)",
+            transform: "scaleY(-0.8)",
           }}
         />
 
-        {/* Floating accent elements */}
-        <motion.div
-          className="absolute -top-4 -right-4 w-24 h-24 bg-black/5 rounded-full blur-2xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-6 -left-6 w-32 h-32 bg-black/5 rounded-full blur-2xl"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
+        {/* Decorative Ambient Lights */}
+        <div className="absolute -top-12 -right-12 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-amber-500/5 blur-[100px] rounded-full pointer-events-none" />
       </motion.div>
     </section>
   );

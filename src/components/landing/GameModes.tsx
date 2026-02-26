@@ -284,14 +284,14 @@ export function GameModes() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
-          className="mt-16 md:mt-20 flex justify-center"
+          className="mt-16 md:mt-20 flex flex-col items-center gap-3 justify-center"
         >
           <motion.button
-            className="group inline-flex items-center gap-3 px-8 py-3 bg-black text-white font-normal rounded-full shadow-lg hover:shadow-xl cursor-pointer transition-all"
+            className="group inline-flex items-center underline font-normal cursor-pointer transition-all"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="text-lg font-normal">Explore All Markets</span>
+            <span className="text-lg font-normal mr-2">Explore All Markets</span>
             <IconArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </motion.button>
         </motion.div>

@@ -21,10 +21,10 @@ export function VisualShowcase() {
         >
          
           <h2 className="text-4xl md:text-6xl font-normal tracking-tight text-black/90 leading-[1.1]">
-            Built for the <span className="italic text-orange-600">Culture</span>
+            The Signal <span className="italic text-orange-600">Economy</span>
           </h2>
           <p className="text-lg md:text-xl text-black/70 leading-relaxed font-normal">
-            More than just markets. It's about who you win with. Join a community that celebrates every victory together.
+            Monetize your instincts into a tradable asset. Build a reputation based on accurate forecasts, not follower counts.
           </p>
         </motion.div>
 
@@ -41,7 +41,7 @@ export function VisualShowcase() {
           >
              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/80 z-10" />
              {/* Use a reliable Unsplash ID for "Happy African Friends" */}
-             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1642543492481-44e81e3914a7?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
              
              <div className="absolute bottom-0 left-0 p-8 z-20 text-white">
                 <div className="flex items-center gap-3 mb-2">
@@ -49,8 +49,8 @@ export function VisualShowcase() {
                         <IconHeartHandshake className="w-4 h-4 text-white" />
                     </div>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-medium mb-2">Win Together</h3>
-                <p className="text-white/80 max-w-lg">Share the thrill. Pools are better when shared with friends.</p>
+                <h3 className="text-2xl md:text-3xl font-medium mb-2">Consensus Pools</h3>
+                <p className="text-white/80 max-w-lg">Harness the wisdom of the crowd. Liquid markets driven by social intelligence.</p>
              </div>
           </motion.div>
 
@@ -64,11 +64,11 @@ export function VisualShowcase() {
           >
              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/70 z-10" />
              {/* "Coworking High Five" */}
-              <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1531545514256-b1400bc00f31?q=80&w=2574&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1639322537231-2f206e06af84?q=80&w=2574&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
              
              <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
-                <h3 className="text-xl font-medium mb-1">Squad Goals</h3>
-                <p className="text-white/80 text-sm">Create your own private leagues.</p>
+                <h3 className="text-xl font-medium mb-1">Syndicated Intelligence</h3>
+                <p className="text-white/80 text-sm">Create and govern private prediction circles.</p>
              </div>
           </motion.div>
 
@@ -82,14 +82,14 @@ export function VisualShowcase() {
           >
              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/70 z-10" />
              {/* RELIABLE "Woman Nightlife" Image */}
-             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
 
              <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
                 <div className="flex items-center gap-2 mb-2">
                     <IconTrophy className="w-5 h-5 text-yellow-400" />
                 </div>
-                <h3 className="text-xl font-medium mb-1">Instant Payouts</h3>
-                <p className="text-white/80 text-sm">Validations in seconds, not days.</p>
+                <h3 className="text-xl font-medium mb-1">Verifiable Settlements</h3>
+                <p className="text-white/80 text-sm">Immutable resolutions finalized in seconds, not days.</p>
              </div>
           </motion.div>
 

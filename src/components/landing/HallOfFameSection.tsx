@@ -28,7 +28,7 @@ const fallbackLeaders = [
     rank: 1,
     name: "CryptoKing_KE",
     winRate: "88%",
-    profit: "+450K AP",
+    profit: "+$450K",
     avatar:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150&auto=format&fit=crop",
   },
@@ -36,7 +36,7 @@ const fallbackLeaders = [
     rank: 2,
     name: "Nairobi_Bets",
     winRate: "82%",
-    profit: "+320K AP",
+    profit: "+$320K",
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
   },
@@ -44,7 +44,7 @@ const fallbackLeaders = [
     rank: 3,
     name: "Sarah_W",
     winRate: "79%",
-    profit: "+210K AP",
+    profit: "+$210K",
     avatar:
       "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=150&auto=format&fit=crop",
   },
@@ -52,7 +52,7 @@ const fallbackLeaders = [
     rank: 4,
     name: "John_D",
     winRate: "75%",
-    profit: "+180K AP",
+    profit: "+$180K",
     avatar:
       "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=100&auto=format&fit=crop",
   },
@@ -60,7 +60,7 @@ const fallbackLeaders = [
     rank: 5,
     name: "BetMaster_99",
     winRate: "72%",
-    profit: "+150K AP",
+    profit: "+$150K",
     avatar:
       "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop",
   },
@@ -73,8 +73,8 @@ function toLeaderEntry(user: LeaderboardUser, rank: number) {
     rank,
     name: user.username || user.fullName || "Unknown",
     winRate: `${winRate}%`,
-    profit: `+${((user.reputationScore || 0) / 1000).toFixed(0)}K AP`,
-    avatar: user.avatarUrl || "",
+    profit: `+$${((user.reputationScore || 0) / 1000).toFixed(0)}K`,
+    avatar: user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username || user._id}`,
   };
 }
 
