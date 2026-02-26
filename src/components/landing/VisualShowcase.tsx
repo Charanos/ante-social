@@ -41,7 +41,7 @@ export function VisualShowcase() {
           >
              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/80 z-10" />
              {/* Use a reliable Unsplash ID for "Happy African Friends" */}
-             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1642543492481-44e81e3914a7?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1484712401471-05c7215830eb?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
              
              <div className="absolute bottom-0 left-0 p-8 z-20 text-white">
                 <div className="flex items-center gap-3 mb-2">
@@ -64,7 +64,7 @@ export function VisualShowcase() {
           >
              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/70 z-10" />
              {/* "Coworking High Five" */}
-              <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1639322537231-2f206e06af84?q=80&w=2574&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+               <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1718939041030-5f627a5afd97?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
              
              <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
                 <h3 className="text-xl font-medium mb-1">Syndicated Intelligence</h3>
@@ -82,7 +82,7 @@ export function VisualShowcase() {
           >
              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/70 z-10" />
              {/* RELIABLE "Woman Nightlife" Image */}
-             <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
 
              <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
                 <div className="flex items-center gap-2 mb-2">
