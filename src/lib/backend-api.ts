@@ -223,6 +223,19 @@ export async function proxyBackendRequest({
 
         const responseText = await backendResponse.text();
         const responseType = backendResponse.headers.get("content-type") || "application/json";
+        const isApiPath = path.startsWith("/api/");
+        const looksLikeHtml =
+          responseType.includes("text/html") ||
+          /^\s*<!doctype html/i.test(responseText) ||
+          /^\s*<html/i.test(responseText);
+
+        // Some misconfigured upstreams may return HTML with 200. Treat that as invalid
+        // for API routes and continue to the next fallback target.
+        if (backendResponse.ok && isApiPath && looksLikeHtml) {
+          lastStatus = 502;
+          lastBody = "";
+          continue;
+        }
 
         if (
           backendResponse.ok ||

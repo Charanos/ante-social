@@ -518,7 +518,15 @@ export function useMarketList() {
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
-    const payload = await fetchJsonOrNull<any>("/api/markets?limit=200&offset=0");
+    let payload = await fetchJsonOrNull<any>("/api/markets?limit=200&offset=0");
+
+    if (!payload) {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL || "").trim().replace(/\/+$/, "");
+      if (apiBase) {
+        payload = await fetchJsonOrNull<any>(`${apiBase}/api/v1/markets?limit=200&offset=0`);
+      }
+    }
+
     setMarkets(normalizeMarkets(payload));
     setIsLoading(false);
   }, []);
