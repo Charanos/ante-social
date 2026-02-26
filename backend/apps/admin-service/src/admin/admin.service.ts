@@ -22,6 +22,8 @@ import {
   AuditLogDocument,
   FlagStatus,
   FlagReason,
+  RecurringMarketTemplate,
+  RecurringMarketTemplateDocument,
 } from '@app/database';
 import { TransactionType, TransactionStatus, KAFKA_TOPICS } from '@app/common';
 import { ClientKafka, ClientProxy } from '@nestjs/microservices';
@@ -93,6 +95,8 @@ export class AdminService {
     @InjectModel(Transaction.name) private transactionModel: Model<TransactionDocument>,
     @InjectModel(ComplianceFlag.name) private complianceFlagModel: Model<ComplianceFlagDocument>,
     @InjectModel(AuditLog.name) private auditLogModel: Model<AuditLogDocument>,
+    @InjectModel(RecurringMarketTemplate.name)
+    private recurringMarketTemplateModel: Model<RecurringMarketTemplateDocument>,
     @Inject('KAFKA_SERVICE') private readonly kafkaClient: ClientKafka,
     @Inject('WALLET_SERVICE') private readonly walletClient: ClientProxy,
   ) {}
@@ -127,6 +131,39 @@ export class AdminService {
     ]);
 
     return { data: users, meta: { total, limit: safeLimit, offset: safeOffset } };
+  }
+
+  async getUserById(userId: string) {
+    const user = await this.userModel
+      .findById(userId)
+      .select('-passwordHash -twoFactorSecret -backupCodes')
+      .exec();
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+
+  async deleteUser(userId: string, adminId: string) {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) throw new NotFoundException('User not found');
+
+    const suffix = user._id.toString().slice(-8);
+    user.email = `deleted+${suffix}@deleted.local`;
+    user.username = `deleted_${suffix}`;
+    user.fullName = undefined;
+    user.phone = undefined;
+    user.location = undefined;
+    user.bio = undefined;
+    user.avatarUrl = undefined;
+    user.refreshTokenHash = undefined;
+    user.refreshTokenExpiresAt = undefined;
+    user.isBanned = true;
+    user.banReason = 'Deleted by admin';
+    user.isFlagged = false;
+
+    await user.save();
+    await this.logAudit('DELETE_USER', userId, { adminId, entityType: 'user' });
+
+    return { success: true, userId };
   }
 
   async banUser(userId: string, reason?: string) {
@@ -250,6 +287,89 @@ export class AdminService {
     return { success: true };
   }
 
+  async resolveComplianceFlag(flagId: string, notes: string | undefined, adminId: string) {
+    const flag = await this.complianceFlagModel.findById(flagId).exec();
+    if (!flag) throw new NotFoundException('Compliance flag not found');
+
+    flag.status = FlagStatus.RESOLVED;
+    flag.reviewedBy = this.parseObjectId(adminId);
+    if (notes && notes.trim()) {
+      flag.reviewNotes = notes.trim();
+    }
+    flag.resolvedAt = new Date();
+    await flag.save();
+
+    const remainingOpenFlags = await this.complianceFlagModel.countDocuments({
+      userId: flag.userId,
+      status: { $in: [FlagStatus.OPEN, FlagStatus.INVESTIGATING] },
+      _id: { $ne: flag._id },
+    });
+
+    if (remainingOpenFlags === 0) {
+      await this.userModel.findByIdAndUpdate(flag.userId, { isFlagged: false }).exec();
+    }
+
+    await this.logAudit('RESOLVE_COMPLIANCE_FLAG', flag.userId.toString(), {
+      adminId,
+      flagId,
+      notes: notes || null,
+      entityType: 'compliance_flag',
+    });
+
+    return flag;
+  }
+
+  async escalateComplianceFlag(flagId: string, notes: string | undefined, adminId: string) {
+    const flag = await this.complianceFlagModel.findById(flagId).exec();
+    if (!flag) throw new NotFoundException('Compliance flag not found');
+
+    flag.status = FlagStatus.INVESTIGATING;
+    flag.reviewedBy = this.parseObjectId(adminId);
+    if (notes && notes.trim()) {
+      flag.reviewNotes = notes.trim();
+    }
+    await flag.save();
+
+    await this.userModel.findByIdAndUpdate(flag.userId, { isFlagged: true }).exec();
+
+    await this.logAudit('ESCALATE_COMPLIANCE_FLAG', flag.userId.toString(), {
+      adminId,
+      flagId,
+      notes: notes || null,
+      entityType: 'compliance_flag',
+    });
+
+    return flag;
+  }
+
+  async addComplianceFlagNote(flagId: string, note: string, adminId: string) {
+    const trimmedNote = note?.trim();
+    if (!trimmedNote) {
+      throw new BadRequestException('Note is required');
+    }
+
+    const flag = await this.complianceFlagModel.findById(flagId).exec();
+    if (!flag) throw new NotFoundException('Compliance flag not found');
+
+    const timestamp = new Date().toISOString();
+    const nextNotes = flag.reviewNotes
+      ? `${flag.reviewNotes}\n[${timestamp}] ${trimmedNote}`
+      : `[${timestamp}] ${trimmedNote}`;
+
+    flag.reviewNotes = nextNotes;
+    flag.reviewedBy = this.parseObjectId(adminId);
+    await flag.save();
+
+    await this.logAudit('ADD_COMPLIANCE_FLAG_NOTE', flag.userId.toString(), {
+      adminId,
+      flagId,
+      note: trimmedNote,
+      entityType: 'compliance_flag',
+    });
+
+    return flag;
+  }
+
   async getPendingWithdrawals(limit = 20, offset = 0) {
     const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 200);
     const safeOffset = Math.max(Number(offset) || 0, 0);
@@ -312,6 +432,188 @@ export class AdminService {
       entityType: 'transaction',
     });
     return tx;
+  }
+
+  async getRecurringMarketTemplates(limit = 20, offset = 0) {
+    const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 200);
+    const safeOffset = Math.max(Number(offset) || 0, 0);
+
+    const [templates, total] = await Promise.all([
+      this.recurringMarketTemplateModel
+        .find()
+        .sort({ createdAt: -1 })
+        .skip(safeOffset)
+        .limit(safeLimit)
+        .lean()
+        .exec(),
+      this.recurringMarketTemplateModel.countDocuments(),
+    ]);
+
+    return { data: templates, meta: { total, limit: safeLimit, offset: safeOffset } };
+  }
+
+  async createRecurringMarketTemplate(payload: Record<string, any>, adminId: string) {
+    const options = Array.isArray(payload.options)
+      ? payload.options
+          .map((option) => String(option || '').trim())
+          .filter((option) => option.length > 0)
+      : [];
+    if (options.length < 2) {
+      throw new BadRequestException('At least two options are required');
+    }
+
+    const startDate = new Date(payload.startDate || Date.now());
+    if (Number.isNaN(startDate.getTime())) {
+      throw new BadRequestException('Invalid startDate');
+    }
+
+    const recurrence = this.normalizeRecurrence(payload.recurrence);
+    const cronExpression = payload.cronExpression ? String(payload.cronExpression).trim() : undefined;
+
+    const template = new this.recurringMarketTemplateModel({
+      name: String(payload.name || payload.templateName || 'Recurring Market').trim(),
+      titleTemplate: String(payload.titleTemplate || payload.marketTitle || payload.title || '').trim(),
+      description: String(payload.description || '').trim(),
+      marketType: this.normalizeMarketType(payload.marketType || payload.type),
+      options,
+      tags: Array.isArray(payload.tags)
+        ? payload.tags
+            .map((tag: unknown) => String(tag || '').trim())
+            .filter((tag: string) => tag.length > 0)
+        : [],
+      recurrence,
+      cronExpression,
+      timezone: String(payload.timezone || 'UTC').trim() || 'UTC',
+      startDate,
+      openTime: String(payload.openTime || '09:00'),
+      closeTime: String(payload.closeTime || '17:00'),
+      buyInAmount: Number(payload.buyInAmount || payload.minStake || 0),
+      settlementDelayHours: Number(payload.settlementDelayHours || 2),
+      autoPublish: payload.autoPublish !== false,
+      isPaused: Boolean(payload.isPaused),
+      createdBy: this.parseObjectId(adminId) || this.systemActorId,
+    });
+
+    if (!template.titleTemplate) {
+      throw new BadRequestException('titleTemplate is required');
+    }
+
+    template.nextExecutionAt = template.isPaused
+      ? undefined
+      : this.computeNextExecutionAt(template.startDate, template.recurrence, cronExpression);
+
+    await template.save();
+    await this.logAudit('CREATE_RECURRING_MARKET_TEMPLATE', template._id.toString(), {
+      adminId,
+      entityType: 'recurring_market',
+      recurrence: template.recurrence,
+      marketType: template.marketType,
+    });
+
+    return template;
+  }
+
+  async updateRecurringMarketTemplate(
+    templateId: string,
+    updates: Record<string, any>,
+    adminId: string,
+  ) {
+    const template = await this.recurringMarketTemplateModel.findById(templateId).exec();
+    if (!template) throw new NotFoundException('Recurring market template not found');
+
+    if (updates.name !== undefined) {
+      template.name = String(updates.name || '').trim();
+    }
+    if (updates.titleTemplate !== undefined) {
+      template.titleTemplate = String(updates.titleTemplate || '').trim();
+    }
+    if (updates.description !== undefined) {
+      template.description = String(updates.description || '').trim();
+    }
+    if (updates.marketType !== undefined || updates.type !== undefined) {
+      template.marketType = this.normalizeMarketType(updates.marketType || updates.type);
+    }
+    if (updates.options !== undefined) {
+      const options = Array.isArray(updates.options)
+        ? updates.options
+            .map((option: unknown) => String(option || '').trim())
+            .filter((option: string) => option.length > 0)
+        : [];
+      if (options.length < 2) {
+        throw new BadRequestException('At least two options are required');
+      }
+      template.options = options;
+    }
+    if (updates.tags !== undefined) {
+      template.tags = Array.isArray(updates.tags)
+        ? updates.tags
+            .map((tag: unknown) => String(tag || '').trim())
+            .filter((tag: string) => tag.length > 0)
+        : [];
+    }
+    if (updates.recurrence !== undefined) {
+      template.recurrence = this.normalizeRecurrence(updates.recurrence);
+    }
+    if (updates.cronExpression !== undefined) {
+      template.cronExpression = updates.cronExpression
+        ? String(updates.cronExpression).trim()
+        : undefined;
+    }
+    if (updates.timezone !== undefined) {
+      template.timezone = String(updates.timezone || 'UTC').trim() || 'UTC';
+    }
+    if (updates.startDate !== undefined) {
+      const startDate = new Date(updates.startDate);
+      if (Number.isNaN(startDate.getTime())) {
+        throw new BadRequestException('Invalid startDate');
+      }
+      template.startDate = startDate;
+    }
+    if (updates.openTime !== undefined) {
+      template.openTime = String(updates.openTime || '09:00');
+    }
+    if (updates.closeTime !== undefined) {
+      template.closeTime = String(updates.closeTime || '17:00');
+    }
+    if (updates.buyInAmount !== undefined || updates.minStake !== undefined) {
+      template.buyInAmount = Number(updates.buyInAmount ?? updates.minStake);
+    }
+    if (updates.settlementDelayHours !== undefined) {
+      template.settlementDelayHours = Number(updates.settlementDelayHours);
+    }
+    if (updates.autoPublish !== undefined) {
+      template.autoPublish = Boolean(updates.autoPublish);
+    }
+    if (updates.isPaused !== undefined) {
+      template.isPaused = Boolean(updates.isPaused);
+    }
+
+    template.nextExecutionAt = template.isPaused
+      ? undefined
+      : this.computeNextExecutionAt(
+          template.startDate,
+          template.recurrence,
+          template.cronExpression,
+        );
+
+    await template.save();
+    await this.logAudit('UPDATE_RECURRING_MARKET_TEMPLATE', templateId, {
+      adminId,
+      entityType: 'recurring_market',
+    });
+
+    return template;
+  }
+
+  async deleteRecurringMarketTemplate(templateId: string, adminId: string) {
+    const deleted = await this.recurringMarketTemplateModel.findByIdAndDelete(templateId).exec();
+    if (!deleted) throw new NotFoundException('Recurring market template not found');
+
+    await this.logAudit('DELETE_RECURRING_MARKET_TEMPLATE', templateId, {
+      adminId,
+      entityType: 'recurring_market',
+    });
+    return { success: true, id: templateId };
   }
 
   async getAuditLogs(limit = 20, offset = 0, action?: string) {
@@ -742,6 +1044,50 @@ export class AdminService {
         auditLogs,
       },
     };
+  }
+
+  private normalizeRecurrence(value: unknown) {
+    const recurrence = String(value || 'daily').toLowerCase();
+    if (['daily', 'weekly', 'monthly', 'custom'].includes(recurrence)) {
+      return recurrence;
+    }
+    throw new BadRequestException('Invalid recurrence value');
+  }
+
+  private normalizeMarketType(value: unknown) {
+    const marketType = String(value || 'consensus').toLowerCase();
+    if (['consensus', 'reflex', 'ladder', 'betrayal', 'prisoner_dilemma'].includes(marketType)) {
+      return marketType;
+    }
+    throw new BadRequestException('Invalid market type');
+  }
+
+  private computeNextExecutionAt(startDate: Date, recurrence: string, cronExpression?: string) {
+    if (recurrence === 'custom' && cronExpression) {
+      const next = new Date(startDate);
+      if (next.getTime() > Date.now()) {
+        return next;
+      }
+      next.setDate(next.getDate() + 1);
+      return next;
+    }
+
+    const next = new Date(startDate);
+    if (Number.isNaN(next.getTime())) {
+      return new Date();
+    }
+
+    while (next.getTime() <= Date.now()) {
+      if (recurrence === 'weekly') {
+        next.setDate(next.getDate() + 7);
+      } else if (recurrence === 'monthly') {
+        next.setMonth(next.getMonth() + 1);
+      } else {
+        next.setDate(next.getDate() + 1);
+      }
+    }
+
+    return next;
   }
 
   private isMaintenanceTaskId(value: string): value is MaintenanceTaskId {

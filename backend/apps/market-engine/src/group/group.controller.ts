@@ -32,8 +32,12 @@ export class GroupController {
   }
 
   @Post(':id/join')
-  async joinGroup(@Param('id') id: string, @CurrentUser() user: UserDocument) {
-    return this.groupService.joinGroup(id, user._id.toString());
+  async joinGroup(
+    @Param('id') id: string,
+    @Body('inviteCode') inviteCode: string | undefined,
+    @CurrentUser() user: UserDocument,
+  ) {
+    return this.groupService.joinGroup(id, user._id.toString(), inviteCode);
   }
 
   @Post(':id/leave')
@@ -74,6 +78,15 @@ export class GroupController {
     @CurrentUser() user: UserDocument,
   ) {
     return this.groupService.removeMember(groupId, memberId, user._id.toString());
+  }
+
+  @Post(':id/invite')
+  async inviteMember(
+    @Param('id') groupId: string,
+    @Body('invitee') invitee: string | undefined,
+    @CurrentUser() user: UserDocument,
+  ) {
+    return this.groupService.createInvite(groupId, user._id.toString(), invitee);
   }
 
   // ─── Group Bets ───────────────────────────────────

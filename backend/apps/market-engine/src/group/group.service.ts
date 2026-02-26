@@ -53,9 +53,17 @@ export class GroupService {
     return group;
   }
 
-  async joinGroup(groupId: string, userId: string) {
+  async joinGroup(groupId: string, userId: string, inviteCode?: string) {
     const group = await this.groupModel.findById(groupId);
     if (!group) throw new NotFoundException('Group not found');
+
+    if (!group.isPublic) {
+      const normalizedCode = String(inviteCode || '').trim().toUpperCase();
+      const storedCode = String(group.inviteCode || '').trim().toUpperCase();
+      if (!normalizedCode || !storedCode || normalizedCode !== storedCode) {
+        throw new BadRequestException('Invalid or missing invite code for private group');
+      }
+    }
 
     const isMember = group.members.some((member) => member.userId.toString() === userId);
     if (isMember) throw new BadRequestException('Already a member');
@@ -82,6 +90,48 @@ export class GroupService {
 
     await this.userModel.findByIdAndUpdate(userId, { $inc: { groupMemberships: -1 } });
     return group;
+  }
+
+  async createInvite(groupId: string, actorId: string, invitee?: string) {
+    const group = await this.groupModel.findById(groupId);
+    if (!group) throw new NotFoundException('Group not found');
+
+    const actorMembership = group.members.some((member) => member.userId.toString() === actorId);
+    const isOwner = group.createdBy.toString() === actorId;
+    if (!actorMembership && !isOwner) {
+      throw new BadRequestException('Only members can generate invite links');
+    }
+
+    if (!group.inviteCode) {
+      group.inviteCode = this.generateInviteCode();
+      await group.save();
+    }
+
+    let inviteeUser: { id: string; username: string; email: string } | null = null;
+    const trimmedInvitee = String(invitee || '').trim();
+    if (trimmedInvitee) {
+      const inviteeRecord = await this.userModel
+        .findOne({
+          $or: [{ email: trimmedInvitee.toLowerCase() }, { username: trimmedInvitee }],
+        })
+        .select('_id username email')
+        .lean()
+        .exec();
+      if (inviteeRecord) {
+        inviteeUser = {
+          id: inviteeRecord._id.toString(),
+          username: inviteeRecord.username,
+          email: inviteeRecord.email,
+        };
+      }
+    }
+
+    return {
+      groupId: group._id.toString(),
+      inviteCode: group.inviteCode,
+      invitee: inviteeUser,
+      invitePath: `/dashboard/groups/${group._id.toString()}?invite=${group.inviteCode}`,
+    };
   }
 
   async updateGroup(
@@ -338,5 +388,14 @@ export class GroupService {
 
     bet.payoutProcessed = true;
     await bet.save();
+  }
+
+  private generateInviteCode() {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 8; i += 1) {
+      code += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+    return code;
   }
 }

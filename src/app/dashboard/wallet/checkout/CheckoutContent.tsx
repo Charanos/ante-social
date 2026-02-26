@@ -87,8 +87,65 @@ export default function CheckoutContent() {
     null,
   );
   const [generatedPaymentId, setGeneratedPaymentId] = useState<string>("");
+  const fallbackLimits = useNormalizedLimits(user, mode);
+  const [dynamicLimits, setDynamicLimits] = useState<{
+    deposit: { min: number; max: number };
+    withdrawal: { min: number; max: number };
+  } | null>(null);
 
-  const limits = useNormalizedLimits(user, mode);
+  const limits = useMemo(() => {
+    const source = dynamicLimits
+      ? mode === "deposit"
+        ? dynamicLimits.deposit
+        : dynamicLimits.withdrawal
+      : fallbackLimits;
+    return {
+      min: Number(source?.min || 10),
+      max: Number(source?.max || fallbackLimits.max),
+    };
+  }, [dynamicLimits, fallbackLimits, mode]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLimits = async () => {
+      try {
+        const payload = await walletApi.getLimits();
+        if (cancelled) return;
+
+        const depositMin = Number(payload?.minimums?.deposit || 10);
+        const withdrawalMin = Number(payload?.minimums?.withdrawal || 50);
+        const depositMax = Number(
+          payload?.deposit?.remaining?.USD ??
+            payload?.deposit?.max ??
+            fallbackLimits.max,
+        );
+        const withdrawalMax = Number(
+          payload?.withdrawal?.remaining?.USD ??
+            payload?.withdrawal?.max ??
+            fallbackLimits.max,
+        );
+
+        setDynamicLimits({
+          deposit: {
+            min: depositMin > 0 ? depositMin : 10,
+            max: depositMax >= 0 ? depositMax : fallbackLimits.max,
+          },
+          withdrawal: {
+            min: withdrawalMin > 0 ? withdrawalMin : 50,
+            max: withdrawalMax >= 0 ? withdrawalMax : fallbackLimits.max,
+          },
+        });
+      } catch {
+        // Keep tier-based fallback limits when API limits are unavailable.
+      }
+    };
+
+    void loadLimits();
+    return () => {
+      cancelled = true;
+    };
+  }, [fallbackLimits.max]);
 
   useEffect(() => {
     if (mode !== "deposit" || method !== "usdt") {

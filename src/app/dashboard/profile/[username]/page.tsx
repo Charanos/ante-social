@@ -194,9 +194,19 @@ export default function PublicProfilePage() {
       setIsPageLoading(true)
 
       let payload: any = null
-      const publicResponse = await fetch(`/api/users/${username}/profile`, { cache: "no-store" })
-      if (publicResponse.ok) {
-        payload = await publicResponse.json().catch(() => null)
+      let statsPayload: any = null
+      let achievementsPayload: any = null
+
+      const [publicResponse, statsResponse, achievementsResponse] = await Promise.all([
+        fetch(`/api/users/${username}/public-profile`, { cache: "no-store" }),
+        fetch(`/api/users/${username}/stats`, { cache: "no-store" }),
+        fetch(`/api/users/${username}/achievements`, { cache: "no-store" }),
+      ])
+
+      if (publicResponse.ok) payload = await publicResponse.json().catch(() => null)
+      if (statsResponse.ok) statsPayload = await statsResponse.json().catch(() => null)
+      if (achievementsResponse.ok) {
+        achievementsPayload = await achievementsResponse.json().catch(() => null)
       }
 
       if (!payload) {
@@ -207,7 +217,35 @@ export default function PublicProfilePage() {
       }
 
       if (!cancelled) {
-        setProfile(toPublicProfileView(payload || { username }))
+        const normalizedProfile = toPublicProfileView(payload || { username })
+        if (statsPayload) {
+          normalizedProfile.stats = {
+            ...normalizedProfile.stats,
+            totalBets: Number(statsPayload.totalPositions || normalizedProfile.stats.totalBets),
+            winRate: Number(statsPayload.winRate || normalizedProfile.stats.winRate),
+            accuracy: Number(
+              statsPayload.signalAccuracy || normalizedProfile.stats.accuracy,
+            ),
+          }
+        }
+
+        const achievementRows = Array.isArray(achievementsPayload?.data)
+          ? achievementsPayload.data
+          : []
+        if (achievementRows.length > 0) {
+          normalizedProfile.achievements = achievementRows.map((achievement: any, index: number) => ({
+            id: index + 1,
+            title: String(achievement?.title || "Achievement"),
+            category: String(achievement?.category || "general"),
+            reward: Number(achievement?.reward || 0),
+            date: achievement?.unlockedAt
+              ? new Date(achievement.unlockedAt).toLocaleDateString()
+              : "Recently",
+            icon: String(achievement?.icon || "trophy"),
+          }))
+        }
+
+        setProfile(normalizedProfile)
         setIsPageLoading(false)
       }
     }

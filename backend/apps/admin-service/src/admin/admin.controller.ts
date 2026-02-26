@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { JwtAuthGuard, RolesGuard, Roles, UserRole, CurrentUser } from '@app/common';
@@ -19,6 +19,35 @@ export class AdminController {
     return this.analyticsService.getDashboardStats();
   }
 
+  @Get('analytics/overview')
+  async getAnalyticsOverview() {
+    return this.analyticsService.getDashboardStats();
+  }
+
+  @Get('analytics/revenue')
+  async getAnalyticsRevenue(
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.analyticsService.getRevenueMetrics(from, to);
+  }
+
+  @Get('analytics/users')
+  async getAnalyticsUsers(
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.analyticsService.getUserMetrics(from, to);
+  }
+
+  @Get('analytics/markets')
+  async getAnalyticsMarkets(
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.analyticsService.getMarketMetrics(from, to);
+  }
+
   @Get('users')
   async getUsers(
     @Query('limit') limit: number,
@@ -28,6 +57,16 @@ export class AdminController {
     @Query('tier') tier?: string,
   ) {
     return this.adminService.getUsers(limit, offset, search, role, tier);
+  }
+
+  @Get('users/:id')
+  async getUserById(@Param('id') id: string) {
+    return this.adminService.getUserById(id);
+  }
+
+  @Delete('users/:id')
+  async deleteUser(@Param('id') id: string, @CurrentUser() admin: UserDocument) {
+    return this.adminService.deleteUser(id, admin._id.toString());
   }
 
   @Post('users/:id/ban')
@@ -75,6 +114,33 @@ export class AdminController {
     return this.adminService.unfreezeAccount(userId, admin._id.toString());
   }
 
+  @Patch('compliance/flags/:id/resolve')
+  async resolveComplianceFlag(
+    @Param('id') id: string,
+    @Body('notes') notes: string | undefined,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.resolveComplianceFlag(id, notes, admin._id.toString());
+  }
+
+  @Patch('compliance/flags/:id/escalate')
+  async escalateComplianceFlag(
+    @Param('id') id: string,
+    @Body('notes') notes: string | undefined,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.escalateComplianceFlag(id, notes, admin._id.toString());
+  }
+
+  @Post('compliance/flags/:id/notes')
+  async addComplianceFlagNote(
+    @Param('id') id: string,
+    @Body('note') note: string,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.addComplianceFlagNote(id, note, admin._id.toString());
+  }
+
   // ─── Withdrawal Approval ──────────────────────────
   @Get('withdrawals')
   async getPendingWithdrawals(@Query('limit') limit = 20, @Query('offset') offset = 0) {
@@ -96,6 +162,33 @@ export class AdminController {
     @CurrentUser() admin: UserDocument,
   ) {
     return this.adminService.rejectWithdrawal(id, reason, admin._id.toString());
+  }
+
+  @Get('markets/recurring')
+  async getRecurringMarkets(@Query('limit') limit = 20, @Query('offset') offset = 0) {
+    return this.adminService.getRecurringMarketTemplates(Number(limit), Number(offset));
+  }
+
+  @Post('markets/recurring')
+  async createRecurringMarket(
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.createRecurringMarketTemplate(body, admin._id.toString());
+  }
+
+  @Patch('markets/recurring/:id')
+  async updateRecurringMarket(
+    @Param('id') id: string,
+    @Body() body: Record<string, unknown>,
+    @CurrentUser() admin: UserDocument,
+  ) {
+    return this.adminService.updateRecurringMarketTemplate(id, body, admin._id.toString());
+  }
+
+  @Delete('markets/recurring/:id')
+  async deleteRecurringMarket(@Param('id') id: string, @CurrentUser() admin: UserDocument) {
+    return this.adminService.deleteRecurringMarketTemplate(id, admin._id.toString());
   }
 
   @Get('audit-logs')

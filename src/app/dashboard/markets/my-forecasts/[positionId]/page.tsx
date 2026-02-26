@@ -14,6 +14,11 @@ import {
   normalizePosition,
 } from "@/lib/live-data";
 
+type OutcomeOption = {
+  id: string;
+  name: string;
+};
+
 export default function ForecastTicketPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -24,7 +29,10 @@ export default function ForecastTicketPage() {
   const [loading, setLoading] = useState(true);
   const [position, setPosition] = useState<Position | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [newAmount, setNewAmount] = useState<number>(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [marketOutcomes, setMarketOutcomes] = useState<OutcomeOption[]>([]);
+  const [selectedOutcomeId, setSelectedOutcomeId] = useState("");
+  const [savedOutcomeId, setSavedOutcomeId] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -35,7 +43,27 @@ export default function ForecastTicketPage() {
 
       if (foundPosition) {
         setPosition(foundPosition);
-        setNewAmount(foundPosition.stakeAmount);
+        const currentOutcomeId = String(
+          payload?.selectedOutcome?._id || payload?.selectedOutcome?.id || "",
+        );
+        setSelectedOutcomeId(currentOutcomeId);
+        setSavedOutcomeId(currentOutcomeId);
+
+        const marketPayload = await fetchJsonOrNull<any>(
+          `/api/markets/${foundPosition.marketId}`,
+        );
+        const options = Array.isArray(marketPayload?.outcomes)
+          ? marketPayload.outcomes.map((outcome: any, index: number) => ({
+              id: String(outcome?._id || outcome?.id || `option-${index}`),
+              name: String(outcome?.optionText || `Option ${index + 1}`),
+            }))
+          : [];
+        setMarketOutcomes(options);
+
+        if (!currentOutcomeId && options.length > 0) {
+          setSelectedOutcomeId(options[0].id);
+          setSavedOutcomeId(options[0].id);
+        }
       }
       setShowSuccess(searchParams.get("new") === "true" && Boolean(foundPosition));
       setLoading(false);
@@ -43,14 +71,61 @@ export default function ForecastTicketPage() {
     void load();
   }, [positionId, searchParams]);
 
-  const handleUpdatePosition = () => {
+  const handleUpdatePosition = async () => {
     if (!position) return;
-    setIsEditing(false);
-    setNewAmount(position.stakeAmount);
-    toast.info(
-      "Update Unavailable",
-      "Stake changes are not supported after submission.",
+    if (!selectedOutcomeId) {
+      toast.error("Missing Selection", "Choose an outcome before saving.");
+      return;
+    }
+
+    const openedAtMs = new Date(position.openedAt).getTime();
+    const isWithinEditWindow =
+      Number.isFinite(openedAtMs) &&
+      Date.now() - openedAtMs <= 5 * 60 * 1000;
+
+    if (!isWithinEditWindow || position.status !== "active") {
+      toast.error(
+        "Edit Window Closed",
+        "Forecast updates are only available within 5 minutes.",
+      );
+      setIsEditing(false);
+      return;
+    }
+
+    if (selectedOutcomeId === savedOutcomeId) {
+      setIsEditing(false);
+      return;
+    }
+
+    setIsUpdating(true);
+    const response = await fetch(`/api/markets/my/positions/${position.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ outcomeId: selectedOutcomeId }),
+    });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      setIsUpdating(false);
+      toast.error(
+        "Update Failed",
+        payload?.message || payload?.error || "Unable to update forecast.",
+      );
+      return;
+    }
+
+    const selectedOutcome = marketOutcomes.find(
+      (option) => option.id === selectedOutcomeId,
     );
+    setPosition((current) =>
+      current
+        ? { ...current, outcome: selectedOutcome?.name || current.outcome }
+        : current,
+    );
+    setSavedOutcomeId(selectedOutcomeId);
+    setIsUpdating(false);
+    setIsEditing(false);
+    toast.success("Forecast Updated", "Your selected outcome has been updated.");
   };
 
   const handleCancelPosition = async () => {
@@ -100,6 +175,14 @@ export default function ForecastTicketPage() {
   }
 
   const isMarketOpen = position.status === "active";
+  const openedAtMs = new Date(position.openedAt).getTime();
+  const editWindowRemainingMs =
+    Number.isFinite(openedAtMs)
+      ? Math.max(0, openedAtMs + 5 * 60 * 1000 - Date.now())
+      : 0;
+  const canEdit =
+    isMarketOpen && editWindowRemainingMs > 0 && marketOutcomes.length > 0;
+  const canCancel = isMarketOpen && editWindowRemainingMs > 0;
   const potentialProfit = (position.potentialWin || 0) - position.stakeAmount;
   const isWon = position.status === "settled" && (position.pnl ?? 0) > 0;
 
@@ -246,7 +329,7 @@ export default function ForecastTicketPage() {
                 <p className="text-xs font-semibold text-black/40 uppercase tracking-wider">
                   Stake Amount
                 </p>
-                {isMarketOpen && !isEditing && (
+                {canEdit && !isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
                     className="text-xs font-semibold text-black hover:text-black/80 transition-colors cursor-pointer"
@@ -258,29 +341,35 @@ export default function ForecastTicketPage() {
 
               {isEditing ? (
                 <div className="space-y-3">
-                  <div className="relative group">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-semibold text-black/20 group-focus-within:text-black transition-colors">
-                      $
-                    </span>
-                    <input
-                      type="number"
-                      value={newAmount}
-                      onChange={(e) => setNewAmount(parseFloat(e.target.value))}
-                      className="w-full font-mono pl-10 pr-4 py-4 text-3xl font-semibold bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-black/10 focus:outline-none transition-all placeholder:text-black/10 tabular-nums"
-                      autoFocus
-                    />
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-semibold text-black/40 uppercase tracking-wider">
+                      Change Outcome
+                    </label>
+                    <select
+                      value={selectedOutcomeId}
+                      onChange={(event) => setSelectedOutcomeId(event.target.value)}
+                      className="w-full px-4 py-3 rounded-2xl border-2 border-black/10 bg-white outline-none focus:border-black transition-all cursor-pointer text-black/90"
+                    >
+                      {marketOutcomes.map((outcome) => (
+                        <option key={outcome.id} value={outcome.id}>
+                          {outcome.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <button
-                      onClick={handleUpdatePosition}
+                      onClick={() => void handleUpdatePosition()}
+                      disabled={isUpdating}
                       className="py-3 bg-black text-white rounded-xl font-semibold text-sm hover:bg-black/90 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-black/5"
                     >
-                      <IoSaveOutline className="w-4 h-4" /> Save
+                      <IoSaveOutline className="w-4 h-4" />{" "}
+                      {isUpdating ? "Saving..." : "Save"}
                     </button>
                     <button
                       onClick={() => {
                         setIsEditing(false);
-                        setNewAmount(position.stakeAmount);
+                        setSelectedOutcomeId(savedOutcomeId);
                       }}
                       className="py-3 bg-gray-100 text-black/80 rounded-xl font-semibold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
                     >
@@ -293,6 +382,11 @@ export default function ForecastTicketPage() {
                   <p className="text-4xl font-mono font-semibold text-black tracking-tighter tabular-nums">
                     ${position.stakeAmount.toLocaleString()}
                   </p>
+                  {isMarketOpen && !canEdit && (
+                    <p className="text-xs text-black/40 mt-2">
+                      Edit window closed. Updates are allowed for 5 minutes after entry.
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -348,7 +442,7 @@ export default function ForecastTicketPage() {
             </div>
 
             {/* Cancel Action */}
-            {isMarketOpen && (
+            {canCancel && (
               <div className="pt-2">
                 <button
                   onClick={handleCancelPosition}

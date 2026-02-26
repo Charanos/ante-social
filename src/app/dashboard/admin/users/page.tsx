@@ -2,7 +2,24 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconAccessPoint, IconCalendar, IconChevronDown, IconCrown, IconMail, IconSearch, IconShield, IconUser, IconUserCheck, IconUsers, IconLoader3 } from '@tabler/icons-react';
+import {
+  IconAccessPoint,
+  IconCalendar,
+  IconChevronDown,
+  IconCrown,
+  IconEye,
+  IconLoader3,
+  IconLock,
+  IconLockOpen2,
+  IconMail,
+  IconSearch,
+  IconShield,
+  IconTrash,
+  IconUser,
+  IconUserCheck,
+  IconUsers,
+  IconX,
+} from '@tabler/icons-react';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast-notification";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -86,6 +103,7 @@ export default function UserManagementPage() {
   const [levelFilter, setLevelFilter] = useState("all");
   const [kycFilter, setKycFilter] = useState("all");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -120,6 +138,18 @@ export default function UserManagementPage() {
         offset: 0,
       })) as ComplianceFlagsResponse;
     },
+  });
+
+  const {
+    data: selectedUserDetails,
+    isLoading: isUserDetailsLoading,
+  } = useQuery({
+    queryKey: ["admin-user-details", selectedUserId],
+    queryFn: async () => {
+      if (!selectedUserId) return null;
+      return adminApi.getUserById(selectedUserId);
+    },
+    enabled: Boolean(selectedUserId),
   });
 
   const users = usersResponse?.data || [];
@@ -162,6 +192,41 @@ export default function UserManagementPage() {
     },
     onError: (error: any) => {
       toast.error("Action Failed", getApiErrorMessage(error, "Could not update compliance state."));
+    },
+  });
+
+  const suspendUserMutation = useMutation({
+    mutationFn: async ({ userId, reason }: { userId: string; reason?: string }) =>
+      adminApi.suspendUser(userId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User Suspended", "The user has been suspended.");
+    },
+    onError: (error) => {
+      toast.error("Suspend Failed", getApiErrorMessage(error, "Could not suspend user."));
+    },
+  });
+
+  const unsuspendUserMutation = useMutation({
+    mutationFn: async (userId: string) => adminApi.unsuspendUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User Unsuspended", "The user account is active again.");
+    },
+    onError: (error) => {
+      toast.error("Unsuspend Failed", getApiErrorMessage(error, "Could not unsuspend user."));
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => adminApi.deleteUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User Deleted", "The user has been removed.");
+      setSelectedUserId(null);
+    },
+    onError: (error) => {
+      toast.error("Delete Failed", getApiErrorMessage(error, "Could not delete user."));
     },
   });
 
@@ -325,6 +390,29 @@ export default function UserManagementPage() {
       return;
     }
     complianceActionMutation.mutate({ userId, action });
+  };
+
+  const handleSuspendToggle = (user: User) => {
+    if (user.isBanned) {
+      const shouldUnsuspend = window.confirm("Unsuspend this user account?");
+      if (!shouldUnsuspend) return;
+      unsuspendUserMutation.mutate(user._id);
+      return;
+    }
+
+    const reason = window.prompt("Provide suspension reason", "Policy violation");
+    if (!reason || !reason.trim()) return;
+    const shouldSuspend = window.confirm("Suspend this user account?");
+    if (!shouldSuspend) return;
+    suspendUserMutation.mutate({ userId: user._id, reason: reason.trim() });
+  };
+
+  const handleDeleteUser = (user: User) => {
+    const shouldDelete = window.confirm(
+      `Delete user ${user.username}? This action will anonymize the account and ban access.`,
+    );
+    if (!shouldDelete) return;
+    deleteUserMutation.mutate(user._id);
   };
 
   const totalUsers = Number(usersResponse?.meta?.total || users.length);
@@ -509,32 +597,64 @@ export default function UserManagementPage() {
                             </div>
                           </div>
 
-                          <div className="relative">
-                            <button 
-                                onClick={() => setOpenDropdown(openDropdown === user._id ? null : user._id)}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white cursor-pointer hover:bg-neutral-50 transition-all"
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setSelectedUserId(user._id)}
+                              className="flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-50 transition-all cursor-pointer"
                             >
-                                <span className="text-xs font-medium text-neutral-600 uppercase">{user.tier}</span>
-                                <div className="h-4 w-px bg-neutral-200"></div>
-                                <IconChevronDown className="w-3.5 h-3.5 text-neutral-500 ml-1" />
+                              <IconEye className="w-3.5 h-3.5" />
+                              Details
+                            </button>
+                            <button
+                              onClick={() => handleSuspendToggle(user)}
+                              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
+                                user.isBanned
+                                  ? "border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+                                  : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                              }`}
+                            >
+                              {user.isBanned ? (
+                                <IconLockOpen2 className="w-3.5 h-3.5" />
+                              ) : (
+                                <IconLock className="w-3.5 h-3.5" />
+                              )}
+                              {user.isBanned ? "Unsuspend" : "Suspend"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(user)}
+                              className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 transition-all cursor-pointer"
+                            >
+                              <IconTrash className="w-3.5 h-3.5" />
+                              Delete
                             </button>
 
-                            {openDropdown === user._id && (
-                                <div className="absolute right-0 top-full mt-2 w-40 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 overflow-hidden">
-                                    <button 
-                                        onClick={() => handleLevelChange(user._id, 'novice')}
-                                        className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50"
-                                    >
-                                        Novice
-                                    </button>
-                                    <button 
-                                        onClick={() => handleLevelChange(user._id, 'high_roller')}
-                                        className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50"
-                                    >
-                                        High Roller
-                                    </button>
-                                </div>
-                            )}
+                            <div className="relative">
+                              <button
+                                  onClick={() => setOpenDropdown(openDropdown === user._id ? null : user._id)}
+                                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white cursor-pointer hover:bg-neutral-50 transition-all"
+                              >
+                                  <span className="text-xs font-medium text-neutral-600 uppercase">{user.tier}</span>
+                                  <div className="h-4 w-px bg-neutral-200"></div>
+                                  <IconChevronDown className="w-3.5 h-3.5 text-neutral-500 ml-1" />
+                              </button>
+
+                              {openDropdown === user._id && (
+                                  <div className="absolute right-0 top-full mt-2 w-40 bg-white border border-neutral-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                                      <button
+                                          onClick={() => handleLevelChange(user._id, 'novice')}
+                                          className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50"
+                                      >
+                                          Novice
+                                      </button>
+                                      <button
+                                          onClick={() => handleLevelChange(user._id, 'high_roller')}
+                                          className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50"
+                                      >
+                                          High Roller
+                                      </button>
+                                  </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -808,6 +928,82 @@ export default function UserManagementPage() {
                       ))}
                     </div>
                   )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {selectedUserId && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 12 }}
+                    className="w-full max-w-xl rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-neutral-900">User Details</h3>
+                      <button
+                        onClick={() => setSelectedUserId(null)}
+                        className="rounded p-1 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-all cursor-pointer"
+                      >
+                        <IconX className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    {isUserDetailsLoading ? (
+                      <div className="flex justify-center py-10">
+                        <IconLoader3 className="h-6 w-6 animate-spin text-neutral-400" />
+                      </div>
+                    ) : selectedUserDetails ? (
+                      <div className="grid gap-3 text-sm text-neutral-700 md:grid-cols-2">
+                        <p>
+                          <span className="font-medium text-neutral-900">ID:</span>{" "}
+                          {String((selectedUserDetails as { _id?: string })._id || selectedUserId)}
+                        </p>
+                        <p>
+                          <span className="font-medium text-neutral-900">Email:</span>{" "}
+                          {String((selectedUserDetails as { email?: string }).email || "N/A")}
+                        </p>
+                        <p>
+                          <span className="font-medium text-neutral-900">Username:</span>{" "}
+                          {String((selectedUserDetails as { username?: string }).username || "N/A")}
+                        </p>
+                        <p>
+                          <span className="font-medium text-neutral-900">Role:</span>{" "}
+                          {String((selectedUserDetails as { role?: string }).role || "user")}
+                        </p>
+                        <p>
+                          <span className="font-medium text-neutral-900">Tier:</span>{" "}
+                          {String((selectedUserDetails as { tier?: string }).tier || "novice")}
+                        </p>
+                        <p>
+                          <span className="font-medium text-neutral-900">Banned:</span>{" "}
+                          {(selectedUserDetails as { isBanned?: boolean }).isBanned ? "Yes" : "No"}
+                        </p>
+                        <p className="md:col-span-2">
+                          <span className="font-medium text-neutral-900">Created:</span>{" "}
+                          {(selectedUserDetails as { createdAt?: string }).createdAt
+                            ? format(
+                                new Date(
+                                  (selectedUserDetails as { createdAt?: string }).createdAt as string,
+                                ),
+                                "MMM do, yyyy p",
+                              )
+                            : "N/A"}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="py-8 text-center text-sm text-neutral-500">
+                        Could not load user details.
+                      </p>
+                    )}
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

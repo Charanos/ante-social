@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { emitLiveUserRefresh, useLiveUser } from "@/lib/live-data";
 import { signOut, useSession } from "next-auth/react";
-import { authApi } from "@/lib/api";
+import { authApi, settingsApi, type SessionItem } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
 import {
   IconUser,
@@ -85,6 +85,19 @@ type SettingsProfilePayload = {
   twoFactorEnabled?: boolean;
 };
 
+function formatSessionTimestamp(value?: string | null) {
+  if (!value) return "Unknown";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export default function SettingsPage() {
   const toast = useToast();
   const { user, isLoading: isUserLoading, refresh } = useLiveUser();
@@ -96,6 +109,11 @@ export default function SettingsPage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isUploadingProfile, setIsUploadingProfile] = useState(false);
   const [isTwoFactorLoading, setIsTwoFactorLoading] = useState(false);
+  const [isSessionsLoading, setIsSessionsLoading] = useState(false);
+  const [revokingSessionId, setRevokingSessionId] = useState<string | null>(
+    null,
+  );
+  const [activeSessions, setActiveSessions] = useState<SessionItem[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasHydratedProfile, setHasHydratedProfile] = useState(false);
   const [initialProfile, setInitialProfile] = useState({
@@ -380,6 +398,51 @@ export default function SettingsPage() {
       setIsTwoFactorLoading(false);
     }
   }, [toast, twoFactorEnabled]);
+
+  const loadSessions = useCallback(async () => {
+    setIsSessionsLoading(true);
+    try {
+      const payload = (await settingsApi.getSessions()) as {
+        data?: SessionItem[];
+      };
+      const sessions = Array.isArray(payload?.data) ? payload.data : [];
+      setActiveSessions(sessions);
+    } catch {
+      setActiveSessions([]);
+    } finally {
+      setIsSessionsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeSection !== "security") return;
+    void loadSessions();
+  }, [activeSection, loadSessions]);
+
+  const handleRevokeSession = useCallback(
+    async (sessionId: string) => {
+      setRevokingSessionId(sessionId);
+      try {
+        await settingsApi.revokeSession(sessionId);
+        setActiveSessions((prev) =>
+          prev.filter((session) => session.id !== sessionId),
+        );
+        toast.success("Session Revoked", "The session has been signed out.");
+
+        if (sessionId === "current") {
+          await signOut({ callbackUrl: "/login" });
+        }
+      } catch (error) {
+        toast.error(
+          "Revoke Failed",
+          getApiErrorMessage(error, "Unable to revoke this session"),
+        );
+      } finally {
+        setRevokingSessionId(null);
+      }
+    },
+    [toast],
+  );
 
   const handleProfilePictureUpload = useCallback(() => {
     const currentAvatar = user.avatarUrl || "";
@@ -903,6 +966,67 @@ export default function SettingsPage() {
                           </motion.div>
                         </motion.button>
                       </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.25 }}
+                      className="p-6 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 space-y-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-base font-semibold text-black/90">
+                          Active Sessions
+                        </h3>
+                        <button
+                          onClick={() => void loadSessions()}
+                          className="px-3 py-1.5 rounded-lg bg-white border border-black/10 text-xs font-semibold text-black/70 hover:bg-black/5 transition-all cursor-pointer"
+                        >
+                          Refresh
+                        </button>
+                      </div>
+
+                      {isSessionsLoading ? (
+                        <div className="space-y-3">
+                          <Skeleton className="h-14 w-full rounded-lg" />
+                          <Skeleton className="h-14 w-full rounded-lg" />
+                        </div>
+                      ) : activeSessions.length === 0 ? (
+                        <div className="p-4 rounded-lg bg-white border border-black/5 text-xs text-black/50">
+                          No active sessions found.
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {activeSessions.map((session) => (
+                            <div
+                              key={session.id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-white border border-black/5"
+                            >
+                              <div>
+                                <p className="text-sm font-semibold text-black/90">
+                                  {session.device || "Session"}
+                                  {session.current ? " (Current)" : ""}
+                                </p>
+                                <p className="text-xs text-black/50">
+                                  {session.ipAddress || "Unknown IP"} • Last active{" "}
+                                  {formatSessionTimestamp(session.lastActiveAt)}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  void handleRevokeSession(session.id)
+                                }
+                                disabled={revokingSessionId === session.id}
+                                className="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all cursor-pointer disabled:opacity-60"
+                              >
+                                {revokingSessionId === session.id
+                                  ? "Revoking..."
+                                  : "Revoke"}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </motion.div>
 
                     <motion.div

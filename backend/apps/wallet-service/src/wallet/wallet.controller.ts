@@ -28,6 +28,11 @@ export class WalletController {
     return this.walletService.getTransactions(user._id.toString(), limit, offset);
   }
 
+  @Get('limits')
+  async getDailyLimits(@CurrentUser() user: UserDocument) {
+    return this.walletService.getDailyLimits(user._id.toString());
+  }
+
   // ─── User-facing deposit ──────────────────────────
   @Post('deposit')
   async deposit(@CurrentUser() user: UserDocument, @Body() depositDto: DepositDto) {

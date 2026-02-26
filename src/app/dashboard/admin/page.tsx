@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import {
   IconAccessPoint,
   IconAward,
+  IconCalendar,
   IconCurrencyDollar,
   IconEdit,
   IconEye,
@@ -163,6 +164,7 @@ export default function AdminPage() {
       actions: [
         { name: "Create New Market", icon: IconPlus, href: "/dashboard/admin/create-market" },
         { name: "Set Up Recurring Market", icon: IconSettings, action: () => setIsRecurringModalOpen(true) },
+        { name: "Recurring Templates", icon: IconCalendar, href: "/dashboard/admin/recurring-markets" },
         { name: "Manage Markets", icon: IconFileText, href: "/dashboard/admin/markets" }
       ]
     },
@@ -172,6 +174,8 @@ export default function AdminPage() {
       color: "purple",
       actions: [
         { name: "User Management", icon: IconUsers, href: "/dashboard/admin/users" },
+        { name: "Compliance Flags", icon: IconShield, href: "/dashboard/admin/compliance" },
+        { name: "Withdrawal Queue", icon: IconCurrencyDollar, href: "/dashboard/admin/withdrawals" },
         { name: "Admin Management", icon: IconShield, href: "/dashboard/admin/admins" }
       ]
     },
@@ -181,7 +185,8 @@ export default function AdminPage() {
       color: "orange",
       actions: [
         { name: "Audit Logs", icon: IconFileText, href: "/dashboard/admin/audit-logs" },
-        { name: "Cron Monitor", icon: IconAccessPoint, href: "/dashboard/admin/cron-monitor" }
+        { name: "Cron Monitor", icon: IconAccessPoint, href: "/dashboard/admin/cron-monitor" },
+        { name: "Analytics Dashboard", icon: IconTrendingUp, href: "/dashboard/admin/analytics" }
       ]
     },
     {
@@ -754,22 +759,26 @@ export default function AdminPage() {
                       </div>
 
                       <div className="flex gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex cursor-pointer items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black/70 transition-all hover:bg-black/5 hover:border-black/20"
-                        >
-                          <IconEdit className="h-4 w-4" />
-                          Edit
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 shadow-sm hover:shadow"
-                        >
-                          <IconEye className="h-4 w-4" />
-                          View
-                        </motion.button>
+                        <Link href={`/dashboard/admin/markets/${market.id}/edit`}>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex cursor-pointer items-center gap-2 rounded-xl border border-black/10 bg-white px-4 py-2 text-sm font-medium text-black/70 transition-all hover:bg-black/5 hover:border-black/20"
+                          >
+                            <IconEdit className="h-4 w-4" />
+                            Edit
+                          </motion.button>
+                        </Link>
+                        <Link href={`/dashboard/admin/markets/${market.id}`}>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 shadow-sm hover:shadow"
+                          >
+                            <IconEye className="h-4 w-4" />
+                            View
+                          </motion.button>
+                        </Link>
                       </div>
                     </div>
                   </motion.div>
@@ -784,6 +793,9 @@ export default function AdminPage() {
       <RecurringMarketModal
         isOpen={isRecurringModalOpen}
         onClose={() => setIsRecurringModalOpen(false)}
+        onSaved={() => {
+          toast.success("Recurring Template Saved", "View and manage templates in recurring markets.");
+        }}
       />
     </div>
   )

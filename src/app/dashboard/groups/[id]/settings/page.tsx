@@ -51,6 +51,7 @@ type SettingsSection = "general" | "privacy" | "roles" | "markets";
 export default function GroupSettingsPage() {
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter();
   const { user, isLoading: isUserLoading } = useLiveUser();
   const toast = useToast();
   const [activeSection, setActiveSection] =
@@ -59,6 +60,7 @@ export default function GroupSettingsPage() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedMarket, setSelectedMarket] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isMarketActionLoading, setIsMarketActionLoading] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
@@ -131,6 +133,8 @@ export default function GroupSettingsPage() {
           participants: Array.isArray(market.participants)
             ? market.participants.length
             : 0,
+          createdAt: market.createdAt || new Date().toISOString(),
+          options: Array.isArray(market.options) ? market.options : [],
           correctOption: null as string | null,
         })),
       );
@@ -196,18 +200,67 @@ export default function GroupSettingsPage() {
     }
   };
 
+  const persistGroupImage = async (imageUrl: string) => {
+    const normalizedImageUrl = imageUrl.trim();
+    if (!normalizedImageUrl) return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/groups/${id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ imageUrl: normalizedImageUrl }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(
+          payload?.message || payload?.error || "Failed to update group image.",
+        );
+      }
+
+      const normalized = normalizeGroup(payload || {});
+      setGroup((prev: any) => ({
+        ...prev,
+        image: normalized.image || normalizedImageUrl,
+      }));
+      setShowImageUpload(false);
+      toast.success("Group Image Updated", "Group branding has been refreshed.");
+    } catch (error: any) {
+      toast.error(
+        "Image Update Failed",
+        error?.message || "Unable to update group image.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleImageUpload = () => {
-    fileInputRef.current?.click();
+    if (!canEdit) return;
+    const nextImageUrl = window
+      .prompt("Paste a public image URL for this group", group.image || "")
+      ?.trim();
+    if (!nextImageUrl || nextImageUrl === group.image) return;
+    void persistGroupImage(nextImageUrl);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // Handle image upload
-      console.log("Uploading:", file.name);
-      setShowImageUpload(false);
-      setHasUnsavedChanges(true);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = typeof reader.result === "string" ? reader.result : "";
+      if (!dataUrl) {
+        toast.error("Image Upload Failed", "Unable to read selected file.");
+        return;
+      }
+      void persistGroupImage(dataUrl);
+    };
+    reader.onerror = () => {
+      toast.error("Image Upload Failed", "Unable to process selected file.");
+    };
+    reader.readAsDataURL(file);
   };
 
   const sections = [
@@ -251,6 +304,52 @@ export default function GroupSettingsPage() {
       (filterStatus === "settled" && market.status === "settled");
     return matchesSearch && matchesFilter;
   });
+
+  const handleOpenMarketConsole = (marketId: string) => {
+    setSelectedMarket(null);
+    router.push(`/dashboard/groups/${id}/markets/${marketId}`);
+  };
+
+  const handlePendingSettlementAction = async (action: "confirm" | "disagree") => {
+    if (!selectedMarket?.id) return;
+
+    setIsMarketActionLoading(true);
+    try {
+      const response = await fetch(
+        `/api/groups/${id}/markets/${selectedMarket.id}/settle`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action }),
+        },
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || "Failed to submit action.");
+      }
+
+      const fallbackStatus = action === "confirm" ? "settled" : "disputed";
+      const nextStatus = String(payload?.status || fallbackStatus);
+      setSelectedMarket((prev: any) =>
+        prev ? { ...prev, status: nextStatus } : prev,
+      );
+      setMarkets((prev) =>
+        prev.map((market) =>
+          market.id === selectedMarket.id ? { ...market, status: nextStatus } : market,
+        ),
+      );
+
+      if (action === "confirm") {
+        toast.success("Settlement Confirmed", "Market marked as settled.");
+      } else {
+        toast.info("Marked as Disputed", "This market has been escalated for review.");
+      }
+    } catch (error: any) {
+      toast.error("Action Failed", error?.message || "Unable to submit action.");
+    } finally {
+      setIsMarketActionLoading(false);
+    }
+  };
 
   const getTypeStyles = (type: string) => {
     switch (type.toLowerCase()) {
@@ -1102,106 +1201,74 @@ export default function GroupSettingsPage() {
                 {/* Actions based on Status */}
                 {(isPlatformAdmin || isGroupAdmin) && (
                   <div className="space-y-6">
-                    {/* Active State Actions */}
-                    {selectedMarket.status === "active" && (
-                      <div className="space-y-4">
-                        <div className="p-4 rounded-2xl bg-black/5 border border-black/5 space-y-3">
-                          <label className="text-sm font-semibold text-black/70">
-                            Management Options
-                          </label>
-                          <div className="flex gap-3">
-                            <button className="flex-1 py-2.5 px-4 bg-white border border-black/10 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2">
-                              <IconEdit className="w-4 h-4" />
-                              IconEdit Details
-                            </button>
-                            <button className="flex-1 py-2.5 px-4 bg-white border border-black/10 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors flex items-center justify-center gap-2">
-                              <IconX className="w-4 h-4" />
-                              Cancel Market
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Pending Confirmation - Settle Actions */}
-                    {selectedMarket.status === "pending_confirmation" && (
-                      <div className="space-y-4">
-                        <p className="text-sm font-semibold text-black/80 flex items-center gap-2">
-                          <IconGavel className="w-4 h-4" />
-                          Determine Winner
-                        </p>
-                        <div className="grid grid-cols-1 gap-2">
-                          {["Man United", "Liverpool", "Draw"].map((option) => (
-                            <button
-                              key={option}
-                              onClick={() => {
-                                const updated = markets.map((m) =>
-                                  m.id === selectedMarket.id
-                                    ? { ...m, correctOption: option }
-                                    : m,
-                                );
-                                setMarkets(updated);
-                                setSelectedMarket({
-                                  ...selectedMarket,
-                                  correctOption: option,
-                                });
-                              }}
-                              className={cn(
-                                "flex items-center justify-between p-3 rounded-xl border-2 transition-all",
-                                selectedMarket.correctOption === option
-                                  ? "border-black bg-black/5"
-                                  : "border-transparent bg-neutral-50 hover:bg-neutral-100",
-                              )}
-                            >
-                              <span className="font-medium text-sm">
-                                {option}
-                              </span>
-                              {selectedMarket.correctOption === option && (
-                                <IconCircleCheckFilled className="w-4 h-4 text-black" />
-                              )}
-                            </button>
-                          ))}
-                        </div>
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-2xl bg-black/5 border border-black/5 space-y-3">
+                        <label className="text-sm font-semibold text-black/70">
+                          Management Options
+                        </label>
                         <button
-                          disabled={!selectedMarket.correctOption}
-                          onClick={() => {
-                            const updated = markets.map((m) =>
-                              m.id === selectedMarket.id
-                                ? { ...m, status: "settled" }
-                                : m,
-                            );
-                            setMarkets(updated);
-                            setSelectedMarket({
-                              ...selectedMarket,
-                              status: "settled",
-                            });
-                          }}
-                          className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-green-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => handleOpenMarketConsole(String(selectedMarket.id))}
+                          className="w-full py-2.5 px-4 bg-white border border-black/10 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
                         >
-                          <IconCheck className="w-4 h-4" />
-                          Confirm Result
+                          <IconExternalLink className="w-4 h-4" />
+                          Open Market Console
                         </button>
                       </div>
-                    )}
 
-                    {/* Settled View */}
-                    {selectedMarket.status === "settled" && (
-                      <div className="p-4 rounded-xl bg-green-50 border border-green-200">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-green-100 rounded-full">
-                            <IconAward className="w-5 h-5 text-green-700" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-green-800 uppercase tracking-wider">
-                              Winner Declared
-                            </p>
-                            <p className="text-lg font-medium text-green-900">
-                              {selectedMarket.correctOption}
-                            </p>
+                      {selectedMarket.status === "pending_confirmation" && (
+                        <div className="space-y-3">
+                          <p className="text-sm font-semibold text-black/80 flex items-center gap-2">
+                            <IconGavel className="w-4 h-4" />
+                            Settlement Voting
+                          </p>
+                          <div className="grid grid-cols-2 gap-3">
+                            <button
+                              disabled={isMarketActionLoading}
+                              onClick={() => void handlePendingSettlementAction("confirm")}
+                              className="py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
+                            >
+                              {isMarketActionLoading ? "Working..." : "Confirm"}
+                            </button>
+                            <button
+                              disabled={isMarketActionLoading}
+                              onClick={() => void handlePendingSettlementAction("disagree")}
+                              className="py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
+                            >
+                              Dispute
+                            </button>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+
+                      {selectedMarket.status === "active" && (
+                        <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
+                          <p className="text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                            Active Market
+                          </p>
+                          <p className="text-sm text-blue-900 mt-1">
+                            Use the market console to declare a winner when this market closes.
+                          </p>
+                        </div>
+                      )}
+
+                      {selectedMarket.status === "settled" && (
+                        <div className="p-4 rounded-xl bg-green-50 border border-green-200">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-green-100 rounded-full">
+                              <IconAward className="w-5 h-5 text-green-700" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-green-800 uppercase tracking-wider">
+                                Market Settled
+                              </p>
+                              <p className="text-sm text-green-900">
+                                Settlement is complete for this market.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

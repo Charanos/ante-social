@@ -271,6 +271,57 @@ export class AuthService {
     return { success: true, message: 'Password changed successfully' };
   }
 
+  async getSessions(userId: string) {
+    const user = await this.userModel
+      .findById(userId)
+      .select('lastLoginAt lastLoginIp refreshTokenHash refreshTokenExpiresAt createdAt updatedAt');
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.refreshTokenHash) {
+      return { data: [], meta: { total: 0 } };
+    }
+
+    const referenceTime =
+      user.lastLoginAt ||
+      user.updatedAt ||
+      user.createdAt ||
+      new Date();
+
+    return {
+      data: [
+        {
+          id: 'current',
+          device: 'Current session',
+          ipAddress: user.lastLoginIp || null,
+          createdAt: referenceTime.toISOString(),
+          lastActiveAt: referenceTime.toISOString(),
+          expiresAt: user.refreshTokenExpiresAt
+            ? user.refreshTokenExpiresAt.toISOString()
+            : null,
+          current: true,
+        },
+      ],
+      meta: { total: 1 },
+    };
+  }
+
+  async revokeSession(userId: string, sessionId: string) {
+    if (sessionId !== 'current') {
+      throw new NotFoundException('Session not found');
+    }
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.clearRefreshToken(user);
+    return { success: true };
+  }
+
   private async issueAuthTokens(user: UserDocument) {
     const payload: JwtPayload = {
       sub: user._id.toString(),

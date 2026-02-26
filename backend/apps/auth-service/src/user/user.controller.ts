@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Param, Query, UseGuards, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard, CurrentUser } from '@app/common';
 import { UserDocument } from '@app/database';
@@ -24,6 +24,12 @@ export class UserController {
     return this.userService.updateProfile(user._id.toString(), body);
   }
 
+  @Delete('user/profile')
+  @UseGuards(JwtAuthGuard)
+  async deleteProfile(@CurrentUser() user: UserDocument) {
+    return this.userService.deleteProfile(user._id.toString());
+  }
+
   @Get('user/activity')
   @UseGuards(JwtAuthGuard)
   async getActivity(
@@ -37,5 +43,20 @@ export class UserController {
   @Get('users/:userId/profile')
   async getPublicProfile(@Param('userId') userId: string) {
     return this.userService.getPublicProfile(userId);
+  }
+
+  @Get('users/:username/public-profile')
+  async getPublicProfileByUsername(@Param('username') username: string) {
+    return this.userService.getPublicProfile(username);
+  }
+
+  @Get('users/:username/achievements')
+  async getPublicAchievements(@Param('username') username: string) {
+    return this.userService.getPublicAchievements(username);
+  }
+
+  @Get('users/:username/stats')
+  async getPublicStats(@Param('username') username: string) {
+    return this.userService.getPublicStats(username);
   }
 }

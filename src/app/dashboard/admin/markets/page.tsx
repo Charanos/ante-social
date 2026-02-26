@@ -130,6 +130,25 @@ export default function MarketManagerPage() {
     [refresh, toast],
   );
 
+  const handleSettleMarket = useCallback(
+    async (marketId: string) => {
+      setActionLoadingId(marketId);
+      try {
+        await marketsApi.settle(marketId, {});
+        await refresh();
+        toast.success("Settlement Started", "Market settlement has been triggered.");
+      } catch (error) {
+        toast.error(
+          "Action Failed",
+          getApiErrorMessage(error, "Unable to settle market"),
+        );
+      } finally {
+        setActionLoadingId(null);
+      }
+    },
+    [refresh, toast],
+  );
+
   const totalMarkets = markets.length;
   const activeMarkets = markets.filter((m) => m.status === "active").length;
   const totalPool = markets.reduce((sum, m) => sum + m.pool, 0);
@@ -341,6 +360,16 @@ export default function MarketManagerPage() {
                         >
                           <IconAlertCircle className="w-3.5 h-3.5" />
                           Close
+                        </button>
+                      )}
+                      {market.status === "closed" && (
+                        <button
+                          disabled={actionLoadingId === market.id}
+                          onClick={() => void handleSettleMarket(market.id)}
+                          className="px-3 py-1.5 text-xs font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          <IconTrendingUp className="w-3.5 h-3.5" />
+                          Settle
                         </button>
                       )}
                       <button

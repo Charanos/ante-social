@@ -150,6 +150,13 @@ export class User {
 
   @Prop()
   banReason?: string;
+
+  // Timestamp fields are materialized by `timestamps: true` and added here for typing.
+  @Prop()
+  createdAt?: Date;
+
+  @Prop()
+  updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

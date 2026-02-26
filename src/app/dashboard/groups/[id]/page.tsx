@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   IconAccessPoint,
@@ -55,6 +55,8 @@ import {
   normalizePositions,
   useLiveUser,
 } from "@/lib/live-data";
+import { groupsApi } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api/client";
 
 // Types
 interface GroupMember {
@@ -76,6 +78,12 @@ interface GroupActivity {
   details?: string;
   amount?: string;
   timestamp: string;
+  marketId?: string;
+  marketTitle?: string;
+  outcome?: string;
+  status?: string;
+  stakeAmount?: number;
+  currentValue?: number;
 }
 
 interface GroupPosition {
@@ -656,6 +664,7 @@ const ManageForecastSlip = ({
 
 export default function GroupPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const groupId = params.id as string;
   const router = useRouter();
   const toast = useToast();
@@ -695,6 +704,7 @@ export default function GroupPage() {
   const canManageMembers = isPlatformAdmin || isGroupAdmin;
 
   const [isMember, setIsMember] = useState(false);
+  const inviteCodeFromUrl = searchParams?.get("invite") || "";
 
   useEffect(() => {
     const load = async () => {
@@ -810,10 +820,83 @@ export default function GroupPage() {
       );
       setUserForecasts(combined);
       setForecasts(combined);
+
+      const participantActivities: GroupActivity[] = mappedMarkets.flatMap((market: any) =>
+        (market.participantsRaw || []).map((participant: any, index: number) => {
+          const participantUser =
+            participant?.userId && typeof participant.userId === "object"
+              ? participant.userId
+              : {};
+          const participantId =
+            resolveUserId(participant?.userId) || `${market.id}-member-${index}`;
+          const username =
+            String(participantUser?.username || participant?.username || "").trim() ||
+            `member_${index + 1}`;
+          const settled = String(market.status || "").toLowerCase() === "settled";
+          const stakeAmount = Number(market.buyInAmount || 0);
+          const currentValue = Number(participant?.payoutAmount || stakeAmount || 0);
+          return {
+            id: `${market.id}-${participantId}-${settled ? "settled" : "joined"}`,
+            type: settled ? "forecastSettled" : "forecastParticipated",
+            user: username,
+            action: settled ? "settled a forecast in" : "joined a forecast in",
+            details: market.title,
+            amount: `${(settled ? currentValue : stakeAmount).toLocaleString()} KSH`,
+            timestamp: String(
+              participant?.joinedAt ||
+                participant?.createdAt ||
+                market.endsAt ||
+                new Date().toISOString(),
+            ),
+            marketId: String(market.id),
+            marketTitle: market.title,
+            outcome: String(participant?.selectedOption || ""),
+            status: settled ? "settled" : "active",
+            stakeAmount,
+            currentValue,
+          };
+        }),
+      );
+
+      const personalActivities: GroupActivity[] = normalizedPositions.map((position) => ({
+        id: `position-${position.id}`,
+        type: position.status === "settled" ? "forecastSettled" : "forecastParticipated",
+        user: user.username || "You",
+        action:
+          position.status === "settled"
+            ? "settled a personal forecast in"
+            : "placed a personal forecast in",
+        details: position.title,
+        amount: `${Number(position.stakeAmount || 0).toLocaleString()} KSH`,
+        timestamp: String(position.openedAt || new Date().toISOString()),
+        marketId: String(position.marketId || ""),
+        marketTitle: position.title,
+        outcome: position.outcome,
+        status: position.status,
+        stakeAmount: Number(position.stakeAmount || 0),
+        currentValue: Number(position.currentValue || 0),
+      }));
+
+      const activityFeed = [...participantActivities, ...personalActivities]
+        .filter((activity, index, allActivities) => {
+          return (
+            allActivities.findIndex((item) => item.id === activity.id) === index
+          );
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+        )
+        .slice(0, 50);
+
+      setGroup((prev) => ({
+        ...prev,
+        activityFeed,
+      }));
       setIsLoading(false);
     };
     void load();
-  }, [groupId, user.id]);
+  }, [groupId, user.id, user.username]);
 
   const leaderboard = useMemo(() => {
     const members = (group.members || [])
@@ -891,21 +974,15 @@ export default function GroupPage() {
   const handleJoinGroup = useCallback(async () => {
     setIsJoining(true);
     try {
-      const response = await fetch(`/api/groups/${groupId}/join`, {
-        method: "POST",
-      });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new Error(payload?.message || payload?.error || "Failed to join group");
-      }
+      await groupsApi.joinWithInvite(groupId, inviteCodeFromUrl || undefined);
       setIsMember(true);
       toast.success("Joined Group Successfully", `Welcome to ${group.name}!`);
     } catch (error) {
-      toast.error("Error", "Failed to join group");
+      toast.error("Error", getApiErrorMessage(error, "Failed to join group"));
     } finally {
       setIsJoining(false);
     }
-  }, [groupId, group.name, toast]);
+  }, [groupId, inviteCodeFromUrl, group.name, toast]);
 
   const handleLeaveGroup = useCallback(async () => {
     setIsActionLoading(true);
@@ -929,8 +1006,17 @@ export default function GroupPage() {
   }, [groupId, toast, router]);
 
   const handleInvite = useCallback(async () => {
-    const slug = group.name.toLowerCase().replace(/\s+/g, "-");
-    const url = `${window.location.origin}/dashboard/groups/join/${slug}-${group.id}`;
+    let url = `${window.location.origin}/dashboard/groups/${group.id}`;
+    try {
+      const payload = await groupsApi.invite(String(group.id));
+      const invitePath = String((payload as { invitePath?: string }).invitePath || "");
+      if (invitePath) {
+        url = `${window.location.origin}${invitePath}`;
+      }
+    } catch (error) {
+      toast.error("Invite Error", getApiErrorMessage(error, "Could not generate invite link."));
+      return;
+    }
 
     if (navigator.share) {
       try {
@@ -1500,6 +1586,14 @@ export default function GroupPage() {
                     ))
                   ) : (
                     <>
+                      {(group.activityFeed || []).length === 0 ? (
+                        <div className="p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-black/5 text-center">
+                          <p className="text-sm font-medium text-black/60">No activity yet.</p>
+                          <p className="text-xs text-black/40 mt-1">
+                            Group activity appears here as members place and settle forecasts.
+                          </p>
+                        </div>
+                      ) : null}
                       {group.activityFeed?.map(
                         (activity: GroupActivity, index: number) => (
                           <motion.div
@@ -1511,22 +1605,28 @@ export default function GroupPage() {
                               // If it's a forecast-related activity, show management slip
                               if (activity.type.includes("forecast")) {
                                 setSelectedForecastToManage({
-                                  id: activity.id,
-                                  title: activity.details || activity.action,
-                                  amount: parseInt(
-                                    activity.amount?.replace(/[^\d]/g, "") || "0",
-                                  ),
-                                  potentialWin:
+                                  id: activity.id.replace(/^position-/, ""),
+                                  title:
+                                    activity.marketTitle ||
+                                    activity.details ||
+                                    activity.action,
+                                  amount:
+                                    Number(activity.stakeAmount || 0) ||
                                     parseInt(
                                       activity.amount?.replace(/[^\d]/g, "") || "0",
-                                    ) * 1.95,
+                                    ),
+                                  potentialWin:
+                                    Number(activity.currentValue || 0) ||
+                                    Number(activity.stakeAmount || 0) * 1.95,
                                   status:
-                                    activity.type === "forecastSettled"
+                                    activity.status ||
+                                    (activity.type === "forecastSettled"
                                       ? "settled"
-                                      : "active",
-                                  outcome: activity.details || "Unknown",
+                                      : "active"),
+                                  outcome: activity.outcome || activity.details || "Unknown",
                                   date: activity.timestamp,
-                                  marketId: "market_001",
+                                  marketId: activity.marketId || "",
+                                  source: "group_position",
                                 });
                               }
                             }}
@@ -1571,9 +1671,11 @@ export default function GroupPage() {
                           </motion.div>
                         ),
                       )}
-                      <p className="text-center text-sm text-black/30 font-normal py-4">
-                        End of activity
-                      </p>
+                      {(group.activityFeed || []).length > 0 ? (
+                        <p className="text-center text-sm text-black/30 font-normal py-4">
+                          End of activity
+                        </p>
+                      ) : null}
                     </>
                   )}
                 </div>

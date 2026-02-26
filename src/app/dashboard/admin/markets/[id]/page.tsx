@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   IconAward,
@@ -18,6 +18,8 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { marketsApi } from "@/lib/api";
 
 type MarketOutcome = {
   _id?: string;
@@ -87,22 +89,28 @@ export default function ViewMarketPage() {
 
   const [marketData, setMarketData] = useState<MarketPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMutating, setIsMutating] = useState(false);
+  const [selectedOutcomeId, setSelectedOutcomeId] = useState("");
+
+  const loadMarket = useCallback(async () => {
+    setIsLoading(true);
+    const response = await fetch(`/api/markets/${marketId}`, { cache: "no-store" });
+    if (!response.ok) {
+      setMarketData(null);
+      setIsLoading(false);
+      return;
+    }
+    const payload = (await response.json().catch(() => null)) as MarketPayload | null;
+    setMarketData(payload);
+    const firstOutcome = payload?.outcomes?.[0];
+    const firstOutcomeId = String(firstOutcome?._id || firstOutcome?.id || "");
+    setSelectedOutcomeId((current) => current || firstOutcomeId);
+    setIsLoading(false);
+  }, [marketId]);
 
   useEffect(() => {
-    const load = async () => {
-      setIsLoading(true);
-      const response = await fetch(`/api/markets/${marketId}`, { cache: "no-store" });
-      if (!response.ok) {
-        setMarketData(null);
-        setIsLoading(false);
-        return;
-      }
-      const payload = (await response.json().catch(() => null)) as MarketPayload | null;
-      setMarketData(payload);
-      setIsLoading(false);
-    };
-    void load();
-  }, [marketId]);
+    void loadMarket();
+  }, [loadMarket]);
 
   const outcomes = useMemo(() => {
     const raw = Array.isArray(marketData?.outcomes) ? marketData.outcomes : [];
@@ -145,6 +153,49 @@ export default function ViewMarketPage() {
     }
   };
 
+  const handleCloseMarket = async () => {
+    if (!window.confirm("Close this market now?")) return;
+    setIsMutating(true);
+    try {
+      await marketsApi.close(marketId);
+      toast.success("Market Closed", "The market is now closed.");
+      await loadMarket();
+    } catch (error) {
+      toast.error(
+        "Close Failed",
+        getApiErrorMessage(error, "Unable to close market"),
+      );
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
+  const handleSettleMarket = async () => {
+    if (
+      !window.confirm(
+        "Settle this market now? This will trigger payouts and cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    setIsMutating(true);
+    try {
+      await marketsApi.settle(marketId, {
+        winningOptionId: selectedOutcomeId || undefined,
+      });
+      toast.success("Settlement Triggered", "Market settlement has started.");
+      await loadMarket();
+    } catch (error) {
+      toast.error(
+        "Settle Failed",
+        getApiErrorMessage(error, "Unable to settle market"),
+      );
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
   if (isLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
@@ -176,6 +227,39 @@ export default function ViewMarketPage() {
               Edit Market
             </button>
           </Link>
+          {normalizedStatus === "active" && (
+            <button
+              onClick={() => void handleCloseMarket()}
+              disabled={isMutating}
+              className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm disabled:opacity-60"
+            >
+              {isMutating ? "Closing..." : "Close Market"}
+            </button>
+          )}
+          {(normalizedStatus === "closed" || normalizedStatus === "settling") && (
+            <>
+              {outcomes.length > 0 && (
+                <select
+                  value={selectedOutcomeId}
+                  onChange={(event) => setSelectedOutcomeId(event.target.value)}
+                  className="px-3 py-2 text-sm rounded-lg border border-neutral-200 bg-white text-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent cursor-pointer"
+                >
+                  {outcomes.map((outcome) => (
+                    <option key={outcome.id} value={outcome.id}>
+                      {outcome.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={() => void handleSettleMarket()}
+                disabled={isMutating}
+                className="px-4 py-2 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm disabled:opacity-60"
+              >
+                {isMutating ? "Settling..." : "Settle Market"}
+              </button>
+            </>
+          )}
           <button
             onClick={handleShare}
             className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm"
@@ -356,4 +440,3 @@ export default function ViewMarketPage() {
     </div>
   );
 }
-

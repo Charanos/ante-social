@@ -119,6 +119,53 @@ export class WalletService {
     return { data: transactions, meta: { total, limit: safeLimit, offset: safeOffset } };
   }
 
+  async getDailyLimits(userId: string) {
+    const userTier = await this.getUserTier(userId);
+    const limits = DAILY_LIMITS[userTier] || DAILY_LIMITS[UserTier.NOVICE];
+    const today = new Date().toISOString().split('T')[0];
+
+    const record = await this.dailyLimitModel
+      .findOne({ userId: new Types.ObjectId(userId), date: today })
+      .lean()
+      .exec();
+
+    const depositUsedUsd = Number(record?.depositUsedUsd || 0);
+    const depositUsedKsh = Number(record?.depositUsedKsh || 0);
+    const withdrawalUsedUsd = Number(record?.withdrawalUsedUsd || 0);
+    const withdrawalUsedKsh = Number(record?.withdrawalUsedKsh || 0);
+
+    return {
+      tier: userTier,
+      date: today,
+      minimums: {
+        deposit: 10,
+        withdrawal: 50,
+      },
+      deposit: {
+        max: limits.deposit,
+        used: {
+          USD: depositUsedUsd,
+          KSH: depositUsedKsh,
+        },
+        remaining: {
+          USD: Math.max(0, limits.deposit - depositUsedUsd),
+          KSH: Math.max(0, limits.deposit - depositUsedKsh),
+        },
+      },
+      withdrawal: {
+        max: limits.withdrawal,
+        used: {
+          USD: withdrawalUsedUsd,
+          KSH: withdrawalUsedKsh,
+        },
+        remaining: {
+          USD: Math.max(0, limits.withdrawal - withdrawalUsedUsd),
+          KSH: Math.max(0, limits.withdrawal - withdrawalUsedKsh),
+        },
+      },
+    };
+  }
+
   async initiateDeposit(userId: string, depositDto: DepositDto) {
     const tx = await this.withMongoTransaction(async (session) => {
       const wallet = await this.getOrCreateWallet(userId, session);

@@ -14,6 +14,10 @@ import { DailyLimit, DailyLimitSchema } from './schemas/daily-limit.schema';
 import { ComplianceFlag, ComplianceFlagSchema } from './schemas/compliance-flag.schema';
 import { ExchangeRate, ExchangeRateSchema } from './schemas/exchange-rate.schema';
 import { ActivityLog, ActivityLogSchema } from './schemas/activity-log.schema';
+import {
+  RecurringMarketTemplate,
+  RecurringMarketTemplateSchema,
+} from './schemas/recurring-market-template.schema';
 import { UserRepository } from './repositories/user.repository';
 import { WalletRepository } from './repositories/wallet.repository';
 import { TransactionRepository } from './repositories/transaction.repository';
@@ -33,6 +37,7 @@ const schemas = [
   { name: ComplianceFlag.name, schema: ComplianceFlagSchema },
   { name: ExchangeRate.name, schema: ExchangeRateSchema },
   { name: ActivityLog.name, schema: ActivityLogSchema },
+  { name: RecurringMarketTemplate.name, schema: RecurringMarketTemplateSchema },
 ];
 
 @Global()
