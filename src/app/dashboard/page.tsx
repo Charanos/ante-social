@@ -212,6 +212,7 @@ export default function DashboardPage() {
               <Image
                 src="/dashboard-blob.png"
                 fill
+                sizes="(max-width: 1024px) 100vw, 750px"
                 alt="Rank Illustration"
                 className="object-contain drop-shadow-2xl scale-110"
                 priority

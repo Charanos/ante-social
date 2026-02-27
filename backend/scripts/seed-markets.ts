@@ -26,7 +26,7 @@ const DEFAULT_MARKETS: SeedMarket[] = [
     tags: ['crypto', 'btc', 'weekly'],
     outcomes: [{ optionText: 'Yes' }, { optionText: 'No' }],
     mediaUrl:
-      'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=1200&auto=format&fit=crop&q=80',
   },
   {
     title: 'Which team wins Sunday Night Football?',
@@ -36,7 +36,7 @@ const DEFAULT_MARKETS: SeedMarket[] = [
     tags: ['sports', 'nfl', 'snf'],
     outcomes: [{ optionText: 'Home Team' }, { optionText: 'Away Team' }],
     mediaUrl:
-      'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1200&auto=format&fit=crop&q=80',
   },
   {
     title: 'Reflex: First reaction to market crash headline',
@@ -50,6 +50,8 @@ const DEFAULT_MARKETS: SeedMarket[] = [
       { optionText: 'Sell immediately' },
       { optionText: 'Wait and watch' },
     ],
+    mediaUrl:
+      'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&auto=format&fit=crop&q=80',
   },
   {
     title: 'Ladder: Rank AI companies by 2026 revenue growth',
@@ -62,6 +64,8 @@ const DEFAULT_MARKETS: SeedMarket[] = [
       { optionText: 'Company B' },
       { optionText: 'Company C' },
     ],
+    mediaUrl:
+      'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&auto=format&fit=crop&q=80',
   },
 ];
 
@@ -84,6 +88,9 @@ async function seedMarkets() {
     if (!adminUser) {
       throw new Error('No users found. Run seed-admin.ts first.');
     }
+
+    console.log('Clearing existing markets...');
+    await MarketModel.deleteMany({});
 
     const now = Date.now();
     let createdCount = 0;

@@ -143,6 +143,7 @@ export function HallOfFameSection({ className }: HallOfFameSectionProps) {
                 src={leaders[1].avatar}
                 alt={leaders[1].name}
                 fill
+                sizes="80px"
                 className="object-cover"
               />
             </div>
@@ -174,6 +175,7 @@ export function HallOfFameSection({ className }: HallOfFameSectionProps) {
                 src={leaders[0].avatar}
                 alt={leaders[0].name}
                 fill
+                sizes="96px"
                 className="object-cover"
               />
             </div>
@@ -204,6 +206,7 @@ export function HallOfFameSection({ className }: HallOfFameSectionProps) {
                 src={leaders[2].avatar}
                 alt={leaders[2].name}
                 fill
+                sizes="80px"
                 className="object-cover"
               />
             </div>
@@ -239,7 +242,7 @@ export function HallOfFameSection({ className }: HallOfFameSectionProps) {
                 </span>
 
                 <div className="relative w-10 h-10 rounded-full overflow-hidden border border-black/5">
-                  <Image src={leader.avatar} alt={leader.name} fill className="object-cover" />
+                  <Image src={leader.avatar} alt={leader.name} fill sizes="40px" className="object-cover" />
                 </div>
 
                 <div className="flex-1">

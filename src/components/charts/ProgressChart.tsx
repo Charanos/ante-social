@@ -74,7 +74,7 @@ export function ProgressChart({
 
   return (
     <div className={cn("w-full", className)} style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
         <LineChart data={data} margin={{ top: 5, right: hasRightAxis ? 20 : 10, left: hasLeftAxis ? 0 : 10, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
           <XAxis 

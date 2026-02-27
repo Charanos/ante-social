@@ -281,7 +281,7 @@ export default function AdminBlogsPage() {
                   <input
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium"
+                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium text-black"
                     placeholder="Blog post title"
                   />
                 </div>
@@ -291,7 +291,7 @@ export default function AdminBlogsPage() {
                   <input
                     value={form.slug}
                     onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium"
+                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium text-black"
                     placeholder="auto-generated-from-title"
                   />
                 </div>
@@ -302,7 +302,7 @@ export default function AdminBlogsPage() {
                     value={form.excerpt}
                     onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
                     rows={2}
-                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium resize-none text-black"
                     placeholder="Short summary..."
                   />
                 </div>
@@ -313,7 +313,7 @@ export default function AdminBlogsPage() {
                     value={form.content}
                     onChange={(e) => setForm({ ...form, content: e.target.value })}
                     rows={8}
-                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium resize-none text-black"
                     placeholder="Blog post content (supports HTML)..."
                   />
                 </div>
@@ -324,7 +324,7 @@ export default function AdminBlogsPage() {
                     <input
                       value={form.coverImage}
                       onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium"
+                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium text-black"
                       placeholder="https://..."
                     />
                   </div>
@@ -333,7 +333,7 @@ export default function AdminBlogsPage() {
                     <input
                       value={form.author}
                       onChange={(e) => setForm({ ...form, author: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium"
+                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium text-black"
                       placeholder="Author name"
                     />
                   </div>
@@ -345,7 +345,7 @@ export default function AdminBlogsPage() {
                     <input
                       value={form.tags}
                       onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium"
+                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium text-black"
                       placeholder="tag1, tag2, tag3"
                     />
                   </div>
@@ -354,7 +354,7 @@ export default function AdminBlogsPage() {
                     <select
                       value={form.status}
                       onChange={(e) => setForm({ ...form, status: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium cursor-pointer"
+                      className="w-full px-4 py-3 rounded-xl bg-white/60 border border-black/10 focus:border-black/30 outline-none text-sm font-medium cursor-pointer text-black"
                     >
                       <option value="draft">Draft</option>
                       <option value="published">Published</option>
