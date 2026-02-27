@@ -63,7 +63,6 @@ export default function AdminAnalyticsPage() {
   const { data: overview, isLoading: isOverviewLoading, isFetching } = useQuery({
     queryKey: ["admin-analytics-overview"],
     queryFn: () => adminApi.getAnalyticsOverview() as Promise<AdminOverview>,
-    refetchInterval: 30_000,
   });
 
   const { data: revenueMetrics, isLoading: isRevenueLoading } = useQuery({

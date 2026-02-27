@@ -42,8 +42,7 @@ export default function AdminWithdrawalsPage() {
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["admin-withdrawals"],
-    queryFn: () => adminApi.getWithdrawals({ limit: 200, offset: 0, status: "pending" }),
-    refetchInterval: 10_000,
+    queryFn: () => adminApi.getPendingWithdrawals({ limit: 100, offset: 0 }),
   });
 
   const queue = (data?.data || []) as WithdrawalQueueItem[];

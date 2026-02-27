@@ -104,15 +104,6 @@ export default function NotificationsPage() {
   }, [loadNotifications])
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      void loadNotifications()
-    }, 10_000)
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [loadNotifications])
-
-  useEffect(() => {
     const realtimeEventName = "ante-social:notification"
     const handleRealtimeNotification = (event: Event) => {
       const payload = (event as CustomEvent<{ title?: string; message?: string; type?: string }>).detail

@@ -8,16 +8,18 @@ import {
   IconBell,
   IconChevronRight,
   IconHome,
+  IconRotate,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient, useIsFetching } from "@tanstack/react-query";
 import { MobileHeader } from "./MobileHeader";
 import { UserAvatar } from "../ui/UserAvatar";
+import { cn } from "@/lib/utils";
 
 import { UserProfile } from "@/types/user";
 import { EMPTY_USER, useLiveUser, useUnreadNotificationsCount } from "@/lib/live-data";
-
 interface DashboardHeaderProps {
   user?: UserProfile;
   subtitle?: string;
@@ -46,9 +48,16 @@ export default function DashboardHeader({
   const isHome = pathname === "/dashboard";
   const title = pathname?.split("/").filter(Boolean).pop() || "Dashboard";
 
+  const queryClient = useQueryClient();
+  const isFetching = useIsFetching() > 0;
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries();
+  };
+
   return (
     <>
-      <MobileHeader user={user} />
+      <MobileHeader user={user} onRefresh={handleRefresh} isRefreshing={isFetching} />
       
       <div className="hidden md:flex md:items-center justify-between gap-4 px-1 mb-16">
         {/* Left: Back Button & Title */}
@@ -116,6 +125,20 @@ export default function DashboardHeader({
              </span>
           </motion.div>
 
+          {/* Refresh Button */}
+          <motion.button
+            onClick={handleRefresh}
+            className="flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-sm border border-neutral-200/60 rounded-full hover:bg-white hover:shadow-md transition-all shadow-sm group"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title="Refresh dashboard"
+            disabled={isFetching}
+          >
+            <IconRotate className={cn(
+              "w-4 h-4 text-neutral-700 transition-transform",
+              isFetching && "animate-spin"
+            )} />
+          </motion.button>
 
           {/* Notifications IconBell */}
           <motion.button

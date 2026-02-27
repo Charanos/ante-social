@@ -9,7 +9,8 @@ import {
   IoSettingsOutline, 
   IoLogOutOutline, 
   IoPersonOutline,
-  IoChevronDownOutline
+  IoChevronDownOutline,
+  IoRefreshOutline
 } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "next-auth/react";
@@ -18,9 +19,11 @@ import { UserProfile } from "@/types/user";
 
 interface MobileHeaderProps {
   user: UserProfile;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
-export function MobileHeader({ user }: MobileHeaderProps) {
+export function MobileHeader({ user, onRefresh, isRefreshing }: MobileHeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -48,8 +51,20 @@ export function MobileHeader({ user }: MobileHeaderProps) {
         {getPageTitle()}
       </h1>
 
-      {/* Right: Profile Dropdown */}
-      <div className="relative">
+      {/* Right: Actions */}
+      <div className="flex items-center gap-1 pr-2">
+        {onRefresh && (
+          <button 
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="w-10 h-10 flex items-center justify-center rounded-full active:bg-black/5 text-neutral-800 transition-colors cursor-pointer"
+          >
+            <IoRefreshOutline className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
+          </button>
+        )}
+
+        {/* Profile Dropdown */}
+        <div className="relative">
         <button 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="flex items-center gap-2 p-1 rounded-full active:bg-black/5 transition-colors"
@@ -129,5 +144,6 @@ export function MobileHeader({ user }: MobileHeaderProps) {
         </AnimatePresence>
       </div>
     </div>
-  );
+  </div>
+);
 }

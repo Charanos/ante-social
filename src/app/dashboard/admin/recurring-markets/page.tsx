@@ -21,7 +21,6 @@ export default function AdminRecurringMarketsPage() {
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["admin-recurring-markets"],
     queryFn: () => adminApi.getRecurringMarkets({ limit: 200, offset: 0 }),
-    refetchInterval: 30_000,
   });
 
   const templates = useMemo(

@@ -50,7 +50,6 @@ export default function AdminCompliancePage() {
         limit: 300,
         offset: 0,
       }),
-    refetchInterval: 15_000,
   });
 
   const flags = (data?.data || []) as ComplianceFlagItem[];
