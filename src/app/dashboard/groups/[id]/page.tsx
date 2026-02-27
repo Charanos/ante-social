@@ -1018,7 +1018,7 @@ export default function GroupPage() {
       return;
     }
 
-    if (navigator.share) {
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
       try {
         await navigator.share({
           title: `Join ${group.name} on Ante Social`,

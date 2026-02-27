@@ -231,10 +231,10 @@ function FloatingStats() {
         >
           <stat.icon className="w-4 h-4 text-black/80" />
           <div className="flex flex-col items-start">
-            <span className="text-xs text-black/50 font-medium">
+            <span className="text-xs text-black/50 font-normal">
               {stat.label}
             </span>
-            <span className="font-mono text-sm md:text-base font-semibold text-black">
+            <span className="font-mono text-sm md:text-base font-medium text-black">
               {stat.value}
             </span>
           </div>
@@ -333,7 +333,7 @@ export function Hero() {
         className="relative max-w-5xl mx-auto space-y-8 pt-28 z-10"
       >
         <motion.h1
-          className="text-5xl md:text-6xl lg:text-[88px] font-medium tracking-tight text-black leading-[1.1]"
+          className="text-5xl md:text-6xl lg:text-[88px] font-normal tracking-tight text-black leading-[1.1]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
@@ -362,7 +362,7 @@ export function Hero() {
         </motion.h1>
 
         <motion.p
-          className="max-w-2xl mx-auto text-md md:text-lg text-neutral-600 font-medium leading-relaxed"
+          className="max-w-2xl mx-auto text-md md:text-lg text-neutral-600 font-normal leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -391,7 +391,7 @@ export function Hero() {
 
           <Link
             href={heroContent.secondaryCtaLink || "/product/game-modes"}
-            className="px-8 py-2 text-lg font-medium text-black bg-white border border-black/10 rounded-full cursor-pointer hover:bg-black/5 hover:scale-105 transition-all duration-300"
+            className="px-8 py-2 text-lg font-normal text-black bg-white border border-black/10 rounded-full cursor-pointer hover:bg-black/5 hover:scale-105 transition-all duration-300"
           >
             {heroContent.secondaryCtaText || "Explore Markets"}
           </Link>
@@ -500,8 +500,8 @@ export function Hero() {
                 <IconTrendingUp className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold text-black/40 truncate">New Settlement</p>
-                <p className="text-xs md:text-sm font-semibold text-black truncate">+ $1,240.00</p>
+                <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-medium text-black/40 truncate">New Settlement</p>
+                <p className="text-xs md:text-sm font-medium text-black truncate">+ $1,240.00</p>
               </div>
             </div>
           </motion.div>
@@ -526,10 +526,10 @@ export function Hero() {
             }}
           >
             <div className="space-y-0.5 md:space-y-1">
-              <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold text-white/40">Portfolio Value</p>
-              <p className="text-lg md:text-2xl font-mono font-bold text-white">$12,450.82</p>
+              <p className="text-[9px] md:text-[10px] uppercase tracking-widest font-medium text-white/40">Portfolio Value</p>
+              <p className="text-lg md:text-2xl font-mono font-medium text-white">$12,450.82</p>
             </div>
-            <div className="flex items-center gap-1 md:gap-1.5 text-green-400 text-[10px] md:text-xs font-semibold">
+            <div className="flex items-center gap-1 md:gap-1.5 text-green-400 text-[10px] md:text-xs font-medium">
               <IconTrendingUp className="w-3 h-3" />
               +14.2% (24h)
             </div>
@@ -550,7 +550,7 @@ export function Hero() {
                 </div>
               ))}
             </div>
-            <span className="text-[10px] md:text-xs font-bold text-black/60 tracking-tight">Active Analysts: <span className="text-black text-xs md:text-sm">12.5K+</span></span>
+            <span className="text-[10px] md:text-xs font-medium text-black/60 tracking-tight">Active Analysts: <span className="text-black text-xs md:text-sm">12.5K+</span></span>
           </motion.div>
         </div>
         {/* Enhanced Dynamic Reflection */}

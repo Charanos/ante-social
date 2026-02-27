@@ -1186,6 +1186,17 @@ export class AdminService {
     return blog;
   }
 
+  async incrementBlogViews(slug: string) {
+    const blog = await this.blogModel.findOneAndUpdate(
+      { slug },
+      { $inc: { views: 1 } },
+      { new: true, select: 'views' }
+    ).exec();
+    
+    if (!blog) throw new NotFoundException('Blog not found');
+    return { success: true, views: blog.views };
+  }
+
   async createBlog(payload: Record<string, any>, adminId: string) {
     const title = String(payload.title || '').trim();
     if (!title) throw new BadRequestException('Title is required');

@@ -59,8 +59,8 @@ const testimonials = [
 
 function TestimonialCard({ testimonial, index }: any) {
   return (
-    <div className="md:w-[380px] w-[280px] shrink-0 px-3">
-      <div className="relative h-full min-h-[300px] md:min-h-[400px] justify-between p-6 md:p-8 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
+    <div className="md:w-[380px] w-[240px] shrink-0 px-2 md:px-3 flex h-full">
+      <div className="relative w-full min-h-[280px] md:min-h-[400px] justify-between p-5 md:p-8 rounded-[2rem] md:rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5 hover:border-black/10 hover:bg-white/60 transition-all duration-500 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_-8px_rgba(0,0,0,0.12)] flex flex-col group">
         {/* Subtle shine effect on hover */}
         <div className="absolute inset-0 bg-linear-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
 
@@ -72,7 +72,7 @@ function TestimonialCard({ testimonial, index }: any) {
           <IconMessageShare className="w-8 h-8 text-black/10 mb-6" />
 
           {/* Testimonial Text */}
-          <p className="text-base md:text-lg text-black/70 font-medium leading-relaxed mb-6 flex-1 text-pretty">
+          <p className="text-sm md:text-lg text-black/70 font-medium leading-relaxed mb-6 flex-1 text-pretty">
             "{testimonial.text}"
           </p>
 
@@ -159,7 +159,7 @@ export function Testimonials() {
           className="mb-16 md:mb-20 text-center space-y-4"
         >
 
-          <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
+          <h2 className="text-3xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
             {testimonialsContent.title || "Players Say What?"}
           </h2>
           <p className="text-base md:text-lg text-black/80 font-medium max-w-2xl mx-auto leading-relaxed">
@@ -179,6 +179,7 @@ export function Testimonials() {
             speed={40}
             pauseOnHover={true}
             autoFill={true}
+            className="items-stretch"
           >
             {displayTestimonials.map((testimonial: any, index: number) => (
               <TestimonialCard
@@ -196,16 +197,16 @@ export function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="mt-16 md:mt-20"
+          className="mt-12 md:mt-20 px-2 md:px-0"
         >
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12 p-8 md:p-10 rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-12 p-6 md:p-10 rounded-2xl md:rounded-3xl bg-white/40 backdrop-blur-xl border border-black/5">
             {displayStats.map((stat: any, i: number) => (
               <div key={stat.label} className="flex items-center gap-8 md:gap-12">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
+                  <div className="text-2xl md:text-4xl font-semibold font-mono text-black/90 mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-sm text-black/50 font-semibold uppercase tracking-wider">
+                  <div className="text-[10px] md:text-sm text-black/50 font-semibold uppercase tracking-wider">
                     {stat.label}
                   </div>
                 </div>

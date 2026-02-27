@@ -88,10 +88,10 @@ export function BlogSection() {
             transition={{ duration: 0.6 }}
             className="space-y-4 max-w-2xl"
           >
-            <h2 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1]">
+            <h2 className="text-4xl md:text-6xl font-normal tracking-tight text-black/90 leading-[1.1]">
               Latest Insights
             </h2>
-            <p className="text-base md:text-lg text-black/60 font-medium leading-relaxed">
+            <p className="text-base md:text-lg text-black/60 font-normal leading-relaxed">
               Market analysis, platform updates, and advanced prediction strategies from the Ante team.
             </p>
           </motion.div>
@@ -104,7 +104,7 @@ export function BlogSection() {
           >
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 font-semibold text-sm hover:text-black/80 transition-all  group"
+              className="inline-flex items-center gap-2 font-medium text-sm hover:text-black/80 transition-all  group"
             >
               View All Posts
               <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -128,22 +128,22 @@ export function BlogSection() {
                 
                 <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-end">
                   <div className="flex items-center gap-3 mb-5 text-white/90">
-                     <span className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-xs font-semibold uppercase tracking-widest text-white shadow-inner">Featured</span>
-                     <span className="flex items-center gap-1.5 text-sm font-medium"><IconCalendarEvent className="w-4 h-4" /> {formatDate(featured.publishedAt)}</span>
+                     <span className="px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-xs font-medium uppercase tracking-widest text-white shadow-inner">Featured</span>
+                     <span className="flex items-center gap-1.5 text-sm font-normal"><IconCalendarEvent className="w-4 h-4" /> {formatDate(featured.publishedAt)}</span>
                   </div>
-                  <h3 className="text-3xl md:text-5xl lg:text-5xl font-medium text-white mb-5 leading-[1.15] group-hover:text-blue-100 transition-colors duration-400">
+                  <h3 className="text-3xl md:text-5xl lg:text-5xl font-normal text-white mb-5 leading-[1.15] group-hover:text-blue-100 transition-colors duration-400">
                     {featured.title}
                   </h3>
-                  <p className="text-lg md:text-xl text-white/80 font-medium line-clamp-2 mb-10 max-w-2xl leading-relaxed">
+                  <p className="text-lg md:text-xl text-white/80 font-normal line-clamp-2 mb-10 max-w-2xl leading-relaxed">
                     {featured.excerpt || "Dive into our latest analysis and platform updates to stay ahead in the predictive markets."}
                   </p>
 
                   <div className="flex items-center justify-between border-t border-white/10 pt-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white font-semibold text-lg shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 flex items-center justify-center text-white font-medium text-lg shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                         {(featured.author || "A")[0].toUpperCase()}
                       </div>
-                      <span className="text-white font-medium text-lg">{featured.author || "Ante Team"}</span>
+                      <span className="text-white font-normal text-lg">{featured.author || "Ante Team"}</span>
                     </div>
                     
                     <div className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-400 shadow-xl group-hover:scale-110">
@@ -171,23 +171,23 @@ export function BlogSection() {
                      <Image src={post.coverImage || defaultImg} alt={post.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
                      <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-80" />
                      <div className="absolute bottom-4 left-4">
-                       <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
+                       <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-[10px] font-semibold uppercase tracking-widest text-white shadow-sm">
                          Analysis
                        </span>
                      </div>
                   </div>
                   <div className="flex flex-col flex-1 justify-center p-5 sm:p-6 xl:p-5">
-                     <div className="flex items-center gap-2 mb-2.5 text-black/40 text-[11px] font-bold uppercase tracking-widest">
+                     <div className="flex items-center gap-2 mb-2.5 text-black/40 text-[11px] font-semibold uppercase tracking-widest">
                        <IconCalendarEvent className="w-3.5 h-3.5" />
                        <span>{formatDate(post.publishedAt)}</span>
                      </div>
-                     <h4 className="text-xl md:text-xl font-semibold text-black/90 mb-3 leading-[1.3] group-hover:text-amber-600 transition-colors line-clamp-2 md:line-clamp-3">
+                     <h4 className="text-xl md:text-xl font-medium text-black/90 mb-3 leading-[1.3] group-hover:text-amber-600 transition-colors line-clamp-2 md:line-clamp-3">
                        {post.title}
                      </h4>
                      <p className="text-sm text-black/60 line-clamp-2 mb-4">
                        {post.excerpt}
                      </p>
-                     <div className="mt-auto flex items-center gap-1.5 text-xs font-bold text-black/60 group-hover:text-amber-600 uppercase tracking-widest transition-colors">
+                     <div className="mt-auto flex items-center gap-1.5 text-xs font-semibold text-black/60 group-hover:text-amber-600 uppercase tracking-widest transition-colors">
                         Read Story <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                      </div>
                   </div>

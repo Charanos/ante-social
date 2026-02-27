@@ -29,6 +29,12 @@ export class Blog {
   @Prop({ default: 'draft', enum: ['draft', 'published', 'archived'] })
   status!: string;
 
+  @Prop({ default: 0 })
+  views!: number;
+
+  @Prop({ default: 5 })
+  readTime!: number;
+
   @Prop()
   publishedAt?: Date;
 

@@ -312,4 +312,9 @@ export class PublicController {
   async getBlogBySlug(@Param('slug') slug: string) {
     return this.adminService.getBlogBySlug(slug);
   }
+
+  @Post('blogs/:slug/view')
+  async incrementBlogViews(@Param('slug') slug: string) {
+    return this.adminService.incrementBlogViews(slug);
+  }
 }
