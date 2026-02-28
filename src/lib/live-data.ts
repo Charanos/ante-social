@@ -11,6 +11,7 @@ const LIVE_USER_REFRESH_EVENT = "ante-social:live-user-refresh";
 const LIVE_USER_REFRESH_STORAGE_KEY = "ante-social:live-user-refresh-ts";
 const REALTIME_NOTIFICATION_EVENT = "ante-social:notification";
 const REALTIME_MARKET_EVENT = "ante-social:market-update";
+const GLOBAL_DATA_REFRESH_EVENT = "ante-social:global-refresh";
 
 type SessionUser = {
   id?: string;
@@ -110,6 +111,12 @@ export function emitLiveUserRefresh() {
   } catch {
     // Ignore storage write errors in restricted environments.
   }
+}
+
+export function emitGlobalRefresh() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(GLOBAL_DATA_REFRESH_EVENT));
+  emitLiveUserRefresh();
 }
 
 async function resolveLiveUser(
@@ -501,11 +508,12 @@ export function useUnreadNotificationsCount() {
     };
 
     window.addEventListener(REALTIME_NOTIFICATION_EVENT, handleRealtimeNotification);
-    const interval = window.setInterval(load, 30000);
+    window.addEventListener(GLOBAL_DATA_REFRESH_EVENT, handleRealtimeNotification);
+    
     return () => {
       cancelled = true;
       window.removeEventListener(REALTIME_NOTIFICATION_EVENT, handleRealtimeNotification);
-      window.clearInterval(interval);
+      window.removeEventListener(GLOBAL_DATA_REFRESH_EVENT, handleRealtimeNotification);
     };
   }, []);
 
@@ -538,12 +546,11 @@ export function useMarketList() {
       void refresh();
     };
     window.addEventListener(REALTIME_MARKET_EVENT, handleRealtimeMarketUpdate);
-    const interval = window.setInterval(() => {
-      void refresh();
-    }, 30_000);
+    window.addEventListener(GLOBAL_DATA_REFRESH_EVENT, handleRealtimeMarketUpdate);
+
     return () => {
       window.removeEventListener(REALTIME_MARKET_EVENT, handleRealtimeMarketUpdate);
-      window.clearInterval(interval);
+      window.removeEventListener(GLOBAL_DATA_REFRESH_EVENT, handleRealtimeMarketUpdate);
     };
   }, [refresh]);
 
@@ -564,11 +571,11 @@ export function useGroupList() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     void refresh();
-    const interval = window.setInterval(() => {
-      void refresh();
-    }, 60_000);
+    const handleGlobalRefresh = () => { void refresh(); };
+    window.addEventListener(GLOBAL_DATA_REFRESH_EVENT, handleGlobalRefresh);
+
     return () => {
-      window.clearInterval(interval);
+      window.removeEventListener(GLOBAL_DATA_REFRESH_EVENT, handleGlobalRefresh);
     };
   }, [refresh]);
 

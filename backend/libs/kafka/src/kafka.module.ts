@@ -12,6 +12,17 @@ import { KafkaTopicBootstrapService } from './topic-bootstrap.service';
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (config: ConfigService) => {
+          const useKafka = config.get<string>('ENABLE_KAFKA') !== 'false';
+          
+          if (!useKafka) {
+            const host = config.get<string>('NOTIFICATION_SERVICE_HOST') || '127.0.0.1';
+            const port = Number(config.get<string>('NOTIFICATION_RPC_PORT') || 4005);
+            return {
+              transport: Transport.TCP,
+              options: { host, port },
+            };
+          }
+
           const brokers = (config.get<string>('KAFKA_BROKERS') || 'localhost:9092')
             .split(',')
             .map((broker) => broker.trim())

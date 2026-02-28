@@ -64,7 +64,12 @@ export function UserAvatar({
           className="object-cover"
         />
       ) : (
-        <span>{initials || "U"}</span>
+        <Image
+          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || "User")}`}
+          alt={name}
+          fill
+          className="object-cover"
+        />
       )}
       
       {/* Subtle overlay for depth */}

@@ -19,13 +19,19 @@ async function seedAdmin() {
   const UserModel = mongoose.model('User', UserSchema);
   const WalletModel = mongoose.model('Wallet', WalletSchema);
 
+  console.log('Deleting all existing users and wallets...');
+  await UserModel.deleteMany({});
+  await WalletModel.deleteMany({});
+  console.log('Database cleared of users and wallets.');
+
   const adminData = {
-    fullName: 'Platform Administrator',
-    username: process.env.SEED_ADMIN_USERNAME || 'admin',
-    email: process.env.SEED_ADMIN_EMAIL || 'dennismunge960@gmail.com',
-    phone: process.env.SEED_ADMIN_PHONE || '+10000000000',
+    fullName: 'Main Admin',
+    username: 'admin',
+    email: 'admin@antesocial.com',
+    phone: '',
     dateOfBirth: new Date('1990-01-01'),
-    password: process.env.SEED_ADMIN_PASSWORD || 'Password123!',
+    password: '4lofrw;AUzBcz.8x',
+    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=admin`,
     role: 'admin',
     tier: 'high_roller',
     emailVerified: true,
@@ -34,59 +40,28 @@ async function seedAdmin() {
     integrityWeight: 1.0,
   };
 
-  try {
-    const existing = await UserModel.findOne({
-      $or: [{ email: adminData.email }, { username: adminData.username }],
-    });
+  console.log('Creating new main admin user...');
+  const passwordHash = await bcrypt.hash(adminData.password, 12);
 
-    if (existing) {
-      console.log(`User ${existing.username} already exists. Promoting to admin...`);
-      const passwordHash = await bcrypt.hash(adminData.password, 12);
-      existing.role = 'admin';
-      existing.username = adminData.username;
-      existing.email = adminData.email;
-      existing.fullName = adminData.fullName;
-      existing.phone = adminData.phone;
-      existing.passwordHash = passwordHash;
-      existing.tier = 'high_roller';
-      existing.isVerified = true;
-      existing.emailVerified = true;
-      await existing.save();
+  const user = await UserModel.create({
+    ...adminData,
+    passwordHash,
+  });
 
-      const wallet = await WalletModel.findOne({ userId: existing._id });
-      if (!wallet) {
-        await WalletModel.create({
-          userId: existing._id,
-          balanceUsd: 10000,
-          balanceKsh: 1000000,
-        });
-      }
-      console.log('Admin user updated successfully.');
-    } else {
-      console.log('Creating new admin user...');
-      const passwordHash = await bcrypt.hash(adminData.password, 12);
+  await WalletModel.create({
+    userId: user._id,
+    balanceUsd: 10000,
+    balanceKsh: 1000000,
+  });
 
-      const user = await UserModel.create({
-        ...adminData,
-        passwordHash,
-      });
+  console.log('Main Admin user created successfully.');
+  console.log('Credentials:', {
+    email: adminData.email,
+    password: adminData.password,
+  });
 
-      await WalletModel.create({
-        userId: user._id,
-        balanceUsd: 10000,
-        balanceKsh: 1000000,
-      });
-
-      console.log('Admin user created successfully.');
-      console.log('Credentials:', {
-        email: adminData.email,
-        password: adminData.password,
-      });
-    }
-  } finally {
-    await mongoose.disconnect();
-    console.log('Disconnected.');
-  }
+  await mongoose.disconnect();
+  console.log('Disconnected.');
 }
 
 seedAdmin()

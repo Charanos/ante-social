@@ -1,45 +1,52 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RATE_LIMIT_KEY, RateLimitOptions } from '../decorators/rate-limit.decorator';
-import Redis from 'ioredis';
+import { createClient } from 'redis';
 import { ConfigService } from '@nestjs/config';
 import { RATE_LIMITS } from '../constants';
 
 @Injectable()
-export class RateLimitGuard implements CanActivate {
+export class RateLimitGuard implements CanActivate, OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RateLimitGuard.name);
-  private redis: Redis;
+  private redis: ReturnType<typeof createClient>;
 
   constructor(
     private reflector: Reflector,
     private configService: ConfigService,
   ) {
-    // Initialize Redis client for rate limiting with URL-first config.
     const redisUrl =
       this.configService.get<string>('REDIS_URL') ||
       this.configService.get<string>('REDIS_URI');
 
-    if (redisUrl) {
-      this.redis = new Redis(redisUrl, {
-        lazyConnect: true,
-      });
-      return;
-    }
-
     const redisHost = this.configService.get<string>('REDIS_HOST') || 'localhost';
-    const redisPort = this.configService.get<number>('REDIS_PORT') || 6379;
+    const redisPort = Number(this.configService.get<number>('REDIS_PORT') || 6379);
     const redisUsername = this.configService.get<string>('REDIS_USERNAME');
     const redisPassword = this.configService.get<string>('REDIS_PASSWORD');
-    const redisTls = this.configService.get<string>('REDIS_TLS') === 'true';
 
-    this.redis = new Redis({
-      host: redisHost,
-      port: Number(redisPort),
-      username: redisUsername || undefined,
-      password: redisPassword || undefined,
-      tls: redisTls ? {} : undefined,
-      lazyConnect: true,
-    });
+    this.redis = redisUrl
+      ? createClient({ url: redisUrl })
+      : createClient({
+          username: redisUsername,
+          password: redisPassword,
+          socket: {
+            host: redisHost,
+            port: redisPort,
+          },
+        });
+
+    this.redis.on('error', err => this.logger.error('Redis Client Error', err));
+  }
+
+  async onModuleInit() {
+    if (!this.redis.isOpen) {
+      await this.redis.connect();
+    }
+  }
+
+  async onModuleDestroy() {
+    if (this.redis.isOpen) {
+      await this.redis.quit();
+    }
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -64,7 +71,7 @@ export class RateLimitGuard implements CanActivate {
     const key = `ratelimit:${subject}:${context.getClass().name}:${context.getHandler().name}`;
 
     try {
-      if (this.redis.status !== 'ready') {
+      if (!this.redis.isOpen) {
         await this.redis.connect();
       }
 

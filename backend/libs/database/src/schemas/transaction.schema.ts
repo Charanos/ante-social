@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type TransactionDocument = HydratedDocument<Transaction>;
 
@@ -40,11 +40,11 @@ export class Transaction {
   @Prop()
   paymentProvider?: string; // 'mpesa', 'nowpayments', 'internal'
 
-  @Prop()
+  @Prop({ type: String })
   externalTransactionId?: string;
 
-  @Prop({ type: Object })
-  paymentMetadata?: Record<string, unknown>;
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  paymentMetadata?: Record<string, any>;
 
   // ─── Exchange Rate ────────────────────────────
   @Prop()

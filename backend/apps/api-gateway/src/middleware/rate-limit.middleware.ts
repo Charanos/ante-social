@@ -1,12 +1,12 @@
 import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
-import Redis from 'ioredis';
+import { createClient } from 'redis';
 
 @Injectable()
 export class RateLimitMiddleware implements NestMiddleware {
   private readonly logger = new Logger(RateLimitMiddleware.name);
-  private readonly redis: Redis;
+  private readonly redis: ReturnType<typeof createClient>;
   private readonly ttlSeconds: number;
   private readonly maxRequests: number;
 
@@ -17,23 +17,28 @@ export class RateLimitMiddleware implements NestMiddleware {
     const redisUrl =
       this.configService.get<string>('REDIS_URL') ||
       this.configService.get<string>('REDIS_URI');
-    if (redisUrl) {
-      this.redis = new Redis(redisUrl, { lazyConnect: true });
-      return;
-    }
+    const redisHost = this.configService.get<string>('REDIS_HOST') || 'localhost';
+    const redisPort = Number(this.configService.get<number>('REDIS_PORT') || 6379);
+    const redisUsername = this.configService.get<string>('REDIS_USERNAME');
+    const redisPassword = this.configService.get<string>('REDIS_PASSWORD');
 
-    this.redis = new Redis({
-      host: this.configService.get<string>('REDIS_HOST') || 'localhost',
-      port: Number(this.configService.get<string>('REDIS_PORT') || 6379),
-      username: this.configService.get<string>('REDIS_USERNAME') || undefined,
-      password: this.configService.get<string>('REDIS_PASSWORD') || undefined,
-      lazyConnect: true,
-    });
+    this.redis = redisUrl
+      ? createClient({ url: redisUrl })
+      : createClient({
+          username: redisUsername,
+          password: redisPassword,
+          socket: {
+            host: redisHost,
+            port: redisPort,
+          },
+        });
+        
+    this.redis.on('error', err => this.logger.error('Redis Client Error', err));
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      if (this.redis.status !== 'ready') {
+      if (!this.redis.isOpen) {
         await this.redis.connect();
       }
 

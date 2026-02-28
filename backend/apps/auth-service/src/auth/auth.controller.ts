@@ -60,8 +60,13 @@ export class AuthController {
   }
 
   @Post('verify-email')
-  async verifyEmail(@Body('token') token: string) {
-    return this.authService.verifyEmail(token);
+  async verifyEmail(@Body('email') email: string, @Body('token') token: string) {
+    return this.authService.verifyEmail(email, token);
+  }
+
+  @Post('resend-otp')
+  async resendOtp(@Body('email') email: string) {
+    return this.authService.resendOtp(email);
   }
 
   @Post('forgot-password')

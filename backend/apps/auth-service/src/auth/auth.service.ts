@@ -46,13 +46,14 @@ export class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(registerDto.password, 12);
 
-    // Generate email verification token
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    // Generate 6-digit OTP for email verification
+    const emailVerificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Create User
     const user = new this.userModel({
       ...registerDto,
       passwordHash,
+      avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(registerDto.username)}`,
       tier: UserTier.NOVICE,
       role: UserRole.USER,
       reputationScore: 100,
@@ -187,8 +188,8 @@ export class AuthService {
   }
 
   // ─── Email Verification ────────────────────────────
-  async verifyEmail(token: string) {
-    const user = await this.userModel.findOne({ emailVerificationToken: token });
+  async verifyEmail(email: string, token: string) {
+    const user = await this.userModel.findOne({ email, emailVerificationToken: token });
     if (!user) {
       throw new BadRequestException('Invalid or expired verification token');
     }
@@ -198,6 +199,30 @@ export class AuthService {
     await user.save();
 
     return { success: true, message: 'Email verified successfully' };
+  }
+
+  async resendOtp(email: string) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    // Generate new 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.emailVerificationToken = otp;
+    await user.save();
+
+    // Emit Kafka Event for notification
+    this.kafkaClient.emit('auth.resend-otp', {
+      email: user.email,
+      token: otp,
+    });
+
+    return { success: true, message: 'Verification code resent' };
   }
 
   // ─── Forgot Password ──────────────────────────────

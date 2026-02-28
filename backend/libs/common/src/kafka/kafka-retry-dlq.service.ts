@@ -45,6 +45,12 @@ export class KafkaRetryDlqService implements OnModuleDestroy {
   }
 
   async publish(topic: string, message: KafkaEnvelope) {
+    const useKafka = this.configService.get<string>('ENABLE_KAFKA') !== 'false';
+    if (!useKafka) {
+      this.logger.debug(`Kafka disabled. Skipping publish to ${topic}`);
+      return;
+    }
+
     try {
       const producer = await this.getProducer();
       await producer.send({

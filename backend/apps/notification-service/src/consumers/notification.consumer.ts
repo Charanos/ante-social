@@ -70,12 +70,20 @@ export class NotificationConsumer {
     await this.processDispatch(data, 'notification.dispatch');
   }
 
+  @EventPattern('auth.resend-otp')
+  async handleResendOtp(@Payload() data: any) {
+    const payload = data.payload || data;
+    console.log(`[NotificationConsumer] Received auth.resend-otp for ${payload.email}`);
+    await this.emailService.sendVerificationEmail(payload.email, payload.token);
+  }
+
   private async processUserCreated(data: any, topic: string) {
     await this.withRetryDlq(topic, data, async () => {
       const payload = data.payload || data;
       this.logger.log(`Processing user.created for ${payload.userId}`);
+      console.log(`[NotificationConsumer] Processing user.created for user ${payload.userId} (${payload.email})`);
 
-      await this.emailService.sendWelcomeEmail(payload.email, payload.username);
+      await this.emailService.sendVerificationEmail(payload.email, payload.verificationToken);
 
       await this.inAppService.create(
         payload.userId,

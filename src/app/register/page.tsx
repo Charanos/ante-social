@@ -1,77 +1,99 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 import {
   IconArrowRight,
   IconEye,
   IconEyeOff,
   IconLoader3,
-} from "@tabler/icons-react";
+  IconCheck,
+  IconX,
+} from "@tabler/icons-react"
 
-import { signIn } from "next-auth/react";
-import { useToast } from "@/components/ui/toast-notification";
-import Image from "next/image";
+import { useToast } from "@/components/ui/toast-notification"
+import Image from "next/image"
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const toast = useToast();
+  const router = useRouter()
+  const toast = useToast()
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    phone: "",
     password: "",
+    confirmPassword: "",
     dob: "",
-    currency: "KSH",
     agreed: false,
-  });
+  })
 
-  const isStrongPassword = (value: string) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/.test(value);
+  // Password validation helpers
+  const passwordRequirements = {
+    minLength: formData.password.length >= 8,
+    hasUppercase: /[A-Z]/.test(formData.password),
+    hasLowercase: /[a-z]/.test(formData.password),
+    hasNumber: /\d/.test(formData.password),
+  }
+
+  const isPasswordValid = Object.values(passwordRequirements).every(Boolean)
+  const passwordsMatch =
+    formData.password === formData.confirmPassword &&
+    formData.confirmPassword.length > 0
 
   const isAdult = (dateString: string) => {
-    const dob = new Date(dateString);
-    if (Number.isNaN(dob.getTime())) return false;
+    const dob = new Date(dateString)
+    if (Number.isNaN(dob.getTime())) return false
 
-    const now = new Date();
-    let age = now.getFullYear() - dob.getFullYear();
-    const monthDiff = now.getMonth() - dob.getMonth();
+    const now = new Date()
+    let age = now.getFullYear() - dob.getFullYear()
+    const monthDiff = now.getMonth() - dob.getMonth()
 
     if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) {
-      age--;
+      age--
     }
 
-    return age >= 18;
-  };
+    return age >= 18
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
+    // Validation
     if (!formData.agreed) {
-      toast.error("Agreement Required", "You must agree to the terms.");
-      setIsLoading(false);
-      return;
+      toast.error("Agreement Required", "You must agree to the terms.")
+      setIsLoading(false)
+      return
     }
 
-    if (!isStrongPassword(formData.password)) {
+    if (!isPasswordValid) {
+      toast.error("Weak Password", "Password must meet all requirements.")
+      setIsLoading(false)
+      return
+    }
+
+    if (!passwordsMatch) {
       toast.error(
-        "Weak Password",
-        "Use at least 8 characters with uppercase, lowercase, and a number.",
-      );
-      setIsLoading(false);
-      return;
+        "Passwords Don't Match",
+        "Please ensure both passwords are identical.",
+      )
+      setIsLoading(false)
+      return
     }
 
     if (!isAdult(formData.dob)) {
-      toast.error("Age Restriction", "You must be at least 18 years old to register.");
-      setIsLoading(false);
-      return;
+      toast.error(
+        "Age Restriction",
+        "You must be at least 18 years old to register.",
+      )
+      setIsLoading(false)
+      return
     }
 
     try {
@@ -83,54 +105,56 @@ export default function RegisterPage() {
         body: JSON.stringify({
           username: formData.username.trim(),
           email: formData.email.trim().toLowerCase(),
-          phone: formData.phone.trim(),
           password: formData.password,
           dateOfBirth: formData.dob,
-          currency: formData.currency,
         }),
-      });
+      })
 
-      const payload = await response.json().catch(() => null);
+      const payload = await response.json().catch(() => null)
 
       if (!response.ok) {
         const message =
           payload?.error?.message ||
           payload?.message ||
           payload?.error ||
-          "Registration failed.";
+          "Registration failed."
 
         if (message.toLowerCase().includes("service unavailable")) {
           toast.error(
             "Service Unavailable",
             "Registration backend is unavailable or not configured for this environment.",
-          );
-          return;
+          )
+          setIsLoading(false)
+          return
         }
 
-        toast.error("Registration Failed", message);
-        return;
+        toast.error("Registration Failed", message)
+        setIsLoading(false)
+        return
       }
 
-      const signInResult = await signIn("credentials", {
-        redirect: false,
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-      });
+      // Success - redirect to OTP verification
+      toast.success(
+        "Account Created",
+        "Check your email for verification code.",
+      )
 
-      if (signInResult?.ok) {
-        toast.success("Identity Created", "Welcome to the inner circle.");
-        router.push("/dashboard");
-        return;
-      }
+      // Store email for OTP page
+      sessionStorage.setItem(
+        "pendingVerification",
+        formData.email.trim().toLowerCase(),
+      )
 
-      toast.success("Identity Created", "Account created. Please sign in.");
-      router.push("/login");
-    } catch {
-      toast.error("Registration Failed", "System error.");
-    } finally {
-      setIsLoading(false);
+      // Redirect to OTP verification page
+      router.push(
+        `/verify-email?email=${encodeURIComponent(formData.email.trim().toLowerCase())}`,
+      )
+    } catch (error) {
+      console.error("Registration error:", error)
+      toast.error("Registration Failed", "System error. Please try again.")
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen w-full grid lg:grid-cols-2 relative overflow-hidden">
@@ -177,7 +201,7 @@ export default function RegisterPage() {
       </div>
 
       {/* RIGHT SIDE: Form (Dark) */}
-      <div className="relative bg-[#080808] text-white flex flex-col justify-center p-8 lg:p-24 z-10 order-first lg:order-last">
+      <div className="relative bg-[#080808] text-white flex flex-col justify-center p-8 lg:p-24 z-10 order-first lg:order-last overflow-y-auto max-h-screen">
         <div className="max-w-md w-full mx-auto">
           <div className="mb-10 lg:mt-0 mt-8">
             <h2 className="text-3xl font-normal mb-2">Create Account</h2>
@@ -201,6 +225,8 @@ export default function RegisterPage() {
                   className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal"
                   placeholder="jdoe"
                   required
+                  minLength={3}
+                  maxLength={20}
                 />
               </div>
               <div className="space-y-2">
@@ -215,6 +241,13 @@ export default function RegisterPage() {
                   }
                   className="w-full bg-transparent border-b border-neutral-800 py-3 text-white focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal scheme-dark"
                   required
+                  max={
+                    new Date(
+                      new Date().setFullYear(new Date().getFullYear() - 18),
+                    )
+                      .toISOString()
+                      .split("T")[0]
+                  }
                 />
               </div>
             </div>
@@ -235,50 +268,6 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* M-Pesa / Currency Row */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">
-                  M-Pesa Number
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal"
-                  placeholder="+254..."
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">
-                  Currency
-                </label>
-                <div className="flex gap-4 pt-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, currency: "KSH" })
-                    }
-                    className={`text-sm font-medium transition-colors ${formData.currency === "KSH" ? "text-orange-500 border-b border-orange-500" : "text-neutral-600 hover:text-white"}`}
-                  >
-                    KSH
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, currency: "USD" })
-                    }
-                    className={`text-sm font-medium transition-colors ${formData.currency === "USD" ? "text-orange-500 border-b border-orange-500" : "text-neutral-600 hover:text-white"}`}
-                  >
-                    USD
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-2">
               <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">
                 Password
@@ -293,6 +282,7 @@ export default function RegisterPage() {
                   className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal pr-10"
                   placeholder="••••••••"
                   required
+                  minLength={8}
                 />
                 <button
                   type="button"
@@ -306,6 +296,89 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
+
+              {/* Password Requirements */}
+              {formData.password.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="space-y-1 mt-2"
+                >
+                  <PasswordRequirement
+                    met={passwordRequirements.minLength}
+                    text="At least 8 characters"
+                  />
+                  <PasswordRequirement
+                    met={passwordRequirements.hasUppercase}
+                    text="One uppercase letter"
+                  />
+                  <PasswordRequirement
+                    met={passwordRequirements.hasLowercase}
+                    text="One lowercase letter"
+                  />
+                  <PasswordRequirement
+                    met={passwordRequirements.hasNumber}
+                    text="One number"
+                  />
+                </motion.div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal pr-10"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 cursor-pointer text-neutral-600 hover:text-white transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <IconEyeOff className="w-5 h-5" />
+                  ) : (
+                    <IconEye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+
+              {/* Password Match Indicator */}
+              {formData.confirmPassword.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-2 mt-2"
+                >
+                  {passwordsMatch ? (
+                    <>
+                      <IconCheck className="w-4 h-4 text-green-500" />
+                      <span className="text-xs text-green-500">
+                        Passwords match
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <IconX className="w-4 h-4 text-red-500" />
+                      <span className="text-xs text-red-500">
+                        Passwords don't match
+                      </span>
+                    </>
+                  )}
+                </motion.div>
+              )}
             </div>
 
             <div className="pt-2">
@@ -326,15 +399,33 @@ export default function RegisterPage() {
                   />
                 </div>
                 <span className="text-xs text-neutral-600 group-hover:text-neutral-300 transition-colors">
-                  I agree to the Terms & Privacy Policy
+                  I agree to the{" "}
+                  <Link
+                    href="/terms"
+                    className="text-orange-500 hover:underline"
+                  >
+                    Terms
+                  </Link>{" "}
+                  &{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-orange-500 hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
                 </span>
               </label>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-white text-black font-semibold py-2 uppercase tracking-wider rounded-full mt-4 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50"
+              disabled={
+                isLoading ||
+                !isPasswordValid ||
+                !passwordsMatch ||
+                !formData.agreed
+              }
+              className="w-full bg-white text-black font-semibold py-2 uppercase tracking-wider rounded-full mt-4 hover:bg-orange-500 hover:text-white transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <IconLoader3 className="w-5 h-5 animate-spin mx-auto" />
@@ -357,26 +448,24 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-
-      {/* FLOATING BLOB w/ PARALLAX - ABSOLUTE CENTER */}
-      {/* <div className="absolute left-1/2 top-50 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none z-20 opacity-90 hidden lg:block">
-        <motion.div
-          animate={{
-            y: [20, -20, 20],
-            rotate: [0, -5, 0],
-            scale: [1, 1.05, 1]
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="relative w-full h-full"
-        >
-          <Image src="/login-blob.png"
-            alt="Ante Blob"
-            
-            className="object-contain"
-            priority
-          />
-        </motion.div>
-      </div> */}
     </div>
-  );
+  )
+}
+
+// Helper component for password requirements
+function PasswordRequirement({ met, text }: { met: boolean; text: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      {met ? (
+        <IconCheck className="w-3 h-3 text-green-500" />
+      ) : (
+        <IconX className="w-3 h-3 text-neutral-600" />
+      )}
+      <span
+        className={`text-[10px] ${met ? "text-green-500" : "text-neutral-600"}`}
+      >
+        {text}
+      </span>
+    </div>
+  )
 }

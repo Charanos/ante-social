@@ -286,7 +286,7 @@ Spring-animated, always:
   animate={{ rotate: 360 }}
   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
 >
-  <IconLoader2 className="w-4 h-4" />
+  <IconLoader3 className="w-4 h-4" />
 </motion.div>
 ```
 
@@ -608,7 +608,7 @@ text-black/90   → primary / active icons
 text-{colour}   → semantic (green for success, red for danger etc.)
 ```
 
-Never use `IconLoader3` — use `IconLoader2`.  
+Never use `IconLoader3` — use `IconLoader3`.  
 Never render icon names as text (e.g. "IconUser" in a button label).
 
 ---
@@ -633,7 +633,7 @@ Never render icon names as text (e.g. "IconUser" in a button label).
 | Missing empty states         | Every list needs an empty state               |
 | Missing loading state        | Every async action needs loading UI           |
 | Missing toast feedback       | Every mutation needs a toast                  |
-| `IconLoader3`                | `IconLoader2`                                 |
+| `IconLoader3`                | `IconLoader3`                                 |
 
 ---
 
