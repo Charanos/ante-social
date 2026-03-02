@@ -124,7 +124,7 @@ export function BlogSection() {
             {featured && (
               <Link href={`/blog/${featured.slug}`} className="group relative block h-full min-h-[450px] md:min-h-[600px] rounded-[2.5rem] overflow-hidden isolate shadow-2xl shadow-black/5 ring-1 ring-black/5">
                 <Image src={featured.coverImage || defaultImg} alt={featured.title} fill className="object-cover transition-transform duration-1000 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-90" />
                 
                 <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-end">
                   <div className="flex items-center gap-3 mb-5 text-white/90">

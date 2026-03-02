@@ -4,8 +4,8 @@ const DEFAULT_MARKET_SERVICE_URL = "http://localhost:3003";
 const DEFAULT_WALLET_SERVICE_URL = "http://localhost:3004";
 const DEFAULT_NOTIFICATION_SERVICE_URL = "http://localhost:3005";
 const DEFAULT_ADMIN_SERVICE_URL = "http://localhost:3007";
-const DEFAULT_TIMEOUT_MS = 3500;
-const DEFAULT_TOTAL_TIMEOUT_MS = 9000;
+const DEFAULT_TIMEOUT_MS = 30000;
+const DEFAULT_TOTAL_TIMEOUT_MS = 60000;
 
 function getBackendApiBaseUrl() {
   const configuredUrl = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL;

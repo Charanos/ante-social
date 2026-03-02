@@ -1469,7 +1469,7 @@ export default function GroupPage() {
               </div>
             </div>
             </div>
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-4 sticky top-24 self-start">
               <PlaceForecastSlip
                 group={group}
                 activeMarket={activeMarket}

@@ -167,6 +167,10 @@ export const adminApi = {
     apiPost(`/api/admin/compliance/${flagId}/notes`, { note }),
   getWithdrawals: (params?: QueryParams) =>
     apiGet<PaginatedResponse<WithdrawalQueueItem>>(`/api/admin/withdrawals${buildQuery(params)}`),
+  getPendingWithdrawals: (params?: QueryParams) =>
+    apiGet<PaginatedResponse<WithdrawalQueueItem>>(
+      `/api/admin/withdrawals${buildQuery({ ...params, status: "pending" })}`,
+    ),
   approveWithdrawal: (transactionId: string) =>
     apiPost("/api/admin/withdrawals", { transactionId, action: "approve" }),
   rejectWithdrawal: (transactionId: string, reason: string) =>

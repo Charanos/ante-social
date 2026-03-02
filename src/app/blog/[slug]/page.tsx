@@ -18,7 +18,8 @@ import {
   IconBookmark,
   IconBookmarkFilled,
   IconChevronRight,
-  IconEye
+  IconEye,
+  IconLoader3
 } from "@tabler/icons-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -171,7 +172,7 @@ export default function BlogPostPage() {
 
       {/* Reading Progress Bar */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-black z-50 origin-left"
+        className="fixed top-0 left-0 right-0 h-1 bg-orange-500 z-50 origin-left"
         style={{ scaleX: scrollYProgress }}
       />
 
@@ -185,7 +186,7 @@ export default function BlogPostPage() {
           <div className="flex items-center justify-between mb-8">
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-black/40 hover:text-black/80 transition-colors group"
+              className="inline-flex items-center gap-2 text-sm font-medium text-black/40 hover:text-black/80 transition-colors group"
             >
               <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Back to Blog
@@ -194,7 +195,7 @@ export default function BlogPostPage() {
             {user && ['admin', 'superadmin'].includes(user.role || '') && (
               <Link
                 href="/dashboard/admin/blogs"
-                className="inline-flex items-center gap-2 text-sm font-semibold bg-black text-white px-5 py-2.5 rounded-full hover:bg-black/80 transition-all shadow-md hover:shadow-lg"
+                className="inline-flex items-center gap-2 text-sm font-medium bg-black text-white px-5 py-2.5 rounded-full hover:bg-black/80 transition-all shadow-md hover:shadow-lg"
               >
                 Edit Post
               </Link>
@@ -202,21 +203,21 @@ export default function BlogPostPage() {
           </div>
 
           {isLoading ? (
-            <div className="text-center py-16">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-black/20 border-r-black"></div>
-              <p className="mt-4 text-black/40 font-medium">Loading article...</p>
+            <div className="text-center flex items-center justify-center py-16">
+              <IconLoader3 className="w-8 text-black/60 h-8 animate-spin" />
+              <p className="mt-4 text-black/40 font-normal">Loading article...</p>
             </div>
           ) : error || !post ? (
-            <div className="text-center py-16">
+            <div className="text-center flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 rounded-full bg-black/5 flex items-center justify-center mx-auto mb-4">
                 <IconArrowLeft className="w-8 h-8 text-black/20" />
               </div>
-              <p className="text-black/50 font-medium mb-6 text-lg">
+              <p className="text-black/50 font-normal mb-6 text-lg">
                 Blog post not found.
               </p>
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full font-semibold text-sm hover:bg-black/90 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full font-medium text-sm hover:bg-black/90 transition-all cursor-pointer"
               >
                 View All Posts
               </Link>
@@ -231,7 +232,7 @@ export default function BlogPostPage() {
                     {post.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-black/50 bg-black/5 border border-black/10 rounded-full hover:bg-black/10 transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-black/50 bg-black/5 border border-black/10 rounded-full hover:bg-black/10 transition-colors"
                       >
                         {tag}
                       </span>
@@ -240,25 +241,25 @@ export default function BlogPostPage() {
                 )}
 
                 {/* Title */}
-                <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-black/90 leading-[1.1] mb-8">
+                <h1 className="text-4xl md:text-6xl font-medium tracking-tight text-black/90 leading-[1.1] mb-8">
                   {post.title}
                 </h1>
 
                 {/* Excerpt */}
                 {post.excerpt && (
-                  <p className="text-xl text-black/60 font-medium leading-relaxed mb-8">
+                  <p className="text-xl text-black/60 font-normal leading-relaxed mb-8">
                     {post.excerpt}
                   </p>
                 )}
 
                 {/* Meta Info */}
-                <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-black/50 font-medium">
+                <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-black/50 font-normal">
                   {post.author && (
                     <span className="flex items-center gap-2">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-black/10 to-black/5 flex items-center justify-center">
                         <IconUser className="w-5 h-5 text-black/50" />
                       </div>
-                      <span className="font-semibold text-black/70">{post.author}</span>
+                      <span className="font-medium text-black/70">{post.author}</span>
                     </span>
                   )}
                   
@@ -359,7 +360,7 @@ export default function BlogPostPage() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  <span className="text-xs font-semibold text-black/70 relative z-10">
+                  <span className="text-xs font-medium text-black/70 relative z-10">
                     {Math.round(readProgress)}%
                   </span>
                 </div>
@@ -371,14 +372,14 @@ export default function BlogPostPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="prose prose-lg prose-neutral max-w-7xl mx-auto
-                  [&_h1]:text-5xl [&_h1]:font-bold [&_h1]:tracking-tight [&_h1]:mb-8 [&_h1]:text-black/90
-                  [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:mt-16 [&_h2]:mb-6 [&_h2]:text-black/90 scroll-mt-24
-                  [&_h3]:text-2xl [&_h3]:font-medium [&_h3]:mt-12 [&_h3]:mb-4 [&_h3]:text-black/80
-                  [&_p]:text-lg [&_p]:leading-[1.8] [&_p]:text-black/80 [&_p]:mb-8 [&_p]:font-medium
+                  [&_h1]:text-5xl [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:mb-8 [&_h1]:text-black/90
+                  [&_h2]:text-3xl [&_h2]:font-medium [&_h2]:tracking-tight [&_h2]:mt-16 [&_h2]:mb-6 [&_h2]:text-black/90 scroll-mt-24
+                  [&_h3]:text-2xl [&_h3]:font-normal [&_h3]:mt-12 [&_h3]:mb-4 [&_h3]:text-black/80
+                  [&_p]:text-lg [&_p]:leading-[1.8] [&_p]:text-black/80 [&_p]:mb-8 [&_p]:font-normal
                   [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-8 [&_ul_li]:text-lg [&_ul_li]:leading-[1.8] [&_ul_li]:text-black/80 [&_ul_li]:mb-3
                   [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-8 [&_ol_li]:text-lg [&_ol_li]:leading-[1.8] [&_ol_li]:text-black/80 [&_ol_li]:mb-3
-                  [&_a]:text-black [&_a]:underline [&_a]:underline-offset-4 [&_a]:font-semibold hover:[&_a]:text-black/70 [&_a]:transition-colors
-                  [&_strong]:text-black [&_strong]:font-bold
+                  [&_a]:text-black [&_a]:underline [&_a]:underline-offset-4 [&_a]:font-medium hover:[&_a]:text-black/70 [&_a]:transition-colors
+                  [&_strong]:text-black [&_strong]:font-semibold
                   [&_blockquote]:border-l-4 [&_blockquote]:border-black/20 [&_blockquote]:pl-6 [&_blockquote]:py-4 [&_blockquote]:pr-6 [&_blockquote]:my-10 [&_blockquote]:italic [&_blockquote]:text-black/70 [&_blockquote]:bg-black/[0.02] [&_blockquote]:rounded-r-2xl
                   [&_code]:text-black/90 [&_code]:bg-black/5 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:font-mono [&_code]:text-sm
                   [&_pre]:bg-black/[0.03] [&_pre]:border [&_pre]:border-black/10 [&_pre]:rounded-2xl [&_pre]:my-10 [&_pre]:p-6 [&_pre]:overflow-x-auto
@@ -392,7 +393,7 @@ export default function BlogPostPage() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <Link
                     href="/blog"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-black/50 hover:text-black/80 transition-colors group"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-black/50 hover:text-black/80 transition-colors group"
                   >
                     <IconArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                     Back to all posts
@@ -411,7 +412,7 @@ export default function BlogPostPage() {
                       ) : (
                         <IconBookmark className="w-4 h-4" />
                       )}
-                      <span className="text-sm font-medium">Bookmark</span>
+                      <span className="text-sm font-normal">Bookmark</span>
                     </motion.button>
                     
                     <motion.button
@@ -421,7 +422,7 @@ export default function BlogPostPage() {
                       className="px-4 py-2 rounded-xl bg-black text-white hover:bg-black/90 transition-colors cursor-pointer flex items-center gap-2"
                     >
                       <IconShare className="w-4 h-4" />
-                      <span className="text-sm font-semibold">Share</span>
+                      <span className="text-sm font-medium">Share</span>
                     </motion.button>
                   </div>
                 </div>
@@ -437,7 +438,7 @@ export default function BlogPostPage() {
                 >
                   <div className="flex items-center gap-4 mb-8">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/10 to-transparent" />
-                    <h2 className="text-2xl font-semibold text-black/90">Related Articles</h2>
+                    <h2 className="text-2xl font-medium text-black/90">Related Articles</h2>
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/10 to-transparent" />
                   </div>
 
@@ -465,7 +466,7 @@ export default function BlogPostPage() {
                               </div>
                             )}
                             <div className="p-6">
-                              <h3 className="text-lg font-semibold text-black/90 mb-2 group-hover:text-black transition-colors line-clamp-2">
+                              <h3 className="text-lg font-medium text-black/90 mb-2 group-hover:text-black transition-colors line-clamp-2">
                                 {relatedPost.title}
                               </h3>
                               {relatedPost.excerpt && (
@@ -474,7 +475,7 @@ export default function BlogPostPage() {
                                 </p>
                               )}
                               {relatedPost.publishedAt && (
-                                <span className="text-xs text-black/40 font-medium">
+                                <span className="text-xs text-black/40 font-normal">
                                   {new Date(relatedPost.publishedAt).toLocaleDateString(undefined, {
                                     month: "long",
                                     day: "numeric",
@@ -482,7 +483,7 @@ export default function BlogPostPage() {
                                   })}
                                 </span>
                               )}
-                              <div className="flex items-center gap-2 mt-4 text-sm font-medium text-black/50 group-hover:text-black/80 transition-colors">
+                              <div className="flex items-center gap-2 mt-4 text-sm font-normal text-black/50 group-hover:text-black/80 transition-colors">
                                 Read more
                                 <IconChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                               </div>

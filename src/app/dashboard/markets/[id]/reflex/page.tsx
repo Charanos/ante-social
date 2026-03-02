@@ -407,7 +407,7 @@ export default function ReflexMarketPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 sticky top-24 self-start">
             <div className="space-y-6">
               {/* Bet Placement Card */}
               <motion.div
