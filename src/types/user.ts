@@ -12,6 +12,7 @@ export interface UserProfile {
   reputationScore: number;    // 0-1000 (Community Trust)
   signalAccuracy: number;     // 0-100% (Historical correctness)
   joinedAt: string;           // ISO Date
+  preferredCurrency?: 'USD' | 'KSH';
   
   // Financials
   balance: number;            // Available for staking

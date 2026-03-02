@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { useCurrency } from "@/lib/utils/currency";
 import {
   IconAccessPoint,
   IconArrowRight,
@@ -32,6 +33,7 @@ import {
 export default function MarketDetailPage() {
   const params = useParams();
   const { user } = useLiveUser();
+  const { formatCurrency, symbol, convertAmount, preferredCurrency } = useCurrency();
   const marketId = params.id as string;
   const [market, setMarket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -62,18 +64,19 @@ export default function MarketDetailPage() {
   const toast = useToast();
 
   const handlePlaceForecast = async () => {
-    if (!market || !selectedOption || !stakeAmount) return;
-    const stakeValue = Number.parseFloat(stakeAmount);
-    if (!Number.isFinite(stakeValue) || stakeValue < market.minStake) {
+    const stakeValuePreferred = Number.parseFloat(stakeAmount);
+    const stakeValueKsh = convertAmount(stakeValuePreferred, preferredCurrency, "KSH");
+
+    if (!Number.isFinite(stakeValuePreferred) || stakeValueKsh < market.minStake) {
       toast.error(
         "Invalid Stake",
-        `Minimum stake is ${market.minStake.toLocaleString()} KSH`,
+        `Minimum stake is ${formatCurrency(market.minStake)}`,
       );
       return;
     }
 
     // Check balance
-    if (user.balance < stakeValue) {
+    if (user.balance < stakeValueKsh) {
       toast.error(
         "Insufficient Balance",
         "Please top up your wallet to participate in this market."
@@ -96,7 +99,7 @@ export default function MarketDetailPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           outcomeId: selectedOption,
-          amount: stakeValue,
+          amount: stakeValueKsh,
         }),
       });
       const payload = await response.json().catch(() => null);
@@ -113,7 +116,7 @@ export default function MarketDetailPage() {
 
       setPredictionResult({
         optionText: selectedOptionText,
-        amount: stakeValue,
+        amount: stakeValueKsh,
         timestamp: new Date().toISOString(),
         transactionId: payload?.id || payload?._id,
       });
@@ -121,7 +124,7 @@ export default function MarketDetailPage() {
       toast.removeToast(toastId);
       toast.success(
         "Prediction Placed!",
-        `You predicted ${stakeAmount} KSH on "${selectedOptionText}"`,
+        `You predicted ${formatCurrency(Number.parseFloat(stakeAmount))} on "${selectedOptionText}"`,
       );
       // Optional: Delay redirect or let user dismiss receipt
     } catch (error: any) {
@@ -228,10 +231,10 @@ export default function MarketDetailPage() {
                       </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
-                      {market.poolAmount.toLocaleString()}
+                      {formatCurrency(market.poolAmount)}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">
-                      KSH
+                      {symbol}
                     </p>
                   </div>
 
@@ -435,7 +438,7 @@ export default function MarketDetailPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold font-mono text-black/90">
-                        {participant.total_stake.toLocaleString()} KSH
+                        {formatCurrency(participant.total_stake)} {symbol}
                       </p>
                       <p className="text-xs text-black/40 font-medium">
                         {new Date(participant.timestamp).toLocaleTimeString(
@@ -472,11 +475,11 @@ export default function MarketDetailPage() {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-black/5">
                       <span className="text-sm text-black/40 font-medium">Stake</span>
-                      <span className="text-base font-bold text-black/90">{predictionResult.amount.toLocaleString()} KSH</span>
+                      <span className="text-base font-bold text-black/90">{formatCurrency(predictionResult.amount)} {symbol}</span>
                     </div>
                     <div className="flex justify-between items-center py-2">
                        <span className="text-sm text-black/40 font-medium">Platform Fee</span>
-                       <span className="text-sm font-medium text-black/60">{(predictionResult.amount * 0.05).toLocaleString()} KSH</span>
+                       <span className="text-sm font-medium text-black/60">{formatCurrency(predictionResult.amount * 0.05)} {symbol}</span>
                     </div>
                     <button 
                       onClick={() => setPredictionResult(null)}
@@ -548,14 +551,14 @@ export default function MarketDetailPage() {
                           <div className="relative">
                             <input
                               type="number"
-                              placeholder={market.minStake.toLocaleString()}
+                              placeholder={market.minStake.toString()}
                               min={market.minStake}
                               value={stakeAmount}
                               onChange={(e) => setStakeAmount(e.target.value)}
                               className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
                             />
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
-                              KSH
+                              {symbol}
                             </span>
                           </div>
                           <div className="flex justify-between text-xs px-1">
@@ -563,7 +566,7 @@ export default function MarketDetailPage() {
                               Minimum staking amount
                             </span>
                             <span className="font-mono font-semibold text-black/70">
-                              {market.minStake.toLocaleString()} KSH
+                              {formatCurrency(market.minStake)}
                             </span>
                           </div>
                         </div>
@@ -575,7 +578,7 @@ export default function MarketDetailPage() {
                               Platform Fee (5%)
                             </span>
                             <span className="font-mono font-semibold text-black/80">
-                              {platformFee.toLocaleString()} KSH
+                              {formatCurrency(platformFee, preferredCurrency)}
                             </span>
                           </div>
                           <div className="flex justify-between text-base">
@@ -583,7 +586,7 @@ export default function MarketDetailPage() {
                               Total Amount
                             </span>
                             <span className="font-mono font-semibold text-black/90">
-                              {totalAmount.toLocaleString()} KSH
+                              {formatCurrency(totalAmount, preferredCurrency)}
                             </span>
                           </div>
                         </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { IconAward, IconStar, IconTrendingUp } from '@tabler/icons-react';
 import { UserAvatar } from "../ui/UserAvatar";
+import { useCurrency } from "@/lib/utils/currency";
 
 const RankBadge = ({ rank }: { rank: number }) => {
   if (rank === 1) {
@@ -92,6 +93,7 @@ export default function LeaderboardSection({
   icon,
   data,
 }: LeaderboardSectionProps) {
+  const { formatCurrency } = useCurrency();
   const displayData = data || [];
 
   if (displayData.length < 3) {
@@ -153,7 +155,7 @@ export default function LeaderboardSection({
               </h3>
             </Link>
             <p className="text-[10px] md:text-xs font-mono font-semibold text-black/80">
-              {(displayData[1].totalWinnings / 1000).toFixed(0)}K KSH
+              {formatCurrency(displayData[1].totalWinnings, "KSH", { compact: true })}
             </p>
             <p className="hidden md:block text-[10px] text-black/40 font-semibold mt-1">
               {displayData[1].winRate}% Win Rate
@@ -185,7 +187,7 @@ export default function LeaderboardSection({
               </h3>
             </Link>
             <p className="text-xs md:text-sm font-mono font-semibold text-amber-600">
-              {(displayData[0].totalWinnings / 1000).toFixed(0)}K KSH
+              {formatCurrency(displayData[0].totalWinnings, "KSH", { compact: true })}
             </p>
             <p className="hidden md:block text-[10px] text-black/40 font-semibold mt-1">
               {displayData[0].winRate}% Win Rate
@@ -219,7 +221,7 @@ export default function LeaderboardSection({
               </h3>
             </Link>
             <p className="text-[10px] md:text-xs font-mono font-semibold text-black/80">
-              {(displayData[2].totalWinnings / 1000).toFixed(0)}K KSH
+              {formatCurrency(displayData[2].totalWinnings, "KSH", { compact: true })}
             </p>
             <p className="hidden md:block text-[10px] text-black/40 font-semibold mt-1">
               {displayData[2].winRate}% Win Rate
@@ -267,12 +269,9 @@ export default function LeaderboardSection({
 
               <div className="flex items-center gap-3 md:gap-4 ml-4">
                 <TrendIndicator trend={player.trend || "same"} />
-                <div className="text-right min-w-10 md:min-w-[50px]">
+                <div className="text-right min-w-10 md:min-w-[80px]">
                   <p className="text-xs md:text-sm font-semibold font-mono text-black/90">
-                    {(player.totalWinnings / 1000).toFixed(0)}K
-                  </p>
-                  <p className="text-[8px] md:text-[10px] text-black/40 font-semibold uppercase">
-                    KSH
+                    {formatCurrency(player.totalWinnings, "KSH", { compact: true })}
                   </p>
                 </div>
               </div>

@@ -43,6 +43,7 @@ export default function OnboardingPage() {
     fullName: "",
     location: "",
     bio: "",
+    preferredCurrency: "USD" as "USD" | "KSH",
   })
 
   const handleComplete = async () => {
@@ -54,14 +55,15 @@ export default function OnboardingPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/user/complete-profile", {
-        method: "POST",
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: userEmail,
           fullName: profileData.fullName.trim(),
           location: profileData.location.trim(),
           bio: profileData.bio.trim(),
+          preferredCurrency: profileData.preferredCurrency,
         }),
       })
 
@@ -202,6 +204,36 @@ export default function OnboardingPage() {
                     className="w-full bg-transparent border-b border-neutral-800 py-3 text-white placeholder:text-neutral-700 focus:outline-none focus:border-orange-500 transition-colors duration-300 font-normal"
                     placeholder="Nairobi, Kenya"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-wider text-neutral-600 font-medium">
+                    Preferred Currency
+                  </label>
+                  <div className="flex gap-4 pt-2 pb-4">
+                    <label className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border cursor-pointer transition-all duration-300 ${profileData.preferredCurrency === 'USD' ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600'}`}>
+                      <input
+                        type="radio"
+                        name="currency"
+                        value="USD"
+                        checked={profileData.preferredCurrency === 'USD'}
+                        onChange={() => setProfileData({ ...profileData, preferredCurrency: 'USD' })}
+                        className="hidden"
+                      />
+                      <span className="font-medium">USD ($)</span>
+                    </label>
+                    <label className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border cursor-pointer transition-all duration-300 ${profileData.preferredCurrency === 'KSH' ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-neutral-800 text-neutral-400 hover:border-neutral-600'}`}>
+                      <input
+                        type="radio"
+                        name="currency"
+                        value="KSH"
+                        checked={profileData.preferredCurrency === 'KSH'}
+                        onChange={() => setProfileData({ ...profileData, preferredCurrency: 'KSH' })}
+                        className="hidden"
+                      />
+                      <span className="font-medium">KSH (KSh)</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="space-y-2">

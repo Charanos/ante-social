@@ -23,6 +23,7 @@ import { useToast } from "@/components/ui/toast-notification";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLiveUser } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
 
 const ACHIEVEMENT_LIBRARY = [
   {
@@ -57,7 +58,7 @@ const ACHIEVEMENT_LIBRARY = [
   },
   {
     title: "Big Spender",
-    description: "Deposit over 100,000 KSH equivalent",
+    description: "Deposit over significant amounts",
     category: "Risk",
     reward: 750,
   },
@@ -174,6 +175,7 @@ const getCategoryIcon = (category: string) => {
 export default function AchievementsPage() {
   const toast = useToast();
   const { user } = useLiveUser();
+  const { formatCurrency } = useCurrency();
   const achievementData = useMemo(() => buildAchievementData(user), [user]);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [showBonusModal, setShowBonusModal] = useState(false);
@@ -196,7 +198,7 @@ export default function AchievementsPage() {
       setShowBonusModal(false);
       toast.success(
         "Daily Bonus Claimed!",
-        `You've received ${nextBonusReward} KSH. Come back tomorrow for more!`
+        `You've received ${formatCurrency(nextBonusReward)}. Come back tomorrow for more!`
       );
     }, 1500);
   };
@@ -268,7 +270,7 @@ export default function AchievementsPage() {
                   Cash Earned
                 </p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-green-900">
-                  {achievementData.stats.balance} KSH
+                  {formatCurrency(achievementData.stats.balance)}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -319,7 +321,7 @@ export default function AchievementsPage() {
                   Total Rewards
                 </p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-blue-900">
-                  {achievementData.stats.earned} KSH
+                  {formatCurrency(achievementData.stats.earned)}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -395,7 +397,7 @@ export default function AchievementsPage() {
                       </p>
                     </div>
                     <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">
-                      +{item.reward} KSH
+                      +{formatCurrency(item.reward)}
                     </span>
                   </div>
 
@@ -451,7 +453,7 @@ export default function AchievementsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">
-                      +{item.reward} KSH
+                      +{formatCurrency(item.reward)}
                     </span>
                     <span className="text-xs font-semibold text-black/50">
                       {item.category}
@@ -495,7 +497,7 @@ export default function AchievementsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">
-                      +{item.reward} KSH
+                      +{formatCurrency(item.reward)}
                     </span>
                     <span className="text-xs font-semibold text-black/30">
                       {item.category}
@@ -575,7 +577,7 @@ export default function AchievementsPage() {
                     Today's Reward
                   </p>
                   <p className="text-4xl font-semibold font-mono text-amber-900">
-                    {nextBonusReward} <span className="text-2xl">KSH</span>
+                    {formatCurrency(nextBonusReward)}
                   </p>
                 </div>
 

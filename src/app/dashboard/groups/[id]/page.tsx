@@ -55,6 +55,7 @@ import {
   normalizePositions,
   useLiveUser,
 } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
 import { groupsApi } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
 
@@ -155,18 +156,16 @@ const PlaceForecastSlip = ({
   onForecastPlaced
 }: any) => {
   const { user } = useLiveUser();
+  const { formatCurrency, symbol, convertAmount, preferredCurrency } = useCurrency();
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmittingForecast, setIsSubmittingForecast] = useState(false);
   const toast = useToast();
   const router = useRouter();
 
-  const platformFee = useMemo(() => {
-    return stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
-  }, [stakeAmount]);
-
-  const totalAmount = useMemo(() => {
-    return stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
-  }, [stakeAmount, platformFee]);
+  const stakeValuePreferredInput = parseFloat(stakeAmount) || 0;
+  const stakeValueKshBase = convertAmount(stakeValuePreferredInput, preferredCurrency, "KSH");
+  const platformFeeKsh = stakeValueKshBase * 0.05;
+  const totalAmountKsh = stakeValueKshBase + platformFeeKsh;
 
   const availableOptions = useMemo(() => {
     const rawOptions = Array.isArray(activeMarket?.options) ? activeMarket.options : [];
@@ -207,10 +206,13 @@ const PlaceForecastSlip = ({
   const selectedOptionData = availableOptions.find((option: any) => option.id === selectedOption);
 
   const handlePlaceForecast = useCallback(async () => {
-    if (!selectedOptionData || !stakeAmount || parseFloat(stakeAmount) < 50 || !activeMarket?.id) return;
+    const stakeValuePreferred = parseFloat(stakeAmount);
+    const stakeValueKsh = convertAmount(stakeValuePreferred, preferredCurrency, "KSH");
+
+    if (!selectedOptionData || !stakeAmount || stakeValueKsh < 50 || !activeMarket?.id) return;
 
     // Check balance
-    if (user.balance < parseFloat(stakeAmount)) {
+    if (user.balance < stakeValueKsh) {
       toast.error(
         "Insufficient Balance",
         "Please top up your wallet to place this forecast."
@@ -228,7 +230,7 @@ const PlaceForecastSlip = ({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           selectedOption: selectedOptionData.text,
-          amount: Number(stakeAmount),
+          amount: stakeValueKsh,
         }),
       });
       const payload = await response.json().catch(() => null);
@@ -354,15 +356,15 @@ const PlaceForecastSlip = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between my-4">
                 <label className="text-xs font-semibold text-black/80 uppercase tracking-widest">
-                  Stake Amount (KSH)
+                  Stake Amount ({symbol})
                 </label>
                 <span className="text-xs font-semibold text-black/30">
-                  Min: 50
+                  Min: {formatCurrency(50)}
                 </span>
               </div>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-md font-semibold text-black/30">
-                  KSH
+                  {symbol}
                 </span>
                 <input
                   type="number"
@@ -375,10 +377,10 @@ const PlaceForecastSlip = ({
                   className="w-full pl-16 pr-1 py-2 bg-neutral-50 border-2 border-black/10 rounded-xl font-mono font-semibold text-lg text-black focus:border-black focus:bg-white focus:outline-none transition-all placeholder:text-black/20"
                 />
               </div>
-              {stakeAmount && parseFloat(stakeAmount) < 50 && (
+              {stakeValueKshBase > 0 && stakeValueKshBase < 50 && (
                 <p className="text-xs text-red-600 flex items-center gap-1.5">
                   <IconAlertCircle className="w-3.5 h-3.5" />
-                  Minimum stake is 50 KSH
+                  Minimum stake is {formatCurrency(50)}
                 </p>
               )}
             </div>
@@ -390,7 +392,7 @@ const PlaceForecastSlip = ({
                   Platform Fee (5%)
                 </span>
                 <span className="font-mono font-semibold text-black/70">
-                  {platformFee.toFixed(2)} KSH
+                  {formatCurrency(platformFeeKsh)}
                 </span>
               </div>
               <div className="flex justify-between items-center p-4 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
@@ -398,7 +400,7 @@ const PlaceForecastSlip = ({
                   Total to Pay
                 </span>
                 <span className="text-lg font-semibold font-mono text-black">
-                  {totalAmount.toFixed(2)}
+                  {formatCurrency(totalAmountKsh)}
                 </span>
               </div>
             </div>
@@ -428,13 +430,13 @@ const PlaceForecastSlip = ({
               disabled={
                 !selectedOption ||
                 !stakeAmount ||
-                parseFloat(stakeAmount) < 50 ||
+                stakeValueKshBase < 50 ||
                 isSubmittingForecast
               }
               onClick={handlePlaceForecast}
               className={cn(
                 "w-full py-3 rounded-xl font-semibold uppercase tracking-wider text-sm transition-all flex items-center justify-center gap-2",
-                !selectedOption || !stakeAmount || parseFloat(stakeAmount) < 50
+                !selectedOption || !stakeAmount || stakeValueKshBase < 50
                   ? "bg-black/5 text-black/30 cursor-not-allowed"
                   : "bg-black text-white hover:bg-neutral-900 shadow-lg hover:shadow-xl active:scale-95 cursor-pointer",
               )}
@@ -484,6 +486,7 @@ const ManageForecastSlip = ({
   onClose: () => void;
   onPositionCancelled?: (positionId: string) => void;
 }) => {
+  const { formatCurrency } = useCurrency();
   const [isCancelling, setIsCancelling] = useState(false);
   const toast = useToast();
 
@@ -609,7 +612,7 @@ const ManageForecastSlip = ({
           </div>
           <div className="px-5 py-2 rounded-xl bg-linear-to-br from-neutral-50 to-white border border-black/10">
             <p className="text-xl font-mono font-semibold text-black">
-              {stakeAmount} KSH
+              {formatCurrency(stakeAmount)}
             </p>
           </div>
         </div>
@@ -619,7 +622,7 @@ const ManageForecastSlip = ({
             {position.status === "won" ? "Total Won" : "Potential Payout"}
           </p>
           <p className="text-xl font-mono font-semibold text-green-700">
-            {projectedPayout.toFixed(2)} KSH
+            {formatCurrency(projectedPayout)}
           </p>
         </div>
 
@@ -669,6 +672,7 @@ export default function GroupPage() {
   const router = useRouter();
   const toast = useToast();
   const { user, isLoading: isUserLoading } = useLiveUser();
+  const { formatCurrency } = useCurrency();
 
   // State
   const [activeTab, setActiveTab] = useState("feed");
@@ -753,7 +757,8 @@ export default function GroupPage() {
           market.marketType === "winner_takes_all"
             ? "winner_takes_all"
             : "odd_one_out",
-        pool: `${Number(market.totalPool || 0).toLocaleString()} KSH`,
+        totalPool: Number(market.totalPool || 0),
+        pool: formatCurrency(Number(market.totalPool || 0)),
         participants: Array.isArray(market.participants)
           ? market.participants.length
           : 0,
@@ -761,7 +766,6 @@ export default function GroupPage() {
           ? market.participants
           : [],
         buyInAmount: Number(market.buyInAmount || 0),
-        totalPool: Number(market.totalPool || 0),
         options: Array.isArray(market.options)
           ? market.options
           : Array.isArray(market.outcomes)
@@ -841,7 +845,7 @@ export default function GroupPage() {
             user: username,
             action: settled ? "settled a forecast in" : "joined a forecast in",
             details: market.title,
-            amount: `${(settled ? currentValue : stakeAmount).toLocaleString()} KSH`,
+            amount: formatCurrency(settled ? currentValue : stakeAmount),
             timestamp: String(
               participant?.joinedAt ||
                 participant?.createdAt ||
@@ -867,7 +871,7 @@ export default function GroupPage() {
             ? "settled a personal forecast in"
             : "placed a personal forecast in",
         details: position.title,
-        amount: `${Number(position.stakeAmount || 0).toLocaleString()} KSH`,
+        amount: formatCurrency(Number(position.stakeAmount || 0)),
         timestamp: String(position.openedAt || new Date().toISOString()),
         marketId: String(position.marketId || ""),
         marketTitle: position.title,
@@ -1321,7 +1325,7 @@ export default function GroupPage() {
             <div className="space-y-1">
               <p className="text-sm font-normal text-white/50">Total Pool</p>
               <p className="text-2xl font-medium text-white font-mono">
-                93.2K KSH
+                {formatCurrency(93200)}
               </p>
             </div>
           </div>
@@ -1378,7 +1382,7 @@ export default function GroupPage() {
                         <div className="px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
                           <span className="text-[10px] font-semibold text-green-700 uppercase tracking-widest flex items-center gap-1.5">
                             <IconCurrencyDollar className="w-3 h-3" />
-                            Min: 50 KSH
+                            Min: {formatCurrency(50)}
                           </span>
                         </div>
                       </div>
@@ -1395,8 +1399,8 @@ export default function GroupPage() {
                       </p>
                       <p className="text-xl font-semibold font-mono text-black">
                         {group.activePositions && group.activePositions[0]
-                          ? group.activePositions[0].pool
-                          : "45,600 KSH"}
+                          ? formatCurrency(Number((group.activePositions[0] as any).totalPool || 0))
+                          : formatCurrency(45600)}
                       </p>
                     </div>
                   </div>
@@ -1781,7 +1785,7 @@ export default function GroupPage() {
                             <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
                               Stake
                             </p>
-                            <p className="font-mono font-medium">{forecast.stakeAmount} KSH</p>
+                            <p className="font-mono font-medium">{formatCurrency(forecast.stakeAmount)}</p>
                           </div>
                           <div>
                             <p className="text-xs uppercase tracking-wider font-semibold text-black/30">
@@ -1795,7 +1799,7 @@ export default function GroupPage() {
                                   : "text-black/90",
                               )}
                             >
-                               {forecast.status === 'active' ? `${forecast.currentValue}` : (isWon ? `+${forecast.pnl}` : `-${forecast.stakeAmount}`)} KSH
+                               {forecast.status === 'active' ? formatCurrency(forecast.currentValue) : (isWon ? `+${formatCurrency(forecast.pnl)}` : `-${formatCurrency(forecast.stakeAmount)}`)}
                             </p>
                           </div>
                         </div>
@@ -2068,7 +2072,7 @@ export default function GroupPage() {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-semibold font-mono text-black">
-                  93.2K
+                  {formatCurrency(93200)}
                 </p>
                 <p className="text-xs text-black/40 uppercase tracking-wider font-medium mt-1">
                   Total Pool

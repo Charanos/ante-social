@@ -24,6 +24,7 @@ import { CSS } from "@dnd-kit/utilities";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
 import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { MarketChart } from "@/components/markets/MarketChart";
 import Image from "next/image";
@@ -83,7 +84,7 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
       ref={setNodeRef}
       style={style}
       className={`
-        flex items-center gap-4 p-4 rounded-xl border-2 bg-white/60 backdrop-blur-sm transition-all
+        flex items-center justify-between w-full gap-4 p-4 rounded-xl border-2 bg-white/60 backdrop-blur-sm transition-all
         ${isDragging ? "border-black/30 shadow-2xl z-50" : "border-black/10 hover:border-black/20 shadow-sm hover:shadow-md"}
       `}
     >
@@ -113,6 +114,7 @@ export default function LadderMarketPage() {
   const params = useParams();
   const toast = useToast();
   const { user } = useLiveUser();
+  const { formatCurrency, symbol, convertAmount, preferredCurrency } = useCurrency();
   const marketId = params.id as string;
   const [market, setMarket] = useState<any>(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -175,19 +177,21 @@ export default function LadderMarketPage() {
 
   const handleSubmitRankingLive = async () => {
     if (!market) return;
-    const stakeValue = Number.parseFloat(stakeAmount);
+    const stakeValuePreferred = Number.parseFloat(stakeAmount);
+    const stakeValueKsh = convertAmount(stakeValuePreferred, preferredCurrency, "KSH");
+
     if (
       !stakeAmount ||
-      !Number.isFinite(stakeValue) ||
-      stakeValue < market.buy_in_amount
+      !Number.isFinite(stakeValuePreferred) ||
+      stakeValueKsh < market.buy_in_amount
     ) {
       toast.error(
         "Invalid Stake",
-        `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`,
+        `Minimum stake is ${formatCurrency(market.buy_in_amount)}`,
       );
       return;
     }
-    if (user.balance < stakeValue) {
+    if (user.balance < stakeValueKsh) {
       toast.error("Insufficient Balance", "Please top up your wallet to continue.");
       return;
     }
@@ -203,7 +207,7 @@ export default function LadderMarketPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           outcomeId: rankedItems[0].id,
-          amount: stakeValue,
+          amount: stakeValueKsh,
           ranking: rankedItems.map((item) => item.id),
         }),
       });
@@ -214,7 +218,7 @@ export default function LadderMarketPage() {
 
       setPredictionResult({
         optionText: "Custom Ranking",
-        amount: stakeValue,
+        amount: stakeValueKsh,
         timestamp: new Date().toISOString(),
         transactionId: payload?.id || payload?._id,
       });
@@ -235,8 +239,10 @@ export default function LadderMarketPage() {
     return `${days}d ${hours}h`;
   };
 
-  const platformFee = stakeAmount ? parseFloat(stakeAmount) * 0.05 : 0;
-  const totalAmount = stakeAmount ? parseFloat(stakeAmount) + platformFee : 0;
+  const stakeValuePreferred = parseFloat(stakeAmount) || 0;
+  const stakeValueKsh = convertAmount(stakeValuePreferred, preferredCurrency, "KSH");
+  const platformFeeKsh = stakeValueKsh * 0.05;
+  const totalAmountKsh = stakeValueKsh + platformFeeKsh;
 
   if (isPageLoading) {
     return <LoadingLogo fullScreen size="lg" />;
@@ -311,10 +317,10 @@ export default function LadderMarketPage() {
                       </span>
                     </div>
                     <p className="text-xl font-semibold font-mono text-black/90">
-                      {market.total_pool.toLocaleString()}
+                      {formatCurrency(market.total_pool)}
                     </p>
                     <p className="text-xs font-medium text-black/40 mt-1">
-                      KSH
+                      Pool Total
                     </p>
                   </div>
 
@@ -482,7 +488,7 @@ export default function LadderMarketPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold font-mono text-black/90">
-                        {participant.total_stake.toLocaleString()} KSH
+                        {formatCurrency(participant.total_stake)}
                       </p>
                       <p className="text-xs text-black/40 font-medium">
                         {new Date(participant.timestamp).toLocaleTimeString(
@@ -519,11 +525,11 @@ export default function LadderMarketPage() {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-black/5">
                       <span className="text-sm text-black/40 font-medium">Stake</span>
-                      <span className="text-base font-bold text-black/90">{predictionResult.amount.toLocaleString()} KSH</span>
+                      <span className="text-base font-bold text-black/90">{formatCurrency(predictionResult.amount)}</span>
                     </div>
                     <div className="flex justify-between items-center py-2">
                        <span className="text-sm text-black/40 font-medium">Platform Fee</span>
-                       <span className="text-sm font-medium text-black/60">{(predictionResult.amount * 0.05).toLocaleString()} KSH</span>
+                       <span className="text-sm font-medium text-black/60">{formatCurrency(predictionResult.amount * 0.05)}</span>
                     </div>
                     <button 
                       onClick={() => setPredictionResult(null)}
@@ -597,14 +603,14 @@ export default function LadderMarketPage() {
                           <div className="relative">
                             <input
                               type="number"
-                              placeholder={market.buy_in_amount.toLocaleString()}
+                              placeholder={formatCurrency(market.buy_in_amount)}
                               min={market.buy_in_amount}
                               value={stakeAmount}
                               onChange={(e) => setStakeAmount(e.target.value)}
                               className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
                             />
                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
-                              KSH
+                              {symbol}
                             </span>
                           </div>
                           <div className="flex justify-between text-xs px-1">
@@ -612,7 +618,7 @@ export default function LadderMarketPage() {
                               Minimum buy-in
                             </span>
                             <span className="font-mono font-semibold text-black/70">
-                              {market.buy_in_amount.toLocaleString()} KSH
+                              {formatCurrency(market.buy_in_amount)}
                             </span>
                           </div>
                         </div>
@@ -624,7 +630,7 @@ export default function LadderMarketPage() {
                               Platform Fee (5%)
                             </span>
                             <span className="font-mono font-semibold text-black/80">
-                              {platformFee.toLocaleString()} KSH
+                              {formatCurrency(platformFeeKsh)}
                             </span>
                           </div>
                           <div className="flex justify-between text-base">
@@ -632,7 +638,7 @@ export default function LadderMarketPage() {
                               Total Amount
                             </span>
                             <span className="font-mono font-semibold text-black/90">
-                              {totalAmount.toLocaleString()} KSH
+                              {formatCurrency(totalAmountKsh)}
                             </span>
                           </div>
                         </div>

@@ -15,9 +15,12 @@ import { useEffect } from "react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 import { useLiveUser, useMarketList } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
+
 export default function MarketsPage() {
   const { user } = useLiveUser();
   const { markets, isLoading } = useMarketList();
+  const { formatCurrency } = useCurrency();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [isFiltering, setIsFiltering] = useState(false);
@@ -84,17 +87,17 @@ export default function MarketsPage() {
             </CardContent>
           </Card>
 
-          {/* Total Participants Card */}
+          {/* Total Pool Card */}
           <Card className="relative overflow-hidden border-none bg-linear-to-br from-purple-50 via-white to-white shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all cursor-pointer group">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-purple-100/50 blur-2xl transition-all group-hover:bg-purple-200/50" />
             <CardContent className="p-4 md:p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-900/60">
-                    Participants
+                    Total Pool
                   </p>
                   <p className="mt-2 text-2xl md:text-3xl font-medium numeric text-purple-900">
-                    {totalParticipants}
+                    {formatCurrency(totalPool, "KSH", { compact: true })}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">

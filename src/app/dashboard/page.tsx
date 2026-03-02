@@ -26,6 +26,7 @@ import LeaderboardSection from "@/components/dashboard/LeaderboardSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { fetchJsonOrNull, useLiveUser, useMarketList } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
 
 const LIVE_WIN_EVENT = "ante-social:bet-settled";
 const MAX_LIVE_WINS = 20;
@@ -34,7 +35,7 @@ type LiveWin = {
   id: string;
   name: string;
   game: string;
-  amount: string;
+  amount: number;
   currency: string;
 };
 
@@ -55,8 +56,8 @@ function useLiveWins() {
           id: String(item._id || item.id || idx),
           name: String(item.username || item.name || "Player"),
           game: String(item.marketTitle || item.game || "Market"),
-          amount: Number(item.totalWinnings || item.winnings || 0).toLocaleString(),
-          currency: "KSH",
+          amount: Number(item.totalWinnings || item.winnings || 0),
+          currency: "KSH", // Base currency for internal tracking
         }));
       if (seeded.length > 0) {
         setWins(seeded);
@@ -76,8 +77,8 @@ function useLiveWins() {
         id: String(detail.positionId || detail.id || Date.now()),
         name: String(detail.username || detail.user || "Player"),
         game: String(detail.marketTitle || detail.title || "Market"),
-        amount: Number(detail.payout || detail.amount || 0).toLocaleString(),
-        currency: "KSH",
+        amount: Number(detail.payout || detail.amount || 0),
+        currency: "KSH", // Base currency for internal tracking
       };
       setWins((prev) => [win, ...prev].slice(0, MAX_LIVE_WINS));
     };
@@ -89,6 +90,8 @@ function useLiveWins() {
 }
 
 function LiveWinCard({ win }: { win: LiveWin }) {
+  const { formatCurrency } = useCurrency();
+
   return (
     <div className="w-60 shrink-0 px-2">
       <div className="flex items-center gap-3 px-4 py-3 bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-black/5 hover:bg-white/80 hover:border-black/10 hover:shadow-md transition-all cursor-pointer group">
@@ -109,7 +112,7 @@ function LiveWinCard({ win }: { win: LiveWin }) {
         <div className="flex flex-col items-end">
           <span className="text-xs font-semibold text-green-700">Won</span>
           <span className="text-sm font-semibold font-mono text-green-600">
-            {win.amount} <span className="text-xs">{win.currency}</span>
+            {formatCurrency(win.amount)}
           </span>
         </div>
       </div>
@@ -121,6 +124,7 @@ export default function DashboardPage() {
   const { user } = useLiveUser();
   const { markets, isLoading } = useMarketList();
   const liveWins = useLiveWins();
+  const { formatCurrency } = useCurrency();
   const [isReadMeOpen, setIsReadMeOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Markets");
   const [currentPage, setCurrentPage] = useState(1);
@@ -195,8 +199,8 @@ export default function DashboardPage() {
                 />
               </div>
               <div className="flex justify-between text-xs text-neutral-500 font-mono">
-                <span>{totalWinnings.toLocaleString()} KSH earned</span>
-                <span>Goal: {goalAmount.toLocaleString()} KSH</span>
+                <span>{formatCurrency(totalWinnings)} earned</span>
+                <span>Goal: {formatCurrency(goalAmount)}</span>
               </div>
             </div>
 
@@ -389,10 +393,7 @@ export default function DashboardPage() {
                       step: 1,
                       text: "Browse active markets and choose your game mode",
                     },
-                    {
-                      step: 2,
-                      text: "Select an outcome and place your stake (KSH or USD)",
-                    },
+                    {step: 2, text: "Select an outcome and place your stake (MP or USDT)"},
                     {
                       step: 3,
                       text: "Wait for market settlement - results are instant",

@@ -12,8 +12,27 @@ import { useToast } from "@/hooks/useToast";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import { IconAccessPoint, IconAward, IconBriefcase, IconChevronLeft, IconChevronRight, IconCoffee, IconDeviceGamepad, IconDeviceLaptop, IconFlask, IconGlobe, IconLayersOff, IconLoader3, IconLock, IconPalette, IconPlus, IconShield, IconStar, IconTrendingUp, IconUsers } from '@tabler/icons-react';
+import { 
+  IconAccessPoint, 
+  IconAward, 
+  IconBriefcase, 
+  IconChevronLeft, 
+  IconChevronRight, 
+  IconDeviceGamepad, 
+  IconDeviceLaptop, 
+  IconFlask, 
+  IconGlobe, 
+  IconLayersOff, 
+  IconLoader3, 
+  IconLock, 
+  IconPlus, 
+  IconShield, 
+  IconStar, 
+  IconTrendingUp, 
+  IconUsers 
+} from '@tabler/icons-react';
 import { useLiveUser } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
 
 const steps = [
   { id: 1, title: "Category" },
@@ -134,6 +153,7 @@ export default function CreateGroupPage() {
   const router = useRouter();
   const toast = useToast();
   const { user, isLoading: isUserLoading } = useLiveUser();
+  const { formatCurrency, symbol, convertAmount, preferredCurrency } = useCurrency();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
@@ -223,7 +243,7 @@ export default function CreateGroupPage() {
             description: marketDescription,
             marketType:
               selectedMarketType === "poll" ? "winner_takes_all" : "odd_one_out",
-            buyInAmount: Number(buyIn),
+            buyInAmount: convertAmount(Number(buyIn), preferredCurrency, "KSH"),
             options: outcomeOptions,
             selectedOption: outcomeOptions[0]?.optionText || "Yes",
             closeTime: closeDate || undefined,
@@ -733,13 +753,13 @@ export default function CreateGroupPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                        Buy-in (KSh)
+                        Buy-in ({symbol})
                       </label>
                       <input
                         type="number"
                         value={buyIn}
                         onChange={(e) => setBuyIn(e.target.value)}
-                        placeholder="100"
+                        placeholder={(preferredCurrency === "USD" ? 0.77 : 100).toString()}
                         className="w-full px-4 py-2 rounded-lg border-2 border-neutral-200 focus:border-black focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
                       />
                     </div>
@@ -830,7 +850,7 @@ export default function CreateGroupPage() {
                       Entry Fee
                     </span>
                     <span className="text-sm font-semibold text-black font-mono">
-                      {buyIn} MP
+                      {formatCurrency(Number(buyIn))}
                     </span>
                   </div>
                 </div>

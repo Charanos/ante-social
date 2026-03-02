@@ -10,6 +10,7 @@ import {
   IconRotate,
   IconWallet,
   IconTrendingUp,
+  IconLoader3,
 } from "@tabler/icons-react"
 
 import Link from "next/link"
@@ -26,6 +27,7 @@ import {
   useUnreadNotificationsCount, 
   emitGlobalRefresh 
 } from "@/lib/live-data"
+import { useCurrency } from "@/lib/utils/currency"
 
 interface DashboardHeaderProps {
   user?: UserProfile
@@ -41,6 +43,7 @@ export default function DashboardHeader({
   const { user: liveUser } = useLiveUser()
   const unreadCount = useUnreadNotificationsCount()
   const user = initialUser || liveUser || EMPTY_USER
+  const { preferredCurrency, formatCurrency, toggleCurrency, isToggling } = useCurrency()
   
   const queryClient = useQueryClient()
   const isFetching = useIsFetching() > 0
@@ -164,10 +167,29 @@ export default function DashboardHeader({
             <IconWallet className="w-3.5 h-3.5 text-blue-600" />
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold font-mono text-blue-900">
-                ${user.balance.toLocaleString()}
+                {formatCurrency(user.balance)}
               </span>
               <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
             </div>
+          </motion.button>
+
+          {/* Currency Toggle */}
+          <motion.button
+            onClick={toggleCurrency}
+            disabled={isToggling}
+            className="flex items-center gap-2 bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200/60 rounded-lg px-2.5 py-1.5 cursor-pointer hover:shadow-md transition-all shadow-sm group disabled:opacity-50"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            title="Toggle Currency"
+          >
+            <span className="text-[10px] font-semibold text-orange-700 font-mono tracking-wider">
+              {isToggling ? (
+                <IconLoader3 className="w-3 h-3 animate-spin text-orange-600" />
+              ) : (
+                preferredCurrency
+              )}
+            </span>
           </motion.button>
 
           {/* Tier Badge */}

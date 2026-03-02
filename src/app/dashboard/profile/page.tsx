@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
 import { emitLiveUserRefresh, fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import { useSession } from "next-auth/react";
+import { useCurrency } from "@/lib/utils/currency";
 import {
   IconAward,
   IconBell,
@@ -147,6 +148,7 @@ export default function ProfilePage() {
   const toast = useToast();
   const { user, isLoading: isUserLoading, refresh } = useLiveUser();
   const { update: updateSession } = useSession();
+  const { formatCurrency } = useCurrency();
 
   // Loading states
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -680,7 +682,7 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-medium text-black/50">Reward:</span>
                       <span className="text-sm font-mono font-semibold text-green-600">
-                        +{achievement.reward} pts
+                        +{formatCurrency(achievement.reward, "KSH")}
                       </span>
                     </div>
                   </div>

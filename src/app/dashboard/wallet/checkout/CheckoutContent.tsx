@@ -33,6 +33,7 @@ import {
   normalizeMpesaPhone,
   validationRules,
 } from "@/lib/validation/rules";
+import { useCurrency } from "@/lib/utils/currency";
 
 type TransactionType = "deposit" | "withdrawal";
 type PaymentMethod = "mpesa" | "usdt";
@@ -70,6 +71,7 @@ export default function CheckoutContent() {
   const searchParams = useSearchParams();
   const toast = useToast();
   const { user } = useLiveUser();
+  const { symbol, preferredCurrency, convertAmount, formatCurrency } = useCurrency();
 
   const [mode, setMode] = useState<TransactionType>("deposit");
   const [method, setMethod] = useState<PaymentMethod>("mpesa");
@@ -317,9 +319,12 @@ export default function CheckoutContent() {
         }
 
         if (mode === "deposit") {
+          const amountValueKsh = convertAmount(amountNumber, preferredCurrency, "KSH");
+          const amountValueUsd = convertAmount(amountNumber, preferredCurrency, "USD");
+
           if (method === "mpesa") {
             const result = (await walletApi.deposit({
-              amount: amountNumber,
+              amount: amountValueKsh,
               currency: "KSH",
               phoneNumber: normalizeMpesaPhone(phoneNumber),
             })) as { transactionId?: string };
@@ -332,11 +337,11 @@ export default function CheckoutContent() {
 
             toast.success(
               "STK Push Sent",
-              "Check your phone and approve the payment request.",
+              `Check your phone and approve the payment of ${formatCurrency(amountValueKsh)}.`,
             );
           } else {
             const result = (await walletApi.deposit({
-              amount: amountNumber,
+              amount: amountValueUsd,
               currency: "USD",
               transactionHash: trxHash || undefined,
             })) as {
@@ -353,7 +358,7 @@ export default function CheckoutContent() {
             }
             setGeneratedUsdtAddress(String(result?.payAddress || generatedUsdtAddress));
             setGeneratedUsdtAmount(
-              Number(result?.payAmount || amountNumber || 0),
+              Number(result?.payAmount || amountValueUsd || 0),
             );
             setGeneratedPaymentId(String(result?.paymentId || ""));
             setPaymentStatus(String(result?.status || "pending").toLowerCase());
@@ -364,8 +369,11 @@ export default function CheckoutContent() {
             );
           }
         } else {
+          const amountValueKsh = convertAmount(amountNumber, preferredCurrency, "KSH");
+          const amountValueUsd = convertAmount(amountNumber, preferredCurrency, "USD");
+
           const result = (await walletApi.withdraw({
-            amount: amountNumber,
+            amount: method === "mpesa" ? amountValueKsh : amountValueUsd,
             currency: method === "mpesa" ? "KSH" : "USD",
             phoneNumber: method === "mpesa" ? normalizeMpesaPhone(phoneNumber) : undefined,
             cryptoAddress: method === "usdt" ? cryptoAddress : undefined,
@@ -594,6 +602,7 @@ export default function CheckoutContent() {
               </div>
             </div>
 
+
             {/* Amount Input */}
             <div>
               <SectionHeading title="Enter Amount" className="my-16 md:my-18" />
@@ -601,7 +610,7 @@ export default function CheckoutContent() {
               <div className="space-y-2">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 font-semibold">
-                    $
+                    {symbol}
                   </span>
                   <input
                     type="number"
@@ -619,7 +628,7 @@ export default function CheckoutContent() {
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-2 my-6">
-                  {QUICK_AMOUNTS.map((amt) => (
+                  {(preferredCurrency === "USD" ? [1, 5, 10, 50] : [100, 500, 1000, 5000]).map((amt) => (
                     <button
                       key={amt}
                       type="button"
@@ -631,7 +640,7 @@ export default function CheckoutContent() {
                           : "bg-white border border-black/5 text-black/80 hover:bg-black/5",
                       )}
                     >
-                      ${amt}
+                      {symbol}{amt}
                     </button>
                   ))}
                 </div>

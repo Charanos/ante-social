@@ -32,6 +32,7 @@ import {
   useLiveUser,
   type LiveTransaction,
 } from "@/lib/live-data";
+import { useCurrency } from "@/lib/utils/currency";
 
 const TRANSACTION_TYPES = [
   { value: "all", label: "All Transactions" },
@@ -44,6 +45,7 @@ const TRANSACTION_TYPES = [
 export default function WalletPage() {
   const router = useRouter();
   const { user, isLoading: isUserLoading } = useLiveUser();
+  const { formatCurrency } = useCurrency();
   const [transactions, setTransactions] = useState<LiveTransaction[]>([]);
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [isTransactionsLoading, setIsTransactionsLoading] = useState(true);
@@ -171,7 +173,7 @@ export default function WalletPage() {
                   Available Balance
                 </p>
                 <p className="text-3xl md:text-4xl font-semibold font-mono">
-                  ${user.balance.toFixed(2)}
+                  {formatCurrency(user.balance)}
                 </p>
               </div>
             </div>
@@ -194,7 +196,7 @@ export default function WalletPage() {
                 Total Deposited
               </p>
               <p className="text-lg font-semibold font-mono text-green-400">
-                ${stats.deposits.toFixed(0)}
+                {formatCurrency(stats.deposits)}
               </p>
             </div>
             <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
@@ -202,7 +204,7 @@ export default function WalletPage() {
                 Total Withdrawn
               </p>
               <p className="text-lg font-semibold font-mono text-red-400">
-                ${stats.withdrawals.toFixed(0)}
+                {formatCurrency(stats.withdrawals)}
               </p>
             </div>
             <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
@@ -210,7 +212,7 @@ export default function WalletPage() {
                 Total Bets
               </p>
               <p className="text-lg font-semibold font-mono text-blue-400">
-                ${stats.bets.toFixed(0)}
+                {formatCurrency(stats.bets)}
               </p>
             </div>
             <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
@@ -218,13 +220,13 @@ export default function WalletPage() {
                 Net Profit
               </p>
               <p
-                className={cn(
-                  "text-lg font-semibold font-mono",
-                  stats.netProfit >= 0 ? "text-green-400" : "text-red-400",
-                )}
-              >
-                {stats.netProfit >= 0 ? "+" : ""}${stats.netProfit.toFixed(0)}
-              </p>
+              className={cn(
+                "text-lg font-semibold font-mono",
+                stats.netProfit >= 0 ? "text-green-400" : "text-red-400",
+              )}
+            >
+              {stats.netProfit >= 0 ? "+" : ""}{formatCurrency(stats.netProfit)}
+            </p>
             </div>
           </div>
 
@@ -270,7 +272,7 @@ export default function WalletPage() {
                     Total Winnings
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-green-900">
-                    +${(user.totalWinnings || 0).toFixed(2)}
+                    +{formatCurrency(user.totalWinnings || 0)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -295,7 +297,7 @@ export default function WalletPage() {
                     Total Losses
                   </p>
                   <p className="mt-2 text-3xl font-normal numeric text-red-900">
-                    -${(user.totalLosses || 0).toFixed(2)}
+                    -{formatCurrency(user.totalLosses || 0)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -448,7 +450,7 @@ export default function WalletPage() {
                         tx.amount > 0 ? "text-green-600" : "text-black/90",
                       )}
                     >
-                      {tx.amount > 0 ? "+" : ""}${Math.abs(tx.amount)}
+                      {tx.amount > 0 ? "+" : ""}{formatCurrency(tx.amount)}
                     </p>
                     {getStatusBadge(tx.status)}
                   </div>

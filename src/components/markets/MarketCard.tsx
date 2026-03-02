@@ -21,6 +21,7 @@ import { ProbabilityTrend } from "@/components/ui/ProbabilityTrend";
 import { MarketChart } from "./MarketChart";
 
 import { Market } from "@/types/market";
+import { useCurrency } from "@/lib/utils/currency";
 
 interface MarketCardProps {
   market: Market;
@@ -78,20 +79,13 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
   const linkHref = href || `/dashboard/markets/${market.id}/${marketTypeSlug}`;
   const timeLeft = formatTimeLeft(market.endsAt || new Date().toISOString());
   
+  const { formatCurrency } = useCurrency();
+  
   // Format pool amount strictly
-  const formattedPool = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    notation: 'compact',
-    maximumFractionDigits: 1
-  }).format(market.poolAmount || 0);
+  const formattedPool = formatCurrency(market.poolAmount || 0);
   
   // Format stake strictly
-  const formattedStake = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0
-  }).format(minStake);
+  const formattedStake = formatCurrency(minStake);
 
   return (
     <motion.div
