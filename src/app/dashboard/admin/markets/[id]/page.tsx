@@ -20,6 +20,7 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { marketsApi } from "@/lib/api";
+import { useCurrency } from "@/lib/utils/currency";
 
 type MarketOutcome = {
   _id?: string;
@@ -83,6 +84,7 @@ function hoursUntil(value?: string) {
 }
 
 export default function ViewMarketPage() {
+  const { formatCurrency } = useCurrency();
   const params = useParams();
   const toast = useToast();
   const marketId = params.id as string;
@@ -303,7 +305,7 @@ export default function ViewMarketPage() {
                 <IconCurrencyDollar className="w-4 h-4 text-green-600" />
                 <span className="text-xs font-medium text-green-700">Total Pool</span>
               </div>
-              <p className="text-2xl font-medium text-green-900">${Number(marketData.totalPool || 0).toFixed(2)}</p>
+              <p className="text-2xl font-medium text-green-900">{formatCurrency(Number(marketData.totalPool || 0), "KSH")}</p>
             </div>
 
             <div className="p-4 rounded-lg bg-blue-50/50 border border-blue-100">
@@ -322,7 +324,7 @@ export default function ViewMarketPage() {
                 <IconTrendingUp className="w-4 h-4 text-purple-600" />
                 <span className="text-xs font-medium text-purple-700">Buy-in</span>
               </div>
-              <p className="text-2xl font-medium text-purple-900">{Number(marketData.buyInAmount || 0)} MP</p>
+              <p className="text-2xl font-medium text-purple-900">{formatCurrency(Number(marketData.buyInAmount || 0), "KSH")}</p>
             </div>
 
             <div className="p-4 rounded-lg bg-orange-50/50 border border-orange-100">
@@ -425,7 +427,7 @@ export default function ViewMarketPage() {
                       <span className="font-medium text-neutral-900">{outcome.bets}</span> bet(s)
                     </span>
                     <span className="text-neutral-600">
-                      <span className="font-medium text-neutral-900">${outcome.amount.toFixed(2)}</span> staked
+                      <span className="font-medium text-neutral-900">{formatCurrency(outcome.amount, "KSH")}</span> staked
                     </span>
                   </div>
                 </div>

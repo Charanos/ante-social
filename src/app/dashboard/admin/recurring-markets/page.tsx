@@ -11,8 +11,10 @@ import RecurringMarketModal from "@/components/admin/RecurringMarketModal";
 import { adminApi, type RecurringMarketTemplateItem } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { useToast } from "@/components/ui/toast-notification";
+import { useCurrency } from "@/lib/utils/currency";
 
 export default function AdminRecurringMarketsPage() {
+  const { formatCurrency } = useCurrency();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -126,8 +128,8 @@ export default function AdminRecurringMarketsPage() {
                       <p className="text-sm font-semibold text-black/90">{template.name}</p>
                       <p className="mt-1 text-xs text-black/50">{template.titleTemplate}</p>
                       <p className="mt-2 text-xs text-black/50">
-                        {template.recurrence.toUpperCase()} | {template.marketType} | $
-                        {Number(template.buyInAmount || 0).toLocaleString()}
+                        {template.recurrence.toUpperCase()} | {template.marketType} |{" "}
+                        {formatCurrency(Number(template.buyInAmount || 0), "KSH")}
                       </p>
                       <p className="mt-1 text-xs text-black/50">
                         Next execution:{" "}

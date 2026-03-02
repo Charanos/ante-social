@@ -19,6 +19,7 @@ import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast-notification";
+import { useCurrency } from "@/lib/utils/currency";
 
 type AuditLog = {
   _id?: string;
@@ -56,17 +57,18 @@ function shortValue(value: unknown) {
   return `${text.slice(0, 20)}...`;
 }
 
-function amountLabel(log: AuditLog) {
+function amountLabel(log: AuditLog, formatCurrency: any) {
   if (typeof log.amountCents === "number") {
-    return `$${(log.amountCents / 100).toFixed(2)}`;
+    return formatCurrency(log.amountCents / 100, "KSH");
   }
   const amount = log.metadata?.amount;
-  if (typeof amount === "number") return `$${amount.toFixed(2)}`;
+  if (typeof amount === "number") return formatCurrency(amount, "KSH");
   if (typeof amount === "string") return amount;
   return null;
 }
 
 export default function AuditLogsPage() {
+  const { formatCurrency, symbol } = useCurrency();
   const toast = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
@@ -121,7 +123,7 @@ export default function AuditLogsPage() {
       log.entityType || "",
       log.entityId || "",
       log.timestamp || "",
-      amountLabel(log) || "",
+      amountLabel(log, formatCurrency) || "",
       log.verificationStatus || "",
     ]);
 
@@ -333,7 +335,7 @@ export default function AuditLogsPage() {
             {logs.map((log, index) => {
               const event = String(log.action || log.eventType || "EVENT");
               const actor = String(log.actorType || "system");
-              const amount = amountLabel(log);
+              const amount = amountLabel(log, formatCurrency);
               return (
                 <motion.div
                   key={log._id || `${log.sequenceNumber}-${index}`}
@@ -389,7 +391,7 @@ export default function AuditLogsPage() {
                         {amount && (
                           <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green-50 border border-green-100">
                             <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                              <span className="text-green-600 font-medium text-xs">$</span>
+                              <span className="text-green-600 font-medium text-xs">{symbol}</span>
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="text-xs text-green-600 font-medium">Amount</p>

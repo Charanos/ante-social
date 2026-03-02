@@ -7,6 +7,7 @@ import { IconDownload, IconLoader3 } from "@tabler/icons-react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { adminApi } from "@/lib/api";
+import { useCurrency } from "@/lib/utils/currency";
 
 type AdminOverview = {
   totalUsers?: number;
@@ -48,6 +49,7 @@ type MarketMetrics = {
 };
 
 export default function AdminAnalyticsPage() {
+  const { formatCurrency } = useCurrency();
   const defaultTo = new Date();
   const defaultFrom = new Date();
   defaultFrom.setDate(defaultFrom.getDate() - 30);
@@ -200,13 +202,13 @@ export default function AdminAnalyticsPage() {
             <DashboardCard>
               <p className="text-xs uppercase tracking-wide text-black/50">Total Volume</p>
               <p className="mt-2 text-3xl font-mono font-semibold text-black/90">
-                ${totalVolume.toLocaleString()}
+                {formatCurrency(totalVolume, "KSH")}
               </p>
             </DashboardCard>
             <DashboardCard>
               <p className="text-xs uppercase tracking-wide text-black/50">Total Revenue</p>
               <p className="mt-2 text-3xl font-mono font-semibold text-black/90">
-                ${totalRevenue.toLocaleString()}
+                {formatCurrency(totalRevenue, "KSH")}
               </p>
             </DashboardCard>
             <DashboardCard>

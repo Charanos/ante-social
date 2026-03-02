@@ -493,8 +493,8 @@ export default function BetrayalMarketPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4 sticky top-24 self-start">
-            <div className="space-y-6">
+          <div className="lg:col-span-4 lg:self-start space-y-6">
+            <div className="lg:sticky lg:top-28 z-40 h-fit">
               {/* Prediction Result / Slip */}
               {predictionResult ? (
                 <motion.div
@@ -676,6 +676,8 @@ export default function BetrayalMarketPage() {
                 </motion.div>
               )}
 
+            </div>
+
               {/* Info Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -696,7 +698,6 @@ export default function BetrayalMarketPage() {
                   </div>
                 </div>
               </motion.div>
-            </div>
           </div>
       </div>
     </div>

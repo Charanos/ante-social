@@ -16,6 +16,7 @@ import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { adminApi, type WithdrawalQueueItem } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { useToast } from "@/components/ui/toast-notification";
+import { useCurrency } from "@/lib/utils/currency";
 
 type SortBy = "date" | "amount" | "user";
 type SortOrder = "asc" | "desc";
@@ -33,6 +34,7 @@ function getTimestamp(value?: string) {
 
 export default function AdminWithdrawalsPage() {
   const toast = useToast();
+  const { formatCurrency } = useCurrency();
   const queryClient = useQueryClient();
   const [sortBy, setSortBy] = useState<SortBy>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -111,7 +113,7 @@ export default function AdminWithdrawalsPage() {
         <DashboardCard>
           <p className="text-xs uppercase tracking-wide text-black/50">Pending Volume</p>
           <p className="mt-2 text-3xl font-mono font-semibold text-black/90">
-            ${totalAmount.toLocaleString()}
+            {formatCurrency(totalAmount, "KSH")}
           </p>
         </DashboardCard>
         <DashboardCard>
@@ -184,8 +186,8 @@ export default function AdminWithdrawalsPage() {
                       className="text-left cursor-pointer"
                     >
                       <p className="text-sm font-semibold text-black/90">
-                        ${Number(withdrawal.amount || 0).toLocaleString()}{" "}
-                        <span className="text-black/50">{withdrawal.currency || "USD"}</span>
+                        {formatCurrency(Number(withdrawal.amount || 0), "KSH")}{" "}
+                        <span className="text-black/50">{withdrawal.currency || "KSH"}</span>
                       </p>
                       <p className="mt-1 text-xs text-black/50">
                         User: {String(withdrawal.userId || "Unknown")}

@@ -17,6 +17,7 @@ import {
 } from "@tabler/icons-react";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/lib/utils/currency";
 
 const marketTypes = [
   {
@@ -62,6 +63,7 @@ export function MarketCreationForm({
   isSubmitting = false,
   onCancel,
 }: MarketCreationFormProps) {
+  const { symbol } = useCurrency();
   const [selectedType, setSelectedType] = useState<string | null>(
     initialData?.type || null
   );
@@ -302,7 +304,7 @@ export function MarketCreationForm({
                         className="w-full pl-10 pr-12 py-3 rounded-lg border-2 border-neutral-200 focus:border-blue-500 focus:outline-none transition-colors font-mono bg-white/50 backdrop-blur-sm"
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-600 font-medium">
-                        KSh
+                        {symbol}
                       </span>
                     </div>
                   </div>

@@ -19,6 +19,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLiveUser } from "@/lib/live-data";
 import { useToast } from "@/components/ui/toast-notification";
+import { useCurrency } from "@/lib/utils/currency";
 
 type AdminStats = {
   totalUsers?: number;
@@ -59,6 +60,7 @@ function getCategoryIcon(category: string) {
 
 export default function AchievementsPage() {
   const { user } = useLiveUser();
+  const { formatCurrency } = useCurrency();
   const toast = useToast();
   const [showBonusModal, setShowBonusModal] = useState(false);
 
@@ -217,7 +219,7 @@ export default function AchievementsPage() {
               <div>
                 <p className="text-xs md:text-sm font-medium text-green-900/60">Cash Earned</p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-green-900">
-                  {achievementData.stats.balance} KSH
+                  {formatCurrency(achievementData.stats.balance, "KSH")}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -261,7 +263,7 @@ export default function AchievementsPage() {
               <div>
                 <p className="text-xs md:text-sm font-medium text-blue-900/60">Total Rewards</p>
                 <p className="mt-1 md:mt-2 text-xl md:text-3xl font-medium font-mono text-blue-900">
-                  {achievementData.stats.earned} KSH
+                  {formatCurrency(achievementData.stats.earned, "KSH")}
                 </p>
               </div>
               <div className="self-end md:self-auto rounded-xl bg-white/80 p-2 md:p-3 shadow-sm backdrop-blur-sm">
@@ -324,7 +326,7 @@ export default function AchievementsPage() {
                   {day.claimed ? <IconCheck className="w-4 h-4" /> : day.day}
                 </div>
                 <span className={`text-xs font-mono font-semibold ${day.claimed || day.day === 3 ? "text-amber-600" : "text-black/40"}`}>
-                  {day.reward} KSH
+                  {formatCurrency(day.reward, "KSH")}
                 </span>
               </motion.div>
             ))}
@@ -359,7 +361,7 @@ export default function AchievementsPage() {
                     <h4 className="font-semibold text-black/90 text-base">{item.title}</h4>
                     <p className="text-sm text-black/80 font-medium mt-1">{item.description}</p>
                   </div>
-                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">+{item.reward} KSH</span>
+                  <span className="text-green-600 font-mono font-semibold text-sm whitespace-nowrap">+{formatCurrency(item.reward, "KSH")}</span>
                 </div>
                 <div className="space-y-2">
                   <div className="h-2 w-full bg-black/5 rounded-full overflow-hidden">
@@ -398,7 +400,7 @@ export default function AchievementsPage() {
                   <p className="text-xs text-black/80 font-medium mt-1">{item.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">+{item.reward} KSH</span>
+                  <span className="bg-white text-black/80 text-xs font-mono font-semibold px-3 py-1 rounded-lg shadow-sm">+{formatCurrency(item.reward, "KSH")}</span>
                   <span className="text-xs font-semibold text-black/50">{item.category}</span>
                 </div>
                 <span className="text-xs text-black/40 font-medium">Unlocked {item.date}</span>
@@ -428,7 +430,7 @@ export default function AchievementsPage() {
                   <p className="text-xs text-black/40 font-medium mt-1 line-clamp-2">{item.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">+{item.reward} KSH</span>
+                  <span className="bg-black/5 text-black/50 text-xs font-mono font-semibold px-3 py-1 rounded-lg">+{formatCurrency(item.reward, "KSH")}</span>
                   <span className="text-xs font-semibold text-black/30">{item.category}</span>
                 </div>
               </div>
@@ -477,10 +479,7 @@ export default function AchievementsPage() {
 
                 <div className="p-6 rounded-2xl bg-linear-to-br from-amber-50 to-yellow-50 border border-amber-200">
                   <p className="text-sm font-semibold text-amber-900/60 mb-2">Today's Reward</p>
-                  <p className="text-4xl font-semibold font-mono text-amber-900">
-                    {achievementData.dailyBonus.find((day) => !day.claimed)?.reward || 100}{" "}
-                    <span className="text-2xl">KSH</span>
-                  </p>
+                    {formatCurrency(achievementData.dailyBonus.find((day) => !day.claimed)?.reward || 100, "KSH")}
                 </div>
 
                 <motion.button

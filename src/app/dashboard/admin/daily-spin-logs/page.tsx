@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { useToast } from "@/components/ui/toast-notification";
+import { useCurrency } from "@/lib/utils/currency";
 
 type AuditLog = {
   _id?: string;
@@ -70,6 +71,7 @@ function withinRange(timestamp: string | undefined, range = "all") {
 }
 
 export default function DailySpinLogsPage() {
+  const { formatCurrency } = useCurrency();
   const toast = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState("all");
@@ -109,7 +111,7 @@ export default function DailySpinLogsPage() {
           userId: userId ? `${userId.slice(0, 12)}...` : "N/A",
           date: formatDateTime(log.timestamp),
           amountRaw,
-          amount: `${amountRaw >= 0 ? "+" : ""}${amountRaw.toFixed(2)} MP`,
+          amount: `${amountRaw >= 0 ? "+" : ""}${formatCurrency(amountRaw, "KSH")}`,
           type: spinType,
         };
       })
@@ -196,7 +198,7 @@ export default function DailySpinLogsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-900/60">Total Awarded</p>
-                  <p className="mt-2 text-3xl font-medium font-mono text-green-900">{totalAwardedValue.toFixed(2)} MP</p>
+                  <p className="mt-2 text-3xl font-medium font-mono text-green-900">{formatCurrency(totalAwardedValue, "KSH")}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
                   <IconGift className="h-6 w-6 text-green-600" />
@@ -210,7 +212,7 @@ export default function DailySpinLogsPage() {
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-900/60">Jackpots (50 MP)</p>
+                  <p className="text-sm font-medium text-purple-900/60">Jackpots ({formatCurrency(50, "KSH")})</p>
                   <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{jackpots}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
@@ -226,7 +228,7 @@ export default function DailySpinLogsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-amber-900/60">Average Reward</p>
-                  <p className="mt-2 text-3xl font-medium font-mono text-amber-900">{avgReward.toFixed(2)} MP</p>
+                  <p className="mt-2 text-3xl font-medium font-mono text-amber-900">{formatCurrency(avgReward, "KSH")}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
                   <IconTrendingUp className="h-6 w-6 text-amber-600" />

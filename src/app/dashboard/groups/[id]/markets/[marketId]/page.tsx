@@ -444,7 +444,9 @@ export default function PrivateMarketDetailsPage() {
             </AnimatePresence>
           </div>
 
-          <div className="space-y-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1 lg:self-start space-y-6">
+            <div className="lg:sticky lg:top-28 z-40 h-fit">
             <div className="glass-panel p-6 rounded-3xl border-white/50 bg-white/60">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">Valid Entries</h3>
@@ -476,6 +478,7 @@ export default function PrivateMarketDetailsPage() {
                 View All History
               </button>
             </div>
+            </div>
 
             <div className="glass-panel p-6 rounded-3xl border-white/50 bg-white/40">
               <div className="flex items-start gap-4">
@@ -485,7 +488,7 @@ export default function PrivateMarketDetailsPage() {
                 <div>
                   <h4 className="font-semibold text-gray-900">Group Chat</h4>
                   <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                    Discuss this bet with the group. Is {market.creator} bluffing?
+                    Discuss this prediction with the group. Is {market.creator} bluffing?
                   </p>
                   <button className="mt-4 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                     Open Chat 

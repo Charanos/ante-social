@@ -13,6 +13,7 @@ import {
 import { useToast } from "@/components/ui/toast-notification";
 import { adminApi, type RecurringMarketTemplateItem } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
+import { useCurrency } from "@/lib/utils/currency";
 
 interface RecurringMarketModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export default function RecurringMarketModal({
   onSaved,
   initialTemplate = null,
 }: RecurringMarketModalProps) {
+  const { symbol } = useCurrency();
   const toast = useToast();
   const isEditMode = Boolean(initialTemplate?._id);
 
@@ -288,7 +290,7 @@ export default function RecurringMarketModal({
                 </select>
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-900">Buy-in Amount (USD)</label>
+                <label className="mb-2 block text-sm font-medium text-neutral-900">Buy-in Amount ({symbol})</label>
                 <input
                   type="number"
                   min={0}

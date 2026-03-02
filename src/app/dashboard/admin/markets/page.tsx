@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useMarketList } from "@/lib/live-data";
 import { getApiErrorMessage } from "@/lib/api/client";
 import { marketsApi } from "@/lib/api";
+import { useCurrency } from "@/lib/utils/currency";
 
 type MarketRow = {
   id: string;
@@ -40,6 +41,7 @@ type MarketRow = {
 };
 
 export default function MarketManagerPage() {
+  const { formatCurrency } = useCurrency();
   const toast = useToast();
   const { markets: liveMarkets, isLoading, refresh } = useMarketList();
   const [searchQuery, setSearchQuery] = useState("");
@@ -236,7 +238,7 @@ export default function MarketManagerPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-purple-900/60">Total Pool</p>
-                    <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{totalPool} MP</p>
+                    <p className="mt-2 text-3xl font-medium font-mono text-purple-900">{formatCurrency(totalPool, "KSH")}</p>
                   </div>
                   <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm">
                     <IconCurrencyDollar className="h-6 w-6 text-purple-600" />
@@ -416,7 +418,7 @@ export default function MarketManagerPage() {
                         </div>
                         <div>
                           <p className="text-xs text-neutral-600 font-medium">Buy-in</p>
-                          <p className="text-sm font-medium text-neutral-900 font-mono">{market.buyIn} MP</p>
+                          <p className="text-sm font-medium text-neutral-900 font-mono">{formatCurrency(market.buyIn, "KSH")}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">
@@ -434,7 +436,7 @@ export default function MarketManagerPage() {
                         </div>
                         <div>
                           <p className="text-xs text-neutral-600 font-medium">Pool</p>
-                          <p className="text-sm font-medium text-neutral-900 font-mono">{market.pool} MP</p>
+                          <p className="text-sm font-medium text-neutral-900 font-mono">{formatCurrency(market.pool, "KSH")}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-neutral-50 border border-neutral-100">

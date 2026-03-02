@@ -35,9 +35,11 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import RecurringMarketModal from "@/components/admin/RecurringMarketModal"
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
 import { fetchJsonOrNull, useMarketList } from "@/lib/live-data"
+import { useCurrency } from "@/lib/utils/currency"
 
 export default function AdminPage() {
   const toast = useToast()
+  const { formatCurrency } = useCurrency()
   const { markets: marketList, isLoading: isMarketsLoading } = useMarketList()
   const [adminStats, setAdminStats] = useState({
     totalUsers: 0,
@@ -346,7 +348,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-900/60">Total Volume</p>
-                  <p className="mt-2 text-3xl font-medium font-mono text-green-900">${adminStats.totalVolume.toLocaleString()}</p>
+                  <p className="mt-2 text-3xl font-medium font-mono text-green-900">{formatCurrency(adminStats.totalVolume, "KSH")}</p>
                 </div>
                 <div className="rounded-xl bg-white/80 p-3 shadow-sm backdrop-blur-sm group-hover:scale-110 transition-transform">
                   <IconCurrencyDollar className="h-6 w-6 text-green-600" />
@@ -754,7 +756,7 @@ export default function AdminPage() {
                         <div className="mt-5 flex items-center gap-6 text-sm">
                           <div className="flex items-center gap-2">
                             <span className="text-black/40 font-medium">Buy-in</span>
-                            <span className="font-mono font-medium text-black/90">${market.minStake}</span>
+                            <span className="font-mono font-medium text-black/90">{formatCurrency(market.minStake, "KSH")}</span>
                           </div>
                           <div className="h-4 w-px bg-black/10" />
                           <div className="flex items-center gap-2">
@@ -764,7 +766,7 @@ export default function AdminPage() {
                           <div className="h-4 w-px bg-black/10" />
                           <div className="flex items-center gap-2">
                             <span className="text-black/40 font-medium">Total Pool</span>
-                            <span className="font-mono font-medium text-green-600">${market.poolAmount}</span>
+                            <span className="font-mono font-medium text-green-600">{formatCurrency(market.poolAmount, "KSH")}</span>
                           </div>
                         </div>
                       </div>
