@@ -41,6 +41,7 @@ export default function BetrayalMarketPage() {
   >(null);
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [predictionResult, setPredictionResult] = useState<any>(null);
   const [showOutcomes, setShowOutcomes] = useState(false);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function BetrayalMarketPage() {
     };
   }, [marketId]);
 
-  const handlePlaceBet = async () => {
+  const handlePlacePrediction = async () => {
     if (!market) return;
     const stakeValue = Number.parseFloat(stakeAmount);
     const outcomeId =
@@ -78,7 +79,7 @@ export default function BetrayalMarketPage() {
       stakeValue < market.buy_in_amount
     ) {
       toast.error(
-        "Invalid Bet",
+        "Invalid Prediction",
         `Minimum stake is ${market.buy_in_amount.toLocaleString()} KSH`,
       );
       return;
@@ -94,7 +95,7 @@ export default function BetrayalMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/bet`, {
+      const response = await fetch(`/api/markets/${market.id}/predict`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -106,7 +107,17 @@ export default function BetrayalMarketPage() {
       if (!response.ok) {
         throw new Error(parseApiError(payload, "Failed to place choice."));
       }
-      toast.success("Choice Locked In!", `You chose to ${selectedChoice}`);
+      setPredictionResult({
+        optionText: selectedChoice.toUpperCase(),
+        amount: stakeValue,
+        timestamp: new Date().toISOString(),
+        transactionId: payload?.id || payload?._id,
+      });
+
+      toast.success(
+        "Decision Locked!",
+        `You predicted ${stakeAmount} KSH on your choice`,
+      );
     } catch (error: any) {
       toast.error("Submit Failed", error?.message || "Unable to place choice.");
     } finally {
@@ -115,6 +126,7 @@ export default function BetrayalMarketPage() {
   };
 
   const getTimeRemaining = () => {
+    if (!market) return "";
     const diff = market.close_date.getTime() - Date.now();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -130,6 +142,9 @@ export default function BetrayalMarketPage() {
   if (!market) {
     return <div className="p-8 text-sm text-black/50">Market not found.</div>;
   }
+
+  const isClosed = market.status === "closed" || market.status === "settled" || market.status === "resolved";
+  const winningOutcomeId = market.winningOutcomeId;
 
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
@@ -216,32 +231,36 @@ export default function BetrayalMarketPage() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <IconClock className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
-                        Closes In
-                      </span>
+                  {!isClosed && (
+                    <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <IconClock className="w-4 h-4 text-black/40" />
+                        <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                          Closes In
+                        </span>
+                      </div>
+                      <p className="text-xl font-semibold font-mono text-black/90">
+                        {getTimeRemaining()}
+                      </p>
+                      <p className="text-xs font-medium text-black/40 mt-1">
+                        Remaining
+                      </p>
                     </div>
-                    <p className="text-xl font-semibold font-mono text-black/90">
-                      {getTimeRemaining()}
-                    </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">
-                      Remaining
-                    </p>
-                  </div>
+                  )}
                 </div>
               </div>
             </motion.div>
 
             {/* Visual Separator */}
-            <div className="flex items-center gap-4 my-10 md:my-16">
-              <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-                Choose Your Strategy
-              </h2>
-              <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-            </div>
+            {!isClosed && (
+              <div className="flex items-center gap-4 my-10 md:my-16">
+                <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
+                <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                  Choose Your Strategy
+                </h2>
+                <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
+              </div>
+            )}
 
             {/* Choice Cards */}
             <motion.div
@@ -257,8 +276,13 @@ export default function BetrayalMarketPage() {
                 className={`
                   relative overflow-hidden rounded-3xl border-2 p-8 cursor-pointer transition-all
                   ${
+                    isClosed ? "cursor-default opacity-60" : "cursor-pointer"
+                  }
+                  ${
                     selectedChoice === "cooperate"
                       ? "border-green-500/50 bg-green-50/60 backdrop-blur-xl shadow-[0_16px_48px_-8px_rgba(34,197,94,0.3)]"
+                      : winningOutcomeId === market.options?.[0]?.id
+                      ? "border-green-500/30 bg-green-50/20 backdrop-blur-sm shadow-[0_8px_32px_-8px_rgba(34,197,94,0.1)]"
                       : "border-black/10 bg-white/40 backdrop-blur-sm hover:border-green-300/50 hover:bg-green-50/30 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]"
                   }
                 `}
@@ -301,8 +325,13 @@ export default function BetrayalMarketPage() {
                 className={`
                   relative overflow-hidden rounded-3xl border-2 p-8 cursor-pointer transition-all
                   ${
+                    isClosed ? "cursor-default opacity-60" : "cursor-pointer"
+                  }
+                  ${
                     selectedChoice === "betray"
                       ? "border-red-500/50 bg-red-50/60 backdrop-blur-xl shadow-[0_16px_48px_-8px_rgba(239,68,68,0.3)]"
+                      : winningOutcomeId === market.options?.[1]?.id
+                      ? "border-red-500/30 bg-red-50/20 backdrop-blur-sm shadow-[0_8px_32px_-8px_rgba(239,68,68,0.1)]"
                       : "border-black/10 bg-white/40 backdrop-blur-sm hover:border-red-300/50 hover:bg-red-50/30 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]"
                   }
                 `}
@@ -461,140 +490,186 @@ export default function BetrayalMarketPage() {
           {/* Sidebar */}
           <div className="lg:col-span-4 sticky top-24 self-start">
             <div className="space-y-6">
-              {/* Bet Placement Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32_px_-8px_rgba(0,0,0,0.08)] space-y-6 rounded-3xl"
-              >
-                {/* Header */}
-                <div className="p-6 bg-black">
-                  <h3 className="text-xl font-semibold text-white mb-1 rounded-3xl">
-                    Place Your Prediction
-                  </h3>
-                  <p className="text-sm text-white/60 font-medium">
-                    Make your choice
-                  </p>
-                </div>
-
-                {/* Content */}
-                <div className="space-y-6 px-6 py-4">
-                  {/* Selected Choice */}
-                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
-                    <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-2">
-                      Selected Strategy
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {selectedChoice ? (
-                        <>
-                          <span
-                            className={`text-base font-semibold ${
-                              selectedChoice === "cooperate"
-                                ? "text-green-700"
-                                : "text-red-700"
-                            }`}
-                          >
-                            {selectedChoice.toUpperCase()}
+              {/* Prediction Result / Slip */}
+              {predictionResult ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/60 backdrop-blur-xl border border-black/5 shadow-2xl rounded-3xl overflow-hidden"
+                >
+                  <div className="p-6 bg-green-500 text-white text-center">
+                    <IconCircleCheckFilled className="w-12 h-12 mx-auto mb-2" />
+                    <h3 className="text-xl font-bold">Decision Secured</h3>
+                    <p className="text-sm text-white/80">Receipt ID: {predictionResult.transactionId?.slice(-8).toUpperCase()}</p>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/40 font-medium">Outcome</span>
+                      <span className="text-base font-bold text-black/90">{predictionResult.optionText}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/40 font-medium">Stake</span>
+                      <span className="text-base font-bold text-black/90">{predictionResult.amount.toLocaleString()} KSH</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                       <span className="text-sm text-black/40 font-medium">Platform Fee</span>
+                       <span className="text-sm font-medium text-black/60">{(predictionResult.amount * 0.05).toLocaleString()} KSH</span>
+                    </div>
+                    <button 
+                      onClick={() => setPredictionResult(null)}
+                      className="w-full py-3 bg-black text-white rounded-xl font-bold hover:bg-black/90 transition-all mt-4"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                /* Prediction Placement Card */
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className={`bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-6 rounded-3xl overflow-hidden ${isClosed ? 'opacity-75' : ''}`}
+                >
+                  {/* Header */}
+                  <div className={`p-6 ${isClosed ? 'bg-neutral-500' : 'bg-black'} text-white`}>
+                    <h3 className="text-xl font-semibold mb-1">
+                      {isClosed ? 'Market Closed' : 'Place Your Prediction'}
+                    </h3>
+                    <p className="text-sm text-white/60 font-medium">
+                      {isClosed ? 'Choices are no longer accepted' : 'Make your choice'}
+                    </p>
+                  </div>
+  
+                  {/* Content */}
+                  <div className="space-y-6 px-6 py-4">
+                    {/* Selected Choice */}
+                    <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-2">
+                        {isClosed && winningOutcomeId ? 'Final Outcome' : 'Selected Strategy'}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {isClosed && winningOutcomeId ? (
+                           <>
+                           <span className="text-base font-semibold text-black/90">
+                             {market.options.find((o: any) => o.id === winningOutcomeId)?.option_text.toUpperCase()}
+                           </span>
+                           <IconCircleCheckFilled className="w-4 h-4 text-green-600" />
+                         </>
+                        ) : selectedChoice ? (
+                          <>
+                            <span
+                              className={`text-base font-semibold ${
+                                selectedChoice === "cooperate"
+                                  ? "text-green-700"
+                                  : "text-red-700"
+                              }`}
+                            >
+                              {selectedChoice.toUpperCase()}
+                            </span>
+                            <IconCircleCheckFilled
+                              className={`w-4 h-4 ${
+                                selectedChoice === "cooperate"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            />
+                          </>
+                        ) : (
+                          <span className="text-base text-black/40 italic">
+                            No choice selected
                           </span>
-                          <IconCircleCheckFilled
-                            className={`w-4 h-4 ${
-                              selectedChoice === "cooperate"
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          />
-                        </>
-                      ) : (
-                        <span className="text-base text-black/40 italic">
-                          No choice selected
-                        </span>
-                      )}
+                        )}
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Stake Input */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-black/70">
-                      Your Stake
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        placeholder={market.buy_in_amount.toLocaleString()}
-                        min={market.buy_in_amount}
-                        value={stakeAmount}
-                        onChange={(e) => setStakeAmount(e.target.value)}
-                        className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
-                      />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
-                        KSH
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs px-1">
-                      <span className="text-black/40 font-medium">
-                        Minimum buy-in
-                      </span>
-                      <span className="font-mono font-semibold text-black/70">
-                        {market.buy_in_amount.toLocaleString()} KSH
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <div className="pt-6 border-t border-black/5 space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-black/80 font-medium">
-                        Platform Fee (5%)
-                      </span>
-                      <span className="font-mono font-semibold text-black/80">
-                        {platformFee.toLocaleString()} KSH
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-black/90 font-semibold">
-                        Total Amount
-                      </span>
-                      <span className="font-mono font-semibold text-black/90">
-                        {totalAmount.toLocaleString()} KSH
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* CTA Button */}
-                  <motion.button
-                    onClick={handlePlaceBet}
-                    disabled={isSubmitting || !selectedChoice || !stakeAmount}
-                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                      isSubmitting || !selectedChoice || !stakeAmount
-                        ? "bg-black/10 text-black/30 cursor-not-allowed"
-                        : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
-                    }`}
-                    whileHover={
-                      !isSubmitting && selectedChoice && stakeAmount
-                        ? { scale: 1.02 }
-                        : {}
-                    }
-                    whileTap={
-                      !isSubmitting && selectedChoice && stakeAmount
-                        ? { scale: 0.98 }
-                        : {}
-                    }
-                  >
-                    {isSubmitting ? (
+  
+                    {!isClosed && (
                       <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Locking In...
-                      </>
-                    ) : (
-                      <>
-                        IconLock In Choice
-                        <IconArrowRight className="w-5 h-5" />
+                        {/* Stake Input */}
+                        <div className="space-y-3">
+                          <label className="text-sm font-semibold text-black/70">
+                            Your Stake
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              placeholder={market.buy_in_amount.toLocaleString()}
+                              min={market.buy_in_amount}
+                              value={stakeAmount}
+                              onChange={(e) => setStakeAmount(e.target.value)}
+                              className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
+                            />
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
+                              KSH
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs px-1">
+                            <span className="text-black/40 font-medium">
+                              Minimum buy-in
+                            </span>
+                            <span className="font-mono font-semibold text-black/70">
+                              {market.buy_in_amount.toLocaleString()} KSH
+                            </span>
+                          </div>
+                        </div>
+  
+                        {/* Summary */}
+                        <div className="pt-6 border-t border-black/5 space-y-3">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-black/80 font-medium">
+                              Platform Fee (5%)
+                            </span>
+                            <span className="font-mono font-semibold text-black/80">
+                              {platformFee.toLocaleString()} KSH
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-base">
+                            <span className="text-black/90 font-semibold">
+                              Total Amount
+                            </span>
+                            <span className="font-mono font-semibold text-black/90">
+                              {totalAmount.toLocaleString()} KSH
+                            </span>
+                          </div>
+                        </div>
+  
+                        {/* CTA Button */}
+                        <motion.button
+                          onClick={handlePlacePrediction}
+                          disabled={isSubmitting || !selectedChoice || !stakeAmount}
+                          className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
+                            isSubmitting || !selectedChoice || !stakeAmount
+                              ? "bg-black/10 text-black/30 cursor-not-allowed"
+                              : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
+                          }`}
+                          whileHover={
+                            !isSubmitting && selectedChoice && stakeAmount
+                              ? { scale: 1.02 }
+                              : {}
+                          }
+                          whileTap={
+                            !isSubmitting && selectedChoice && stakeAmount
+                              ? { scale: 0.98 }
+                              : {}
+                          }
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Locking In...
+                            </>
+                          ) : (
+                            <>
+                              Lock In Choice
+                              <IconArrowRight className="w-5 h-5" />
+                            </>
+                          )}
+                        </motion.button>
                       </>
                     )}
-                  </motion.button>
-                </div>
-              </motion.div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Info Card */}
               <motion.div

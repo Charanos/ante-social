@@ -30,6 +30,7 @@ import Image from "next/image";
 import {
   IconAccessPoint,
   IconArrowRight,
+  IconCircleCheckFilled,
   IconClock,
   IconEye,
   IconGripVertical,
@@ -118,6 +119,7 @@ export default function LadderMarketPage() {
   const [rankedItems, setRankedItems] = useState<RankItem[]>([]);
   const [stakeAmount, setStakeAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [predictionResult, setPredictionResult] = useState<any>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -162,7 +164,7 @@ export default function LadderMarketPage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
+    if (over && active.id !== over.id && !isClosed) {
       setRankedItems((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
@@ -196,7 +198,7 @@ export default function LadderMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/bet`, {
+      const response = await fetch(`/api/markets/${market.id}/predict`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -210,6 +212,13 @@ export default function LadderMarketPage() {
         throw new Error(parseApiError(payload, "Failed to submit ranking."));
       }
 
+      setPredictionResult({
+        optionText: "Custom Ranking",
+        amount: stakeValue,
+        timestamp: new Date().toISOString(),
+        transactionId: payload?.id || payload?._id,
+      });
+
       toast.success("Ranking Submitted!", "Your ranking has been saved");
     } catch (error: any) {
       toast.error("Submit Failed", error?.message || "Unable to submit ranking.");
@@ -219,6 +228,7 @@ export default function LadderMarketPage() {
   };
 
   const getTimeRemaining = () => {
+    if (!market) return "";
     const diff = market.close_date.getTime() - Date.now();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -234,6 +244,9 @@ export default function LadderMarketPage() {
   if (!market) {
     return <div className="p-8 text-sm text-black/50">Market not found.</div>;
   }
+
+  const isClosed = market.status === "closed" || market.status === "settled" || market.status === "resolved";
+  const winningOutcomeId = market.winningOutcomeId;
 
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
@@ -320,20 +333,22 @@ export default function LadderMarketPage() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <IconClock className="w-4 h-4 text-black/40" />
-                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
-                        Closes In
-                      </span>
+                  {!isClosed && (
+                    <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5 col-span-2 md:col-span-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <IconClock className="w-4 h-4 text-black/40" />
+                        <span className="text-xs font-semibold text-black/40 uppercase tracking-wider">
+                          Closes In
+                        </span>
+                      </div>
+                      <p className="text-xl font-semibold font-mono text-black/90">
+                        {getTimeRemaining()}
+                      </p>
+                      <p className="text-xs font-medium text-black/40 mt-1">
+                        Remaining
+                      </p>
                     </div>
-                    <p className="text-xl font-semibold font-mono text-black/90">
-                      {getTimeRemaining()}
-                    </p>
-                    <p className="text-xs font-medium text-black/40 mt-1">
-                      Remaining
-                    </p>
-                  </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -397,13 +412,15 @@ export default function LadderMarketPage() {
             </motion.div>
 
             {/* Visual Separator */}
-            <div className="flex items-center gap-4 my-10 md:my-16">
-              <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-                Drag to Rank
-              </h2>
-              <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
-            </div>
+            {!isClosed && (
+              <div className="flex items-center gap-4 my-10 md:my-16">
+                <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
+                <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
+                  Drag to Rank
+                </h2>
+                <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
+              </div>
+            )}
 
             {/* Drag and Drop Ranking */}
             <motion.div
@@ -483,126 +500,176 @@ export default function LadderMarketPage() {
           {/* Sidebar */}
           <div className="lg:col-span-4 sticky top-24 self-start">
             <div className="space-y-6">
-              {/* Bet Placement Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-6  rounded-3xl "
-              >
-                {/* Header */}
-                <div className="p-6 bg-black">
-                  <h3 className="text-xl font-semibold text-white mb-1  rounded-3xl ">
-                    Place Your Prediction
-                  </h3>
-                  <p className="text-sm text-white/60 font-medium">
-                    Submit your ranking
-                  </p>
-                </div>
-
-                {/* Content */}
-                <div className="space-y-6 px-6 py-4">
-                  {/* Chain Preview */}
-                  <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
-                    <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-3">
-                      Your Ranking
-                    </span>
-                    <div className="space-y-2">
-                      {rankedItems.map((item, index) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <span className="w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center font-mono shrink-0">
-                            {index + 1}
-                          </span>
-                          <span className="text-base font-semibold text-black/90">
-                            <item.icon className="w-4 h-4 inline mr-2" />
-                            {item.text}
-                          </span>
+              {/* Prediction Result / Slip */}
+              {predictionResult ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/60 backdrop-blur-xl border border-black/5 shadow-2xl rounded-3xl overflow-hidden"
+                >
+                  <div className="p-6 bg-green-500 text-white text-center">
+                    <IconCircleCheckFilled className="w-12 h-12 mx-auto mb-2" />
+                    <h3 className="text-xl font-bold">Prediction Secured</h3>
+                    <p className="text-sm text-white/80">Receipt ID: {predictionResult.transactionId?.slice(-8).toUpperCase()}</p>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/40 font-medium">Outcome</span>
+                      <span className="text-base font-bold text-black/90">Ladder Ranking</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-black/5">
+                      <span className="text-sm text-black/40 font-medium">Stake</span>
+                      <span className="text-base font-bold text-black/90">{predictionResult.amount.toLocaleString()} KSH</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                       <span className="text-sm text-black/40 font-medium">Platform Fee</span>
+                       <span className="text-sm font-medium text-black/60">{(predictionResult.amount * 0.05).toLocaleString()} KSH</span>
+                    </div>
+                    <button 
+                      onClick={() => setPredictionResult(null)}
+                      className="w-full py-3 bg-black text-white rounded-xl font-bold hover:bg-black/90 transition-all mt-4"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                /* Prediction Placement Card */
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className={`bg-white/40 backdrop-blur-xl border border-black/5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-6 rounded-3xl overflow-hidden ${isClosed ? 'opacity-75' : ''}`}
+                >
+                  {/* Header */}
+                  <div className={`p-6 ${isClosed ? 'bg-neutral-500' : 'bg-black'} text-white`}>
+                    <h3 className="text-xl font-semibold mb-1">
+                      {isClosed ? 'Market Closed' : 'Place Your Prediction'}
+                    </h3>
+                    <p className="text-sm text-white/60 font-medium">
+                      {isClosed ? 'Predictions are no longer accepted' : 'Submit your ranking'}
+                    </p>
+                  </div>
+  
+                  {/* Content */}
+                  <div className="space-y-6 px-6 py-4">
+                    {/* Chain Preview */}
+                    <div className="p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-black/5">
+                      <span className="text-xs font-semibold text-black/40 uppercase tracking-wider block mb-3">
+                        {isClosed && winningOutcomeId ? 'Winning Outcome' : 'Your Ranking'}
+                      </span>
+                      <div className="space-y-2">
+                        {isClosed && winningOutcomeId ? (
+                           <div className="flex items-center gap-2 text-sm">
+                             <span className="w-6 h-6 rounded-full bg-green-600 text-white text-xs flex items-center justify-center font-mono shrink-0">
+                               #1
+                             </span>
+                             <span className="text-base font-semibold text-black/90">
+                               {market.options.find((o: any) => o.id === winningOutcomeId)?.option_text}
+                             </span>
+                           </div>
+                        ) : (
+                          rankedItems.map((item, index) => (
+                            <div
+                              key={item.id}
+                              className="flex items-center gap-2 text-sm"
+                            >
+                              <span className="w-6 h-6 rounded-full bg-black text-white text-xs flex items-center justify-center font-mono shrink-0">
+                                {index + 1}
+                              </span>
+                              <span className="text-base font-semibold text-black/90">
+                                <item.icon className="w-4 h-4 inline mr-2" />
+                                {item.text}
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+  
+                    {!isClosed && (
+                      <>
+                        {/* Stake Input */}
+                        <div className="space-y-3">
+                          <label className="text-sm font-semibold text-black/70">
+                            Your Stake
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              placeholder={market.buy_in_amount.toLocaleString()}
+                              min={market.buy_in_amount}
+                              value={stakeAmount}
+                              onChange={(e) => setStakeAmount(e.target.value)}
+                              className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
+                            />
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
+                              KSH
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs px-1">
+                            <span className="text-black/40 font-medium">
+                              Minimum buy-in
+                            </span>
+                            <span className="font-mono font-semibold text-black/70">
+                              {market.buy_in_amount.toLocaleString()} KSH
+                            </span>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Stake Input */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-black/70">
-                      Your Stake
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        placeholder={market.buy_in_amount.toLocaleString()}
-                        min={market.buy_in_amount}
-                        value={stakeAmount}
-                        onChange={(e) => setStakeAmount(e.target.value)}
-                        className="w-full px-4 py-2 pr-16 bg-white/60 backdrop-blur-sm border border-black/10 rounded-xl text-base font-mono font-semibold text-black/90 focus:border-black/30 focus:bg-white/80 outline-none transition-all placeholder:text-black/30"
-                      />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-black/40">
-                        KSH
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs px-1">
-                      <span className="text-black/40 font-medium">
-                        Minimum buy-in
-                      </span>
-                      <span className="font-mono font-semibold text-black/70">
-                        {market.buy_in_amount.toLocaleString()} KSH
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <div className="pt-6 border-t border-black/5 space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-black/80 font-medium">
-                        Platform Fee (5%)
-                      </span>
-                      <span className="font-mono font-semibold text-black/80">
-                        {platformFee.toLocaleString()} KSH
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-black/90 font-semibold">
-                        Total Amount
-                      </span>
-                      <span className="font-mono font-semibold text-black/90">
-                        {totalAmount.toLocaleString()} KSH
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* CTA Button */}
-                  <motion.button
-                    onClick={handleSubmitRankingLive}
-                    disabled={isSubmitting || !stakeAmount}
-                    className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
-                      isSubmitting || !stakeAmount
-                        ? "bg-black/10 text-black/30 cursor-not-allowed"
-                        : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
-                    }`}
-                    whileHover={
-                      !isSubmitting && stakeAmount ? { scale: 1.02 } : {}
-                    }
-                    whileTap={
-                      !isSubmitting && stakeAmount ? { scale: 0.98 } : {}
-                    }
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        Submit Ranking
-                        <IconArrowRight className="w-5 h-5" />
+  
+                        {/* Summary */}
+                        <div className="pt-6 border-t border-black/5 space-y-3">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-black/80 font-medium">
+                              Platform Fee (5%)
+                            </span>
+                            <span className="font-mono font-semibold text-black/80">
+                              {platformFee.toLocaleString()} KSH
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-base">
+                            <span className="text-black/90 font-semibold">
+                              Total Amount
+                            </span>
+                            <span className="font-mono font-semibold text-black/90">
+                              {totalAmount.toLocaleString()} KSH
+                            </span>
+                          </div>
+                        </div>
+  
+                        {/* CTA Button */}
+                        <motion.button
+                          onClick={handleSubmitRankingLive}
+                          disabled={isSubmitting || !stakeAmount}
+                          className={`w-full py-2 rounded-xl font-semibold text-base flex items-center justify-center gap-2 transition-all ${
+                            isSubmitting || !stakeAmount
+                              ? "bg-black/10 text-black/30 cursor-not-allowed"
+                              : "bg-black text-white hover:bg-black/90 shadow-lg cursor-pointer"
+                          }`}
+                          whileHover={
+                            !isSubmitting && stakeAmount ? { scale: 1.02 } : {}
+                          }
+                          whileTap={
+                            !isSubmitting && stakeAmount ? { scale: 0.98 } : {}
+                          }
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              Confirm Prediction
+                              <IconArrowRight className="w-5 h-5" />
+                            </>
+                          )}
+                        </motion.button>
                       </>
                     )}
-                  </motion.button>
-                </div>
-              </motion.div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Info Card */}
               <motion.div

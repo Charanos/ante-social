@@ -253,7 +253,7 @@ export function normalizeUser(
   sessionUser: SessionUser | undefined,
 ): LiveUser {
   const tier = normalizeTier(profile?.tier || sessionUser?.user_level);
-  const walletBalances = wallet?.balances?.USD || {};
+  const walletBalances = wallet?.balances?.KSH || wallet?.balances?.USD || {};
   const totalWinnings = toNumber(wallet?.totalWinnings);
   const totalLosses = toNumber(wallet?.totalLosses);
 
@@ -316,6 +316,7 @@ export function normalizeMarket(raw: any): Market {
     signalStrength: Math.min(100, Math.max(10, participantCount * 3 + Math.floor(totalPool / 1000))),
     priceHistory: probabilities.length > 1 ? probabilities : [probability, probability],
     participantCount,
+    winningOutcomeId: toString(raw?.winningOutcomeId),
     commentCount: 0,
     shareCount: 0,
     tags: toArray<string>(raw?.tags),

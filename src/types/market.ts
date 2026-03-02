@@ -44,6 +44,7 @@ export interface Market {
   shareCount: number;
 
   tags: string[];
+  winningOutcomeId?: string;
 }
 
 export type PositionStatus = 'active' | 'settled' | 'cancelled';

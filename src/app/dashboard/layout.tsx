@@ -12,7 +12,7 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative">
       {/* Background Pattern */}
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none z-0 bg-fixed"

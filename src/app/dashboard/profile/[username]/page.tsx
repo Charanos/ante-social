@@ -210,10 +210,12 @@ export default function PublicProfilePage() {
       }
 
       if (!payload) {
-        const selfResponse = await fetch("/api/user/profile", { cache: "no-store" })
-        if (selfResponse.ok) {
-          payload = await selfResponse.json().catch(() => null)
-        }
+        // If the public profile fetch failed and this isn't the logged in user themselves,
+        // we should not blindly fall back to /api/user/profile.
+        // Instead, we only fall back if we are trying to view our own profile or if explicitly allowed.
+        // For now, let's just mark it as not found if payload is missing.
+        setIsPageLoading(false);
+        return;
       }
 
       if (!cancelled) {
@@ -295,6 +297,27 @@ export default function PublicProfilePage() {
 
   if (isPageLoading) {
     return <LoadingLogo fullScreen size="lg" />
+  }
+  if (!profile || profile.username === "user") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-6">
+        <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center">
+          <IconUser className="w-10 h-10 text-black/20" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-semibold text-black/90">User Not Found</h2>
+          <p className="text-black/40 mt-2 max-w-md">
+            The profile you are looking for doesn't exist or has been made private.
+          </p>
+        </div>
+        <button 
+          onClick={() => window.history.back()}
+          className="px-6 py-2.5 rounded-xl bg-black text-white font-medium hover:bg-black/80 transition-all cursor-pointer"
+        >
+          Go Back
+        </button>
+      </div>
+    );
   }
 
   return (

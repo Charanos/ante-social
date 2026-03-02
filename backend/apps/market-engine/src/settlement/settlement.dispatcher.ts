@@ -177,7 +177,7 @@ export class SettlementDispatcher {
     this.emitSettledEvent(market, prizePool, platformFee, winners.length);
   }
 
-  // â”€â”€â”€ Betrayal ("Trust vs Betray") â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Betrayal ("Trust vs Betray") ──────────────────
   private async handleBetrayal(market: MarketDocument) {
     const bets = await this.betModel.find({ marketId: market._id }).exec();
     if (bets.length === 0) return;
@@ -290,7 +290,7 @@ export class SettlementDispatcher {
         this.walletClient.send('credit_balance', {
           userId,
           amount,
-          currency: 'USD',
+          currency: 'KSH',
           description: `Payout from: ${marketTitle}`,
           type: 'bet_payout',
         })

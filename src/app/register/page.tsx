@@ -401,14 +401,14 @@ export default function RegisterPage() {
                 <span className="text-xs text-neutral-600 group-hover:text-neutral-300 transition-colors">
                   I agree to the{" "}
                   <Link
-                    href="/terms"
+                    href="/legal/terms-of-service"
                     className="text-orange-500 hover:underline"
                   >
                     Terms
                   </Link>{" "}
                   &{" "}
                   <Link
-                    href="/privacy"
+                    href="/legal/privacy-policy"
                     className="text-orange-500 hover:underline"
                   >
                     Privacy Policy

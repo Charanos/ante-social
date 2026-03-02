@@ -125,12 +125,27 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("All Markets");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const rank = user?.tier === "whale" || user?.tier === "oracle" ? "Expert" : "Novice";
-  const progress = 75;
-  const nextRank = "Expert";
+  const totalWinnings = user?.totalWinnings || 0;
+  
+  const tierConfig = [
+    { id: "novice", name: "Novice", goal: 10000 },
+    { id: "prognosticator", name: "Prognosticator", goal: 50000 },
+    { id: "expert", name: "Expert", goal: 250000 },
+    { id: "oracle", name: "Oracle", goal: 1000000 },
+    { id: "whale", name: "Whale", goal: 5000000 },
+  ];
+
+  const currentTierId = user?.tier || "novice";
+  const currentIndex = tierConfig.findIndex(t => t.id === currentTierId);
+  const currentTier = tierConfig[currentIndex === -1 ? 0 : currentIndex];
+  const nextTier = tierConfig[currentIndex + 1] || currentTier;
+  
+  const rank = currentTier.name;
+  const nextRank = nextTier.name;
+  const goalAmount = nextTier.goal;
+  const progress = Math.min(100, Math.max(5, (totalWinnings / goalAmount) * 100));
 
   const ITEMS_PER_PAGE = 6;
-
   const activeMarkets = markets;
   const totalPages = Math.max(1, Math.ceil(activeMarkets.length / ITEMS_PER_PAGE));
   const currentMarkets = activeMarkets.slice(
@@ -180,15 +195,15 @@ export default function DashboardPage() {
                 />
               </div>
               <div className="flex justify-between text-xs text-neutral-500 font-mono">
-                <span>99,375 KSH earned</span>
-                <span>Goal: 132,500 KSH</span>
+                <span>{totalWinnings.toLocaleString()} KSH earned</span>
+                <span>Goal: {goalAmount.toLocaleString()} KSH</span>
               </div>
             </div>
 
             <div className="flex gap-3 md:gap-4 pt-2">
               <Link href="/dashboard/profile/achievements" className="flex-1 md:flex-none">
                 <motion.button
-                  className="w-full md:w-auto bg-white/10 cursor-pointer hover:bg-white/20 border border-white/10 text-white backdrop-blur-md rounded-xl px-4 md:px-6 py-3 text-sm md:text-base font-medium tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full md:w-auto bg-white/10 cursor-pointer hover:bg-white/20 border border-white/10 text-white backdrop-blur-md rounded-xl px-4 md:px-6 py-2 text-sm md:text-base font-medium tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -197,7 +212,7 @@ export default function DashboardPage() {
               </Link>
               <Link href="/dashboard/wallet" className="flex-1 md:flex-none">
                 <motion.button
-                  className="w-full md:w-auto bg-linear-to-r cursor-pointer from-amber-500 to-yellow-500 hover:brightness-110 text-black border-0 rounded-xl px-4 md:px-8 py-3 text-sm md:text-base font-medium tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all"
+                  className="w-full md:w-auto bg-linear-to-r cursor-pointer from-amber-500 to-yellow-500 hover:brightness-110 text-black border-0 rounded-xl px-4 md:px-8 py-2 text-sm md:text-base font-medium tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

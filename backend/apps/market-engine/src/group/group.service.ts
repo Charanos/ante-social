@@ -351,7 +351,7 @@ export class GroupService {
         this.walletClient.send('debit_balance', {
           userId,
           amount,
-          currency: 'USD',
+          currency: 'KSH',
           description,
           type: 'bet_placed',
         }),
@@ -378,7 +378,7 @@ export class GroupService {
           this.walletClient.send('credit_balance', {
             userId: winnerId,
             amount: prize,
-            currency: 'USD',
+            currency: 'KSH',
             description: `Group Bet Win: ${bet.title}`,
             type: 'bet_payout',
           }),

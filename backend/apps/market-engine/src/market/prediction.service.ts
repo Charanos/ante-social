@@ -73,8 +73,8 @@ export class PredictionService {
         this.walletClient.send('debit_balance', {
           userId,
           amount: dto.amount,
-          currency: 'USD',
-          description: `Bet on ${market.title}`,
+          currency: 'KSH',
+          description: `Prediction on ${market.title}`,
           type: 'bet_placed'
         })
       );
@@ -87,7 +87,7 @@ export class PredictionService {
     }
 
     // 3. Create Bet
-    const bet = new this.betModel({
+    const prediction = new this.betModel({
       marketId: new Types.ObjectId(dto.marketId),
       userId: new Types.ObjectId(userId),
       selectedOutcomeId: new Types.ObjectId(selectedOutcomeId),
@@ -97,7 +97,7 @@ export class PredictionService {
     });
 
     try {
-      await bet.save();
+      await prediction.save();
     } catch (error: any) {
       if (error?.code === 11000) {
         await this.refundFailedPlacement(userId, dto.amount, market.title);
@@ -122,7 +122,7 @@ export class PredictionService {
     this.kafkaClient.emit(
       KAFKA_TOPICS.BET_PLACEMENTS,
       new BetPlacedEvent({
-        betId: bet._id.toString(),
+        betId: prediction._id.toString(),
         marketId: dto.marketId,
         userId,
         amount: dto.amount,
@@ -130,7 +130,7 @@ export class PredictionService {
       }),
     );
 
-    return bet;
+    return prediction;
   }
 
   async getUserPredictions(userId: string, limit = 100, offset = 0) {
@@ -219,7 +219,7 @@ export class PredictionService {
       previousOptionId,
       newOptionId: newOutcomeId,
       stake: bet.amountContributed,
-      currency: 'USD',
+      currency: 'KSH',
       editedAt: new Date().toISOString(),
     }));
 
@@ -228,14 +228,14 @@ export class PredictionService {
 
   // ─── Cancel Prediction (5-min window) ──────────────
   async cancelPrediction(userId: string, predictionId: string) {
-    const bet = await this.betModel.findById(predictionId);
-    if (!bet) throw new NotFoundException('Prediction not found');
+    const prediction = await this.betModel.findById(predictionId);
+    if (!prediction) throw new NotFoundException('Prediction not found');
     
-    if (bet.userId.toString() !== userId) {
+    if (prediction.userId.toString() !== userId) {
       throw new BadRequestException('Not your prediction');
     }
 
-    if (!bet.editableUntil || new Date() > bet.editableUntil) {
+    if (!prediction.editableUntil || new Date() > prediction.editableUntil) {
       throw new BadRequestException('Cancel window has expired (5 minutes)');
     }
 
@@ -244,8 +244,8 @@ export class PredictionService {
       await lastValueFrom(
         this.walletClient.send('credit_balance', {
           userId,
-          amount: bet.amountContributed,
-          currency: 'USD',
+          amount: prediction.amountContributed,
+          currency: 'KSH',
           description: 'Prediction cancelled - refund',
           type: 'refund',
         })
@@ -255,31 +255,31 @@ export class PredictionService {
     }
 
     // Update market stats
-    await this.marketModel.findByIdAndUpdate(bet.marketId, {
+    await this.marketModel.findByIdAndUpdate(prediction.marketId, {
       $inc: {
-        totalPool: -bet.amountContributed,
+        totalPool: -prediction.amountContributed,
         participantCount: -1,
-        'outcomes.$[elem].totalAmount': -bet.amountContributed,
+        'outcomes.$[elem].totalAmount': -prediction.amountContributed,
         'outcomes.$[elem].participantCount': -1,
       }
     }, {
-      arrayFilters: [{ 'elem._id': bet.selectedOutcomeId }]
+      arrayFilters: [{ 'elem._id': prediction.selectedOutcomeId }]
     });
 
-    // Mark bet as cancelled
-    bet.isCancelled = true;
-    await bet.save();
+    // Mark prediction as cancelled
+    prediction.isCancelled = true;
+    await prediction.save();
 
     this.kafkaClient.emit(KAFKA_TOPICS.BET_PLACEMENTS, new BetCancelledEvent({
       betId: predictionId,
-      marketId: bet.marketId.toString(),
+      marketId: prediction.marketId.toString(),
       userId,
-      refundAmount: bet.amountContributed,
-      currency: 'USD',
+      refundAmount: prediction.amountContributed,
+      currency: 'KSH',
       cancelledAt: new Date().toISOString(),
     }));
 
-    return { success: true, refundAmount: bet.amountContributed };
+    return { success: true, refundAmount: prediction.amountContributed };
   }
 
   private enrichBetWithMarket(bet: MarketBetDocument, market?: MarketDocument) {
@@ -344,7 +344,7 @@ export class PredictionService {
         this.walletClient.send('credit_balance', {
           userId,
           amount,
-          currency: 'USD',
+          currency: 'KSH',
           description: `Refund for duplicate placement on ${marketTitle}`,
           type: 'refund',
         }),
