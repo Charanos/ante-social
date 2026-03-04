@@ -44,7 +44,6 @@ export function Navbar() {
       <div className="hidden md:flex items-center gap-8">
         {[
             { label: "About", href: "/company/about" },
-            { label: "Game Modes", href: "/product/game-modes" },
             { label: "Community", href: "/community" }
         ].map((item) => {
           const isActive = pathname === item.href;

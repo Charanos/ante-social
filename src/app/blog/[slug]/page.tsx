@@ -203,7 +203,7 @@ export default function BlogPostPage() {
           </div>
 
           {isLoading ? (
-            <div className="text-center flex items-center justify-center py-16">
+            <div className="text-center flex flex-col items-center justify-center py-16">
               <IconLoader3 className="w-8 text-black/60 h-8 animate-spin" />
               <p className="mt-4 text-black/40 font-normal">Loading article...</p>
             </div>

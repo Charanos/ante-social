@@ -1,289 +1,199 @@
-
 "use client";
 
 import { motion } from "framer-motion";
 import PageLayout from "@/components/landing/PageLayout";
-import { PageHeader } from "@/components/landing/PageHeader";
-import { WaveBackground } from "@/components/landing/WaveBackground";
-import { IconChartPie3, IconMasksTheater, IconBolt, IconStairsUp, IconShieldLock, IconArrowRight, IconSparkles, IconChartArcs, IconUsersGroup, IconChartDots, IconHierarchy } from "@tabler/icons-react";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import Link from "next/link";
+import { IconArrowRight, IconEye, IconUsers, IconBolt, IconChartBar, IconLock, IconArrowsSplit } from "@tabler/icons-react";
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const gameModes = [
   {
-    icon: IconChartPie3,
-    title: "Poll-Style Markets",
-    description: "The classic prediction market. Vote on outcomes, pool your stakes, and let the wisdom of the crowd decide the odds.",
-    tag: "Most Popular",
-    tagColor: "bg-blue-100 text-blue-800 border-blue-200",
-    gradient: "from-blue-500/20 via-purple-500/20 to-transparent",
-    image: "https://images.unsplash.com/photo-1591696205602-2f950c417cb9?q=80&w=2670&auto=format&fit=crop",
-    stats: { players: "12.5K", winRate: "68%" }
+    id: "consensus",
+    num: "01",
+    title: "Consensus Markets",
+    subtitle: "The crowd is the oracle.",
+    description: "Forecast an outcome, and capital flows toward the correct position. The best forecasters compound quietly — everyone else donates.",
+    icon: <IconChartBar stroke={1} size={32} />,
+    size: "col-span-2 md:col-span-3",
+    color: "bg-blue-50/50",
   },
   {
-    icon: IconMasksTheater,
-    title: "The Betrayal Game",
-    description: "A social experiment in trust. Cooperate for a shared win, or betray for a massive payout. But if everyone betrays, everyone loses.",
-    tag: "High Stakes",
-    tagColor: "bg-red-100 text-red-800 border-red-200",
-    gradient: "from-red-500/20 via-orange-500/20 to-transparent",
-    image: "https://images.unsplash.com/photo-1560523159-4a9692d222ef?q=80&w=2669&auto=format&fit=crop",
-    stats: { players: "8.2K", winRate: "45%" }
+    id: "prisoner",
+    num: "02",
+    title: "Prisoner's Dilemma",
+    subtitle: "Trust is finite.",
+    description: "Cooperate for shared yield, or Defect to seize liquidity. If everyone defects, the market collapses.",
+    icon: <IconUsers stroke={1} size={32} />,
+    size: "col-span-2 md:col-span-3",
+    color: "bg-red-50/50",
   },
   {
-    icon: IconBolt,
-    title: "Reflex Reaction",
-    description: "Fast-paced prediction on immediate events. Predict the majority's instinct in seconds. Rewards quick thinking.",
-    tag: "Fast Paced",
-    tagColor: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    gradient: "from-yellow-500/20 via-amber-500/20 to-transparent",
-    image: "https://images.unsplash.com/photo-1534670007418-fbb7f6cf32c3?q=80&w=2688&auto=format&fit=crop",
-    stats: { players: "15.1K", winRate: "52%" }
+    id: "reflex",
+    num: "03",
+    title: "Reflex Signal Test",
+    subtitle: "Five seconds. One take.",
+    description: "The window opens for five seconds. Pattern recognition and social calibration over research.",
+    icon: <IconBolt stroke={1} size={32} />,
+    size: "col-span-2 md:col-span-2",
+    color: "bg-amber-50/50",
   },
   {
-    icon: IconStairsUp,
-    title: "Majority Prediction Ladder",
-    description: "Rank items based on what you think the majority will choose. A test of empathy and social awareness.",
-    tag: "Strategy",
-    tagColor: "bg-green-100 text-green-800 border-green-200",
-    gradient: "from-green-500/20 via-emerald-500/20 to-transparent",
-    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2670&auto=format&fit=crop",
-    stats: { players: "6.8K", winRate: "61%" }
+    id: "ladder",
+    num: "04",
+    title: "Prediction Ladder",
+    subtitle: "Applied empathy.",
+    description: "Rank options in the order the crowd will rank them. Your personal preferences are a liability here.",
+    icon: <IconArrowsSplit stroke={1} size={32} />,
+    size: "col-span-2 md:col-span-2",
+    color: "bg-purple-50/50",
   },
   {
-    icon: IconShieldLock,
-    title: "Private Group Bets",
-    description: "Create exclusive markets for your inner circle. Winner Takes All or Odd One Out. You set the rules.",
-    tag: "Private",
-    tagColor: "bg-orange-100 text-orange-800 border-orange-200",
-    gradient: "from-orange-500/20 via-red-500/20 to-transparent",
-    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2670&auto=format&fit=crop",
-    stats: { players: "4.3K", winRate: "73%" }
+    id: "syndicates",
+    num: "05",
+    title: "Private Syndicates",
+    subtitle: "Your circle. Your terms.",
+    description: "Closed markets for crews who prefer private competition. Invite-only, peer-confirmed settlement.",
+    icon: <IconLock stroke={1} size={32} />,
+    size: "col-span-2 md:col-span-2",
+    color: "bg-emerald-50/50",
   },
   {
-    icon: IconHierarchy,
+    id: "divergence",
+    num: "06",
     title: "Consensus Divergence",
-    description: "The ultimate contrarian test. Predict the minority outcome to win. When everyone thinks the same, the one who thinks different takes it all.",
-    tag: "Contrarian",
-    tagColor: "bg-purple-100 text-purple-800 border-purple-200",
-    gradient: "from-purple-500/20 via-pink-500/20 to-transparent",
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2670&auto=format&fit=crop",
-    stats: { players: "3.1K", winRate: "28%" }
-  }
+    subtitle: "The minority wins.",
+    description: "The option with the fewest votes takes the pot. A structural reward for contrarian thinking.",
+    icon: <IconEye stroke={1} size={32} />,
+    size: "col-span-2 md:col-span-6", // Full width accent
+    color: "bg-slate-900 text-white",
+  },
 ];
 
-export default function GameModesPage() {
-  const FeaturedIcon = gameModes[0].icon;
+// ─── Components ───────────────────────────────────────────────────────────────
 
+function Hero() {
   return (
-    <PageLayout>
-      {/* Hero Section with Wave */}
-      <div className="relative">
-        <PageHeader
-          title="Game Modes"
-          description="From improved classics to psychological experiments. Discover new ways to play and win."
+    <section className="relative h-[85vh] w-full flex items-center justify-start overflow-hidden bg-black">
+      {/* Background Image - THE INSTINCT IMAGE */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
+        <img 
+          src="/path-to-your-generated-eye-image.jpg" 
+          alt="Human Instinct"
+          className="w-full h-full object-cover opacity-80"
         />
       </div>
 
-      {/* Main Content */}
-      <section className="relative pt-10 pb-24 md:pb-32 px-4 md:px-6 overflow-hidden">
-        {/* Background Elements - African Inspired Colors */}
-        
+      <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12 w-full">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-2xl"
+        >
+          <span className="inline-block px-3 py-1 rounded-full border border-white/20 text-white/50 text-[10px] font-mono tracking-widest uppercase mb-6">
+            The Mechanics of Instinct
+          </span>
+          <h1 className="text-6xl md:text-8xl font-medium text-white leading-none tracking-tighter mb-8" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Six ways to <br />
+            <em className="italic font-normal text-white/40">disagree.</em>
+          </h1>
+          <p className="text-lg text-white/60 leading-relaxed max-w-md">
+            Not all prediction is the same act. We've engineered six distinct arenas to test your pattern recognition, empathy, and raw nerve.
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="relative max-w-7xl mx-auto">
-          {/* Bento Grid Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Featured Card - Large (Poll Style) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="lg:col-span-2 lg:row-span-2 group relative overflow-hidden rounded-3xl bg-neutral-900 min-h-[500px] cursor-pointer ring-1 ring-white/10 hover:ring-orange-500/50 transition-all duration-500"
-            >
-              {/* Background Image */}
-              <div className="absolute inset-0">
-                <div 
-                  className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                  style={{ backgroundImage: `url('${gameModes[0].image}')` }}
-                />
-                <div className={`absolute inset-0 bg-gradient-to-br ${gameModes[0].gradient}`} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-              </div>
+export default function GameModesPage() {
+  return (
+    <PageLayout>
+      <div className="bg-white">
+        <Hero />
 
-              {/* Content */}
-              <div className="relative h-full flex flex-col justify-between p-8 md:p-10">
-                <div className="flex items-start justify-between">
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium border ${gameModes[0].tagColor} backdrop-blur-sm`}>
-                    {gameModes[0].tag}
-                  </div>
-                  <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
-                    <FeaturedIcon className="w-5 h-5 text-white" />
-                  </div>
-                </div>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row justify-between items-baseline mb-16 gap-4">
+            <h2 className="text-4xl font-medium text-black/90 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+              The Game Formats
+            </h2>
+            <p className="text-sm font-mono text-black/40 uppercase tracking-widest">
+              Navigate by Strategy
+            </p>
+          </div>
 
-                <div className="space-y-6">
-                  <h3 className="text-3xl md:text-4xl font-normal text-white">{gameModes[0].title}</h3>
-                  <p className="text-white/80 text-lg max-w-xl">{gameModes[0].description}</p>
-                  
-                  {/* Stats */}
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <IconUsersGroup className="w-5 h-5 text-orange-400" />
-                      <span className="text-white/90 font-mono text-sm">{gameModes[0].stats.players}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <IconChartDots className="w-5 h-5 text-green-400" />
-                      <span className="text-white/90 font-mono text-sm">{gameModes[0].stats.winRate} Win Rate</span>
-                    </div>
-                  </div>
-
-                  <button className="inline-flex items-center gap-2 px-6 py-2 bg-white text-black rounded-full font-normal cursor-pointer hover:bg-orange-500 hover:text-white transition-all group-hover:gap-3">
-                    Play Now <IconArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Smaller Cards - Rest of the modes */}
-            {gameModes.slice(1).map((mode, index) => {
-              const Icon = mode.icon;
-              return (
+          {/* Asymmetrical Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6">
+            {gameModes.map((mode, i) => (
               <motion.div
-                key={mode.title}
+                key={mode.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.1 + (index + 1) * 0.1 }}
-                className="group relative overflow-hidden rounded-3xl bg-neutral-900 min-h-[300px] cursor-pointer ring-1 ring-white/10 hover:ring-orange-500/50 transition-all duration-500"
+                transition={{ delay: i * 0.1 }}
+                className={`${mode.size} group relative p-8 md:p-10 rounded-[2.5rem] overflow-hidden flex flex-col justify-between transition-all hover:shadow-2xl hover:-translate-y-1 ${mode.color}`}
               >
-                {/* Background Image */}
-                <div className="absolute inset-0">
-                  <div 
-                    className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
-                    style={{ backgroundImage: `url('${mode.image}')` }}
-                  />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${mode.gradient}`} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                </div>
-
-                {/* Content */}
-                <div className="relative h-full flex flex-col justify-between p-6 space-y-6">
-                  <div className="flex items-start justify-between">
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium border ${mode.tagColor} backdrop-blur-sm`}>
-                      {mode.tag}
-                    </div>
-                    <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-white" />
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-12">
+                    <span className="text-xs font-mono font-bold opacity-30 tracking-tighter">
+                      MODE_{mode.num}
+                    </span>
+                    <div className="opacity-40 group-hover:opacity-100 transition-opacity">
+                      {mode.icon}
                     </div>
                   </div>
-
-                  <div className="space-y-3">
-                    <h3 className="text-xl md:text-2xl font-normal text-white">{mode.title}</h3>
-                    <p className="text-white/70 text-sm line-clamp-2">{mode.description}</p>
-                    
-                    {/* Stats */}
-                    <div className="flex items-center gap-4 text-xs">
-                      <div className="flex items-center gap-1">
-                        <IconUsersGroup className="w-4 h-4 text-orange-400" />
-                        <span className="text-white/80 font-mono">{mode.stats.players}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <IconChartDots className="w-4 h-4 text-green-400" />
-                        <span className="text-white/80 font-mono">{mode.stats.winRate}</span>
-                      </div>
-                    </div>
-
-                    <button className="inline-flex items-center gap-2 px-4 cursor-pointer py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full text-sm font-normal hover:bg-white hover:text-black transition-all">
-                      Try Now <IconArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
+                  
+                  <h3 className="text-3xl font-medium mb-3 tracking-tight leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {mode.title}
+                  </h3>
+                  <p className={`text-sm font-mono uppercase tracking-wider mb-6 ${mode.id === 'divergence' ? 'text-white/50' : 'text-black/40'}`}>
+                    {mode.subtitle}
+                  </p>
+                  <p className={`text-base leading-relaxed max-w-xs ${mode.id === 'divergence' ? 'text-white/70' : 'text-black/60'}`}>
+                    {mode.description}
+                  </p>
                 </div>
+
+                <div className="relative z-10 mt-12 flex justify-between items-center">
+                   <Link href="/register" className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest font-mono ${mode.id === 'divergence' ? 'text-white' : 'text-black'}`}>
+                    Enter Arena
+                    <IconArrowRight size={14} />
+                  </Link>
+                </div>
+
+                {/* Subtle Background Pattern for Divergence */}
+                {mode.id === "divergence" && (
+                   <div className="absolute inset-0 opacity-10 pointer-events-none" 
+                        style={{ backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`, backgroundSize: '24px 24px' }} 
+                   />
+                )}
               </motion.div>
-            )})}
+            ))}
           </div>
         </div>
 
-        {/* NEW: How It Works Section */}
-        <div className="relative max-w-7xl mx-auto mt-32 mb-20">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center mb-16"
-            >
-                 <h2 className="text-3xl md:text-5xl font-medium tracking-tight text-black mb-4">
-                  How It Works
-                </h2>
-                <p className="text-black/60 text-lg max-w-2xl mx-auto">
-                    Three steps to glory. It's simpler than you think.
-                </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-4">
-                {[
-                    { title: "Pick Your Arena", desc: "Choose a game mode that fits your style. Strategy, speed, or social manipulation?", icon: "01" },
-                    { title: "Place Your Stake", desc: "Back your intuition with real stakes. Join the pool and lock in your position.", icon: "02" },
-                    { title: "Win & Celebrate", desc: "If the crowd or outcome swings your way, you take the pot. Instant payouts.", icon: "03" }
-                ].map((step, i) => (
-                    <motion.div 
-                        key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        className="bg-white/40 backdrop-blur-md rounded-3xl p-8 border border-white/50 shadow-sm"
-                    >
-                        <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-6 text-2xl font-medium text-orange-600 font-serif">
-                            {step.icon}
+        {/* Process Rail - Minimalist */}
+        <section className="bg-stone-50 py-24 border-y border-stone-200">
+            <div className="max-w-7xl mx-auto px-6 md:px-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+                    {[
+                        { step: "01", title: "Select Arena", text: "Six formats. Six ways to win. Choose where your edge lies." },
+                        { step: "02", title: "Lock Position", text: "Commit stakes. The market reacts. The signal hardens." },
+                        { step: "03", title: "Instant Settlement", text: "Five minute resolution windows. Liquid payouts." },
+                    ].map((item, i) => (
+                        <div key={i} className="space-y-4">
+                            <span className="text-[10px] font-mono text-black/20 font-bold uppercase tracking-[0.3em]">{item.step}</span>
+                            <h4 className="text-xl font-medium text-black/80" style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h4>
+                            <p className="text-sm text-black/40 leading-relaxed">{item.text}</p>
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                        <p className="text-black/60 leading-relaxed">{step.desc}</p>
-                    </motion.div>
-                ))}
+                    ))}
+                </div>
             </div>
-        </div>
-
-        {/* Why Choose Ante Social Section */}
-        <div className="relative max-w-7xl mx-auto mt-32 mb-20">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-center mb-16"
-            >
-                <SectionHeading title="Why Choose Ante Social?" className="mb-16" />
-                <p className="text-black/60 text-lg max-w-2xl mx-auto">
-                    More than just predictions, it's a community where every decision matters.
-                </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center px-4">
-                {[
-                    { icon: IconUsersGroup, title: "Community-Driven", desc: "Engage with a vibrant community, share insights, and learn from the collective wisdom." },
-                    { icon: IconShieldLock, title: "Fair & Transparent", desc: "Blockchain-powered markets ensure every prediction is recorded and every payout is instant and verifiable." },
-                    { icon: IconBolt, title: "Innovative Game Modes", desc: "Beyond traditional markets, explore unique social experiments and fast-paced challenges." },
-                    { icon: IconChartDots, title: "Rewarding Experience", desc: "Earn real rewards for your foresight and strategic thinking. The more you play, the more you can win." }
-                ].map((feature, i) => {
-                    const FeatureIcon = feature.icon;
-                    return (
-                        <motion.div 
-                            key={i}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.1 }}
-                            className="bg-white/40 backdrop-blur-md rounded-3xl p-8 border border-white/50 shadow-sm group hover:bg-white/60 transition-colors"
-                        >
-                            <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                            <p className="text-black/60 leading-relaxed">{feature.desc}</p>
-                        </motion.div>
-                    );
-                })}
-            </div>
-        </div>
-
-        <WaveBackground variant="bottom" />
-      </section>
+        </section>
+      </div>
     </PageLayout>
   );
 }
