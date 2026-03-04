@@ -217,7 +217,7 @@ export default function BlogPostPage() {
               </p>
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-full font-medium text-sm hover:bg-black/90 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2  font-medium text-sm underline transition-all cursor-pointer"
               >
                 View All Posts
               </Link>
