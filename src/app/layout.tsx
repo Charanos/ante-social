@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/next';
 import { Providers } from "@/components/Providers";
 
 // Mona Sans is loaded via CSS import in globals.css
@@ -32,7 +33,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} ${jetbrainsMono.variable} ${outfit.className} bg-white`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        <Analytics />
+        </Providers>
       </body>
     </html>
   );

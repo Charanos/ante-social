@@ -28,6 +28,7 @@
     "@tabler/icons-react": "^3.36.1",
     "@tanstack/react-query": "^5.90.10",
     "@types/react-scroll": "^1.8.10",
+    "@vercel/analytics": "^1.6.1",
     "@web3icons/react": "^4.1.17",
     "axios": "^1.13.5",
     "canvas-confetti": "^1.9.4",
