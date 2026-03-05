@@ -25,7 +25,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
 import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import { useCurrency } from "@/lib/utils/currency";
-import UserAvatar from "@/components/ui/UserAvatar";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { MarketChart } from "@/components/markets/MarketChart";
 import Image from "next/image";
 import {
@@ -81,10 +81,10 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={\`
+      className={`
         flex items-center justify-between w-full gap-4 p-4 rounded-xl border-2 bg-white/60 backdrop-blur-sm transition-all
-        \${isDragging ? "border-slate-800 shadow-2xl z-50 bg-slate-50" : "border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md bg-white"}
-      \`}
+        ${isDragging ? "border-slate-800 shadow-2xl z-50 bg-slate-50" : "border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md bg-white"}
+      `}
     >
       <div
         {...attributes}
@@ -139,7 +139,7 @@ export default function LadderMarketPage() {
 
     const load = async () => {
       setIsPageLoading(true);
-      const payload = await fetchJsonOrNull<any>(\`/api/markets/\${marketId}\`);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
       if (cancelled) return;
       if (!payload) {
         setMarket(null);
@@ -192,7 +192,7 @@ export default function LadderMarketPage() {
     ) {
       toast.error(
         "Invalid Stake",
-        \`Minimum stake is \${formatCurrency(market.buy_in_amount)}\`,
+        `Minimum stake is ${formatCurrency(market.buy_in_amount)}`,
       );
       return;
     }
@@ -207,7 +207,7 @@ export default function LadderMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(\`/api/markets/\${market.id}/predict\`, {
+      const response = await fetch(`/api/markets/${market.id}/predict`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -241,7 +241,7 @@ export default function LadderMarketPage() {
     const diff = market.close_date.getTime() - Date.now();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    return \`\${days}d \${hours}h\`;
+    return `${days}d ${hours}h`;
   };
 
   const stakeValuePreferred = parseFloat(stakeAmount) || 0;
@@ -283,19 +283,19 @@ export default function LadderMarketPage() {
                   </span>
                 </div>
                 <div
-                  className={\`flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border \${
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border ${
                     isClosed
                       ? "bg-slate-800/80 border-slate-700"
                       : "bg-emerald-500/20 border-emerald-500/30"
-                  }\`}
+                  }`}
                 >
                   {!isClosed && (
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   )}
                   <span
-                    className={\`text-xs font-bold uppercase tracking-widest \${
+                    className={`text-xs font-bold uppercase tracking-widest ${
                       isClosed ? "text-slate-300" : "text-emerald-300"
-                    }\`}
+                    }`}
                   >
                     {isClosed ? "Closed" : "Live"}
                   </span>
@@ -491,13 +491,13 @@ export default function LadderMarketPage() {
 
               <div className="space-y-4">
                 {market?.items?.map((item: any, index: number) => (
-                  <div key={item.id} className={\`flex items-center gap-4 p-5 rounded-3xl border \${index === 0 ? 'border-amber-200 bg-amber-50 shadow-md' : 'border-slate-100 bg-slate-50'}\`}>
-                    <div className={\`flex items-center justify-center w-12 h-12 rounded-xl font-bold text-xl shrink-0 \${
+                  <div key={item.id} className={`flex items-center gap-4 p-5 rounded-3xl border ${index === 0 ? 'border-amber-200 bg-amber-50 shadow-md' : 'border-slate-100 bg-slate-50'}`}>
+                    <div className={`flex items-center justify-center w-12 h-12 rounded-xl font-bold text-xl shrink-0 ${
                       index === 0 ? 'bg-amber-100 text-amber-700' :
                       index === 1 ? 'bg-slate-200 text-slate-700' :
                       index === 2 ? 'bg-orange-100 text-orange-800' :
                       'bg-white text-slate-500 shadow-sm border border-slate-100'
-                    }\`}>
+                    }`}>
                       #{index + 1}
                     </div>
                     <div className="flex-1 flex items-center gap-4">
@@ -624,12 +624,12 @@ export default function LadderMarketPage() {
                   <div className="space-y-4">
                     {sortedParticipants.slice(0, 5).map((player: any, idx: number) => (
                       <div key={idx} className="flex items-center gap-3">
-                        <div className={\`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm \${
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm ${
                           idx === 0 ? 'bg-amber-100 text-amber-700' :
                           idx === 1 ? 'bg-slate-200 text-slate-700' :
                           idx === 2 ? 'bg-orange-100 text-orange-800' :
                           'bg-slate-50 text-slate-500'
-                        }\`}>
+                        }`}>
                           {idx + 1}
                         </div>
                         <UserAvatar name={player.username || "Anonymous"} size="sm" border={false} />
@@ -780,11 +780,11 @@ export default function LadderMarketPage() {
                         <motion.button
                           onClick={handleSubmitRankingLive}
                           disabled={isSubmitting || !stakeAmount}
-                          className={\`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all mt-6 \${
+                          className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all mt-6 ${
                             isSubmitting || !stakeAmount
                               ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                               : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-600/20 cursor-pointer"
-                          }\`}
+                          }`}
                           whileHover={
                             !isSubmitting && stakeAmount ? { scale: 1.02 } : {}
                           }

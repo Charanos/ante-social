@@ -36,7 +36,7 @@ import { useCurrency } from "@/lib/utils/currency";
 import Image from "next/image";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
-import UserAvatar from "@/components/ui/UserAvatar";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { MarketChart } from "@/components/markets/MarketChart";
 
 const REFLEX_ICONS = [
@@ -89,7 +89,7 @@ export default function ReflexMarketPage() {
 
     const load = async () => {
       setIsPageLoading(true);
-      const payload = await fetchJsonOrNull<any>(\`/api/markets/\${marketId}\`);
+      const payload = await fetchJsonOrNull<any>(`/api/markets/${marketId}`);
       if (cancelled) return;
       if (!payload) {
         setMarket(null);
@@ -124,7 +124,7 @@ export default function ReflexMarketPage() {
     ) {
       toast.error(
         "Invalid Prediction",
-        \`Minimum stake is \${formatCurrency(market.buy_in_amount)}\`,
+        `Minimum stake is ${formatCurrency(market.buy_in_amount)}`,
       );
       return;
     }
@@ -135,7 +135,7 @@ export default function ReflexMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(\`/api/markets/\${market.id}/predict\`, {
+      const response = await fetch(`/api/markets/${market.id}/predict`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -160,7 +160,7 @@ export default function ReflexMarketPage() {
 
       toast.success(
         "Prediction Placed!",
-        \`You predicted \${formatCurrency(stakeValueKsh)} on "\${selectedOptionText}"\`,
+        `You predicted ${formatCurrency(stakeValueKsh)} on "${selectedOptionText}"`,
       );
     } catch (error: any) {
       toast.error("Prediction Failed", error?.message || "Unable to place prediction.");
@@ -174,7 +174,7 @@ export default function ReflexMarketPage() {
     const diff = market.close_date.getTime() - Date.now();
     const minutes = Math.floor(diff / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return \`\${minutes}m \${seconds}s\`;
+    return `${minutes}m ${seconds}s`;
   };
 
   const stakeValuePreferredInput = parseFloat(stakeAmount) || 0;
@@ -217,19 +217,19 @@ export default function ReflexMarketPage() {
                   </span>
                 </div>
                 <div
-                  className={\`flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border \${
+                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border ${
                     isClosed
                       ? "bg-slate-800/80 border-slate-700"
                       : "bg-emerald-500/20 border-emerald-500/30"
-                  }\`}
+                  }`}
                 >
                   {!isClosed && (
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   )}
                   <span
-                    className={\`text-xs font-bold uppercase tracking-widest \${
+                    className={`text-xs font-bold uppercase tracking-widest ${
                       isClosed ? "text-slate-300" : "text-emerald-300"
-                    }\`}
+                    }`}
                   >
                     {isClosed ? "Closed" : "Live"}
                   </span>
@@ -357,21 +357,21 @@ export default function ReflexMarketPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.2 + index * 0.05 }}
                       onClick={() => setSelectedOption(option.id)}
-                      className={\`group relative p-6 rounded-3xl transition-all duration-300 cursor-pointer \${
+                      className={`group relative p-6 rounded-3xl transition-all duration-300 cursor-pointer ${
                         isSelected
                           ? "bg-indigo-50 border-2 border-indigo-500 shadow-[0_16px_48px_-8px_rgba(99,102,241,0.25)]"
                           : "bg-white border-2 border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 shadow-sm hover:shadow-md"
-                      }\`}
+                      }`}
                     >
                       <div className="flex items-center gap-5">
-                        <div className={\`shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-colors \${
+                        <div className={`shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
                           isSelected ? "bg-indigo-100 ring-4 ring-indigo-50" : "bg-slate-100 group-hover:bg-indigo-100"
-                        }\`}>
-                          <option.icon className={\`w-7 h-7 \${isSelected ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-600'}\`} />
+                        }`}>
+                          <option.icon className={`w-7 h-7 ${isSelected ? 'text-indigo-600' : 'text-slate-500 group-hover:text-indigo-600'}`} />
                         </div>
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center justify-between">
-                            <h4 className={\`text-xl font-bold \${isSelected ? 'text-indigo-900' : 'text-slate-900 group-hover:text-indigo-900'}\`}>
+                            <h4 className={`text-xl font-bold ${isSelected ? 'text-indigo-900' : 'text-slate-900 group-hover:text-indigo-900'}`}>
                               {option.option_text}
                             </h4>
                             <div className="flex items-center gap-2">
@@ -389,15 +389,15 @@ export default function ReflexMarketPage() {
                             <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: \`\${option.percentage}%\` }}
+                                animate={{ width: `${option.percentage}%` }}
                                 transition={{
                                   duration: 1,
                                   ease: "easeOut",
                                   delay: 0.3 + index * 0.05,
                                 }}
-                                className={\`h-full rounded-full \${
+                                className={`h-full rounded-full ${
                                   isSelected ? "bg-indigo-500" : "bg-slate-300 group-hover:bg-indigo-400"
-                                }\`}
+                                }`}
                               />
                             </div>
                             <span className="text-sm text-slate-500 font-semibold block uppercase tracking-wider">
@@ -452,7 +452,7 @@ export default function ReflexMarketPage() {
                             const colors = ["#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6"];
                             return (
                               <Cell
-                                key={\`cell-\${index}\`}
+                                key={`cell-${index}`}
                                 fill={isWinning ? "#4f46e5" : colors[index % colors.length]}
                                 opacity={isWinning ? 1 : 0.6}
                               />
@@ -496,11 +496,11 @@ export default function ReflexMarketPage() {
                     return (
                       <div
                         key={opt.id}
-                        className={\`p-4 rounded-2xl border \${
+                        className={`p-4 rounded-2xl border ${
                           isWinning
                             ? "border-indigo-200 bg-indigo-50/50"
                             : "border-slate-100 bg-slate-50"
-                        }\`}
+                        }`}
                       >
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center gap-2">
@@ -517,12 +517,12 @@ export default function ReflexMarketPage() {
                         </div>
                         <div className="w-full bg-slate-200 rounded-full h-2 mb-2 overflow-hidden">
                           <div
-                            className={\`h-2 rounded-full \${
+                            className={`h-2 rounded-full ${
                               isWinning 
                                 ? "bg-indigo-600" 
                                 : "bg-slate-400"
-                            }\`}
-                            style={{ width: \`\${percentage}%\` }}
+                            }`}
+                            style={{ width: `${percentage}%` }}
                           />
                         </div>
                         <div className="text-sm font-medium text-slate-500">
@@ -645,12 +645,12 @@ export default function ReflexMarketPage() {
                   <div className="space-y-4">
                     {sortedParticipants.slice(0, 5).map((player: any, idx: number) => (
                       <div key={idx} className="flex items-center gap-3">
-                        <div className={\`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm \${
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm ${
                           idx === 0 ? 'bg-amber-100 text-amber-700' :
                           idx === 1 ? 'bg-slate-200 text-slate-700' :
                           idx === 2 ? 'bg-orange-100 text-orange-800' :
                           'bg-slate-50 text-slate-500'
-                        }\`}>
+                        }`}>
                           {idx + 1}
                         </div>
                         <UserAvatar name={player.username || "Anonymous"} size="sm" border={false} />
@@ -805,11 +805,11 @@ export default function ReflexMarketPage() {
                         <motion.button
                           onClick={handlePlacePrediction}
                           disabled={isSubmitting || !selectedOption || !stakeAmount}
-                          className={\`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all mt-6 \${
+                          className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all mt-6 ${
                             isSubmitting || !selectedOption || !stakeAmount
                               ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                               : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-600/20 cursor-pointer"
-                          }\`}
+                          }`}
                           whileHover={
                             !isSubmitting && selectedOption && stakeAmount
                               ? { scale: 1.02 }
