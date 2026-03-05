@@ -39,7 +39,7 @@ import {
   Legend as RechartsLegend 
 } from "recharts";
 
-export default function PollMarketPage() {
+export default function DivergenceMarketPage() {
   const params = useParams();
   const toast = useToast();
   const { user } = useLiveUser();
@@ -298,7 +298,7 @@ export default function PollMarketPage() {
                   <div className="flex-1 space-y-6">
                     <div>
                       <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Market Resolution</h3>
-                      <p className="text-slate-500 font-medium mt-1">Final distribution of community consensus</p>
+                      <p className="text-slate-500 font-medium mt-1">Final distribution of community divergence</p>
                     </div>
                     
                     <div className="space-y-4">
@@ -663,7 +663,7 @@ export default function PollMarketPage() {
                         Place Your Prediction
                       </h3>
                       <p className="text-sm text-white/60 font-medium">
-                        Join the poll and win
+                        Predict the divergence and win
                       </p>
                     </div>
 
@@ -795,7 +795,7 @@ export default function PollMarketPage() {
                       How it works
                     </p>
                     <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                      Winners split the prize pool proportionally based on their
+                      Winning depends on anticipating how the group diverges. Winners split the prize pool proportionally based on their
                       stake. All payouts are processed instantly when the market
                       closes.
                     </p>
