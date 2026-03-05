@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import {
   IconAccessPoint,
   IconAlertCircle,
@@ -372,11 +371,6 @@ export default function GroupSettingsPage() {
 
   return (
     <div className="min-h-screen pl-0 md:pl-8 pb-20">
-      <DashboardHeader
-        user={user}
-        subtitle={`Manage configuration and permissions for ${group.name}`}
-      />
-
       <div className="w-full mx-auto px-0 md:px-4 space-y-8">
         {/* Global Group Overview Stats */}
         <motion.div

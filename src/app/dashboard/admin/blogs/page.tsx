@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { DashboardCard } from "@/components/dashboard/DashboardCard"
 import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
 import {
   IconPlus,
@@ -126,8 +125,6 @@ export default function AdminBlogsPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8">
-      <DashboardHeader subtitle="Create and manage blog posts" />
-
       <SearchFilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}

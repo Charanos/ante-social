@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { MarketCard } from "@/components/markets/MarketCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -55,11 +54,6 @@ export default function MarketsPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto md:pl-8 pl-0 pb-8 space-y-2">
-        <DashboardHeader
-          user={user}
-          subtitle="Explore active betting markets and join the action"
-        />
-
         {/* Stats Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -120,6 +114,7 @@ export default function MarketsPage() {
             { id: "betrayal", label: "Betrayal" },
             { id: "reflex", label: "Reflex" },
             { id: "ladder", label: "Ladder" },
+            { id: "divergence", label: "Divergence" },
           ]}
           activeTab={filterType}
           onTabChange={setFilterType}

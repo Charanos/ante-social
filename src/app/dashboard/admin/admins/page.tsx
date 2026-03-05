@@ -13,7 +13,6 @@ import {
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/components/ui/toast-notification";
 
 type AdminUser = {
@@ -85,8 +84,6 @@ export default function AdminManagementPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        <DashboardHeader subtitle="Manage admin access and permissions" />
-
         <div className="flex justify-end -mt-16 mb-8 relative z-10 px-2">
           <button
             onClick={() => toast.info("Access control", "Create admins through secure user provisioning flow")}

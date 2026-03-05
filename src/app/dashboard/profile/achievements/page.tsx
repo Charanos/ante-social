@@ -17,7 +17,6 @@ import {
   IconLoader3,
 } from "@tabler/icons-react";
 
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
@@ -239,11 +238,6 @@ export default function AchievementsPage() {
   return (
     <div className="space-y-6 md:space-y-16 pl-0 md:pl-6 pb-12 md:pb-16 px-1 md:px-0">
       {/* Header */}
-      <DashboardHeader
-        user={user}
-        subtitle="Track your progress and unlock exclusive rewards"
-      />
-
       {/* Visual Separator */}
       <div className="hidden md:flex items-center gap-4 my-8">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>

@@ -49,9 +49,11 @@ const getTypeStyles = (type: string) => {
       return { label: "Ladder", color: "purple", icon: IconAward };
     case "betrayal":
     case "prisoner_dilemma":
-      return { label: "Dilemma", color: "red", icon: IconTarget };
-    case "syndicate":
       return { label: "Betrayal", color: "red", icon: IconTarget };
+    case "divergence":
+      return { label: "Divergence", color: "indigo", icon: IconTrendingUp };
+    case "syndicate":
+      return { label: "Syndicate", color: "red", icon: IconTarget };
     default:
       return { label: "Market", color: "gray", icon: IconAlertCircle };
   }
@@ -72,6 +74,7 @@ export function MarketCard({ market, index = 0, href }: MarketCardProps) {
     'consensus': 'consensus',
     'reflex': 'reflex',
     'ladder': 'ladder',
+    'divergence': 'divergence',
     'syndicate': 'betrayal'
   };
   

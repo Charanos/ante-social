@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import {
   IconArrowDownLeft,
   IconArrowUpRight,
@@ -147,10 +146,6 @@ export default function WalletPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full">
-      <DashboardHeader
-        user={user}
-        subtitle="Manage your balance and transactions"
-      />
 
       {/* Hero Balance Card */}
       <motion.div
@@ -209,7 +204,7 @@ export default function WalletPage() {
             </div>
             <div className="p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
               <p className="text-xs text-white/50 font-normal mb-1">
-                Total Bets
+                Total Predictions
               </p>
               <p className="text-lg font-semibold font-mono text-blue-400">
                 {formatCurrency(stats.bets)}

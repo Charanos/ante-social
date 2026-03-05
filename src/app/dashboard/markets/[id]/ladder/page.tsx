@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   DndContext,
@@ -21,7 +22,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
 import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
 import { useCurrency } from "@/lib/utils/currency";
@@ -82,27 +82,31 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
       ref={setNodeRef}
       style={style}
       className={`
-        flex items-center justify-between w-full gap-4 p-4 rounded-xl border-2 bg-white/60 backdrop-blur-sm transition-all
-        ${isDragging ? "border-slate-800 shadow-2xl z-50 bg-slate-50" : "border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md bg-white"}
+        flex items-center gap-3 w-full p-4 rounded-2xl border transition-all duration-200
+        ${
+          isDragging
+            ? "border-slate-900 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.18)] z-50 bg-white"
+            : "border-slate-200 bg-white/60 backdrop-blur-sm hover:bg-white/90 hover:border-slate-300 shadow-sm hover:shadow-md"
+        }
       `}
     >
       <div
         {...attributes}
         {...listeners}
-        className="shrink-0 cursor-grab active:cursor-grabbing p-2 hover:bg-slate-100 rounded-lg transition-colors"
+        className="shrink-0 cursor-grab active:cursor-grabbing p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
       >
-        <IconGripVertical className="w-5 h-5 text-slate-400" />
+        <IconGripVertical className="w-4 h-4 text-slate-400" />
       </div>
 
-      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-900 text-white font-bold font-mono">
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 text-white font-semibold font-mono text-xs shrink-0">
         {index + 1}
       </div>
 
       <div className="flex-1 flex items-center gap-3">
-        <div className="shrink-0 w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-          <item.icon className="w-5 h-5 text-slate-700" />
+        <div className="shrink-0 w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center">
+          <item.icon className="w-4 h-4 text-slate-600" />
         </div>
-        <span className="font-bold text-slate-900">{item.text}</span>
+        <span className="font-medium text-slate-900 text-sm">{item.text}</span>
       </div>
     </div>
   );
@@ -256,96 +260,91 @@ export default function LadderMarketPage() {
     return <div className="p-8 text-sm text-black/50">Market not found.</div>;
   }
 
-  const winningOutcomeId = market.winningOutcomeId;
   return (
-    <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw] px-2">
-      <DashboardHeader user={user} />
-
+    <div className="space-y-6 md:space-y-10 pb-12 w-full px-2 md:px-6 lg:px-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-8">
         {/* Main Content */}
-        <div className="lg:col-span-8 space-y-8 lg:space-y-12">
-          {/* Hero Section */}
+        <div className="lg:col-span-8 space-y-8">
+
+          {/* Hero Section — matches poll page pattern */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 shadow-2xl"
+            transition={{ delay: 0.1 }}
+            className="relative overflow-hidden rounded-[2rem] bg-slate-900 text-white shadow-2xl"
           >
-            {/* Background Glows */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[128px] mix-blend-screen" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[128px] mix-blend-screen" />
+            {/* Hero Image & Backgrounds */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src={market.image}
+                alt={market.title}
+                fill
+                className="object-cover opacity-50 mix-blend-luminosity"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-transparent" />
+            </div>
 
-            <div className="relative p-8 md:p-12 pb-16">
+            {/* Content */}
+            <div className="relative z-10 p-8 md:p-10 lg:p-12 h-full flex flex-col justify-end min-h-[400px]">
               {/* Badges */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="px-4 py-1.5 rounded-full flex items-center bg-white/10 backdrop-blur-md border border-white/10">
-                  <span className="text-xs font-bold text-white uppercase tracking-widest">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="px-2 py-0 rounded-md bg-white/10 backdrop-blur-md border border-white/10">
+                  <span className="text-[10px] font-medium text-white/90 uppercase tracking-widest">
                     {market.category}
                   </span>
                 </div>
-                <div
-                  className={`flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-md border ${
-                    isClosed
-                      ? "bg-slate-800/80 border-slate-700"
-                      : "bg-emerald-500/20 border-emerald-500/30"
-                  }`}
-                >
-                  {!isClosed && (
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  )}
-                  <span
-                    className={`text-xs font-bold uppercase tracking-widest ${
-                      isClosed ? "text-slate-300" : "text-emerald-300"
-                    }`}
-                  >
-                    {isClosed ? "Closed" : "Live"}
+                <div className={`flex items-center gap-2 px-3 py-1 rounded-md backdrop-blur-md border ${
+                  isClosed
+                    ? "bg-slate-500/20 border-slate-500/30 text-slate-300"
+                    : "bg-emerald-500/20 border-emerald-500/30 text-emerald-400"
+                }`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${isClosed ? "bg-slate-400" : "bg-emerald-400 animate-pulse"}`} />
+                  <span className="text-[10px] font-medium uppercase tracking-widest">
+                    {market.status}
                   </span>
                 </div>
               </div>
 
-              {/* Title & Description */}
-              <div className="max-w-3xl space-y-6 relative z-10 w-full lg:w-3/5">
-                <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+              <div className="max-w-3xl mb-12">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-normal tracking-tight mb-4 text-white">
                   {market.title}
                 </h2>
-                <p className="text-lg text-slate-300 font-medium leading-relaxed">
+                <p className="text-base md:text-lg text-white/70 font-normal leading-relaxed max-w-2xl">
                   {market.description}
                 </p>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-12 relative z-10">
-                <div className="p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-colors">
-                  <div className="flex items-center gap-2 mb-3">
-                    <IconTrendingUp className="w-5 h-5 text-emerald-400" />
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      Total Pool
-                    </span>
+              {/* Stats — inline with border-separated dividers like poll page */}
+              <div className="flex flex-wrap items-center gap-8 md:gap-12 mt-auto border-t border-white/10 pt-8">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-white/50">
+                    <IconTrendingUp className="w-4 h-4" />
+                    <span className="text-[10px] font-medium uppercase tracking-widest">Total Pool</span>
                   </div>
-                  <p className="text-2xl md:text-3xl font-bold font-mono text-white">
+                  <p className="text-2xl font-medium font-mono text-white">
                     {formatCurrency(market.total_pool)}
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-colors">
-                  <div className="flex items-center gap-2 mb-3">
-                    <IconUsers className="w-5 h-5 text-blue-400" />
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      Players
-                    </span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-white/50">
+                    <IconUsers className="w-4 h-4" />
+                    <span className="text-[10px] font-medium uppercase tracking-widest">Players</span>
                   </div>
-                  <p className="text-2xl md:text-3xl font-bold font-mono text-white">
+                  <p className="text-2xl font-medium font-mono text-white">
                     {market.participant_count}
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-colors col-span-2 md:col-span-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <IconClock className="w-5 h-5 text-purple-400" />
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      {isClosed ? "Finalized" : "Time Left"}
+                <div className="space-y-1 border-l border-white/10 pl-8">
+                  <div className="flex items-center gap-2 text-white/50">
+                    <IconClock className="w-4 h-4" />
+                    <span className="text-[10px] font-medium uppercase tracking-widest">
+                      {isClosed ? "Finalized On" : "Closes In"}
                     </span>
                   </div>
-                  <p className="text-2xl md:text-3xl font-bold font-mono text-white">
+                  <p className="text-2xl font-medium font-mono text-white">
                     {isClosed
                       ? new Date(market.close_date).toLocaleDateString()
                       : getTimeRemaining()}
@@ -353,102 +352,129 @@ export default function LadderMarketPage() {
                 </div>
               </div>
             </div>
-
-            {/* Overlapping Hero Image */}
-            <div className="absolute right-0 top-0 bottom-0 w-2/5 hidden lg:block opacity-60 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700">
-              <div className="absolute inset-0 bg-linear-to-r from-slate-900 via-transparent to-transparent z-10" />
-              <img
-                src={market.image}
-                alt={market.title}
-                className="w-full h-full object-cover object-center"
-              />
-            </div>
-            {/* Mobile Hero Image Background */}
-            <div className="absolute inset-0 lg:hidden opacity-20 pointer-events-none">
-              <div className="absolute inset-0 bg-slate-900/80 z-10" />
-              <img
-                src={market.image}
-                alt={market.title}
-                className="w-full h-full object-cover object-center"
-              />
-            </div>
           </motion.div>
 
-          {!isClosed ? (
-            <div className="space-y-8">
-              {/* Performance Chart */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                className="p-8 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl"
-              >
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-100">
-                      <IconTrendingUp className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-900 tracking-tight">Market Momentum</h3>
-                      <p className="text-sm text-slate-500 font-medium">Historical Consensus Movement</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold font-mono text-slate-900">76%</p>
-                    <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest">+5.2% Consensus Strength</p>
-                  </div>
-                </div>
-                
-                <div className="h-64 mt-4">
-                  <MarketChart 
-                    data={[60, 62, 65, 68, 70, 72, 74, 76]} 
-                    height="100%" 
-                    color="#10b981" 
-                    showAxes 
-                  />
-                </div>
-              </motion.div>
-
-              {/* Instructions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                className="p-8 rounded-[2.5rem] bg-indigo-50 border border-indigo-100/50 shadow-inner"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center">
-                    <IconGripVertical className="w-6 h-6 text-indigo-600" />
+          {/* Performance Chart — only when open */}
+          {!isClosed && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="p-6 md:p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] overflow-hidden"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-slate-100 pb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
+                    <IconTrendingUp className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest mb-2">
-                      How to Play
-                    </h3>
-                    <p className="text-lg font-medium text-indigo-900/80 leading-relaxed">
-                      Drag items to rank them from <strong>#1 (best)</strong> to{" "}
-                      <strong>#5 (last)</strong>. Your goal is to match what the{" "}
-                      <strong>majority</strong> will choose. Winners split the
-                      prize pool!
+                    <h3 className="text-lg font-semibold text-slate-900 tracking-tight">Market Momentum</h3>
+                    <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mt-0.5">Historical Consensus Movement</p>
+                  </div>
+                </div>
+                <div className="sm:text-right hidden sm:block">
+                  <p className="text-2xl font-semibold font-mono text-slate-900">76%</p>
+                  <p className="text-[10px] text-emerald-600 font-semibold uppercase tracking-widest">+5.2% Consensus Strength</p>
+                </div>
+              </div>
+
+              <div className="h-64 mt-4 -mx-2 sm:mx-0">
+                <MarketChart
+                  data={[60, 62, 65, 68, 70, 72, 74, 76]}
+                  height="100%"
+                  color="#0f172a"
+                  showAxes={false}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {/* Closed State — Final Ranking */}
+          {isClosed && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="p-8 md:p-10 rounded-[2rem] bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]"
+            >
+              <div className="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+                <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
+                  <IconTrophy className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 tracking-tight">Final Market Ranking</h3>
+                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mt-0.5">The community's ultimate consensus</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {market?.items?.map((item: any, index: number) => (
+                  <div
+                    key={item.id}
+                    className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
+                      index === 0
+                        ? "border-amber-200 bg-amber-50/60"
+                        : "border-slate-100 bg-slate-50/60"
+                    }`}
+                  >
+                    <div className={`flex items-center justify-center w-10 h-10 rounded-xl font-semibold text-sm shrink-0 ${
+                      index === 0 ? "bg-amber-100 text-amber-700" :
+                      index === 1 ? "bg-slate-200 text-slate-700" :
+                      index === 2 ? "bg-orange-100 text-orange-800" :
+                      "bg-white text-slate-500 border border-slate-100 shadow-sm"
+                    }`}>
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center shrink-0">
+                        <item.icon className="w-4 h-4 text-slate-600" />
+                      </div>
+                      <span className="font-medium text-slate-900">{item.text}</span>
+                    </div>
+                    {index === 0 && <IconTrophy className="w-5 h-5 text-amber-500 shrink-0" />}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* How to Play + Drag to Rank — only when open */}
+          {!isClosed && (
+            <>
+              {/* Visual Separator */}
+              <div className="flex items-center gap-4 my-4">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
+                <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-widest">
+                  Drag to Rank
+                </h2>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
+              </div>
+
+              {/* Instructions — styled like poll info card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200"
+              >
+                <div className="flex gap-4">
+                  <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm h-fit">
+                    <IconGripVertical className="w-5 h-5 text-slate-900" />
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-slate-900">How to Play</p>
+                    <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                      Drag items to rank them from <strong>#1 (best)</strong> to <strong>#5 (last)</strong>. Your goal is to match what the <strong>majority</strong> will choose. Winners split the prize pool!
                     </p>
                   </div>
                 </div>
               </motion.div>
-
-              {/* Visual Separator */}
-              <div className="flex items-center gap-4 py-4">
-                <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-300 to-transparent"></div>
-                <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest bg-slate-50 px-4 rounded-full">
-                  Drag to Rank
-                </h2>
-                <div className="h-px flex-1 bg-linear-to-r from-transparent via-slate-300 to-transparent"></div>
-              </div>
 
               {/* Drag and Drop Ranking */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="space-y-4"
               >
                 <DndContext
                   sensors={sensors}
@@ -459,7 +485,7 @@ export default function LadderMarketPage() {
                     items={rankedItems.map((item) => item.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {rankedItems.map((item, index) => (
                         <SortableItem key={item.id} item={item} index={index} />
                       ))}
@@ -467,348 +493,286 @@ export default function LadderMarketPage() {
                   </SortableContext>
                 </DndContext>
               </motion.div>
-            </div>
-          ) : (
-            /* Closed State - Market Resolution */
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-8 md:p-12 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl space-y-8"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center">
-                  <IconTrophy className="w-6 h-6 text-indigo-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-900">
-                    Final Market Ranking
-                  </h3>
-                  <p className="text-slate-500 font-medium">
-                    The community's ultimate consensus
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {market?.items?.map((item: any, index: number) => (
-                  <div key={item.id} className={`flex items-center gap-4 p-5 rounded-3xl border ${index === 0 ? 'border-amber-200 bg-amber-50 shadow-md' : 'border-slate-100 bg-slate-50'}`}>
-                    <div className={`flex items-center justify-center w-12 h-12 rounded-xl font-bold text-xl shrink-0 ${
-                      index === 0 ? 'bg-amber-100 text-amber-700' :
-                      index === 1 ? 'bg-slate-200 text-slate-700' :
-                      index === 2 ? 'bg-orange-100 text-orange-800' :
-                      'bg-white text-slate-500 shadow-sm border border-slate-100'
-                    }`}>
-                      #{index + 1}
-                    </div>
-                    <div className="flex-1 flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center shrink-0">
-                        <item.icon className="w-6 h-6 text-slate-700" />
-                      </div>
-                      <span className="font-bold text-xl text-slate-900">{item.text}</span>
-                    </div>
-                    {index === 0 && <IconTrophy className="w-8 h-8 text-amber-500 shrink-0" />}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            </>
           )}
+
           {/* Recent Activity */}
-          {!isClosed && (
-            <div className="space-y-6 pt-8">
-              <div className="flex items-center gap-3 px-2">
-                <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                  <IconEye className="w-5 h-5 text-slate-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900">
-                    Recent Activity
-                  </h3>
-                  <p className="text-sm text-slate-500 font-medium">
-                    Live updates from other players
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <AnimatePresence>
-                  {market.participants && market.participants.length > 0 ? (
-                    market.participants.map((participant: any, idx: number) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + idx * 0.05 }}
-                        className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-200 hover:shadow-md transition-all cursor-pointer"
-                      >
-                        <div className="flex items-center gap-4">
-                          <UserAvatar 
-                            name={participant.username || "Anonymous"} 
-                            size="md" 
-                            border={false}
-                          />
-                          <div>
-                            <p className="text-base font-bold text-slate-900">
-                              {participant.username || "Anonymous"}
-                            </p>
-                            <p className="text-sm text-slate-500 font-medium">
-                              Submitted ranking
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-base font-bold font-mono text-slate-900">
-                            {formatCurrency(participant.total_stake)}
-                          </p>
-                          <p className="text-sm text-slate-400 font-medium">
-                            {new Date(participant.timestamp).toLocaleTimeString(
-                              [],
-                              { hour: "2-digit", minute: "2-digit" },
-                            )}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="py-12 px-6 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50"
-                    >
-                      <IconGhost className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                      <h4 className="text-lg font-bold text-slate-700 mb-1">
-                        Much Empty
-                      </h4>
-                      <p className="text-slate-500 font-medium">
-                        Be the first to submit a ranking in this market!
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <IconEye className="w-5 h-5 text-black/40" />
+              <h3 className="text-lg font-medium text-black/90">Recent Activity</h3>
             </div>
-          )}
+
+            <div className="space-y-3">
+              <AnimatePresence>
+                {market.participants && market.participants.length > 0 ? (
+                  market.participants.map((participant: any, idx: number) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 + idx * 0.05 }}
+                      className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-200 hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center gap-4">
+                        <UserAvatar
+                          name={participant.username || "Anonymous"}
+                          size="md"
+                          border={false}
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">
+                            {participant.username || "Anonymous"}
+                          </p>
+                          <p className="text-xs text-slate-500 font-normal mt-0.5">
+                            Submitted ranking
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold font-mono text-slate-900">
+                          {formatCurrency(participant.total_stake)}
+                        </p>
+                        <p className="text-xs text-slate-400 font-normal mt-0.5">
+                          {new Date(participant.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center justify-center py-12 px-4 rounded-3xl bg-slate-100/50 border border-dashed border-slate-300 text-center"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mb-4">
+                      <IconGhost className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <h4 className="text-base font-semibold text-slate-900 mb-1">No activity yet</h4>
+                    <p className="text-sm text-slate-500 max-w-sm">
+                      Be the first to submit a ranking in this market!
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
-        <div className="lg:col-span-4 lg:self-start space-y-6">
-          <div className="lg:sticky lg:top-8 z-40 h-fit space-y-6 transition-all duration-300">
+        <div className="lg:col-span-4 lg:self-start h-full">
+          <div className="lg:sticky lg:top-8 z-40 space-y-6">
             {isClosed ? (
               <>
                 {/* Closed Market Notice */}
-                <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
-                  <div className="flex items-center gap-3 mb-4">
-                    <IconTrophy className="w-6 h-6 text-amber-400" />
-                    <h3 className="text-lg font-bold">Market Resolved</h3>
-                  </div>
-                  <p className="text-slate-300 text-sm font-medium leading-relaxed mb-6">
-                    This market has concluded and winnings have been distributed. 
-                    Those whose ranked predictions matched the community consensus 
-                    have claimed the pool.
-                  </p>
-                  
-                  <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Final Pool Value</p>
-                    <p className="text-2xl font-mono font-bold text-white tracking-tight">{formatCurrency(market.total_pool)}</p>
-                  </div>
-                </div>
-
-                {/* Leaderboard */}
-                <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-200">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-bold text-slate-900">Top Participants</h3>
-                    <div className="px-3 py-1 bg-slate-100 rounded-full">
-                      <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">Final</span>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] rounded-[2rem] overflow-hidden"
+                >
+                  <div className="p-6 bg-slate-900 text-white flex items-center gap-3">
+                    <div>
+                      <h3 className="text-lg font-medium tracking-tight">Market Resolved</h3>
+                      <p className="text-xs text-white/60 font-normal tracking-wide uppercase">Final Results</p>
                     </div>
                   </div>
-                  
-                  <div className="space-y-4">
+                  <div className="p-6 space-y-4">
+                    <p className="text-sm text-slate-500 font-normal leading-relaxed">
+                      This market has concluded and winnings have been distributed. Those whose ranked predictions matched the community consensus have claimed the pool.
+                    </p>
+                    <div className="flex justify-between items-center py-2.5 border-b border-slate-100">
+                      <span className="text-sm text-slate-500 font-normal">Final Pool</span>
+                      <span className="text-base font-semibold font-mono text-slate-900">{formatCurrency(market.total_pool)}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2.5 border-b border-slate-100">
+                      <span className="text-sm text-slate-500 font-normal">Total Players</span>
+                      <span className="text-base font-medium font-mono text-slate-900">{market.participant_count}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2.5">
+                      <span className="text-sm text-slate-500 font-normal">Closed On</span>
+                      <span className="text-sm font-medium text-slate-900">
+                        {new Date(market.close_date).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Leaderboard */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] rounded-[2rem] overflow-hidden"
+                >
+                  <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white/40">
+                    <div>
+                      <h3 className="text-base font-medium text-slate-900">Top Participants</h3>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-medium mt-0.5">By Stake Amount</p>
+                    </div>
+                    <IconUsers className="w-5 h-5 text-slate-400" />
+                  </div>
+                  <div className="p-2 space-y-1">
                     {sortedParticipants.slice(0, 5).map((player: any, idx: number) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm ${
-                          idx === 0 ? 'bg-amber-100 text-amber-700' :
-                          idx === 1 ? 'bg-slate-200 text-slate-700' :
-                          idx === 2 ? 'bg-orange-100 text-orange-800' :
-                          'bg-slate-50 text-slate-500'
-                        }`}>
+                      <div key={idx} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                        <span className={`text-xs font-semibold w-4 text-center ${idx < 3 ? "text-slate-900" : "text-slate-400"}`}>
                           {idx + 1}
-                        </div>
+                        </span>
                         <UserAvatar name={player.username || "Anonymous"} size="sm" border={false} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-slate-900 truncate">{player.username}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-mono font-bold text-slate-900">{formatCurrency(player.total_stake)}</p>
-                        </div>
+                        <span className="text-sm font-medium text-slate-700 flex-1 truncate">{player.username}</span>
+                        <span className="text-sm font-semibold font-mono text-slate-900">{formatCurrency(player.total_stake)}</span>
                       </div>
                     ))}
                     {sortedParticipants.length === 0 && (
-                      <div className="text-center py-6 text-slate-500 text-sm font-medium">
-                        No participants in this market
-                      </div>
+                      <p className="text-sm text-slate-500 text-center py-6">No participants yet.</p>
                     )}
                   </div>
+                </motion.div>
+              </>
+            ) : predictionResult ? (
+              /* Prediction Result */
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] rounded-[2rem] overflow-hidden"
+              >
+                <div className="p-6 bg-slate-900 text-white text-center">
+                  <IconCircleCheckFilled className="w-12 h-12 mx-auto mb-2" />
+                  <h3 className="text-xl font-semibold">Ranking Secured</h3>
+                  <p className="text-sm text-white/80">Receipt ID: {predictionResult.transactionId?.slice(-8).toUpperCase()}</p>
                 </div>
-              </>
-            ) : (
-              <>
-                {/* Prediction Result / Slip */}
-                {predictionResult ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white border border-emerald-100 shadow-[0_20px_60px_-15px_rgba(16,185,129,0.2)] rounded-3xl overflow-hidden"
-                  >
-                    <div className="p-8 bg-emerald-500 text-white text-center relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-[32px] translate-x-1/2 -translate-y-1/2" />
-                      <IconCircleCheckFilled className="w-16 h-16 mx-auto mb-4 drop-shadow-lg" />
-                      <h3 className="text-2xl font-bold mb-1">Ranking Secured</h3>
-                      <p className="text-sm text-emerald-100 font-medium">Receipt ID: {predictionResult.transactionId?.slice(-8).toUpperCase()}</p>
-                    </div>
-                    <div className="p-8 space-y-5 bg-white">
-                      <div className="flex justify-between items-center py-3 border-b border-slate-100">
-                        <span className="text-sm text-slate-500 font-semibold uppercase tracking-wider">Outcome</span>
-                        <span className="text-base font-bold text-emerald-600">Ladder Ranking</span>
-                      </div>
-                      <div className="flex justify-between items-center py-3 border-b border-slate-100">
-                        <span className="text-sm text-slate-500 font-semibold uppercase tracking-wider">Stake</span>
-                        <span className="text-lg font-bold font-mono text-slate-900">{formatCurrency(predictionResult.amount)}</span>
-                      </div>
-                      <div className="flex justify-between items-center py-3">
-                         <span className="text-sm text-slate-400 font-semibold uppercase tracking-wider">Platform Fee</span>
-                         <span className="text-sm font-bold font-mono text-slate-500">{formatCurrency(predictionResult.amount * 0.05)}</span>
-                      </div>
-                      <button 
-                        onClick={() => setPredictionResult(null)}
-                        className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all mt-6 shadow-lg shadow-slate-900/20"
-                      >
-                        Dismiss
+                <div className="p-6 space-y-4">
+                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span className="text-sm text-slate-500 font-normal">Outcome</span>
+                    <span className="text-base font-semibold text-emerald-600">Ladder Ranking</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span className="text-sm text-slate-500 font-normal">Stake</span>
+                    <span className="text-base font-semibold font-mono text-slate-900">{formatCurrency(predictionResult.amount)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-sm text-slate-500 font-normal">Platform Fee</span>
+                    <span className="text-sm font-normal font-mono text-slate-600">{formatCurrency(predictionResult.amount * 0.05)}</span>
+                  </div>
+                  <div className="flex flex-col gap-3 mt-4">
+                    <Link href={`/dashboard/markets/my-forecasts/${predictionResult.transactionId}?new=true`} className="w-full">
+                      <button className="w-full py-2 cursor-pointer bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20">
+                        View in My Predictions
                       </button>
+                    </Link>
+                    <button
+                      onClick={() => setPredictionResult(null)}
+                      className="w-full py-2 cursor-pointer bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-all"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              /* Prediction Placement Card */
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] rounded-[2rem] overflow-hidden"
+              >
+                {/* Header */}
+                <div className="p-6 bg-slate-900 text-white">
+                  <h3 className="text-xl font-medium mb-1">Submit Ranking</h3>
+                  <p className="text-sm text-white/60 font-normal">Review your order before locking in</p>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-6 px-6 py-5">
+                  {/* Current Ranking Preview */}
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest block mb-3">
+                      Current Ranking Order
+                    </span>
+                    <div className="space-y-2.5">
+                      {rankedItems.map((item, index) => (
+                        <div key={item.id} className="flex items-center gap-2.5 text-sm">
+                          <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs flex items-center justify-center font-semibold font-mono shrink-0">
+                            {index + 1}
+                          </span>
+                          <span className="font-medium text-slate-900 flex items-center gap-2">
+                            <span className="bg-white p-1 rounded-md border border-slate-100 shadow-sm">
+                              <item.icon className="w-3.5 h-3.5 text-slate-500" />
+                            </span>
+                            {item.text}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  </motion.div>
-                ) : (
-                  /* Prediction Placement Card */
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-white border border-slate-200 shadow-xl space-y-6 rounded-3xl overflow-hidden"
+                  </div>
+
+                  {/* Stake Input */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">
+                      Your Stake
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        placeholder={formatCurrency(market.buy_in_amount)}
+                        min={market.buy_in_amount}
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        className="w-full px-4 py-3 pr-16 bg-white border border-slate-200 rounded-xl text-lg font-mono font-medium text-slate-900 focus:border-slate-400 focus:ring-4 focus:ring-slate-100 outline-none transition-all placeholder:text-slate-300"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-slate-400">
+                        {symbol}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs px-1">
+                      <span className="text-slate-400 font-normal">Minimum buy-in</span>
+                      <span className="font-mono font-medium text-slate-600">
+                        {formatCurrency(market.buy_in_amount)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Summary */}
+                  <div className="pt-6 border-t border-slate-100 space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500 font-normal">Platform Fee (5%)</span>
+                      <span className="font-mono font-medium text-slate-700">{formatCurrency(platformFeeKsh)}</span>
+                    </div>
+                    <div className="flex justify-between text-base">
+                      <span className="text-slate-900 font-medium">Total Amount</span>
+                      <span className="font-mono font-semibold text-slate-900">{formatCurrency(totalAmountKsh)}</span>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <motion.button
+                    onClick={handleSubmitRankingLive}
+                    disabled={isSubmitting || !stakeAmount}
+                    className={`w-full py-3.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all ${
+                      isSubmitting || !stakeAmount
+                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : "bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/20 cursor-pointer"
+                    }`}
+                    whileHover={!isSubmitting && stakeAmount ? { scale: 1.02 } : {}}
+                    whileTap={!isSubmitting && stakeAmount ? { scale: 0.98 } : {}}
                   >
-                    {/* Header */}
-                    <div className="p-8 bg-slate-900 text-white relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-[32px] translate-x-1/2 -translate-y-1/2 mix-blend-screen" />
-                      <h3 className="text-2xl font-bold mb-2 relative z-10">
-                        Submit Ranking
-                      </h3>
-                      <p className="text-sm text-slate-300 font-medium relative z-10">
-                        Review your order before locking in
-                      </p>
-                    </div>
-    
-                    {/* Content */}
-                    <div className="space-y-6 px-8 py-6">
-                      {/* Chain Preview */}
-                      <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-4">
-                          Current Ranking Order
-                        </span>
-                        <div className="space-y-3">
-                          {rankedItems.map((item, index) => (
-                            <div
-                              key={item.id}
-                              className="flex items-center gap-3 text-sm"
-                            >
-                              <span className="w-7 h-7 rounded-full bg-slate-900 text-white text-xs flex items-center justify-center font-bold font-mono shrink-0">
-                                {index + 1}
-                              </span>
-                              <span className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                <span className="bg-white p-1 rounded-md border border-slate-100 shadow-sm"><item.icon className="w-4 h-4 text-slate-500" /></span>
-                                {item.text}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-    
-                      {/* Stake Input */}
-                      <div className="space-y-4 pt-2">
-                        <label className="text-sm font-bold text-slate-700">
-                          Your Stake
-                        </label>
-                        <div className="relative group">
-                          <input
-                            type="number"
-                            placeholder={formatCurrency(market.buy_in_amount)}
-                            min={market.buy_in_amount}
-                            value={stakeAmount}
-                            onChange={(e) => setStakeAmount(e.target.value)}
-                            className="w-full px-5 py-4 pr-16 bg-white border-2 border-slate-200 rounded-2xl text-lg font-mono font-bold text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-300"
-                          />
-                          <span className="absolute right-5 top-1/2 -translate-y-1/2 text-base font-bold text-slate-400">
-                            {symbol}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm px-1">
-                          <span className="text-slate-500 font-medium">
-                            Minimum buy-in
-                          </span>
-                          <span className="font-mono font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                            {formatCurrency(market.buy_in_amount)}
-                          </span>
-                        </div>
-                      </div>
-    
-                      {/* Summary */}
-                      <div className="pt-6 border-t border-slate-100 space-y-4 bg-slate-50/50 -mx-8 px-8 pb-8 -mb-6 mt-6">
-                        <div className="flex justify-between text-sm mt-6">
-                          <span className="text-slate-500 font-bold uppercase tracking-wider">
-                            Platform Fee (5%)
-                          </span>
-                          <span className="font-mono font-bold text-slate-600">
-                            {formatCurrency(platformFeeKsh)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-lg items-center">
-                          <span className="text-slate-900 font-bold">
-                            Total Amount
-                          </span>
-                          <span className="font-mono font-black text-blue-600 text-2xl">
-                            {formatCurrency(totalAmountKsh)}
-                          </span>
-                        </div>
-      
-                        {/* CTA Button */}
-                        <motion.button
-                          onClick={handleSubmitRankingLive}
-                          disabled={isSubmitting || !stakeAmount}
-                          className={`w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all mt-6 ${
-                            isSubmitting || !stakeAmount
-                              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                              : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-600/20 cursor-pointer"
-                          }`}
-                          whileHover={
-                            !isSubmitting && stakeAmount ? { scale: 1.02 } : {}
-                          }
-                          whileTap={
-                            !isSubmitting && stakeAmount ? { scale: 0.98 } : {}
-                          }
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                              Locking In...
-                            </>
-                          ) : (
-                            <>
-                              Confirm Prediction
-                              <IconArrowRight className="w-6 h-6" />
-                            </>
-                          )}
-                        </motion.button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </>
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Locking In...
+                      </>
+                    ) : (
+                      <>
+                        Confirm Prediction
+                        <IconArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </motion.button>
+                </div>
+              </motion.div>
             )}
 
             {/* Info Card */}
@@ -816,20 +780,16 @@ export default function LadderMarketPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="p-6 rounded-3xl bg-blue-50 border border-blue-100/50 shadow-inner"
+              className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200"
             >
               <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                  <IconShield className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm h-fit">
+                  <IconShield className="w-5 h-5 text-slate-900" />
                 </div>
                 <div className="space-y-2">
-                  <p className="text-base font-bold text-blue-900">
-                    How it works
-                  </p>
-                  <p className="text-sm text-blue-800/80 font-medium leading-relaxed">
-                    Winners are those whose ranking matches the majority's
-                    consensus exactly. Prize pool split proportionally based
-                    on stakes.
+                  <p className="text-sm font-semibold text-slate-900">How it works</p>
+                  <p className="text-xs text-slate-600 font-normal leading-relaxed">
+                    Winners are those whose ranking matches the majority's consensus exactly. Prize pool split proportionally based on stakes.
                   </p>
                 </div>
               </div>

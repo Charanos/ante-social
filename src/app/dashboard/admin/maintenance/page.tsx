@@ -12,7 +12,6 @@ import {
   IconTool,
 } from "@tabler/icons-react";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/components/ui/toast-notification";
 
 type MaintenanceTask = {
@@ -175,8 +174,6 @@ export default function DataMaintenancePage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        <DashboardHeader subtitle="Data repair, integrity checks, and system reconciliation" />
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           {sortedTasks.map((task, index) => {
             const Icon = taskIcons[task.id] || IconTool;

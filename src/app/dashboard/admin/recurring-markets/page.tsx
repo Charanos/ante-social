@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IconCalendarClock, IconLoader3, IconPlayerPause, IconPlayerPlay, IconPlus, IconTrash } from "@tabler/icons-react";
 import { format } from "date-fns";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import RecurringMarketModal from "@/components/admin/RecurringMarketModal";
 import { adminApi, type RecurringMarketTemplateItem } from "@/lib/api";
@@ -61,8 +60,6 @@ export default function AdminRecurringMarketsPage() {
 
   return (
     <div className="space-y-8 pb-16">
-      <DashboardHeader subtitle="Create, pause, resume, and edit recurring market templates." />
-
       <div className="grid gap-4 md:grid-cols-3">
         <DashboardCard>
           <p className="text-xs uppercase tracking-wide text-black/50">Templates</p>

@@ -215,7 +215,7 @@ function normalizeMarketType(value: unknown): Market["type"] {
   if (raw === "poll") return "consensus";
   if (raw === "prisoner_dilemma" || raw === "syndicate") return "betrayal";
   if (raw === "betrayal") return "betrayal";
-  if (raw === "reflex" || raw === "ladder" || raw === "consensus") return raw;
+  if (raw === "reflex" || raw === "ladder" || raw === "consensus" || raw === "divergence") return raw;
   return "consensus";
 }
 

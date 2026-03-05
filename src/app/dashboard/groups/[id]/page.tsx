@@ -37,7 +37,6 @@ import {
   IconLock,
   IconTarget,
 } from "@tabler/icons-react";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
@@ -1155,11 +1154,6 @@ export default function GroupPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full px-2">
-      <DashboardHeader
-        user={user}
-        subtitle="Discover communities and join the conversation"
-      />
-
       {/* Group Hero Section */}
       <div className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-2xl">
         {group.image && (

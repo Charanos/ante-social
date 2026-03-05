@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
@@ -108,10 +107,6 @@ export default function DiscoverGroupsPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8 w-full">
-      <DashboardHeader
-        user={user}
-        subtitle="Discover communities and join the conversation"
-      />
 
       <SearchFilterBar
         searchQuery={searchTerm}
@@ -171,6 +166,7 @@ export default function DiscoverGroupsPage() {
           </div>
         }
       />
+
 
       {/* Trending Section */}
       {selectedCategory === "All" && !searchTerm && (

@@ -5,6 +5,7 @@ import PageLayout from "@/components/landing/PageLayout";
 import Link from "next/link";
 import { IconArrowRight, IconEye, IconUsers, IconBolt, IconChartBar, IconLock, IconArrowsSplit } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -216,16 +217,39 @@ export default function GameModesPage() {
                   </Link>
                 </div>
 
-                {/* Subtle Background Pattern for Divergence */}
+                {/* Background Composition for Divergence */}
                 {mode.id === "divergence" && (
-                <>
-                    <div className="absolute inset-0 opacity-10 pointer-events-none" 
-                         style={{ backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`, backgroundSize: '24px 24px' }} 
+                  <>
+                    <div 
+                      className="absolute inset-0 opacity-10 pointer-events-none" 
+                      style={{ backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`, backgroundSize: '24px 24px' }} 
                     />
-                    {/* Decorative blob similar to dashboard */}
-                    <img src="/game-blob.png" alt="decorative blob" className="absolute -right-8 -bottom-8 w-48 h-48 opacity-30 hidden md:block" />
-                </>
-            )}
+                    
+                    {/* Background Glows */}
+                    <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+                    <div className="absolute right-12 bottom-12 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] pointer-events-none" />
+
+                    {/* Floating Illustration Composition */}
+                    <div className="hidden md:block absolute -right-12 -bottom-32 w-[700px] h-[700px] pointer-events-none z-0">
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                        whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        className="relative w-full h-full flex items-center justify-center animate-game-float"
+                      >
+                        <Image
+                          src="/dashboard-blob.png"
+                          fill
+                          sizes="400px"
+                          alt="Divergence Illustration"
+                          className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] brightness-90 scale-110"
+                          priority
+                        />
+                      </motion.div>
+                    </div>
+                  </>
+                )}
               </motion.div>
             )})}
           </div>

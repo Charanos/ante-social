@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { IconDownload, IconLoader3 } from "@tabler/icons-react";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { adminApi } from "@/lib/api";
 import { useCurrency } from "@/lib/utils/currency";
@@ -135,8 +134,6 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-8 pb-16">
-      <DashboardHeader subtitle="Live platform analytics with exportable operational metrics." />
-
       <DashboardCard>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="flex flex-wrap items-end gap-3">

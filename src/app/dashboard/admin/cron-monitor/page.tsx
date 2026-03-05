@@ -15,7 +15,6 @@ import {
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast-notification";
 
@@ -180,8 +179,6 @@ export default function CronMonitorPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        <DashboardHeader subtitle="Automated task execution and health monitoring" />
-
         <div className="flex items-center justify-end gap-3 -mt-6 mb-8">
           <button
             onClick={() => void handleRefresh()}

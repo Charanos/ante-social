@@ -4,6 +4,7 @@ export type MarketType =
   | 'ladder'
   | 'betrayal'
   | 'prisoner_dilemma'
+  | 'divergence'
   | 'syndicate';
 
 export type MarketStatus = 'active' | 'suspended' | 'resolved' | 'disputed';

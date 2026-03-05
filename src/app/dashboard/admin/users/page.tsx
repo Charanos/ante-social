@@ -23,7 +23,6 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast-notification";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { format } from "date-fns";
 import { adminApi } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -427,8 +426,6 @@ export default function UserManagementPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        <DashboardHeader subtitle="User lookup, tier management, KYC review, and fraud detection" />
-
         <DashboardCard className="overflow-hidden p-0">
           {/* Tabs */}
           <div className="flex items-center border-b border-neutral-100 overflow-x-auto">

@@ -651,7 +651,7 @@ export default function PublicProfilePage() {
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
         >
           {[
-            { label: "Total Bets", value: profile.stats.totalBets, icon: IconCheck, color: "blue" },
+            { label: "Total Predictions", value: profile.stats.totalBets, icon: IconCheck, color: "blue" },
             { label: "Accuracy", value: `${profile.stats.accuracy}%`, icon: IconTarget, color: "green" },
             { label: "Total Volume", value: `$${profile.stats.totalVolume.toLocaleString()}`, icon: IconCoins, color: "purple" }
           ].map((stat, index) => (

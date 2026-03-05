@@ -243,7 +243,7 @@ export default function ForecastTicketPage() {
           )}
         </AnimatePresence>
 
-        {/* Header - Bet Details */}
+        {/* Header - Prediction-Slip Details */}
         <div className="bg-black text-white p-6 pb-12 relative overflow-hidden">
           {/* Decorative blurred blob */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />

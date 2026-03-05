@@ -18,7 +18,6 @@ import {
 
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast-notification";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { IoPhonePortraitOutline } from "react-icons/io5";
 import {
@@ -422,15 +421,6 @@ export default function CheckoutContent() {
 
   return (
     <div className="space-y-6 pb-12 pl-0 md:pl-8 w-full">
-      <DashboardHeader
-        user={user}
-        subtitle={
-          mode === "deposit"
-            ? "Add funds to your wallet instantly"
-            : "Cash out your winnings securely"
-        }
-      />
-
       <div className="max-w-7xl mx-auto space-y-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column - Payment Details */}

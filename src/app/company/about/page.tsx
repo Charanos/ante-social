@@ -114,10 +114,10 @@ export default function AboutPage() {
       <div className="bg-white overflow-hidden selection:bg-[#E8703A]/30">
 
         {/* ── Hero Section ── */}
-        <section ref={heroRef} className="relative rounded-3xl mt-24 m-6 h-[90vh] min-h-[600px] flex items-end overflow-hidden">
+        <section ref={heroRef} className="relative rounded-3xl mt-24 m-6 h-[50vh] min-h-[600px] flex items-end overflow-hidden">
           <motion.div className="absolute inset-0 z-0" style={{ y: heroY }}>
             <Image
-              src="/about-hero.png"
+              src="/about-tu.jpg"
               alt="Nairobi skyline"
               fill
               priority
@@ -127,14 +127,14 @@ export default function AboutPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent" />
           </motion.div>
 
-          <div className="relative z-10 w-full px-1 md:px-12 pb-16 md:pb-24 max-w-7xl mx-auto">
+          <div className="relative z-10 w-full px-3 md:px-12 pb-16 md:pb-24 max-w-7xl mx-auto">
             <FadeUp delay={0.1}>
               <p className="text-[12px] font-medium uppercase tracking-[0.4em] text-white/70 mb-6 font-mono">
                 About Ante Social
               </p>
             </FadeUp>
             <FadeUp delay={0.2}>
-              <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal text-white leading-relaxed tracking-tight ">
+              <h1 className="text-4xl md:text-6xl lg:text-[4.5rem] font-normal text-white leading-relaxed tracking-tight ">
                 Building a market for human instinct.
               </h1>
             </FadeUp>

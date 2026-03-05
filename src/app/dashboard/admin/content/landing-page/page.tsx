@@ -5,7 +5,6 @@ import { motion } from "framer-motion"
 import { DashboardCard } from "@/components/dashboard/DashboardCard"
 import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { contentApi } from "@/lib/api"
 import { IconDeviceFloppy, IconRefresh } from "@tabler/icons-react"
 
@@ -80,8 +79,6 @@ export default function AdminLandingPageCMS() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8">
-      <DashboardHeader subtitle="Edit landing page content sections" />
-
       <div className="flex gap-4 mb-6">
         <motion.button
           whileHover={{ scale: 1.02 }}

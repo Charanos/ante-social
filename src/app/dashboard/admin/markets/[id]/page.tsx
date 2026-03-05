@@ -14,7 +14,6 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { useParams } from "next/navigation";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
@@ -206,7 +205,6 @@ export default function ViewMarketPage() {
     return (
       <div className="min-h-screen pb-8">
         <div className="max-w-full mx-auto px-6">
-          <DashboardHeader subtitle="View market information and betting activity" />
           <div className="rounded-xl border border-neutral-200 bg-white p-8 text-sm text-neutral-600">
             Market not found.
           </div>
@@ -220,8 +218,6 @@ export default function ViewMarketPage() {
   return (
     <div className="min-h-screen pb-8">
       <div className="max-w-full mx-auto px-6">
-        <DashboardHeader subtitle="View market information and betting activity" />
-
         <div className="flex items-center justify-end gap-2 -mt-16 mb-8 relative z-10 px-2">
           <Link href={`/dashboard/admin/markets/${marketId}/edit`}>
             <button className="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-sm">

@@ -1,17 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { IconAccessPoint, IconLoader3, IconPlus, IconTrendingUp, IconUsers } from '@tabler/icons-react';
 
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GroupCard } from "@/components/groups/GroupCard";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/toast-notification";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useGroupList, useLiveUser } from "@/lib/live-data";
@@ -21,12 +18,11 @@ export default function GroupsPage() {
   const router = useRouter();
   const { user, isLoading: isUserLoading } = useLiveUser();
   const { groups, isLoading: isGroupsLoading } = useGroupList();
-  // Keep the filtering logic for role-based visibility
   const [isCreating, setIsCreating] = useState(false);
   const toast = useToast();
 
-  const filteredGroups = groups.filter((group) =>
-    group.members.some((member) => member.id === user.id)
+  const filteredGroups = (groups || []).filter((group) =>
+    (group.members || []).some((member) => member.id === user?.id)
   );
 
   // Redirect to dedicated group creation page
@@ -48,21 +44,12 @@ export default function GroupsPage() {
     },
   };
 
-  const item = {
-    hidden: { y: 20, opacity: 0 },
-    show: { y: 0, opacity: 1 },
-  };
-
   if (isUserLoading || isGroupsLoading) {
     return <LoadingLogo fullScreen size="lg" />;
   }
 
   return (
     <div className="space-y-8 pl-0 md:pl-8 w-full">
-      <DashboardHeader
-        user={user}
-        subtitle="Join communities and create private prediction markets"
-      />
 
       <div className="flex justify-end z-10">
         <motion.button

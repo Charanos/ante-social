@@ -31,7 +31,6 @@ import {
   IconLoader3
 } from "@tabler/icons-react"
 import Link from "next/link"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import RecurringMarketModal from "@/components/admin/RecurringMarketModal"
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
 import { fetchJsonOrNull, useMarketList } from "@/lib/live-data"
@@ -255,8 +254,6 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8">
-      <DashboardHeader subtitle="Manage public prediction markets and platform operations" />
-
       <SearchFilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}

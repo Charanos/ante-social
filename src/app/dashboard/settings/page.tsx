@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
@@ -570,11 +569,6 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 pb-20 pl-0 md:pl-8 w-full">
-      <DashboardHeader
-        user={user}
-        subtitle="Manage your account preferences and settings"
-      />
-
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Sidebar Navigation */}

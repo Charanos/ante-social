@@ -15,7 +15,6 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useLiveUser } from "@/lib/live-data";
 import { useToast } from "@/components/ui/toast-notification";
@@ -195,11 +194,6 @@ export default function AchievementsPage() {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-16">
-      <DashboardHeader
-        user={user}
-        subtitle="Track your progress and unlock exclusive rewards"
-      />
-
       <div className="hidden md:flex items-center gap-4 my-8 md:my-18">
         <div className="h-px flex-1 bg-linear-to-r from-transparent via-neutral-200 to-transparent"></div>
         <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">Overview</h2>

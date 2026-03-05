@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   IconAccessPoint,
@@ -47,8 +48,16 @@ export default function DashboardHeader({
   
   const queryClient = useQueryClient()
   const isFetching = useIsFetching() > 0
+  const [scrolled, setScrolled] = useState(false)
 
-  // Back button logic
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   const handleBack = () => {
     const parts = pathname?.split("/").filter(Boolean) || []
     if (parts.length > 2) {
@@ -95,7 +104,15 @@ export default function DashboardHeader({
         isRefreshing={isFetching} 
       />
       
-      <div className="hidden md:flex md:items-center justify-between gap-4 px-1 mb-12">
+      <motion.div 
+        layout
+        className={cn(
+          "hidden md:flex md:items-center justify-between gap-4 w-full mx-3 mt-3 mb-9 transition-all duration-500",
+          scrolled 
+            ? "bg-white/80 backdrop-blur-xl mx-auto max-w-[95%] shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-black/5 rounded-2xl px-6 py-3 ring-1 ring-white/20" 
+            : "relative px-3"
+        )}
+      >
         {/* Left: Back Button & Title */}
         <div className="flex items-center gap-4">
           <AnimatePresence mode="wait">
@@ -262,7 +279,7 @@ export default function DashboardHeader({
             </motion.button>
           </Link>
         </div>
-      </div>
+      </motion.div>
     </>
   )
 }

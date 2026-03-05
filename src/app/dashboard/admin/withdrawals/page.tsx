@@ -11,7 +11,6 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { adminApi, type WithdrawalQueueItem } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -103,8 +102,6 @@ export default function AdminWithdrawalsPage() {
 
   return (
     <div className="space-y-8 pb-16">
-      <DashboardHeader subtitle="Review and action pending withdrawal requests in real time." />
-
       <div className="grid gap-4 md:grid-cols-3">
         <DashboardCard>
           <p className="text-xs uppercase tracking-wide text-black/50">Pending Requests</p>

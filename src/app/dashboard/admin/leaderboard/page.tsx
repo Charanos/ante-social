@@ -13,7 +13,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/components/ui/toast-notification";
 
 type UserRow = {
@@ -115,8 +114,6 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        <DashboardHeader subtitle="View all users ranked by reputation score" />
-
         <div className="flex justify-end -mt-6 mb-8">
           <button
             onClick={() => void handleRefresh()}

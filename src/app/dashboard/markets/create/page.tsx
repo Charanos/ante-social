@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { useRouter } from "next/navigation";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/hooks/useToast";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { MarketCreationForm } from "@/components/market/MarketCreationForm";
@@ -124,11 +123,6 @@ export default function CreateMarketPage() {
     <div className="min-h-screen pb-12 pl-0 md:pl-8">
       <div className="max-w-full mx-auto px-6 pb-8">
         {/* Header */}
-        <DashboardHeader
-          user={user}
-          subtitle="Deploy a new prediction market with high-fidelity configuration"
-        />
-
         <MarketCreationForm 
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}

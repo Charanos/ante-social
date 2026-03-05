@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 export default function DashboardLayout({
   children,
@@ -27,9 +28,18 @@ export default function DashboardLayout({
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
         <div
-          className={`py-4 px-1 pb-24 md:pb-4 transition-all duration-300 ${sidebarCollapsed ? "sm:ml-15" : "sm:ml-64"}`}
+          className={`flex flex-col min-h-screen transition-all duration-300 ${sidebarCollapsed ? "sm:ml-15" : "sm:ml-64"}`}
         >
-          <div className="mt-0 rounded-lg pb-6 md:py-3 px-2 md:px-8">{children}</div>
+          {/* Header Container - now spans the full width of the content area */}
+          <div className="sticky top-0 z-[100] px-4 md:px-8 py-4 pointer-events-none">
+            <div className="pointer-events-auto">
+              <DashboardHeader />
+            </div>
+          </div>
+
+          <div className="flex-1 mt-0 rounded-lg pb-24 md:pb-6 px-4 md:px-8">
+            {children}
+          </div>
         </div>
         <MobileNav user={null} />
       </div>

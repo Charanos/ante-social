@@ -19,7 +19,6 @@ import {
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
 import { useMarketList } from "@/lib/live-data";
@@ -176,8 +175,6 @@ export default function MarketManagerPage() {
   return (
     <div className="min-h-screen pb-12">
       <div className="max-w-full mx-auto px-6 pb-8">
-        <DashboardHeader subtitle="Manage all public prediction markets" />
-
         <div className="flex justify-end -mt-16 mb-4 relative z-10 px-2">
           <Link href="/dashboard/admin/create-market">
             <button className="px-5 py-2 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-md">

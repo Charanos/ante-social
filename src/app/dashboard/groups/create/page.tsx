@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useRouter } from "next/navigation";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/hooks/useToast";
@@ -268,10 +267,6 @@ export default function CreateGroupPage() {
   return (
     <div className="min-h-screen pb-12 pl-0 md:pl-8">
       <div className="w-full mx-auto px-0 md:px-6 pb-8">
-        <DashboardHeader
-          user={user}
-          subtitle="Start a new community and launch your first betting market"
-        />
 
         {/* Progress Steps */}
         <div className="mb-8 md:mb-12 mt-4 md:mt-8">

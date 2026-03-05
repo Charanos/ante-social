@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { cn } from "@/lib/utils";
@@ -535,10 +534,6 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-12 md:pb-20 pl-0 md:pl-8">
-      <DashboardHeader
-        user={user}
-        subtitle="Manage your account and preferences"
-      />
 
       {/* Achievements Hero Section */}
       <motion.div

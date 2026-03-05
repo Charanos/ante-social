@@ -18,7 +18,6 @@ import {
 } from "@tabler/icons-react";
 
 import Image from "next/image";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import Link from "next/link";
 import { MarketCard } from "@/components/markets/MarketCard";
 import Marquee from "react-fast-marquee";
@@ -159,7 +158,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 md:space-y-10 pb-12 pl-0 md:pl-8 overflow-x-hidden w-full max-w-[100vw]">
-      <DashboardHeader user={user} />
 
       {/* Hero Section */}
       <motion.div

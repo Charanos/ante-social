@@ -12,7 +12,6 @@ import {
   IconTrendingUp,
 } from "@tabler/icons-react";
 
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
@@ -28,7 +27,7 @@ type EnrichedPosition = Position & {
   marketType: string;
 };
 
-export default function MyBetsPage() {
+export default function MyPredictionsPage() {
   const { user, isLoading: isUserLoading } = useLiveUser();
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -90,11 +89,6 @@ export default function MyBetsPage() {
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-full mx-auto pl-0 md:pl-8 pb-8 space-y-8">
-        <DashboardHeader
-          user={user}
-          subtitle="Track your active positions and market history"
-        />
-
         {/* Stats Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

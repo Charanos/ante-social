@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
 import { cn } from "@/lib/utils"
@@ -290,7 +289,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8 pb-20 pl-0 md:pl-8">
-      <DashboardHeader subtitle="Stay updated with your latest activity" />
 
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Main Content */}

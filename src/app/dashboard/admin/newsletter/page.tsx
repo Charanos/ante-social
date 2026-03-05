@@ -5,7 +5,6 @@ import { motion } from "framer-motion"
 import { DashboardCard } from "@/components/dashboard/DashboardCard"
 import { LoadingLogo } from "@/components/ui/LoadingLogo"
 import { useToast } from "@/components/ui/toast-notification"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar"
 import { IconMail, IconUsers } from "@tabler/icons-react"
 
@@ -48,8 +47,6 @@ export default function AdminNewsletterPage() {
 
   return (
     <div className="space-y-10 pb-20 pl-0 md:pl-8">
-      <DashboardHeader subtitle="Newsletter subscriber management" />
-
       <SearchFilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}

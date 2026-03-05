@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { IconLoader3, IconNote, IconSearch, IconShield, IconTarget } from "@tabler/icons-react";
 import { format } from "date-fns";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { adminApi, type ComplianceFlagItem } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -107,8 +106,6 @@ export default function AdminCompliancePage() {
 
   return (
     <div className="space-y-8 pb-16">
-      <DashboardHeader subtitle="Investigate, escalate, and resolve compliance alerts." />
-
       <div className="grid gap-4 md:grid-cols-3">
         <DashboardCard>
           <p className="text-xs uppercase tracking-wide text-black/50">Visible Flags</p>
