@@ -43,6 +43,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SearchFilterBar } from "@/components/ui/SearchFilterBar";
 import { fetchJsonOrNull, normalizeGroup, useLiveUser } from "@/lib/live-data";
 import { useToast } from "@/hooks/useToast";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
 // IconSettings Sections
 type SettingsSection = "general" | "privacy" | "roles" | "markets";
@@ -67,7 +68,14 @@ export default function GroupSettingsPage() {
   const [isPublic, setIsPublic] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isMemberActioning, setIsMemberActioning] = useState<string | null>(null);
+  const [memberToKick, setMemberToKick] = useState<any | null>(null);
+  const [marketToClose, setMarketToClose] = useState<any | null>(null);
+  const [marketToDelete, setMarketToDelete] = useState<any | null>(null);
+  const [isMarketMutating, setIsMarketMutating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [groupImageUrl, setGroupImageUrl] = useState("");
   const [group, setGroup] = useState<any>({
     id,
     name: "Group",
@@ -81,7 +89,8 @@ export default function GroupSettingsPage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   const isPlatformAdmin = user.role === "admin";
-  const isGroupAdmin = group.creatorId === user.id;
+  const groupAdmins: string[] = Array.isArray(group.admins) ? group.admins : [];
+  const isGroupAdmin = group.creatorId === user.id || groupAdmins.includes(user.id);
   const canEdit = isPlatformAdmin || isGroupAdmin;
 
   useEffect(() => {
@@ -149,6 +158,7 @@ export default function GroupSettingsPage() {
     setGroupDescription(group.description);
     setGroupCategory(group.category || "Sports");
     setIsPublic(group.isPublic !== false);
+    setGroupImageUrl(group.image || "");
   }, [group]);
 
   // Track changes
@@ -236,11 +246,125 @@ export default function GroupSettingsPage() {
 
   const handleImageUpload = () => {
     if (!canEdit) return;
-    const nextImageUrl = window
-      .prompt("Paste a public image URL for this group", group.image || "")
-      ?.trim();
-    if (!nextImageUrl || nextImageUrl === group.image) return;
-    void persistGroupImage(nextImageUrl);
+    setShowImageUpload(!showImageUpload);
+  };
+
+  const handleImageUrlPersist = () => {
+    if (!groupImageUrl.trim() || groupImageUrl === group.image) {
+      setShowImageUpload(false);
+      return;
+    }
+    void persistGroupImage(groupImageUrl.trim());
+  };
+
+  const handleDeleteGroup = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/groups/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.message || "Failed to delete group.");
+      }
+      toast.success("Group Deleted", "The group has been permanently removed.");
+      router.push("/dashboard/groups");
+    } catch (error: any) {
+      toast.error("Delete Failed", error?.message || "Unable to delete group.");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleKickMember = async (member: any) => {
+    setIsMemberActioning(member._id || member.id);
+    try {
+      const memberId = member._id || member.id;
+      const response = await fetch(`/api/groups/${id}/members/${memberId}`, { method: "DELETE" });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.message || "Failed to remove member.");
+      }
+      setGroup((prev: any) => ({
+        ...prev,
+        members: (prev.members || []).filter((m: any) => (m._id || m.id) !== memberId),
+        memberCount: Math.max(0, (prev.memberCount || 1) - 1),
+      }));
+      toast.success("Member Removed", `${member.username || "Member"} has been removed from the group.`);
+    } catch (error: any) {
+      toast.error("Remove Failed", error?.message || "Unable to remove member.");
+    } finally {
+      setIsMemberActioning(null);
+      setMemberToKick(null);
+    }
+  };
+
+  const handleRoleChange = async (member: any, makeAdmin: boolean) => {
+    const memberId = member._id || member.id;
+    setIsMemberActioning(memberId);
+    try {
+      const response = await fetch(`/api/groups/${id}/members/${memberId}/role`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ role: makeAdmin ? "admin" : "member" }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(payload?.message || "Failed to update role.");
+      }
+      setGroup((prev: any) => ({
+        ...prev,
+        admins: makeAdmin
+          ? [...(prev.admins || []), memberId]
+          : (prev.admins || []).filter((a: string) => a !== memberId),
+      }));
+      toast.success(
+        makeAdmin ? "Admin Granted" : "Admin Revoked",
+        `${member.username || "Member"} is now a ${makeAdmin ? "group admin" : "regular member"}.`,
+      );
+    } catch (error: any) {
+      toast.error("Role Change Failed", error?.message || "Unable to update role.");
+    } finally {
+      setIsMemberActioning(null);
+    }
+  };
+
+  const handleCloseGroupMarket = async () => {
+    if (!marketToClose) return;
+    setIsMarketMutating(true);
+    try {
+      const response = await fetch(`/api/groups/${id}/markets/${marketToClose.id}/close`, { method: "POST" });
+      if (!response.ok) {
+        const p = await response.json().catch(() => null);
+        throw new Error(p?.message || "Failed to close market.");
+      }
+      setMarkets((prev) => prev.map((m) => m.id === marketToClose.id ? { ...m, status: "closed" } : m));
+      toast.success("Market Closed", `"${marketToClose.title}" is now closed.`);
+    } catch (error: any) {
+      toast.error("Close Failed", error?.message);
+    } finally {
+      setIsMarketMutating(false);
+      setMarketToClose(null);
+    }
+  };
+
+  const handleDeleteGroupMarket = async () => {
+    if (!marketToDelete) return;
+    setIsMarketMutating(true);
+    try {
+      const response = await fetch(`/api/groups/${id}/markets/${marketToDelete.id}`, { method: "DELETE" });
+      if (!response.ok) {
+        const p = await response.json().catch(() => null);
+        throw new Error(p?.message || "Failed to delete market.");
+      }
+      setMarkets((prev) => prev.filter((m) => m.id !== marketToDelete.id));
+      setSelectedMarket(null);
+      toast.success("Market Deleted", `"${marketToDelete.title}" has been removed.`);
+    } catch (error: any) {
+      toast.error("Delete Failed", error?.message);
+    } finally {
+      setIsMarketMutating(false);
+      setMarketToDelete(null);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -569,31 +693,67 @@ export default function GroupSettingsPage() {
                             )}
                           </div>
                           <div className="space-y-4 flex-1">
-                            <div className="space-y-2 p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                              <p className="text-xs font-medium text-blue-900 uppercase tracking-wider flex items-center gap-2">
-                                <IconAlertCircle className="w-3.5 h-3.5" />
-                                Image Guidelines
-                              </p>
-                              <ul className="text-xs text-blue-700 space-y-1 ml-5 list-disc">
-                                <li>Recommended size: 400×400px</li>
-                                <li>Maximum file size: 2MB</li>
-                                <li>Formats: JPG, PNG, WEBP</li>
-                              </ul>
-                            </div>
-                            {canEdit && (
-                              <div className="flex gap-3">
-                                <button
-                                  onClick={handleImageUpload}
-                                  className="px-6 py-2 bg-black hover:bg-black/90 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-black/20 hover:shadow-xl active:scale-95"
-                                >
-                                  <IconUpload className="w-4 h-4" />
-                                  Upload New
-                                </button>
-                                {group.image && (
-                                  <button className="px-6 py-2 hover:bg-red-50 text-red-600 border-2 border-red-200 rounded-xl text-sm font-medium transition-all hover:border-red-300 active:scale-95">
-                                    <IconX className="w-4 h-4 inline mr-1.5" />
-                                    Remove
+                            {showImageUpload ? (
+                              <div className="space-y-3 p-4 bg-black/5 rounded-xl border-2 border-dashed border-black/10 animate-in fade-in slide-in-from-top-2">
+                                <label className="block text-[10px] font-bold text-black/40 uppercase tracking-widest">
+                                  Paste Image URL
+                                </label>
+                                <input
+                                  type="text"
+                                  value={groupImageUrl}
+                                  onChange={(e) => setGroupImageUrl(e.target.value)}
+                                  placeholder="https://example.com/image.png"
+                                  className="w-full px-4 py-2 bg-white border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black/5"
+                                  autoFocus
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={handleImageUrlPersist}
+                                    disabled={isSaving}
+                                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg text-xs font-bold hover:bg-neutral-800 transition-all disabled:opacity-50"
+                                  >
+                                    {isSaving ? "Updating..." : "Verify & Save"}
                                   </button>
+                                  <button
+                                    onClick={() => setShowImageUpload(false)}
+                                    className="px-4 py-2 bg-black/5 text-black/60 rounded-lg text-xs font-bold hover:bg-black/10 transition-all"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                <div className="space-y-2 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                                  <p className="text-xs font-medium text-blue-900 uppercase tracking-wider flex items-center gap-2">
+                                    <IconAlertCircle className="w-3.5 h-3.5" />
+                                    Image Guidelines
+                                  </p>
+                                  <ul className="text-xs text-blue-700 space-y-1 ml-5 list-disc">
+                                    <li>Recommended size: 400×400px</li>
+                                    <li>Direct links (PNG, JPG, WEBP)</li>
+                                    <li>URLs must be publicly accessible</li>
+                                  </ul>
+                                </div>
+                                {canEdit && (
+                                  <div className="flex gap-3">
+                                    <button
+                                      onClick={handleImageUpload}
+                                      className="px-6 py-2 bg-black hover:bg-black/90 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-black/20 hover:shadow-xl active:scale-95"
+                                    >
+                                      <IconUpload className="w-4 h-4" />
+                                      Update URL
+                                    </button>
+                                    {group.image && (
+                                      <button 
+                                        onClick={() => void persistGroupImage("")}
+                                        className="px-6 py-2 hover:bg-red-50 text-red-600 border-2 border-red-200 rounded-xl text-sm font-medium transition-all hover:border-red-300 active:scale-95"
+                                      >
+                                        <IconX className="w-4 h-4 inline mr-1.5" />
+                                        Remove
+                                      </button>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             )}
@@ -931,6 +1091,68 @@ export default function GroupSettingsPage() {
                         ))}
                       </div>
                     </div>
+
+                    {/* Member Roster with Kick / Promote */}
+                    {canEdit && Array.isArray(group.members) && group.members.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="font-medium text-sm text-black/80 uppercase tracking-widest flex items-center gap-2">
+                          <IconUsers className="w-4 h-4" />
+                          Member Roster
+                        </h3>
+                        <div className="divide-y divide-black/5 border-2 border-black/10 rounded-2xl overflow-hidden shadow-sm">
+                          {group.members.map((member: any) => {
+                            const memberId = member._id || member.id;
+                            const isSelf = memberId === user.id;
+                            const isCreator = memberId === group.creatorId;
+                            const isAdmin = groupAdmins.includes(memberId) || isCreator;
+                            const isActioning = isMemberActioning === memberId;
+                            return (
+                              <div key={memberId} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-neutral-50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-sm font-semibold text-black/60 shrink-0">
+                                    {(member.username || member.email || "?")[0].toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-medium text-black/90">{member.username || member.email || memberId}</p>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                      {isCreator && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-semibold rounded uppercase tracking-wider">Owner</span>}
+                                      {!isCreator && isAdmin && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[9px] font-semibold rounded uppercase tracking-wider">Admin</span>}
+                                      {isSelf && <span className="px-1.5 py-0.5 bg-black/5 text-black/50 text-[9px] font-semibold rounded uppercase tracking-wider">You</span>}
+                                    </div>
+                                  </div>
+                                </div>
+                                {!isSelf && !isCreator && (
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleRoleChange(member, !isAdmin)}
+                                      disabled={!!isActioning}
+                                      className={cn(
+                                        "px-3 py-1.5 text-xs font-medium rounded-lg transition-all disabled:opacity-50 cursor-pointer",
+                                        isAdmin
+                                          ? "bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100"
+                                          : "bg-black/5 border border-black/10 text-black/70 hover:bg-black/10"
+                                      )}
+                                    >
+                                      {isActioning ? (
+                                        <IconLoader3 className="w-3.5 h-3.5 animate-spin" />
+                                      ) : isAdmin ? "Remove Admin" : "Make Admin"}
+                                    </button>
+                                    <button
+                                      onClick={() => setMemberToKick(member)}
+                                      disabled={!!isActioning}
+                                      className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 cursor-pointer"
+                                      title="Remove member"
+                                    >
+                                      <IconTrash className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1207,6 +1429,22 @@ export default function GroupSettingsPage() {
                           <IconExternalLink className="w-4 h-4" />
                           Open Market Console
                         </button>
+                        {selectedMarket.status === "active" && (
+                          <button
+                            onClick={() => { setMarketToClose(selectedMarket); setSelectedMarket(null); }}
+                            className="w-full py-2.5 px-4 bg-orange-50 border border-orange-200 text-orange-700 rounded-xl text-sm font-medium hover:bg-orange-100 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <IconX className="w-4 h-4" />
+                            Close Market
+                          </button>
+                        )}
+                        <button
+                          onClick={() => { setMarketToDelete(selectedMarket); setSelectedMarket(null); }}
+                          className="w-full py-2.5 px-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <IconTrash className="w-4 h-4" />
+                          Delete Market
+                        </button>
                       </div>
 
                       {selectedMarket.status === "pending_confirmation" && (
@@ -1271,52 +1509,57 @@ export default function GroupSettingsPage() {
         )}
       </AnimatePresence>
 
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {showDeleteConfirm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setShowDeleteConfirm(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-center space-y-6">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                  <IconAlertCircle className="w-8 h-8 text-red-600" />
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-medium text-black/90">
-                    Delete Group?
-                  </h3>
-                  <p className="text-black/80 leading-relaxed">
-                    This action cannot be undone. All markets, member data, and
-                    activity will be permanently removed.
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 py-2 bg-black/5 hover:bg-black/10 text-black/70 font-medium rounded-xl transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button className="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-all shadow-lg shadow-red-600/30">
-                    Delete Forever
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Delete Group — ConfirmationModal */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteGroup}
+        isLoading={isDeleting}
+        title="Delete Group?"
+        message="This action cannot be undone. All markets, member data, and activity will be permanently removed."
+        confirmLabel="Delete Forever"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
+
+      {/* Kick Member — ConfirmationModal */}
+      <ConfirmationModal
+        isOpen={!!memberToKick}
+        onClose={() => setMemberToKick(null)}
+        onConfirm={() => memberToKick && handleKickMember(memberToKick)}
+        isLoading={!!isMemberActioning}
+        title="Remove Member"
+        message={`Remove ${memberToKick?.username || "this member"} from the group? They will need to re-join to participate again.`}
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
+
+      {/* Close Market — ConfirmationModal */}
+      <ConfirmationModal
+        isOpen={!!marketToClose}
+        onClose={() => setMarketToClose(null)}
+        onConfirm={handleCloseGroupMarket}
+        isLoading={isMarketMutating}
+        title="Close Market"
+        message={`Close "${marketToClose?.title}"? Members will no longer be able to place predictions.`}
+        confirmLabel="Yes, Close"
+        cancelLabel="Cancel"
+        variant="default"
+      />
+
+      {/* Delete Market — ConfirmationModal */}
+      <ConfirmationModal
+        isOpen={!!marketToDelete}
+        onClose={() => setMarketToDelete(null)}
+        onConfirm={handleDeleteGroupMarket}
+        isLoading={isMarketMutating}
+        title="Delete Market"
+        message={`Permanently delete "${marketToDelete?.title}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
 
       {/* Save Changes Bottom Bar */}
       <AnimatePresence>

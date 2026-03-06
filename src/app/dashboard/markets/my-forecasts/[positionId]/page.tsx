@@ -13,6 +13,7 @@ import {
   fetchJsonOrNull,
   normalizePosition,
 } from "@/lib/live-data";
+import { LoadingLogo } from "@/components/ui/LoadingLogo";
 
 type OutcomeOption = {
   id: string;
@@ -161,13 +162,7 @@ export default function ForecastTicketPage() {
   };
 
   if (loading) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
-        <div className="relative">
-          <IoRefresh className="w-16 h-16 border-[3px] border-white/10 border-t-white rounded-full animate-spin" />
-        </div>
-      </div>
-    );
+    return <LoadingLogo fullScreen size="lg" />;
   }
 
   if (!position) {

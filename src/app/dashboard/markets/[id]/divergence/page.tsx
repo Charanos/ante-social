@@ -18,6 +18,7 @@ import {
 
 import { useToast } from "@/hooks/useToast";
 import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import { formatTimeComprehensive } from "@/lib/utils/time";
 import { useCurrency } from "@/lib/utils/currency";
 import { MarketChart } from "@/components/markets/MarketChart";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -85,7 +86,7 @@ export default function DivergenceMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/predict`, {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ outcomeId: selectedOption, amount: stakeValueKsh }),
@@ -110,10 +111,7 @@ export default function DivergenceMarketPage() {
 
   const getTimeRemaining = () => {
     if (!market) return "";
-    const diff = market.close_date.getTime() - Date.now();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
+    return formatTimeComprehensive(market.close_date);
   };
 
   const stakeValuePreferredInput = parseFloat(stakeAmount) || 0;

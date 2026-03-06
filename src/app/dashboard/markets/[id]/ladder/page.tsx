@@ -211,7 +211,7 @@ export default function LadderMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/predict`, {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

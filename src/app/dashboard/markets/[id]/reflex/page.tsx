@@ -9,6 +9,7 @@ import {
   IconArrowRight,
   IconBell,
   IconBolt,
+  IconBrain,
   IconCircleCheckFilled,
   IconClock,
   IconEye,
@@ -32,10 +33,11 @@ import {
 
 import { useToast } from "@/hooks/useToast";
 import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import { formatTimeComprehensive } from "@/lib/utils/time";
 import { useCurrency } from "@/lib/utils/currency";
 import Image from "next/image";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
-import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
+import { mapMarketToDetailView, parseApiError, extractCreatedPredictionId } from "@/lib/market-detail-view";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { MarketChart } from "@/components/markets/MarketChart";
 
@@ -128,9 +130,8 @@ export default function ReflexMarketPage() {
       return;
     }
 
-    setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/predict`, {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ outcomeId: selectedOption, amount: stakeValueKsh }),
@@ -138,12 +139,13 @@ export default function ReflexMarketPage() {
       const payload = await response.json().catch(() => null);
       if (!response.ok) throw new Error(parseApiError(payload, "Failed to place prediction."));
 
+      const positionId = extractCreatedPredictionId(payload);
       const selectedOptionText = market.options.find((o: any) => o.id === selectedOption)?.option_text;
       setPredictionResult({
         optionText: selectedOptionText,
         amount: stakeValueKsh,
         timestamp: new Date().toISOString(),
-        transactionId: payload?.id || payload?._id,
+        transactionId: positionId || payload?.id || payload?._id,
       });
       toast.success("Prediction Placed!", `You predicted ${formatCurrency(stakeValueKsh)} on "${selectedOptionText}"`);
     } catch (error: any) {
@@ -155,10 +157,7 @@ export default function ReflexMarketPage() {
 
   const getTimeRemaining = () => {
     if (!market) return "";
-    const diff = market.close_date.getTime() - Date.now();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return `${minutes}m ${seconds}s`;
+    return formatTimeComprehensive(market.close_date);
   };
 
   const stakeValuePreferredInput = parseFloat(stakeAmount) || 0;
@@ -268,7 +267,7 @@ export default function ReflexMarketPage() {
             >
               <div className="flex gap-4">
                 <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm h-fit">
-                  <IconBolt className="w-5 h-5 text-slate-900" />
+                  <IconBrain className="w-5 h-5 text-slate-900" />
                 </div>
                 <div className="space-y-2">
                   <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">The Scenario</p>
@@ -378,7 +377,7 @@ export default function ReflexMarketPage() {
 
           {/* Visual Separator — only when open */}
           {!isClosed && (
-            <div className="flex items-center gap-4 my-4">
+            <div className="flex items-center gap-4 md:my-26 my-4">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
               <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-widest">Quick Reactions</h2>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />

@@ -70,6 +70,13 @@ const marketTypes = [
     description: "Rank items by prediction",
     color: "purple",
   },
+  {
+    id: "divergence",
+    name: "Consensus Divergence",
+    icon: IconStar,
+    description: "Minority opinion wins big",
+    color: "indigo",
+  },
 ];
 
 const groupCategories = [
@@ -173,9 +180,15 @@ export default function CreateGroupPage() {
   const [buyIn, setBuyIn] = useState("");
   const [closeDate, setCloseDate] = useState("");
   const [options, setOptions] = useState([
-    { id: 1, text: "", emoji: "" },
-    { id: 2, text: "", emoji: "" },
+    { id: 1, text: "", emoji: "", imageUrl: "" },
+    { id: 2, text: "", emoji: "", imageUrl: "" },
   ]);
+  const [ladderItems, setLadderItems] = useState([
+    { id: 1, text: "", emoji: "", imageUrl: "" },
+    { id: 2, text: "", emoji: "", imageUrl: "" },
+    { id: 3, text: "", emoji: "", imageUrl: "" },
+  ]);
+  const [buyInCurrency, setBuyInCurrency] = useState<"KSH" | "USD">(preferredCurrency as "KSH" | "USD" || "KSH");
 
   const handleNext = () => {
     if (currentStep === 1 && !selectedCategory) {
@@ -229,10 +242,26 @@ export default function CreateGroupPage() {
 
       const groupId = createdGroup?._id || createdGroup?.id;
       if (groupId && marketTitle && marketDescription && buyIn) {
-        const outcomeOptions = options
-          .map((option) => option.text.trim())
-          .filter((optionText) => optionText.length > 0)
-          .map((optionText) => ({ optionText }));
+        const typeMap: Record<string, string> = {
+          poll: "consensus", betrayal: "betrayal", reflex: "reflex",
+          ladder: "ladder", divergence: "divergence",
+        };
+        const betrayalOutcomes = [{ optionText: "Cooperate" }, { optionText: "Betray" }];
+        const outcomeSource = selectedMarketType === "ladder" ? ladderItems : options;
+        const outcomeOptions = selectedMarketType === "betrayal"
+          ? betrayalOutcomes
+          : outcomeSource
+              .filter((o) => o.text.trim().length > 0)
+              .map((o) => ({
+                optionText: o.text.trim(),
+                mediaUrl: o.imageUrl || undefined,
+                mediaType: o.imageUrl ? "image" : "none",
+              }));
+
+        const closeTime = closeDate
+          ? new Date(closeDate).toISOString()
+          : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        const settlementTime = new Date(new Date(closeTime).getTime() + 60 * 60 * 1000).toISOString();
 
         await fetch(`/api/groups/${groupId}/markets`, {
           method: "POST",
@@ -240,12 +269,12 @@ export default function CreateGroupPage() {
           body: JSON.stringify({
             title: marketTitle,
             description: marketDescription,
-            marketType:
-              selectedMarketType === "poll" ? "winner_takes_all" : "odd_one_out",
-            buyInAmount: convertAmount(Number(buyIn), preferredCurrency, "KSH"),
-            options: outcomeOptions,
-            selectedOption: outcomeOptions[0]?.optionText || "Yes",
-            closeTime: closeDate || undefined,
+            betType: typeMap[selectedMarketType || "poll"],
+            buyInAmount: convertAmount(Number(buyIn), buyInCurrency, "KSH"),
+            buyInCurrency,
+            outcomes: outcomeOptions,
+            closeTime,
+            settlementTime,
           }),
         });
       }
@@ -629,6 +658,15 @@ export default function CreateGroupPage() {
                       border: "border-purple-100/50",
                       activeBorder: "border-purple-500",
                     },
+                    indigo: {
+                      bg: "from-indigo-50/50 via-white/50 to-white/50",
+                      blur: "bg-indigo-100/50",
+                      title: "text-indigo-900",
+                      subtitle: "text-indigo-800",
+                      icon: "text-indigo-600",
+                      border: "border-indigo-100/50",
+                      activeBorder: "border-indigo-500",
+                    },
                   };
                   const colors = colorMap[type.color] || colorMap.blue;
 
@@ -748,15 +786,25 @@ export default function CreateGroupPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                        Buy-in ({symbol})
+                        Buy-in Amount
                       </label>
-                      <input
-                        type="number"
-                        value={buyIn}
-                        onChange={(e) => setBuyIn(e.target.value)}
-                        placeholder={(preferredCurrency === "USD" ? 0.77 : 100).toString()}
-                        className="w-full px-4 py-2 rounded-lg border-2 border-neutral-200 focus:border-black focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
-                      />
+                      <div className="flex gap-2">
+                        <div className="flex rounded-lg border-2 border-neutral-200 overflow-hidden shrink-0">
+                          {(["KSH", "USD"] as const).map((cur) => (
+                            <button key={cur} type="button" onClick={() => setBuyInCurrency(cur)}
+                              className={`px-3 py-0 text-sm font-semibold transition-all cursor-pointer ${buyInCurrency === cur ? "bg-black text-white" : "bg-white text-neutral-600 hover:bg-neutral-50"}`}>
+                              {cur}
+                            </button>
+                          ))}
+                        </div>
+                        <input
+                          type="number"
+                          value={buyIn}
+                          onChange={(e) => setBuyIn(e.target.value)}
+                          placeholder={buyInCurrency === "USD" ? "0.77" : "100"}
+                          className="flex-1 px-4 py-2 rounded-lg border-2 border-neutral-200 focus:border-black focus:outline-none transition-colors bg-white/50 backdrop-blur-sm"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-neutral-900 mb-2">

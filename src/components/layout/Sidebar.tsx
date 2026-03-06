@@ -53,6 +53,9 @@ const navItems: NavItem[] = [
     icon: IconBasket,
     children: [
       { title: "All Markets", url: "/dashboard/markets" },
+      { title: "Recurring", url: "/dashboard/markets?tab=recurring" },
+      { title: "One-Time", url: "/dashboard/markets?tab=one-time" },
+      { title: "Past", url: "/dashboard/markets?tab=past" },
       { title: "My Forecasts", url: "/dashboard/markets/my-forecasts" },
       { title: "Create Market", url: "/dashboard/markets/create" },
     ],

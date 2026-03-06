@@ -21,6 +21,7 @@ import {
 
 import { useToast } from "@/hooks/useToast";
 import { fetchJsonOrNull, useLiveUser } from "@/lib/live-data";
+import { formatTimeComprehensive } from "@/lib/utils/time";
 import { useCurrency } from "@/lib/utils/currency";
 import { MarketChart } from "@/components/markets/MarketChart";
 import { UserAvatar } from "@/components/ui/UserAvatar";
@@ -29,9 +30,10 @@ import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import {
   mapMarketToDetailView,
   parseApiError,
+  extractCreatedPredictionId
 } from "@/lib/market-detail-view";
 import { 
-  PieChart, 
+  PieChart,
   Pie, 
   Cell, 
   ResponsiveContainer, 
@@ -94,7 +96,7 @@ export default function PollMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/predict`, {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -107,6 +109,7 @@ export default function PollMarketPage() {
         throw new Error(parseApiError(payload, "Failed to place vote."));
       }
 
+      const positionId = extractCreatedPredictionId(payload);
       const selectedOptionText = market.options.find(
         (o: any) => o.id === selectedOption,
       )?.option_text;
@@ -115,7 +118,7 @@ export default function PollMarketPage() {
         optionText: selectedOptionText,
         amount: stakeValueKsh,
         timestamp: new Date().toISOString(),
-        transactionId: payload?.id || payload?._id,
+        transactionId: positionId || payload?.id || payload?._id,
       });
 
       toast.success(
@@ -131,10 +134,7 @@ export default function PollMarketPage() {
 
   const getTimeRemaining = () => {
     if (!market) return "";
-    const diff = market.close_date.getTime() - Date.now();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
+    return formatTimeComprehensive(market.close_date);
   };
 
   const stakeValuePreferredInput = parseFloat(stakeAmount) || 0;

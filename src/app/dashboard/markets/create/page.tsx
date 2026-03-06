@@ -10,15 +10,21 @@ import { useLiveUser } from "@/lib/live-data";
 
 type MarketFormOption = {
   text?: string;
+  emoji?: string;
+  imageUrl?: string;
 };
 
 type MarketFormData = {
   type?: string;
   title?: string;
   description?: string;
+  category?: string;
+  isFeatured?: boolean;
   buyIn?: string | number;
+  buyInCurrency?: string;
   closeDate?: string;
   scenario?: string;
+  mediaUrl?: string;
   options?: MarketFormOption[];
   ladderItems?: MarketFormOption[];
 };
@@ -50,14 +56,25 @@ export default function CreateMarketPage() {
         betrayal: "betrayal",
         reflex: "reflex",
         ladder: "ladder",
+        divergence: "divergence",
         prisoner_dilemma: "betrayal",
         syndicate: "betrayal",
       };
 
       const outcomesSource = data.type === "ladder" ? data.ladderItems : data.options;
-      const outcomes = (outcomesSource || [])
-        .map((item: MarketFormOption) => ({ optionText: item?.text }))
-        .filter((item): item is { optionText: string } => Boolean(item.optionText));
+      const betrayalOutcomes = [
+        { optionText: "Cooperate" },
+        { optionText: "Betray" },
+      ];
+      const outcomes = data.type === "betrayal"
+        ? betrayalOutcomes
+        : (outcomesSource || [])
+            .map((item: any) => ({
+              optionText: item?.text as string,
+              mediaUrl: item?.imageUrl || undefined,
+              mediaType: item?.imageUrl ? "image" : "none",
+            }))
+            .filter((item) => Boolean(item.optionText));
 
       const closeTime = data.closeDate
         ? new Date(data.closeDate).toISOString()
@@ -68,14 +85,18 @@ export default function CreateMarketPage() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          type: typeMap[data.type] || data.type,
+          betType: typeMap[data.type] || data.type,
           title: data.title,
           description: data.description,
+          category: data.category || undefined,
+          isFeatured: data.isFeatured || false,
           buyInAmount: Number(data.buyIn),
+          buyInCurrency: data.buyInCurrency || "KSH",
           closeTime,
           settlementTime,
           outcomes,
           tags: [data.type],
+          mediaUrl: data.mediaUrl || undefined,
           scenario: data.scenario,
         }),
       });
@@ -85,16 +106,12 @@ export default function CreateMarketPage() {
         throw new Error(errorPayload?.error || "Failed to create market");
       }
 
-      toast.success(
-        "Market Created!",
-        `${data.title} market created successfully`,
-      );
+      toast.success("Market Created!", `${data.title} market created successfully`);
       setIsSubmitting(false);
       router.push("/dashboard/markets");
     } catch (error: unknown) {
       setIsSubmitting(false);
-      const message =
-        error instanceof Error ? error.message : "Could not create market";
+      const message = error instanceof Error ? error.message : "Could not create market";
       toast.error("Create Failed", message);
     }
   };

@@ -125,7 +125,7 @@ export default function DashboardPage() {
   const liveWins = useLiveWins();
   const { formatCurrency } = useCurrency();
   const [isReadMeOpen, setIsReadMeOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("All Markets");
+  const [activeTab, setActiveTab] = useState("Featured");
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalWinnings = user?.totalWinnings || 0;
@@ -148,8 +148,17 @@ export default function DashboardPage() {
   const goalAmount = nextTier.goal;
   const progress = Math.min(100, Math.max(5, (totalWinnings / goalAmount) * 100));
 
-  const ITEMS_PER_PAGE = 6;
-  const activeMarkets = markets;
+  const ITEMS_PER_PAGE = 9;
+
+  // Filter markets based on active tab
+  const activeMarkets = activeTab === "Recurring"
+    ? markets.filter((m) => m.isRecurring)
+    : activeTab === "One-Time"
+    ? markets.filter((m) => !m.isRecurring)
+    : activeTab === "Featured"
+    ? markets.filter((m) => m.isFeatured)
+    : markets;
+
   const totalPages = Math.max(1, Math.ceil(activeMarkets.length / ITEMS_PER_PAGE));
   const currentMarkets = activeMarkets.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -277,7 +286,7 @@ export default function DashboardPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row items-center justify-between px-2 gap-4">
           <div className="flex w-full md:w-auto gap-4 md:gap-6 border-b border-black/5 overflow-x-auto no-scrollbar">
-            {["All Markets", "Recurring", "One-Time"].map((tab) => (
+            {["Featured", "Recurring", "One-Time"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => {

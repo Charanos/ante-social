@@ -34,8 +34,8 @@ import {
   IconUserPlus,
   IconUsers,
   IconX,
-  IconLock,
-  IconTarget,
+  IconPlus,
+  IconTrash,
 } from "@tabler/icons-react";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -57,6 +57,8 @@ import {
 import { useCurrency } from "@/lib/utils/currency";
 import { groupsApi } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
+import { MarketCreationForm } from "@/components/market/MarketCreationForm";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 
 // Types
 interface GroupMember {
@@ -108,6 +110,7 @@ interface UnifiedGroup {
   createdAt: string | Date;
   creatorId: string;
   image: string;
+  admins: string[];
   members?: (string | GroupMember)[];
   activePositions?: GroupPosition[];
   activityFeed?: GroupActivity[];
@@ -124,6 +127,7 @@ const defaultGroupDetails: UnifiedGroup = {
   createdAt: new Date().toISOString(),
   creatorId: "",
   image: "",
+  admins: [],
   members: [],
   activePositions: [],
   activityFeed: [],
@@ -701,9 +705,14 @@ export default function GroupPage() {
   const [selectedForecastToManage, setSelectedForecastToManage] = useState<any | null>(
     null,
   );
+  const [showCreateMarketModal, setShowCreateMarketModal] = useState(false);
+  const [showDeleteGroupConfirm, setShowDeleteGroupConfirm] = useState(false);
+  const [isDeletingGroup, setIsDeletingGroup] = useState(false);
+  const [isCreatingMarket, setIsCreatingMarket] = useState(false);
 
   const isPlatformAdmin = user.role === "admin";
-  const isGroupAdmin = group.creatorId === user.id;
+  const groupAdmins = Array.isArray(group.admins) ? group.admins : [];
+  const isGroupAdmin = group.creatorId === user.id || groupAdmins.includes(user.id);
   const canManageMembers = isPlatformAdmin || isGroupAdmin;
 
   const [isMember, setIsMember] = useState(false);
@@ -733,6 +742,7 @@ export default function GroupPage() {
           createdAt: normalized.createdAt,
           creatorId: normalized.creatorId,
           image: normalized.image,
+          admins: normalized.admins || [],
           members: normalized.members,
           activePositions: [],
           activityFeed: [],
@@ -1136,6 +1146,46 @@ export default function GroupPage() {
     [groupId, toast],
   );
 
+  const handleDeleteGroup = async () => {
+    setIsDeletingGroup(true);
+    try {
+      await fetch(`/api/groups/${groupId}`, { method: "DELETE" });
+      toast.success("Group Deleted", "The group and all its data have been removed.");
+      router.push("/dashboard/groups");
+    } catch (error) {
+      toast.error("Error", "Failed to delete group");
+    } finally {
+      setIsDeletingGroup(false);
+      setShowDeleteGroupConfirm(false);
+    }
+  };
+
+  const handleCreateMarketSubmit = async (data: any) => {
+    setIsCreatingMarket(true);
+    try {
+      const payload = {
+        ...data,
+        groupId,
+        isGroupMarket: true,
+      };
+      const response = await fetch(`/api/groups/${groupId}/markets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Failed to create market");
+      toast.success("Market Created", "Your new group market is live!");
+      setShowCreateMarketModal(false);
+      // Refresh markets
+      const marketsPayload = await fetchJsonOrNull<any>(`/api/groups/${groupId}/markets`);
+      if (marketsPayload) setGroupMarkets(marketsPayload);
+    } catch (error) {
+      toast.error("Error", "Failed to create group market");
+    } finally {
+      setIsCreatingMarket(false);
+    }
+  };
+
   const handleTabChange = useCallback(
     (tabId: string) => {
       if (tabId === activeTab) return;
@@ -1325,6 +1375,101 @@ export default function GroupPage() {
           </div>
         </div>
       </div>
+
+      {/* Admin Actions Bar */}
+      {(isPlatformAdmin || isGroupAdmin) && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-black/5 shadow-sm"
+        >
+          <div className="flex items-center gap-2 px-3 border-r border-black/5 mr-2">
+            <IconShield className="w-5 h-5 text-black/40" />
+            <span className="text-sm font-semibold text-black/70">Admin Controls</span>
+          </div>
+          <div className="flex items-center gap-3 flex-1">
+            <Link href={`/dashboard/groups/${groupId}/settings`}>
+              <button className="px-4 py-2 rounded-xl bg-black/5 hover:bg-black/10 text-black/70 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer">
+                <IconSettings className="w-4 h-4" />
+                Edit Settings
+              </button>
+            </Link>
+            <button
+              onClick={() => setShowCreateMarketModal(true)}
+              className="px-4 py-2 rounded-xl bg-black text-white text-sm font-medium hover:bg-neutral-900 transition-colors flex items-center gap-2 cursor-pointer"
+            >
+              <IconPlus className="w-4 h-4" />
+              Create Market
+            </button>
+          </div>
+          <button
+            onClick={() => setShowDeleteGroupConfirm(true)}
+            className="px-4 py-2 rounded-xl border border-red-100 text-red-600 text-sm font-medium hover:bg-red-50 transition-colors flex items-center gap-2 cursor-pointer"
+          >
+            <IconTrash className="w-4 h-4" />
+            Delete Group
+          </button>
+        </motion.div>
+      )}
+
+      {/* Market Creation Modal */}
+      <AnimatePresence>
+        {showCreateMarketModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowCreateMarketModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl"
+            >
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-2xl bg-black/5">
+                      <IconTrendingUp className="w-6 h-6 text-black" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-black">Create Group Market</h2>
+                      <p className="text-sm text-black/40">Launch a new prediction for your members</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateMarketModal(false)}
+                    className="p-2 hover:bg-black/5 rounded-full transition-all"
+                  >
+                    <IconX className="w-6 h-6 text-black/40" />
+                  </button>
+                </div>
+
+                <MarketCreationForm
+                  onSubmit={handleCreateMarketSubmit}
+                  isSubmitting={isCreatingMarket}
+                  onCancel={() => setShowCreateMarketModal(false)}
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <ConfirmationModal
+        isOpen={showDeleteGroupConfirm}
+        onClose={() => setShowDeleteGroupConfirm(false)}
+        onConfirm={handleDeleteGroup}
+        isLoading={isDeletingGroup}
+        title="Delete Group?"
+        message="This action cannot be undone. All markets, members, and data will be permanently removed."
+        confirmLabel="Yes, Delete Forever"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
 
       {/* Featured Market Trading Section */}
       {isMember && group.activePositions && group.activePositions.length > 0 && (

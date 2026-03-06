@@ -5,7 +5,13 @@ const DEFAULT_OPTION_IMAGE =
   "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?w=800&auto=format&fit=crop&q=80";
 
 function toString(value: unknown, fallback = ""): string {
-  return typeof value === "string" ? value : fallback;
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === "string") return value;
+  if (typeof (value as any)?.toString === "function") {
+    const str = (value as any).toString();
+    return str === "[object Object]" ? fallback : str;
+  }
+  return fallback;
 }
 
 function toNumber(value: unknown, fallback = 0): number {

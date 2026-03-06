@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { useToast } from "@/components/ui/toast-notification";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -92,6 +93,7 @@ export default function ViewMarketPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
   const [selectedOutcomeId, setSelectedOutcomeId] = useState("");
+  const [confirmState, setConfirmState] = useState<{ isOpen: boolean; type: "close" | "settle" | null; title: string; message: string; }>({ isOpen: false, type: null, title: "", message: "" });
 
   const loadMarket = useCallback(async () => {
     setIsLoading(true);
@@ -155,11 +157,20 @@ export default function ViewMarketPage() {
   };
 
   const handleCloseMarket = async () => {
-    if (!window.confirm("Close this market now?")) return;
+    setConfirmState({
+      isOpen: true,
+      type: "close",
+      title: "Close Market",
+      message: "Are you sure you want to close this market now? This restricts further trading.",
+    });
+  };
+
+  const executeCloseMarket = async () => {
     setIsMutating(true);
     try {
       await marketsApi.close(marketId);
       toast.success("Market Closed", "The market is now closed.");
+      setConfirmState(prev => ({ ...prev, isOpen: false }));
       await loadMarket();
     } catch (error) {
       toast.error(
@@ -172,20 +183,22 @@ export default function ViewMarketPage() {
   };
 
   const handleSettleMarket = async () => {
-    if (
-      !window.confirm(
-        "Settle this market now? This will trigger payouts and cannot be undone.",
-      )
-    ) {
-      return;
-    }
+    setConfirmState({
+      isOpen: true,
+      type: "settle",
+      title: "Settle Market",
+      message: "Are you sure you want to settle this market now? This will trigger payouts and cannot be undone.",
+    });
+  };
 
+  const executeSettleMarket = async () => {
     setIsMutating(true);
     try {
       await marketsApi.settle(marketId, {
         winningOptionId: selectedOutcomeId || undefined,
       });
       toast.success("Settlement Triggered", "Market settlement has started.");
+      setConfirmState(prev => ({ ...prev, isOpen: false }));
       await loadMarket();
     } catch (error) {
       toast.error(
@@ -216,7 +229,7 @@ export default function ViewMarketPage() {
   const normalizedStatus = String(marketData.status || "unknown").toLowerCase();
 
   return (
-    <div className="min-h-screen pb-8">
+    <div className="min-h-screen py-12">
       <div className="max-w-full mx-auto px-6">
         <div className="flex items-center justify-end gap-2 -mt-16 mb-8 relative z-10 px-2">
           <Link href={`/dashboard/admin/markets/${marketId}/edit`}>
@@ -435,6 +448,17 @@ export default function ViewMarketPage() {
           </div>
         </motion.div>
       </div>
+      <ConfirmationModal
+        isOpen={confirmState.isOpen}
+        onClose={() => setConfirmState((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmState.type === "close" ? executeCloseMarket : executeSettleMarket}
+        isLoading={isMutating}
+        title={confirmState.title}
+        message={confirmState.message}
+        confirmLabel={confirmState.type === "close" ? "Yes, Close" : "Yes, Settle"}
+        cancelLabel="Cancel"
+        variant={confirmState.type === "settle" ? "danger" : "default"}
+      />
     </div>
   );
 }

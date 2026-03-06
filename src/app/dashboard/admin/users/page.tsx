@@ -23,6 +23,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/toast-notification";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import { format } from "date-fns";
 import { adminApi } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/api/client";
@@ -103,6 +104,7 @@ export default function UserManagementPage() {
   const [kycFilter, setKycFilter] = useState("all");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -223,6 +225,7 @@ export default function UserManagementPage() {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       toast.success("User Deleted", "The user has been removed.");
       setSelectedUserId(null);
+      setUserToDelete(null);
     },
     onError: (error) => {
       toast.error("Delete Failed", getApiErrorMessage(error, "Could not delete user."));
@@ -407,11 +410,7 @@ export default function UserManagementPage() {
   };
 
   const handleDeleteUser = (user: User) => {
-    const shouldDelete = window.confirm(
-      `Delete user ${user.username}? This action will anonymize the account and ban access.`,
-    );
-    if (!shouldDelete) return;
-    deleteUserMutation.mutate(user._id);
+    setUserToDelete(user);
   };
 
   const totalUsers = Number(usersResponse?.meta?.total || users.length);
@@ -1007,6 +1006,20 @@ export default function UserManagementPage() {
           </div>
         </DashboardCard>
       </div>
+
+      <ConfirmationModal
+        isOpen={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={() => {
+          if (userToDelete) deleteUserMutation.mutate(userToDelete._id);
+        }}
+        isLoading={deleteUserMutation.isPending}
+        title="Delete User"
+        message={`Are you sure you want to delete ${userToDelete?.username}? This action will anonymize the account and ban access.`}
+        confirmLabel="Delete User"
+        cancelLabel="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

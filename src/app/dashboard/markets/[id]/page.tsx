@@ -93,7 +93,7 @@ export default function MarketDetailPage() {
     );
 
     try {
-      const response = await fetch(`/api/markets/${market.id}/predict`, {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -117,7 +117,7 @@ export default function MarketDetailPage() {
         optionText: selectedOptionText,
         amount: stakeValueKsh,
         timestamp: new Date().toISOString(),
-        transactionId: payload?.id || payload?._id,
+        transactionId: positionId || payload?.id || payload?._id,
       });
 
       toast.removeToast(toastId);

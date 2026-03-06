@@ -26,7 +26,7 @@ import { useCurrency } from "@/lib/utils/currency";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import Image from "next/image";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
-import { mapMarketToDetailView, parseApiError } from "@/lib/market-detail-view";
+import { mapMarketToDetailView, parseApiError, extractCreatedPredictionId } from "@/lib/market-detail-view";
 
 export default function BetrayalMarketPage() {
   const params = useParams();
@@ -85,7 +85,7 @@ export default function BetrayalMarketPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/markets/${market.id}/predict`, {
+      const response = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ outcomeId, amount: stakeValueKsh }),
@@ -93,11 +93,12 @@ export default function BetrayalMarketPage() {
       const payload = await response.json().catch(() => null);
       if (!response.ok) throw new Error(parseApiError(payload, "Failed to place choice."));
 
+      const positionId = extractCreatedPredictionId(payload);
       setPredictionResult({
         optionText: selectedChoice.toUpperCase(),
         amount: stakeValueKsh,
         timestamp: new Date().toISOString(),
-        transactionId: payload?.id || payload?._id,
+        transactionId: positionId || payload?.id || payload?._id,
       });
       toast.success("Decision Locked!", `You predicted ${formatCurrency(stakeValueKsh)} on your choice`);
     } catch (error: any) {
@@ -219,7 +220,7 @@ export default function BetrayalMarketPage() {
 
           {/* Visual Separator */}
           {!isClosed && (
-            <div className="flex items-center gap-4 my-4">
+            <div className="flex items-center gap-4 my-16">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
               <h2 className="text-xs font-medium text-neutral-500 uppercase tracking-widest">
                 Choose Your Strategy
@@ -342,7 +343,7 @@ export default function BetrayalMarketPage() {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="p-6 md:p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl border border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-4"
+              className="p-6 md:p-8 rounded-[2rem] bg-white/60 backdrop-blur-xl border my-14 border-slate-200 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] space-y-4"
             >
               <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
                 <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
@@ -401,7 +402,7 @@ export default function BetrayalMarketPage() {
           <div className="text-center">
             <button
               onClick={() => setShowOutcomes(!showOutcomes)}
-              className="px-6 py-2 text-xs font-medium text-slate-500 hover:text-slate-700 uppercase tracking-widest transition-colors underline underline-offset-4"
+              className="px-6 py-2 text-xs font-medium cursor-pointer text-slate-500 hover:text-slate-700 uppercase tracking-widest transition-colors underline underline-offset-4"
             >
               {showOutcomes ? "Hide" : "Show"} Possible Outcomes
             </button>
@@ -659,7 +660,7 @@ export default function BetrayalMarketPage() {
                       <motion.button
                         onClick={handlePlacePrediction}
                         disabled={isSubmitting || !selectedChoice || !stakeAmount}
-                        className={`w-full py-3.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all ${
+                        className={`w-full py-2 uppercase rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all ${
                           isSubmitting || !selectedChoice || !stakeAmount
                             ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                             : "bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/20 cursor-pointer"

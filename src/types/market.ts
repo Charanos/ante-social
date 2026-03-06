@@ -46,6 +46,32 @@ export interface Market {
 
   tags: string[];
   winningOutcomeId?: string;
+  isFeatured?: boolean;
+  buyInCurrency?: string;
+  isRecurring?: boolean;
+  outcomes?: Array<{
+    _id?: string;
+    optionText: string;
+    mediaUrl?: string;
+    mediaType?: string;
+    participantCount?: number;
+    totalAmount?: number;
+  }>;
+  // Legacy/UI Aliases
+  options?: Array<{
+    id: string;
+    option_text: string;
+    votes: number;
+    total_amount: number;
+    percentage: number;
+    image: string;
+    icon?: any;
+    pool_amount?: number;
+  }>;
+  buy_in_amount?: number;
+  total_pool?: number;
+  participant_count?: number;
+  close_date?: string;
 }
 
 export type PositionStatus = 'active' | 'settled' | 'cancelled';

@@ -21,39 +21,80 @@ import {
   IconTrash,
   IconMailOpened,
   IconMail,
-  IconX
+  IconX,
+  IconTrophy,
+  IconRocket,
+  IconAlertTriangle,
+  IconCurrencyDollar,
+  IconWallet,
+  IconUserCheck,
+  IconChartBar,
+  IconShieldCheck,
 } from "@tabler/icons-react"
 
 type NotificationType = "bet" | "group" | "social" | "system"
 type NotificationFilter = "all" | "unread" | "bet" | "group" | "social" | "system"
 
+type GranularType =
+  | "market_settled"
+  | "market_created"
+  | "market_deleted"
+  | "bet_placed"
+  | "deposit_confirmed"
+  | "withdrawal_processed"
+  | "welcome"
+  | "market_event"
+  | NotificationType
+
 interface Notification {
   id: string
-  type: NotificationType
+  type: GranularType
   title: string
   message: string
   is_read: boolean
   created_date: string
 }
 
-function mapNotificationType(type: string): NotificationType {
+function mapNotificationType(type: string): GranularType {
   const value = type.toLowerCase()
+  // Granular backend types — return as-is so icon map can use them
+  const granular: GranularType[] = [
+    "market_settled", "market_created", "market_deleted", "bet_placed",
+    "deposit_confirmed", "withdrawal_processed", "welcome", "market_event"
+  ]
+  if (granular.includes(value as GranularType)) return value as GranularType
+  // Broad fallback buckets
   if (value.includes("bet") || value.includes("market")) return "bet"
   if (value.includes("group")) return "group"
-  if (value.includes("social") || value.includes("follow") || value.includes("message")) {
-    return "social"
-  }
+  if (value.includes("social") || value.includes("follow") || value.includes("message")) return "social"
   return "system"
 }
 
 const FILTER_OPTIONS: { value: NotificationFilter; label: string; icon: any }[] = [
-  { value: "all", label: "All", icon: IconBell },
+  { value: "all",    label: "All",    icon: IconBell },
   { value: "unread", label: "Unread", icon: IconMail },
-  { value: "bet", label: "Bets", icon: IconTrendingUp },
-  { value: "group", label: "Groups", icon: IconUsers },
+  { value: "bet",    label: "Bets",   icon: IconTrendingUp },
+  { value: "group",  label: "Groups", icon: IconUsers },
   { value: "social", label: "Social", icon: IconMessage },
   { value: "system", label: "System", icon: IconSettings }
 ]
+
+// Granular icon styles for each notification type
+const NOTIFICATION_STYLES: Record<string, { icon: any; color: string; bg: string; border: string }> = {
+  market_settled:       { icon: IconTrophy,          color: "text-amber-600",  bg: "bg-amber-50",  border: "border-amber-100" },
+  market_created:       { icon: IconRocket,           color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-100" },
+  market_deleted:       { icon: IconAlertTriangle,    color: "text-red-600",    bg: "bg-red-50",    border: "border-red-100" },
+  market_event:         { icon: IconChartBar,         color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-100" },
+  bet_placed:           { icon: IconTrendingUp,       color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-100" },
+  deposit_confirmed:    { icon: IconCurrencyDollar,   color: "text-green-600",  bg: "bg-green-50",  border: "border-green-100" },
+  withdrawal_processed: { icon: IconWallet,           color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-100" },
+  welcome:              { icon: IconUserCheck,        color: "text-teal-600",   bg: "bg-teal-50",   border: "border-teal-100" },
+  // Broad buckets fallback
+  bet:    { icon: IconTrendingUp,  color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-100" },
+  group:  { icon: IconUsers,       color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-100" },
+  social: { icon: IconMessage,     color: "text-green-600",  bg: "bg-green-50",  border: "border-green-100" },
+  system: { icon: IconShieldCheck, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-100" },
+}
 
 export default function NotificationsPage() {
   const toast = useToast()
@@ -260,14 +301,8 @@ export default function NotificationsPage() {
   }, [showFilterMenu])
 
   // Get notification icon and color
-  const getNotificationStyle = (type: NotificationType) => {
-    const styles = {
-      bet: { icon: IconTrendingUp, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-      group: { icon: IconUsers, color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-100" },
-      social: { icon: IconMessage, color: "text-green-600", bg: "bg-green-50", border: "border-green-100" },
-      system: { icon: IconSettings, color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-100" }
-    }
-    return styles[type]
+  const getNotificationStyle = (type: GranularType) => {
+    return NOTIFICATION_STYLES[type] ?? NOTIFICATION_STYLES.system
   }
 
   // Time ago

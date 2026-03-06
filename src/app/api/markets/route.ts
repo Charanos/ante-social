@@ -97,6 +97,10 @@ export async function POST(req: Request) {
       : [],
     mediaUrl: typeof body.mediaUrl === "string" ? body.mediaUrl : undefined,
     mediaType: typeof body.mediaType === "string" ? body.mediaType : undefined,
+    category: typeof body.category === "string" ? body.category : undefined,
+    isFeatured: typeof body.isFeatured === "boolean" ? body.isFeatured : false,
+    isRecurring: typeof body.isRecurring === "boolean" ? body.isRecurring : false,
+    buyInCurrency: typeof body.buyInCurrency === "string" ? body.buyInCurrency : "KSH",
   }
 
   return proxyBackendRequest({

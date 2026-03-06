@@ -39,7 +39,7 @@ export function SearchFilterBar({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className={cn("z-30 mb-6 md:mb-8", sticky && "sticky top-4", className)}
+      className={cn("z-30 mb-6 md:mb-8", sticky && "sticky top-26", className)}
     >
       <div className="flex flex-col md:flex-row gap-3 p-1.5 md:p-2 bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl ring-1 ring-black/5">
         {/* IconSearch Input */}

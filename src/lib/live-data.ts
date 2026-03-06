@@ -66,6 +66,7 @@ export type LiveGroup = {
   activePositionsCount: number;
   createdAt: string;
   creatorId: string;
+  admins: string[];
   members: LiveGroupMember[];
 };
 
@@ -177,7 +178,14 @@ function toNumber(value: unknown, fallback = 0): number {
 }
 
 function toString(value: unknown, fallback = ""): string {
-  return typeof value === "string" ? value : fallback;
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === "string") return value;
+  if (typeof (value as any)?.toString === "function") {
+    const str = (value as any).toString();
+    // Prevent "[object Object]" as a valid string
+    return str === "[object Object]" ? fallback : str;
+  }
+  return fallback;
 }
 
 function normalizeTier(value: unknown): UserTier {
@@ -320,6 +328,21 @@ export function normalizeMarket(raw: any): Market {
     commentCount: 0,
     shareCount: 0,
     tags: toArray<string>(raw?.tags),
+    outcomes,
+    options: outcomes.map((o: any) => ({
+      id: toString(o?._id || o?.id),
+      option_text: toString(o?.optionText || o?.option_text || o?.text),
+      votes: toNumber(o?.participantCount || o?.votes),
+      total_amount: toNumber(o?.totalAmount || o?.amount),
+      percentage: totalOutcomeAmount > 0 
+        ? Math.round((toNumber(o?.totalAmount || o?.amount) / totalOutcomeAmount) * 100)
+        : 50,
+      image: toString(o?.mediaUrl || o?.image)
+    })),
+    buy_in_amount: toNumber(raw?.buyInAmount, 1),
+    total_pool: totalPool,
+    participant_count: participantCount,
+    close_date: raw?.closeTime || raw?.endsAt || new Date().toISOString(),
   };
 }
 
@@ -354,6 +377,7 @@ export function normalizeGroup(raw: any): LiveGroup {
     activePositionsCount: toNumber(raw?.activeBetsCount || raw?.activePositionsCount),
     createdAt: toString(raw?.createdAt || new Date().toISOString()),
     creatorId: toString(raw?.createdBy || raw?.creatorId),
+    admins: toArray<string>(raw?.admins),
     members,
   };
 }

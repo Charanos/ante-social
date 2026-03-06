@@ -245,7 +245,7 @@ export default function EditMarketPage() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
             />
           </div>
 
@@ -257,7 +257,7 @@ export default function EditMarketPage() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all resize-none"
+              className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all resize-none"
             />
             <div className="flex justify-end mt-1.5">
               <span className="text-xs text-neutral-500">{descriptionLength} / 2000 characters</span>
@@ -273,7 +273,7 @@ export default function EditMarketPage() {
                 value={currentTag}
                 onChange={(e) => setCurrentTag(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
-                className="flex-1 px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="flex-1 px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
               <button
                 onClick={handleAddTag}
@@ -313,7 +313,7 @@ export default function EditMarketPage() {
                 type="number"
                 value={buyInAmount}
                 onChange={(e) => setBuyInAmount(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
             </div>
 
@@ -323,7 +323,7 @@ export default function EditMarketPage() {
                 type="number"
                 value={minParticipants}
                 onChange={(e) => setMinParticipants(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -335,7 +335,7 @@ export default function EditMarketPage() {
                 type="number"
                 value={maxParticipants}
                 onChange={(e) => setMaxParticipants(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
             </div>
             <div></div>
@@ -353,7 +353,7 @@ export default function EditMarketPage() {
                 type="datetime-local"
                 value={closeTime}
                 onChange={(e) => setCloseTime(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
             </div>
 
@@ -366,7 +366,7 @@ export default function EditMarketPage() {
                 type="datetime-local"
                 value={settlementTime}
                 onChange={(e) => setSettlementTime(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -416,7 +416,7 @@ export default function EditMarketPage() {
                     )
                   }
                   placeholder="Option text..."
-                  className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                  className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
               </div>
             ))}

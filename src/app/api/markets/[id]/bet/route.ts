@@ -21,8 +21,10 @@ export async function POST(
     method: "POST",
     token,
     jsonBody: {
+      marketId: id,
       outcomeId: body.outcomeId || body.optionId || body.option_id,
       amount: body.amount ?? body.stake,
+      rankedOutcomeIds: body.rankedOutcomeIds || body.ranking,
     },
   })
 }
