@@ -36,6 +36,7 @@ import {
   IconX,
   IconPlus,
   IconTrash,
+  IconGhost3,
 } from "@tabler/icons-react";
 import { LoadingLogo } from "@/components/ui/LoadingLogo";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -782,6 +783,8 @@ export default function GroupPage() {
             : [],
         endsAt: market.createdAt || new Date().toISOString(),
         status: market.status || "active",
+        isFeatured: Boolean(market.isFeatured),
+        isRecurring: Boolean(market.isRecurring),
       }));
       setGroupMarkets(mappedMarkets);
       setActiveMarket(mappedMarkets[0] || null);
@@ -1472,7 +1475,7 @@ export default function GroupPage() {
       />
 
       {/* Featured Market Trading Section */}
-      {isMember && group.activePositions && group.activePositions.length > 0 && (
+      {isMember && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1493,6 +1496,7 @@ export default function GroupPage() {
             </Link>
           </div>
 
+          {group.activePositions && group.activePositions.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Main Market Display */}
             <div className="lg:col-span-8">
@@ -1503,12 +1507,18 @@ export default function GroupPage() {
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <div className="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
-                          <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-widest flex items-center gap-1.5">
-                            <IconAccessPoint className="w-3 h-3" />
-                            Active Market
-                          </span>
-                        </div>
+                        {activeMarket?.isFeatured ? (
+                          <div className="px-2.5 py-1.5 rounded-full bg-amber-400 border border-amber-500 shadow-sm">
+                             <IconStar className="w-4 h-4 text-white fill-white" />
+                          </div>
+                        ) : (
+                          <div className="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                            <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-widest flex items-center gap-1.5">
+                              <IconAccessPoint className="w-3 h-3" />
+                              Active Market
+                            </span>
+                          </div>
+                        )}
                         <div className="px-2.5 py-1 rounded-full bg-black/5 border border-black/10">
                           <span className="text-[10px] font-semibold text-black/40 uppercase tracking-widest flex items-center gap-1.5">
                             <IconClock className="w-3 h-3" />
@@ -1627,6 +1637,17 @@ export default function GroupPage() {
               />
             </div>
           </div>
+          ) : (
+          <div className="flex flex-col items-center justify-center py-24 px-6 bg-white/30 backdrop-blur-sm border border-black/5 rounded-3xl text-center">
+            <div className="w-20 h-20 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 rotate-3">
+              <IconGhost3 className="w-10 h-10 text-orange-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-black/90 mb-2">No Markets Available</h3>
+            <p className="text-sm text-black/60 max-w-sm mx-auto">
+              There are currently no active markets. Check back later or create one below!
+            </p>
+          </div>
+          )}
         </motion.div>
       )}
 

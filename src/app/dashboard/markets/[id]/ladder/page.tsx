@@ -279,6 +279,7 @@ export default function LadderMarketPage() {
                 src={market.image}
                 alt={market.title}
                 fill
+                unoptimized
                 className="object-cover opacity-50 mix-blend-luminosity"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent" />

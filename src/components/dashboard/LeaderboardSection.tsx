@@ -88,29 +88,62 @@ interface LeaderboardSectionProps {
   data?: LeaderboardPlayer[];
 }
 
+const fallbackLeaders: LeaderboardPlayer[] = [
+  {
+    rank: 1,
+    username: "CryptoKing_KE",
+    winRate: 88,
+    totalWinnings: 450000,
+    activePositions: 12,
+    trend: "up" as const,
+    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150&auto=format&fit=crop",
+  },
+  {
+    rank: 2,
+    username: "Nairobi_Bets",
+    winRate: 82,
+    totalWinnings: 320000,
+    activePositions: 8,
+    trend: "up" as const,
+    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
+  },
+  {
+    rank: 3,
+    username: "Sarah_W",
+    winRate: 79,
+    totalWinnings: 210000,
+    activePositions: 5,
+    trend: "same" as const,
+    avatarUrl: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=150&auto=format&fit=crop",
+  },
+  {
+    rank: 4,
+    username: "John_D",
+    winRate: 75,
+    totalWinnings: 180000,
+    activePositions: 3,
+    trend: "down" as const,
+    avatarUrl: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=100&auto=format&fit=crop",
+  },
+  {
+    rank: 5,
+    username: "BetMaster_99",
+    winRate: 72,
+    totalWinnings: 150000,
+    activePositions: 2,
+    trend: "up" as const,
+    avatarUrl: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=100&auto=format&fit=crop",
+  },
+];
+
 export default function LeaderboardSection({
   title = "Top Players",
   icon,
   data,
 }: LeaderboardSectionProps) {
   const { formatCurrency } = useCurrency();
-  const displayData = data || [];
-
-  if (displayData.length < 3) {
-    return (
-      <div className="space-y-6 my-12 md:my-16">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            {icon || <IconAward className="w-5 h-5 text-amber-500" />}
-            <h2 className="text-lg font-semibold text-black/90">{title}</h2>
-          </div>
-        </div>
-        <div className="relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-sm border border-black/5 shadow-lg p-8 text-center">
-          <p className="text-sm font-medium text-black/50">Leaderboard data is not available yet.</p>
-        </div>
-      </div>
-    );
-  }
+  const hasRealData = data && data.length >= 3;
+  const displayData = hasRealData ? data : fallbackLeaders;
 
   return (
     <div className="space-y-6 my-12 md:my-16">
@@ -278,6 +311,20 @@ export default function LeaderboardSection({
             </motion.div>
           ))}
         </div>
+        
+        {!hasRealData && (
+          <div className="p-6 bg-neutral-50/50 text-center border-t border-black/5">
+            <p className="text-sm text-neutral-500 font-medium mb-4">
+              This could be you. Start trading today to climb the ranks.
+            </p>
+            <Link
+              href="/dashboard/wallet/checkout"
+              className="inline-block px-6 py-2 bg-black text-white rounded-full text-xs font-semibold uppercase tracking-wider hover:bg-neutral-800 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Deposit to Start
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

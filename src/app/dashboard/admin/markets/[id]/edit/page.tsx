@@ -20,6 +20,8 @@ type MarketOutcome = {
   _id?: string;
   id?: string;
   optionText?: string;
+  mediaUrl?: string;
+  mediaType?: string;
 };
 
 type MarketPayload = {
@@ -28,7 +30,13 @@ type MarketPayload = {
   title?: string;
   description?: string;
   tags?: string[];
+  category?: string;
+  isFeatured?: boolean;
+  isTrending?: boolean;
+  mediaUrl?: string;
+  mediaType?: string;
   buyInAmount?: number;
+  buyInCurrency?: string;
   minParticipants?: number;
   maxParticipants?: number;
   closeTime?: string;
@@ -39,6 +47,8 @@ type MarketPayload = {
 type EditableOutcome = {
   id: string;
   name: string;
+  mediaUrl: string;
+  mediaType: string;
 };
 
 function toDateInputValue(value?: string) {
@@ -63,14 +73,20 @@ export default function EditMarketPage() {
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState("");
+  const [category, setCategory] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isTrending, setIsTrending] = useState(false);
+  const [mediaUrl, setMediaUrl] = useState("");
+  const [mediaType, setMediaType] = useState("none");
   const [buyInAmount, setBuyInAmount] = useState("1");
+  const [buyInCurrency, setBuyInCurrency] = useState("USD");
   const [minParticipants, setMinParticipants] = useState("2");
   const [maxParticipants, setMaxParticipants] = useState("1000");
   const [closeTime, setCloseTime] = useState("");
   const [settlementTime, setSettlementTime] = useState("");
   const [outcomes, setOutcomes] = useState<EditableOutcome[]>([
-    { id: "1", name: "" },
-    { id: "2", name: "" },
+    { id: "1", name: "", mediaUrl: "", mediaType: "none" },
+    { id: "2", name: "", mediaUrl: "", mediaType: "none" },
   ]);
 
   useEffect(() => {
@@ -92,7 +108,13 @@ export default function EditMarketPage() {
       setTitle(payload.title || "");
       setDescription(payload.description || "");
       setTags(Array.isArray(payload.tags) ? payload.tags : []);
+      setCategory(payload.category || "");
+      setIsFeatured(payload.isFeatured || false);
+      setIsTrending(payload.isTrending || false);
+      setMediaUrl(payload.mediaUrl || "");
+      setMediaType(payload.mediaType || "none");
       setBuyInAmount(String(payload.buyInAmount ?? 1));
+      setBuyInCurrency(payload.buyInCurrency || "USD");
       setMinParticipants(String(payload.minParticipants ?? 2));
       setMaxParticipants(String(payload.maxParticipants ?? 1000));
       setCloseTime(toDateInputValue(payload.closeTime));
@@ -101,8 +123,14 @@ export default function EditMarketPage() {
       const mappedOutcomes = (payload.outcomes || []).map((outcome, index) => ({
         id: outcome._id || outcome.id || `${index + 1}`,
         name: outcome.optionText || "",
+        mediaUrl: outcome.mediaUrl || "",
+        mediaType: outcome.mediaType || "none",
       }));
-      setOutcomes(mappedOutcomes.length >= 2 ? mappedOutcomes : [{ id: "1", name: "" }, { id: "2", name: "" }]);
+      setOutcomes(
+        mappedOutcomes.length >= 2 
+          ? mappedOutcomes 
+          : [{ id: "1", name: "", mediaUrl: "", mediaType: "none" }, { id: "2", name: "", mediaUrl: "", mediaType: "none" }]
+      );
 
       setIsLoading(false);
     };
@@ -131,7 +159,7 @@ export default function EditMarketPage() {
   };
 
   const handleAddOutcome = () => {
-    setOutcomes((prev) => [...prev, { id: `${Date.now()}-${prev.length}`, name: "" }]);
+    setOutcomes((prev) => [...prev, { id: `${Date.now()}-${prev.length}`, name: "", mediaUrl: "", mediaType: "none" }]);
   };
 
   const handleRemoveOutcome = (id: string) => {
@@ -153,7 +181,13 @@ export default function EditMarketPage() {
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim(),
+          category: category.trim(),
+          isFeatured,
+          isTrending,
+          mediaUrl: mediaUrl.trim(),
+          mediaType,
           buyInAmount: Number(buyInAmount),
+          buyInCurrency,
           minParticipants: Number(minParticipants),
           maxParticipants: Number(maxParticipants),
           closeTime: closeTime ? new Date(closeTime).toISOString() : undefined,
@@ -161,7 +195,12 @@ export default function EditMarketPage() {
           tags,
           outcomes: outcomes
             .filter((outcome) => outcome.name.trim().length > 0)
-            .map((outcome) => ({ optionText: outcome.name.trim() })),
+            .map((outcome) => ({ 
+              ...(outcome.id.length === 24 ? { id: outcome.id } : {}),
+              optionText: outcome.name.trim(),
+              mediaUrl: outcome.mediaUrl.trim(),
+              mediaType: outcome.mediaType,
+            })),
         }),
       });
 
@@ -205,29 +244,7 @@ export default function EditMarketPage() {
 
   return (
     <div className="min-h-screen pb-32">
-      <div className="max-w-full mx-auto px-6 pb-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
-        >
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="w-10 h-10 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 transition-colors flex items-center justify-center cursor-pointer"
-            >
-              <IconArrowLeft className="w-5 h-5 text-neutral-600" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-medium text-neutral-900">Edit Market</h1>
-              <p className="text-sm text-neutral-600 mt-0.5">Update market details and outcomes</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100">
-            <IconCircleCheckFilled className="w-4 h-4" />
-            <span className="font-medium">Connected to live backend</span>
-          </div>
-        </motion.div>
+      <div className="max-w-full mx-auto px-6 py-8">
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -306,15 +323,92 @@ export default function EditMarketPage() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-neutral-900 mb-2">
-                Buy-in Amount (MP) <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-sm font-medium text-neutral-900 mb-2">Category</label>
               <input
-                type="number"
-                value={buyInAmount}
-                onChange={(e) => setBuyInAmount(e.target.value)}
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                placeholder="e.g. Sports, Crypto, Politics"
               />
+            </div>
+            <div className="flex flex-col md:flex-row gap-6 md:items-center md:mt-8">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                  className="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+                />
+                <span className="text-sm font-medium text-neutral-900">Featured Market</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isTrending}
+                  onChange={(e) => setIsTrending(e.target.checked)}
+                  className="w-5 h-5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+                />
+                <span className="text-sm font-medium text-neutral-900">Trending Market</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-neutral-900 mb-2">Media URL</label>
+              <input
+                type="text"
+                value={mediaUrl}
+                onChange={(e) => setMediaUrl(e.target.value)}
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-900 mb-2">Media Type</label>
+              <select
+                value={mediaType}
+                onChange={(e) => setMediaType(e.target.value)}
+                className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+              >
+                <option value="none">None</option>
+                <option value="image">Image</option>
+                <option value="video">Video</option>
+                <option value="gif">GIF</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="border-t border-neutral-100 my-6"></div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-900 mb-2">
+                  Buy-in Amount <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={buyInAmount}
+                  onChange={(e) => setBuyInAmount(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-900 mb-2">
+                  Currency <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={buyInCurrency}
+                  onChange={(e) => setBuyInCurrency(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+                >
+                  <option value="USD">USD</option>
+                  <option value="KSH">KSH</option>
+                </select>
+              </div>
             </div>
 
             <div>
@@ -418,6 +512,44 @@ export default function EditMarketPage() {
                   placeholder="Option text..."
                   className="w-full px-3.5 py-2.5 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
                 />
+
+                <div className="grid md:grid-cols-3 gap-4 mt-4">
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-neutral-700 mb-1">Outcome Media URL</label>
+                    <input
+                      type="text"
+                      value={outcome.mediaUrl}
+                      onChange={(e) =>
+                        setOutcomes((prev) =>
+                          prev.map((item) =>
+                            item.id === outcome.id ? { ...item, mediaUrl: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      placeholder="https://..."
+                      className="w-full px-3 py-2 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-neutral-700 mb-1">Outcome Media Type</label>
+                    <select
+                      value={outcome.mediaType}
+                      onChange={(e) =>
+                        setOutcomes((prev) =>
+                          prev.map((item) =>
+                            item.id === outcome.id ? { ...item, mediaType: e.target.value } : item,
+                          ),
+                        )
+                      }
+                      className="w-full px-3 py-2 text-sm font-medium text-neutral-900 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-900 transition-all"
+                    >
+                      <option value="none">None</option>
+                      <option value="image">Image</option>
+                      <option value="video">Video</option>
+                      <option value="gif">GIF</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

@@ -105,6 +105,7 @@ export function MarketCreationForm({ initialData, onSubmit, isSubmitting = false
   const [description, setDescription] = useState(initialData?.description || "");
   const [category, setCategory] = useState(initialData?.category || "");
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured || false);
+  const [isTrending, setIsTrending] = useState(initialData?.isTrending || false);
   const [mediaUrl, setMediaUrl] = useState(initialData?.mediaUrl || "");
 
   // Step 3 – Outcomes
@@ -137,7 +138,7 @@ export function MarketCreationForm({ initialData, onSubmit, isSubmitting = false
   const handleBack = () => setStep((s) => Math.max(s - 1, 1));
 
   const handleSubmit = () => {
-    onSubmit({ type: selectedType, title, description, category, isFeatured, mediaUrl, buyIn, buyInCurrency, closeDate, options, ladderItems, scenario });
+    onSubmit({ type: selectedType, title, description, category, isFeatured, isTrending, mediaUrl, buyIn, buyInCurrency, closeDate, options, ladderItems, scenario });
   };
 
   const updateOption = (idx: number, field: keyof Option, value: string) => {
@@ -261,14 +262,24 @@ export function MarketCreationForm({ initialData, onSubmit, isSubmitting = false
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button type="button" onClick={() => setIsFeatured(!isFeatured)}
                     className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all cursor-pointer w-full text-left",
                       isFeatured ? "border-amber-400 bg-amber-50" : "border-neutral-200 bg-white/50 hover:border-neutral-300")}>
                     <IconStar className={cn("w-5 h-5 transition-colors", isFeatured ? "text-amber-500 fill-amber-500" : "text-neutral-400")} />
                     <div>
-                      <p className="text-sm font-semibold text-neutral-900">Feature on Dashboard</p>
-                      <p className="text-xs text-neutral-500">Pin this market to the main discover feed</p>
+                      <p className="text-sm font-semibold text-neutral-900">Featured</p>
+                      <p className="text-xs text-neutral-500">Pin to discover feed</p>
+                    </div>
+                  </button>
+
+                  <button type="button" onClick={() => setIsTrending(!isTrending)}
+                    className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all cursor-pointer w-full text-left",
+                      isTrending ? "border-orange-500 bg-orange-50" : "border-neutral-200 bg-white/50 hover:border-neutral-300")}>
+                    <IconTrendingUp className={cn("w-5 h-5 transition-colors", isTrending ? "text-orange-600" : "text-neutral-400")} />
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-900">Trending</p>
+                      <p className="text-xs text-neutral-500">Highlight high activity</p>
                     </div>
                   </button>
                 </div>

@@ -49,6 +49,7 @@ export interface Market {
   isFeatured?: boolean;
   buyInCurrency?: string;
   isRecurring?: boolean;
+  isTrending?: boolean;
   outcomes?: Array<{
     _id?: string;
     optionText: string;

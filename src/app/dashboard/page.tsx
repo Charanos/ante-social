@@ -15,6 +15,9 @@ import {
   IconX,
   Icon,
   IconEyeDollar,
+  IconGhost,
+  IconGhost2,
+  IconGhost3,
 } from "@tabler/icons-react";
 
 import Image from "next/image";
@@ -150,14 +153,25 @@ export default function DashboardPage() {
 
   const ITEMS_PER_PAGE = 9;
 
+  const now = new Date().getTime();
+  
   // Filter markets based on active tab
-  const activeMarkets = activeTab === "Recurring"
-    ? markets.filter((m) => m.isRecurring)
-    : activeTab === "One-Time"
-    ? markets.filter((m) => !m.isRecurring)
-    : activeTab === "Featured"
-    ? markets.filter((m) => m.isFeatured)
-    : markets;
+  const activeMarkets = markets.filter((m) => {
+    const isExpired =
+      now > new Date(m.endsAt || Date.now()).getTime() ||
+      m.status === "resolved";
+
+    if (activeTab === "Past") return isExpired;
+
+    if (isExpired) return false;
+
+    if (activeTab === "Recurring") return m.isRecurring;
+    if (activeTab === "One-Time") return !m.isRecurring;
+    if (activeTab === "Featured") return m.isFeatured;
+    if (activeTab === "Trending") return m.isTrending;
+
+    return true; // Default fallback if tab is somehow unset
+  });
 
   const totalPages = Math.max(1, Math.ceil(activeMarkets.length / ITEMS_PER_PAGE));
   const currentMarkets = activeMarkets.slice(
@@ -286,7 +300,7 @@ export default function DashboardPage() {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row items-center justify-between px-2 gap-4">
           <div className="flex w-full md:w-auto gap-4 md:gap-6 border-b border-black/5 overflow-x-auto no-scrollbar">
-            {["Featured", "Recurring", "One-Time"].map((tab) => (
+            {["Featured", "Trending", "Recurring", "One-Time", "Past"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => {
@@ -323,6 +337,16 @@ export default function DashboardPage() {
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
             <IconLoader3 className="w-8 h-8 animate-spin text-black/40" />
+          </div>
+        ) : currentMarkets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 px-6 bg-white/30 backdrop-blur-sm border border-black/5 rounded-3xl text-center">
+            <div className="w-20 h-20 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 rotate-3">
+              <IconGhost3 className="w-10 h-10 text-orange-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-black/90 mb-2">No Markets Available</h3>
+            <p className="text-sm text-black/60 max-w-sm mx-auto">
+              There are currently no active markets in this category. Check out other tabs or check back later!
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

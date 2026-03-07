@@ -145,6 +145,7 @@ export default function DivergenceMarketPage() {
                 src={market.image}
                 alt={market.title}
                 fill
+                unoptimized
                 className="object-cover opacity-50 mix-blend-luminosity"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent" />
@@ -352,6 +353,7 @@ export default function DivergenceMarketPage() {
                           src={option.image}
                           alt={option.option_text}
                           fill
+                          unoptimized
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />

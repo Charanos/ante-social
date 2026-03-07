@@ -343,6 +343,10 @@ export function normalizeMarket(raw: any): Market {
     total_pool: totalPool,
     participant_count: participantCount,
     close_date: raw?.closeTime || raw?.endsAt || new Date().toISOString(),
+    isFeatured: Boolean(raw?.isFeatured),
+    isRecurring: Boolean(raw?.isRecurring),
+    isTrending: Boolean(raw?.isTrending),
+    buyInCurrency: toString(raw?.buyInCurrency || "USD"),
   };
 }
 

@@ -50,6 +50,7 @@ export default function CreateMarketPage() {
           description: data.description,
           category: data.category || undefined,
           isFeatured: data.isFeatured || false,
+          isTrending: data.isTrending || false,
           buyInAmount: Number(data.buyIn),
           buyInCurrency: data.buyInCurrency || "KSH",
           closeTime,
