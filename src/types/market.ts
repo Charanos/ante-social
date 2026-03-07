@@ -13,6 +13,7 @@ export type OracleType = 'manual' | 'automated' | 'community_consensus';
 
 export interface Market {
   id: string;
+  groupId?: string;
   title: string;
   description: string;
   image: string;

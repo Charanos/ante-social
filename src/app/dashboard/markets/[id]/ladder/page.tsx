@@ -51,6 +51,7 @@ interface RankItem {
   id: string;
   text: string;
   icon: any;
+  image?: string;
 }
 
 const LADDER_ICONS = [
@@ -103,9 +104,15 @@ function SortableItem({ item, index }: { item: RankItem; index: number }) {
       </div>
 
       <div className="flex-1 flex items-center gap-3">
-        <div className="shrink-0 w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center">
-          <item.icon className="w-4 h-4 text-slate-600" />
-        </div>
+        {item.image && item.image !== "" ? (
+          <div className="relative shrink-0 w-8 h-8 rounded-[8px] overflow-hidden">
+            <Image src={item.image} alt={item.text} fill unoptimized className="object-cover" />
+          </div>
+        ) : (
+          <div className="shrink-0 w-8 h-8 rounded-[8px] bg-slate-100 flex items-center justify-center">
+            <item.icon className="w-4 h-4 text-slate-600" />
+          </div>
+        )}
         <span className="font-medium text-slate-900 text-sm">{item.text}</span>
       </div>
     </div>
@@ -157,6 +164,7 @@ export default function LadderMarketPage() {
         id: option.id,
         text: option.option_text,
         icon: LADDER_ICONS[index % LADDER_ICONS.length],
+        image: option.image,
       }));
 
       setMarket({ ...detail, items });

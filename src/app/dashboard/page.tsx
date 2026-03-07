@@ -151,7 +151,7 @@ export default function DashboardPage() {
   const goalAmount = nextTier.goal;
   const progress = Math.min(100, Math.max(5, (totalWinnings / goalAmount) * 100));
 
-  const ITEMS_PER_PAGE = 9;
+  const ITEMS_PER_PAGE = 12;
 
   const now = new Date().getTime();
   
@@ -357,31 +357,67 @@ export default function DashboardPage() {
         )}
 
         {/* Pagination */}
-        <div className="flex items-center justify-center gap-4 pt-8">
-          <motion.button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="w-10 h-10 flex cursor-pointer items-center justify-center rounded-full bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            whileHover={{ scale: currentPage === 1 ? 1 : 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <IconChevronLeft className="w-4 h-4" />
-          </motion.button>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 pt-10 pb-4">
+            <motion.button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-10 h-10 flex cursor-pointer flex-shrink-0 items-center justify-center rounded-full bg-white border border-black/5 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] text-black/60 hover:text-black hover:bg-black/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <IconChevronLeft className="w-5 h-5" />
+            </motion.button>
 
-          <span className="text-sm font-semibold font-mono text-black/70">
-            {currentPage} / {totalPages}
-          </span>
+            <div className="flex items-center gap-1 bg-white/50 backdrop-blur-md border border-neutral-200/60 p-1.5 rounded-full shadow-inner">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                const isSelected = page === currentPage;
+                // Only show a limited number of pages to avoid overflow if there are many pages
+                if (
+                  totalPages > 7 &&
+                  page !== 1 &&
+                  page !== totalPages &&
+                  Math.abs(page - currentPage) > 1
+                ) {
+                  if (page === currentPage - 2 || page === currentPage + 2) {
+                    return (
+                      <span key={page} className="w-8 flex justify-center text-neutral-400 font-bold tracking-widest text-xs">
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                }
 
-          <motion.button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="w-10 h-10 flex cursor-pointer items-center justify-center rounded-full bg-white/40 backdrop-blur-sm border border-black/5 hover:bg-white/60 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            whileHover={{ scale: currentPage === totalPages ? 1 : 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <IconChevronRight className="w-4 h-4" />
-          </motion.button>
-        </div>
+                return (
+                  <motion.button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`min-w-[36px] h-9 px-2 flex items-center justify-center rounded-full text-sm font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-black text-white shadow-md ring-1 ring-black/5"
+                        : "text-neutral-500 hover:bg-black/5 hover:text-black"
+                    }`}
+                    whileHover={!isSelected ? { scale: 1.05 } : {}}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {page}
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            <motion.button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-10 h-10 flex cursor-pointer flex-shrink-0 items-center justify-center rounded-full bg-white border border-black/5 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] text-black/60 hover:text-black hover:bg-black/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <IconChevronRight className="w-5 h-5" />
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* Guide Modal */}

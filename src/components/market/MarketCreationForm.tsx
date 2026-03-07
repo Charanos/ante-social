@@ -19,6 +19,9 @@ import {
   IconStar,
   IconUsers,
   IconX,
+  IconTrendingUp,
+  IconRefresh,
+  IconHistory,
 } from "@tabler/icons-react";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
 import { cn } from "@/lib/utils";

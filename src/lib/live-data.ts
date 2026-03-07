@@ -306,6 +306,7 @@ export function normalizeMarket(raw: any): Market {
 
   return {
     id: toString(raw?._id || raw?.id),
+    groupId: toString(raw?.groupId || raw?.group_id),
     title: toString(raw?.title || "Untitled Market"),
     description: toString(raw?.description || ""),
     image: toString(raw?.mediaUrl || DEFAULT_MARKET_IMAGE),

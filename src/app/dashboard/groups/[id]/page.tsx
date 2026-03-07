@@ -1488,12 +1488,14 @@ export default function GroupPage() {
               className="my-10 md:my-16"
               icon={<IconTrendingUp className="w-4 h-4 text-green-500" />}
             />
-            <Link
-              href={`/dashboard/markets`}
-              className="text-sm font-medium text-black/40 hover:text-black/80 transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              Browse All <IconArrowRight className="w-4 h-4" />
-            </Link>
+            {group.activePositions && group.activePositions.length > 1 && (
+              <Link
+                href={`/dashboard/groups/${group.id}/markets`}
+                className="text-sm font-medium text-black/40 hover:text-black/80 transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                Browse All <IconArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
 
           {group.activePositions && group.activePositions.length > 0 ? (

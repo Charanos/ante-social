@@ -254,10 +254,14 @@ export default function BetrayalMarketPage() {
               `}
             >
               <div className="text-center space-y-4">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${
-                  selectedChoice === "cooperate" ? "bg-emerald-100" : "bg-slate-100"
+                <div className={`relative overflow-hidden inline-flex items-center justify-center w-16 h-16 rounded-2xl transition-all ${
+                  selectedChoice === "cooperate" ? "bg-emerald-100 ring-2 ring-emerald-500 ring-offset-2 scale-105" : "bg-slate-100"
                 }`}>
-                  <IconHandClick className={`w-8 h-8 ${selectedChoice === "cooperate" ? "text-emerald-600" : "text-slate-500"}`} />
+                  {market.options?.[0]?.image ? (
+                    <Image src={market.options[0].image} alt="Cooperate" fill unoptimized className="object-cover" />
+                  ) : (
+                    <IconHandClick className={`w-8 h-8 ${selectedChoice === "cooperate" ? "text-emerald-600" : "text-slate-500"}`} />
+                  )}
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-slate-900 tracking-tight">COOPERATE</h3>
@@ -304,10 +308,14 @@ export default function BetrayalMarketPage() {
               `}
             >
               <div className="text-center space-y-4">
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${
-                  selectedChoice === "betray" ? "bg-red-100" : "bg-slate-100"
+                <div className={`relative overflow-hidden inline-flex items-center justify-center w-16 h-16 rounded-2xl transition-all ${
+                  selectedChoice === "betray" ? "bg-red-100 ring-2 ring-red-500 ring-offset-2 scale-105" : "bg-slate-100"
                 }`}>
-                  <IconBolt className={`w-8 h-8 ${selectedChoice === "betray" ? "text-red-600" : "text-slate-500"}`} />
+                  {market.options?.[1]?.image ? (
+                    <Image src={market.options[1].image} alt="Betray" fill unoptimized className="object-cover" />
+                  ) : (
+                    <IconBolt className={`w-8 h-8 ${selectedChoice === "betray" ? "text-red-600" : "text-slate-500"}`} />
+                  )}
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-slate-900 tracking-tight">BETRAY</h3>

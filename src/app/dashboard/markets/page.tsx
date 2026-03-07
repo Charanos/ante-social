@@ -47,6 +47,8 @@ export default function MarketsPage() {
   const [sortBy, setSortBy] = useState("ending_soon");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
 
   useEffect(() => {
     setIsFiltering(true);
@@ -113,6 +115,11 @@ export default function MarketsPage() {
 
   const recurringMarkets = filteredMarkets.filter((m) => m.isRecurring);
   const oneTimeMarkets = filteredMarkets.filter((m) => !m.isRecurring);
+
+  const totalPages = Math.ceil(filteredMarkets.length / ITEMS_PER_PAGE);
+  const paginatedAll = filteredMarkets.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginatedRecurring = recurringMarkets.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginatedOneTime = oneTimeMarkets.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   if (isLoading) return <LoadingLogo fullScreen size="lg" />;
 
@@ -303,7 +310,7 @@ export default function MarketsPage() {
                     <span className="text-xs text-neutral-400 font-medium">{filteredMarkets.length} markets</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {filteredMarkets.map((market, index) => (
+                    {paginatedAll.map((market, index) => (
                       <MarketCard key={market.id} market={market} index={index} />
                     ))}
                   </div>
@@ -322,7 +329,7 @@ export default function MarketsPage() {
                     <span className="text-xs text-neutral-400 font-medium">{recurringMarkets.length} markets</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {recurringMarkets.map((market, index) => (
+                    {paginatedRecurring.map((market, index) => (
                       <MarketCard key={market.id} market={market} index={index} />
                     ))}
                   </div>
@@ -343,7 +350,7 @@ export default function MarketsPage() {
                     </div>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {oneTimeMarkets.map((market, index) => (
+                    {paginatedOneTime.map((market, index) => (
                       <MarketCard key={market.id} market={market} index={index} />
                     ))}
                   </div>
@@ -354,6 +361,70 @@ export default function MarketsPage() {
                 <div className="flex flex-col items-center justify-center py-16">
                   <p className="text-lg font-semibold text-black/40 mb-2">No markets found</p>
                   <p className="text-sm text-black/30 font-medium">Try adjusting your search or filters</p>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-3 pt-10 pb-4">
+                  <motion.button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="w-10 h-10 flex cursor-pointer flex-shrink-0 items-center justify-center rounded-full bg-white border border-black/5 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] text-black/60 hover:text-black hover:bg-black/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <IconLayoutGrid className="w-5 h-5 hidden" />
+                    {"<"}
+                  </motion.button>
+
+                  <div className="flex items-center gap-1 bg-white/50 backdrop-blur-md border border-neutral-200/60 p-1.5 rounded-full shadow-inner">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      const isSelected = page === currentPage;
+                      if (
+                        totalPages > 7 &&
+                        page !== 1 &&
+                        page !== totalPages &&
+                        Math.abs(page - currentPage) > 1
+                      ) {
+                        if (page === currentPage - 2 || page === currentPage + 2) {
+                          return (
+                            <span key={page} className="w-8 flex justify-center text-neutral-400 font-bold tracking-widest text-xs">
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
+                      }
+
+                      return (
+                        <motion.button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`min-w-[36px] h-9 px-2 flex items-center justify-center rounded-full text-sm font-semibold transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-black text-white shadow-md ring-1 ring-black/5"
+                              : "text-neutral-500 hover:bg-black/5 hover:text-black"
+                          }`}
+                          whileHover={!isSelected ? { scale: 1.05 } : {}}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {page}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  <motion.button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="w-10 h-10 flex cursor-pointer flex-shrink-0 items-center justify-center rounded-full bg-white border border-black/5 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] text-black/60 hover:text-black hover:bg-black/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <IconLayoutGrid className="w-5 h-5 hidden" />
+                    {">"}
+                  </motion.button>
                 </div>
               )}
             </motion.div>

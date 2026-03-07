@@ -405,11 +405,15 @@ export default function ReflexMarketPage() {
                     }`}
                   >
                     <div className="flex items-center gap-4 p-5">
-                      {/* Icon */}
-                      <div className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
-                        isSelected ? "bg-slate-900" : "bg-slate-100 group-hover:bg-slate-200"
+                      {/* Image / Icon */}
+                      <div className={`relative shrink-0 w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center transition-all ${
+                        isSelected ? "bg-slate-900 ring-2 ring-slate-900 ring-offset-2 scale-105" : "bg-slate-100 group-hover:bg-slate-200"
                       }`}>
-                        <option.icon className={`w-5 h-5 ${isSelected ? "text-white" : "text-slate-500"}`} />
+                        {option.image && option.image !== "" ? (
+                          <Image src={option.image} alt={option.option_text} fill unoptimized className="object-cover" />
+                        ) : (
+                          <IconBolt className={`w-6 h-6 ${isSelected ? "text-white" : "text-slate-500"}`} />
+                        )}
                       </div>
 
                       {/* Text + Bar */}
